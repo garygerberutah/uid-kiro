@@ -11,3 +11,22 @@ build/
 .env
 .claude/settings.local.json
 __pycache__/
+
+# Terraform source is namespaced by its source repository. Track root provider
+# locks, but never local caches, state, saved plans, private overrides, or
+# guarded plan bundles.
+terraform/repos/**/.terraform/
+terraform/repos/**/.terraform.lock.hcl
+!terraform/repos/**/envs/*/.terraform.lock.hcl
+!terraform/repos/**/stacks/*/*/.terraform.lock.hcl
+terraform/repos/**/*.tfstate
+terraform/repos/**/*.tfstate.*
+terraform/repos/**/*.tfplan
+terraform/repos/**/tfplan
+terraform/repos/**/tfplan.txt
+terraform/repos/**/planA
+terraform/repos/**/rollback-versions.tsv
+terraform/repos/**/*.tf.plan
+terraform/repos/**/*.local.auto.tfvars
+terraform/repos/**/scripts/uid-full-build-*/
+terraform/repos/**/.terraform-validation/

@@ -1,0 +1,88 @@
+name: UID Portal Terraform validation
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate namespaced Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      # A reusable workflow checks out the caller repository. Recursive
+      # submodules make this central repository's pinned Terraform available
+      # at aws/ without copying validation automation back into the app repo.
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: services/api/requirements.txt
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          # S3 native locking (use_lockfile) requires Terraform 1.10+.
+          terraform_version: "1.15.8"
+          terraform_wrapper: false
+
+      - name: Check Terraform formatting
+        run: terraform fmt -recursive -check -diff aws/terraform/repos/utahdts/uid-portal
+
+      # Audit source before terraform init: external data programs can execute
+      # during plan, and downloaded modules obscure ownership review. The
+      # State-owned inventory tree is frozen historical inventory and is never
+      # a plan/apply root.
+      - name: Enforce read-only use of State-owned resources
+        run: |
+          python3 aws/terraform/repos/utahdts/uid-portal/scripts/check-state-owned-boundary.py \
+            --terraform-root aws/terraform/repos/utahdts/uid-portal/envs/dev \
+            --terraform-root aws/terraform/repos/utahdts/uid-portal/envs/at \
+            --terraform-root aws/terraform/repos/utahdts/uid-portal/envs/prod \
+            --terraform-root aws/terraform/repos/utahdts/uid-portal/stacks/db-proxy/dev \
+            --terraform-root aws/terraform/repos/utahdts/uid-portal/stacks/cdn-headers/unassigned
+
+      # -backend=false: no remote state, no credentials, nothing touched in AWS.
+      # validate still type-checks every module and evaluates the yamldecode
+      # that turns routes.yaml into functions and routes.
+      - name: Validate every Terraform root
+        env:
+          # This is intentionally scoped to init/validate. Plans and applies
+          # retain normal credential validation and allowed-account checks.
+          TF_VAR_offline_provider_validation: "true"
+        run: |
+          set -euo pipefail
+          for env in dev at prod; do
+            echo "::group::$env"
+            # A dedicated data directory prevents an earlier S3-backed init
+            # from being reused despite -backend=false on a persistent runner.
+            export TF_DATA_DIR="${RUNNER_TEMP}/uid-portal-terraform-env-${env}"
+            terraform -chdir="aws/terraform/repos/utahdts/uid-portal/envs/$env" init -backend=false -input=false -lockfile=readonly
+            terraform -chdir="aws/terraform/repos/utahdts/uid-portal/envs/$env" validate
+            echo "::endgroup::"
+          done
+          for root in \
+            aws/terraform/repos/utahdts/uid-portal/stacks/db-proxy/dev \
+            aws/terraform/repos/utahdts/uid-portal/stacks/cdn-headers/unassigned; do
+            echo "::group::$root"
+            root_key="${root//\//-}"
+            export TF_DATA_DIR="${RUNNER_TEMP}/uid-portal-${root_key}"
+            terraform -chdir="$root" init -backend=false -input=false -lockfile=readonly
+            terraform -chdir="$root" validate
+            echo "::endgroup::"
+          done
+
+      # A placeholder reaching a deployable branch would apply into the wrong
+      # VPC, and the plan would look entirely healthy while doing it.
+      - name: Refuse unfilled placeholders on deployable branches
+        if: github.ref == 'refs/heads/prod' || github.ref == 'refs/heads/main'
+        run: |
+          if grep -rn "REPLACE_ME" aws/terraform/repos/utahdts/uid-portal/envs/*/terraform.tfvars; then
+            echo "::error::terraform.tfvars still contains REPLACE_ME placeholders."
+            exit 1
+          fi

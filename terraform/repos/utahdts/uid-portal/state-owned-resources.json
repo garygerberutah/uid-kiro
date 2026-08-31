@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "policy": "Application Terraform may reference these resources but must never own, import, create, update, replace, delete, retag, or repair them. Only a reviewed Terraform forget transition is permitted.",
+  "inventory_scope": "Known identifiers are evidence, not an allowlist. This inventory is non-exhaustive; protected resource-type families and live adopted-bucket data remain authoritative.",
+  "protected_resource_types": [
+    "aws_cloudfront_distribution",
+    "aws_cloudfront_monitoring_subscription",
+    "aws_db_instance",
+    "aws_db_instance_role_association",
+    "aws_db_option_group",
+    "aws_db_parameter_group",
+    "aws_db_subnet_group",
+    "aws_rds_cluster",
+    "aws_rds_cluster_endpoint",
+    "aws_rds_cluster_instance",
+    "aws_rds_global_cluster",
+    "aws_rds_shard_group",
+    "aws_s3_account_public_access_block",
+    "awscc_cloudfront_distribution",
+    "awscc_rds_db_cluster",
+    "awscc_rds_db_cluster_parameter_group",
+    "awscc_rds_db_instance",
+    "awscc_rds_db_parameter_group",
+    "awscc_rds_db_subnet_group",
+    "awscc_rds_global_cluster"
+  ],
+  "protected_resource_prefixes": [
+    "aws_acm_",
+    "aws_acmpca_",
+    "aws_db_instance_",
+    "aws_db_snapshot",
+    "aws_kms_",
+    "aws_rds_",
+    "aws_route53_",
+    "aws_route53domains_",
+    "aws_secretsmanager_",
+    "awscc_acmpca_",
+    "awscc_certificatemanager_",
+    "awscc_kms_",
+    "awscc_route53_",
+    "awscc_secretsmanager_"
+  ],
+  "resources": [
+    {
+      "class": "network",
+      "resource_types": [
+        "aws_ec2_transit_gateway",
+        "aws_route_table",
+        "aws_security_group",
+        "aws_subnet",
+        "aws_vpc",
+        "aws_vpc_endpoint"
+      ],
+      "resource_type_prefixes": [
+        "aws_ec2_transit_gateway_",
+        "aws_vpc_security_group_"
+      ],
+      "identity_attributes": [
+        "cidr_block",
+        "destination_cidr_block",
+        "id",
+        "route_table_id",
+        "security_group_id",
+        "subnet_id",
+        "transit_gateway_id",
+        "vpc_endpoint_id",
+        "vpc_id"
+      ],
+      "identifiers": [
+        "10.192.6.0/23",
+        "vpc-05d3e6ccb65d2d11c",
+        "subnet-0c6272b1eea00003c",
+        "subnet-0a1e2c8e6751b6833",
+        "subnet-0ab8d2f30f6d4934d",
+        "subnet-0ce32321a0899ce69",
+        "subnet-0b211dae8ecd2e774",
+        "rtb-00f83bc1b800e256e",
+        "rtb-05baf67fbb981e644",
+        "tgw-0bd4c03dfbcf1e171",
+        "vgw-0c016f35caa06e899",
+        "vpce-0d706ed8c9cfa91a3",
+        "vpce-0e84666df3e55536d",
+        "vpce-0186f6e62e8836f07",
+        "vpce-0c2e98c201e1e963c",
+        "vpce-svc-08cd73bd7085233a2",
+        "sg-01e9d097e3d7585ea",
+        "sg-0ab06d83d516f0163",
+        "sg-0637efea445216701",
+        "sg-0659ff58d34c4f4b0",
+        "sg-0718ab0aa616b909e",
+        "sg-078a51c949097f1a0",
+        "sg-088e3b3e7215f4bb9",
+        "sg-0f8629e93d313e6d5"
+      ]
+    },
+    {
+      "class": "adopted_sife_bucket_and_objects",
+      "resource_type_prefixes": ["aws_s3_"],
+      "identity_attributes": ["bucket"],
+      "identifiers": [
+        "uid-file-upload",
+        "uid-dev-sife-files",
+        "uid-dev-sife-download-files"
+      ]
+    },
+    {
+      "class": "state_owned_terraform_backend",
+      "resource_type_prefixes": ["aws_s3_"],
+      "identity_attributes": ["bucket"],
+      "identifiers": [
+        "uid-portal-tfstate",
+        "uid-portal-tfstate-281669077180"
+      ]
+    },
+    {
+      "class": "existing_database",
+      "resource_types": [
+        "aws_appautoscaling_policy",
+        "aws_appautoscaling_target",
+        "aws_db_instance",
+        "aws_db_instance_role_association",
+        "aws_rds_cluster",
+        "aws_rds_cluster_activity_stream",
+        "aws_rds_cluster_endpoint",
+        "aws_rds_cluster_instance",
+        "aws_rds_cluster_role_association",
+        "aws_rds_global_cluster",
+        "aws_rds_shard_group"
+      ],
+      "identity_attributes": [
+        "cluster_identifier",
+        "db_cluster_identifier",
+        "db_instance_identifier",
+        "id",
+        "identifier",
+        "resource_id"
+      ],
+      "identifiers": [
+        "uid-dev-postgresqlv2",
+        "uid-dev-postgresqlv2.cluster-cxk41gv3busd.us-west-2.rds.amazonaws.com"
+      ]
+    },
+    {
+      "class": "existing_secret",
+      "resource_type_prefixes": ["aws_secretsmanager_"],
+      "identity_attributes": ["arn", "id", "name", "secret_id"],
+      "identifiers": [
+        "dev/postgres/portal/rotate",
+        "arn:aws:secretsmanager:us-west-2:705157108110:secret:dev/postgres/portal/rotate-w0w68d",
+        "dev/postgres/snapproxy/rotate",
+        "dev/oracle/admin",
+        "prod/sendgrid/new",
+        "arn:aws:secretsmanager:us-west-2:705157108110:secret:prod/sendgrid/new-ri9tTm"
+      ]
+    },
+    {
+      "class": "external_cloudfront_distribution",
+      "resource_types": [
+        "aws_cloudfront_distribution",
+        "aws_cloudfront_monitoring_subscription"
+      ],
+      "identity_attributes": ["distribution_id", "id"],
+      "identifiers": [
+        "E2FZZADHPAMGOH"
+      ],
+      "historical_identifiers": [
+        {
+          "identifier": "E2L8GSFVL165TN",
+          "status": "returned NoSuchDistribution in the expected account on 2026-08-24; replacement id remains UID-operations-supplied and unknown"
+        }
+      ]
+    },
+    {
+      "class": "existing_certificate",
+      "resource_type_prefixes": ["aws_acm_", "aws_acmpca_"],
+      "identity_attributes": [
+        "arn",
+        "certificate_arn",
+        "certificate_authority_arn",
+        "id"
+      ],
+      "identifiers": [
+        "arn:aws:acm:us-east-1:705157108110:certificate/32f16885-fcda-4c02-8264-ed136d6de499",
+        "arn:aws:acm:us-west-2:705157108110:certificate/5b17baae-453a-4418-81e8-788e8336c3de"
+      ]
+    },
+    {
+      "class": "external_api_gateway_custom_domain",
+      "resource_types": [
+        "aws_api_gateway_domain_name",
+        "aws_apigatewayv2_domain_name"
+      ],
+      "identity_attributes": ["domain_name", "id"],
+      "identifiers": ["api.uid-dev.utah.gov"]
+    },
+    {
+      "class": "external_dns",
+      "resource_type_prefixes": ["aws_route53_"],
+      "identity_attributes": ["id", "name", "zone_id"],
+      "identifiers": [
+        "api.uid-dev.utah.gov",
+        "insureu.uid-dev.utah.gov",
+        "portal-api.uid-dev.utah.gov",
+        "insureu.uid.utah.gov",
+        "portal-api.uid.utah.gov"
+      ]
+    }
+  ]
+}

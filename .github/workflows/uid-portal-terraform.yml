@@ -1,0 +1,365 @@
+name: UID Portal Terraform plan and apply
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: Terraform environment root and protected GitHub environment.
+        required: true
+        type: string
+      aws-role-arn:
+        description: OIDC deployment role for the target AWS account.
+        required: true
+        type: string
+      aws-region:
+        description: AWS region for the deployment.
+        required: false
+        default: us-west-2
+        type: string
+      allowed-host:
+        description: Independently reviewed exact hostname expected in every API Lambda.
+        required: true
+        type: string
+      deploy:
+        description: Apply the saved plan after the protected-environment gate.
+        required: false
+        default: false
+        type: boolean
+      schema-migrations-applied-through:
+        description: Exact latest V### migration independently applied and verified against the target database; required when deploy is true.
+        required: false
+        default: ""
+        type: string
+    secrets:
+      alert_emails_json:
+        description: Approved alert recipients as a nonempty JSON string array; required for AT plans.
+        required: false
+    outputs:
+      api_url:
+        description: Terraform-managed custom-domain URL, available after an apply.
+        value: ${{ jobs.apply.outputs.api_url }}
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: api-gateway-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: Validate and plan ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    env:
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "false"
+      AWS_REGION: ${{ inputs['aws-region'] }}
+      DEPLOY_ENV: ${{ inputs.environment }}
+      TF_ROOT: aws/terraform/repos/utahdts/uid-portal/envs/${{ inputs.environment }}
+      # AT and historical dev use separate state keys in the same AWS account.
+      # The ownership preflight binds this exact repository root before reading
+      # it, so an arbitrary empty directory cannot stand in for the dev state.
+      AT_SIBLING_TF_ROOT: aws/terraform/repos/utahdts/uid-portal/envs/dev
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: services/api/requirements-dev.txt
+
+      - name: Install API dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r services/api/requirements-dev.txt
+
+      - name: Test route, handler, and infrastructure contracts
+        run: |
+          make -C services/api lint
+          make -C services/api coverage
+          python3 scripts/check-docs-integrity.py
+          python3 scripts/check-runbook.py
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.8"
+          terraform_wrapper: false
+
+      - name: Check Terraform formatting
+        run: terraform fmt -recursive -check -diff aws/terraform/repos/utahdts/uid-portal
+
+      # Reject placeholders before assuming an AWS role. Terraform validates
+      # several ID shapes too, but not every account-owned name can have a
+      # useful syntactic validator (for example an adopted bucket name).
+      - name: Refuse unresolved environment facts
+        run: |
+          if grep -n "REPLACE_ME" "$TF_ROOT/terraform.tfvars"; then
+            echo "::error::$TF_ROOT/terraform.tfvars contains unresolved environment facts."
+            exit 1
+          fi
+
+      # Run before credentials, init, or plan. In particular, data.external can
+      # execute during planning, so a source audit performed after plan would
+      # not be a security boundary.
+      - name: Refuse State-owned resources and indirect Terraform provisioning
+        run: python3 aws/terraform/repos/utahdts/uid-portal/scripts/check-state-owned-boundary.py --terraform-root "$TF_ROOT"
+
+      # The tracked AT value is deliberately empty because the current approved
+      # recipient is an operator address. A clean runner must receive that
+      # ignored override without printing or committing it; otherwise Terraform
+      # would propose deleting the confirmed live SNS subscription.
+      - name: Load approved AT alert recipients
+        if: inputs.environment == 'at'
+        env:
+          ALERT_EMAILS_JSON: ${{ secrets.alert_emails_json }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import sys
+
+          raw = os.environ.get("ALERT_EMAILS_JSON", "")
+          try:
+              recipients = json.loads(raw)
+          except json.JSONDecodeError:
+              recipients = None
+
+          email = re.compile(
+              r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+          )
+          if (
+              not isinstance(recipients, list)
+              or not recipients
+              or any(
+                  not isinstance(recipient, str)
+                  or recipient != recipient.strip()
+                  or email.fullmatch(recipient) is None
+                  for recipient in recipients
+              )
+          ):
+              print(
+                  "::error::AT_ALERT_EMAILS_JSON must be a nonempty JSON array of valid email addresses.",
+                  file=sys.stderr,
+              )
+              raise SystemExit(1)
+
+          # GitHub masks the complete JSON secret, not necessarily an address
+          # rendered by Terraform as a for_each key. Register each derived
+          # value before Terraform can render the plan.
+          for recipient in recipients:
+              escaped = recipient.replace("%", "%25")
+              print(f"::add-mask::{escaped}")
+
+          # Environment variables have lower precedence than terraform.tfvars,
+          # whose tracked AT value is intentionally empty. Match the attended
+          # deployment mechanism with a later-loading ignored auto.tfvars file.
+          override_path = os.path.join(
+              os.environ["TF_ROOT"], "ci-alerts.local.auto.tfvars"
+          )
+          flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+          descriptor = os.open(override_path, flags, 0o600)
+          with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+              compact = json.dumps(recipients, separators=(",", ":"))
+              handle.write(f"alert_emails = {compact}\n")
+          PY
+
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ inputs['aws-role-arn'] }}
+          aws-region: ${{ inputs['aws-region'] }}
+          role-session-name: uid-portal-${{ inputs.environment }}-${{ github.run_id }}
+
+      - name: Initialize and validate
+        run: |
+          set -euo pipefail
+          terraform -chdir="$TF_ROOT" init -input=false
+          terraform -chdir="$TF_ROOT" validate
+          if [ "$DEPLOY_ENV" = "at" ]; then
+            terraform -chdir="$AT_SIBLING_TF_ROOT" init \
+              -input=false \
+              -lockfile=readonly
+          fi
+
+      - name: Refuse multiple APIs, custom domains, or state owners before planning
+        run: |
+          set -euo pipefail
+          sibling_args=()
+          if [ "$DEPLOY_ENV" = "at" ]; then
+            sibling_args+=(--sibling-tf-root "$AT_SIBLING_TF_ROOT")
+          fi
+          python3 aws/terraform/repos/utahdts/uid-portal/scripts/check-api-gateway-ownership.py \
+            --tf-root "$TF_ROOT" \
+            --env "$DEPLOY_ENV" \
+            --region "${{ inputs['aws-region'] }}" \
+            "${sibling_args[@]}"
+
+      - name: Create the saved plan
+        run: |
+          set -euo pipefail
+          BUILD_TIME=$(git show -s --format=%cI "$GITHUB_SHA")
+          terraform -chdir="$TF_ROOT" plan \
+            -input=false \
+            -lock-timeout=5m \
+            -out=tfplan \
+            -var="release_version=${GITHUB_SHA}" \
+            -var="build_time=${BUILD_TIME}" \
+            2>&1 | python3 -u aws/terraform/repos/utahdts/uid-portal/scripts/redact-plan-emails.py
+          terraform -chdir="$TF_ROOT" show -no-color tfplan \
+            2>&1 | python3 -u aws/terraform/repos/utahdts/uid-portal/scripts/redact-plan-emails.py > "$TF_ROOT/tfplan.txt"
+
+      - name: Refuse State-owned resource changes
+        run: |
+          set -euo pipefail
+          terraform -chdir="$TF_ROOT" show -json tfplan |
+            python3 aws/terraform/repos/utahdts/uid-portal/scripts/check-state-owned-boundary.py --terraform-root "$TF_ROOT" --plan-json -
+
+      - name: Preserve the exact plan and upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          # The binary saved plan necessarily contains effective input values;
+          # keep access repository-scoped and retention short. The rendered
+          # review above redacts alert recipients before upload.
+          name: api-gateway-${{ inputs.environment }}-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 2
+          if-no-files-found: error
+          include-hidden-files: true
+          path: |
+            ${{ env.TF_ROOT }}/tfplan
+            ${{ env.TF_ROOT }}/tfplan.txt
+
+  apply:
+    name: Apply reviewed ${{ inputs.environment }} plan
+    if: inputs.deploy
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    outputs:
+      api_url: ${{ steps.infrastructure_outputs.outputs.api_url }}
+    env:
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "false"
+      AWS_REGION: ${{ inputs['aws-region'] }}
+      DEPLOY_ENV: ${{ inputs.environment }}
+      TF_ROOT: aws/terraform/repos/utahdts/uid-portal/envs/${{ inputs.environment }}
+      AT_SIBLING_TF_ROOT: aws/terraform/repos/utahdts/uid-portal/envs/dev
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install read-only acceptance-audit dependency
+        run: python -m pip install PyYAML==6.0.3
+
+      - name: Require the target database at the repository schema version
+        env:
+          APPLIED_SCHEMA_VERSION: ${{ inputs['schema-migrations-applied-through'] }}
+        run: |
+          set -euo pipefail
+          latest=$(find db/migrations -maxdepth 1 -type f -name 'V*__*.sql' -printf '%f\n' | sort -V | tail -n 1 | cut -d_ -f1)
+          if [ -z "$latest" ]; then
+            echo "::error::No versioned migrations were found."
+            exit 1
+          fi
+          if [ "$APPLIED_SCHEMA_VERSION" != "$latest" ]; then
+            echo "::error::Apply and verify migrations through $latest from an approved network path, then dispatch again with schema-migrations-applied-through=$latest."
+            exit 1
+          fi
+          echo "Protected-environment reviewer attested that the target schema is at $latest."
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.8"
+          terraform_wrapper: false
+
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ inputs['aws-role-arn'] }}
+          aws-region: ${{ inputs['aws-region'] }}
+          role-session-name: uid-portal-${{ inputs.environment }}-${{ github.run_id }}-apply
+
+      - name: Initialize the pinned provider set
+        run: |
+          set -euo pipefail
+          terraform -chdir="$TF_ROOT" init -input=false
+          if [ "$DEPLOY_ENV" = "at" ]; then
+            terraform -chdir="$AT_SIBLING_TF_ROOT" init \
+              -input=false \
+              -lockfile=readonly
+          fi
+
+      # Download after init so provider/module setup cannot disturb the exact
+      # saved plan selected for the protected apply job.
+      - uses: actions/download-artifact@v4
+        with:
+          name: api-gateway-${{ inputs.environment }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.TF_ROOT }}
+
+      # A reviewed plan does not freeze account inventory. Re-run the same
+      # state/live ownership proof after the approval wait and immediately
+      # before apply to narrow the approval-window race. Terraform cannot lock
+      # API Gateway against a concurrent out-of-band CreateApi call; the deploy
+      # role/SCP boundary must provide that account-level exclusion.
+      - name: Recheck the sole API, custom domain, and state owner before apply
+        run: |
+          set -euo pipefail
+          sibling_args=()
+          if [ "$DEPLOY_ENV" = "at" ]; then
+            sibling_args+=(--sibling-tf-root "$AT_SIBLING_TF_ROOT")
+          fi
+          python3 aws/terraform/repos/utahdts/uid-portal/scripts/check-api-gateway-ownership.py \
+            --tf-root "$TF_ROOT" \
+            --env "$DEPLOY_ENV" \
+            --region "${{ inputs['aws-region'] }}" \
+            "${sibling_args[@]}"
+
+      - name: Recheck the State-owned resource boundary
+        run: |
+          set -euo pipefail
+          terraform -chdir="$TF_ROOT" show -json tfplan |
+            python3 aws/terraform/repos/utahdts/uid-portal/scripts/check-state-owned-boundary.py --terraform-root "$TF_ROOT" --plan-json -
+
+      - name: Apply the saved plan
+        run: |
+          set -euo pipefail
+          terraform -chdir="$TF_ROOT" apply \
+            -input=false \
+            -lock-timeout=5m \
+            tfplan \
+            2>&1 | python3 -u aws/terraform/repos/utahdts/uid-portal/scripts/redact-plan-emails.py
+
+      - name: Capture the custom-domain URL for software acceptance
+        id: infrastructure_outputs
+        run: |
+          api_url=$(terraform -chdir="$TF_ROOT" output -raw api_gateway_url)
+          printf 'api_url=%s\n' "$api_url" >> "$GITHUB_OUTPUT"
+
+      # This audit is deliberately configuration-only. Terraform provisions
+      # placeholder Lambda payloads, so functional health belongs after the
+      # software workflow publishes real function versions.
+      - name: Prove the one custom-domain gateway and Lambda ingress configuration
+        run: |
+          set -euo pipefail
+          api_id=$(terraform -chdir="$TF_ROOT" output -raw api_gateway_id)
+          api_name=$(terraform -chdir="$TF_ROOT" output -raw api_gateway_name)
+          expected_vpc_config_json=$(terraform -chdir="$TF_ROOT" output -json lambda_vpc_config)
+          python3 aws/terraform/repos/utahdts/uid-portal/scripts/check-lambda-ingress.py \
+            --env "${{ inputs.environment }}" \
+            --region "${{ inputs['aws-region'] }}" \
+            --api-id "$api_id" \
+            --api-name "$api_name" \
+            --allowed-host "${{ inputs['allowed-host'] }}" \
+            --expected-vpc-config-json "$expected_vpc_config_json"

@@ -1,0 +1,3 @@
+schema_version = 1
+source_slug = "utahdts/uid-portal"
+source_url = "git@github.com:utahdts/uid-portal.git"

@@ -1,0 +1,634 @@
+# HISTORICAL INVENTORY ONLY — this file intentionally does not end in .tf.
+# It describes organization-owned resources and must never be loaded by Terraform.
+
+# __generated__ by Terraform from "igw-005c82ba48e352e71"
+resource "aws_internet_gateway" "igw_005c82ba48e352e71" {
+  tags = {
+    Name = "uid-dev-internet-gateway"
+  }
+  tags_all = {
+    Name = "uid-dev-internet-gateway"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform from "rtb-05bcba1d2ce5dd301"
+resource "aws_route_table" "rtb_05bcba1d2ce5dd301" {
+  propagating_vgws = []
+  route            = []
+  tags = {
+    Name = "UID-Dev-RTB-PRIVATE-1-A"
+  }
+  tags_all = {
+    Name = "UID-Dev-RTB-PRIVATE-1-A"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_route_table" "rtb_050ad2b35aeaf1689" {
+  propagating_vgws = []
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "igw-005c82ba48e352e71"
+  }
+  route {
+    cidr_block = "8.42.63.240/29"
+    gateway_id = "vgw-0c016f35caa06e899"
+  }
+  tags = {
+    Name        = "UID-Dev-RTB-PUBLIC"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Chad Thompson"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    supportcode = "hstsahsy"
+  }
+  tags_all = {
+    Name        = "UID-Dev-RTB-PUBLIC"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Chad Thompson"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    supportcode = "hstsahsy"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_subnet" "subnet_0a1e2c8e6751b6833" {
+  assign_ipv6_address_on_creation                = false
+  availability_zone                              = "us-west-2b"
+  cidr_block                                     = "10.192.6.192/26"
+  customer_owned_ipv4_pool                       = null
+  enable_dns64                                   = false
+  enable_resource_name_dns_a_record_on_launch    = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  ipv6_cidr_block                                = null
+  ipv6_native                                    = false
+  map_public_ip_on_launch                        = false
+  outpost_arn                                    = null
+  private_dns_hostname_type_on_launch            = "ip-name"
+  tags = {
+    Name              = "UID-Dev-SUBNET-PRIVATE-1-B"
+    STNOStatus-Subnet = "2021-01-26T14:26:39Z: Subnet appended to the TGW attachment."
+    app               = "UID-DEV AWS acct vpc"
+    contact           = "Gary Gerber"
+    dept              = "uid"
+    elcid             = "ID6903ALAA"
+    env               = "dev"
+    managedby         = "Terraform - State in S3 Bucket"
+    security          = "0"
+    subnet-type       = "private-app"
+    supportcode       = "hstsahsy"
+  }
+  tags_all = {
+    Name              = "UID-Dev-SUBNET-PRIVATE-1-B"
+    STNOStatus-Subnet = "2021-01-26T14:26:39Z: Subnet appended to the TGW attachment."
+    app               = "UID-DEV AWS acct vpc"
+    contact           = "Gary Gerber"
+    dept              = "uid"
+    elcid             = "ID6903ALAA"
+    env               = "dev"
+    managedby         = "Terraform - State in S3 Bucket"
+    security          = "0"
+    subnet-type       = "private-app"
+    supportcode       = "hstsahsy"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_subnet" "subnet_0c6272b1eea00003c" {
+  assign_ipv6_address_on_creation                = false
+  availability_zone                              = "us-west-2a"
+  cidr_block                                     = "10.192.6.128/26"
+  customer_owned_ipv4_pool                       = null
+  enable_dns64                                   = false
+  enable_resource_name_dns_a_record_on_launch    = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  ipv6_cidr_block                                = null
+  ipv6_native                                    = false
+  map_public_ip_on_launch                        = false
+  outpost_arn                                    = null
+  private_dns_hostname_type_on_launch            = "ip-name"
+  tags = {
+    Name              = "UID-Dev-SUBNET-PRIVATE-1-A"
+    STNOStatus-Subnet = "2021-01-26T14:23:32Z: Subnet appended to the TGW attachment."
+    Tier              = "UID-Dev-SUBNET-PRIVATE-1-A"
+    app               = "UID-DEV AWS acct vpc"
+    contact           = "Gary Gerber"
+    dept              = "uid"
+    elcid             = "ID6903ALAA"
+    env               = "dev"
+    managedby         = "Terraform - State in S3 Bucket"
+    security          = "0"
+    subnet-type       = "private-app"
+    supportcode       = "hstsahsy"
+  }
+  tags_all = {
+    Name              = "UID-Dev-SUBNET-PRIVATE-1-A"
+    STNOStatus-Subnet = "2021-01-26T14:23:32Z: Subnet appended to the TGW attachment."
+    Tier              = "UID-Dev-SUBNET-PRIVATE-1-A"
+    app               = "UID-DEV AWS acct vpc"
+    contact           = "Gary Gerber"
+    dept              = "uid"
+    elcid             = "ID6903ALAA"
+    env               = "dev"
+    managedby         = "Terraform - State in S3 Bucket"
+    security          = "0"
+    subnet-type       = "private-app"
+    supportcode       = "hstsahsy"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_subnet" "subnet_0ab8d2f30f6d4934d" {
+  assign_ipv6_address_on_creation                = false
+  availability_zone                              = "us-west-2a"
+  cidr_block                                     = "10.192.6.32/27"
+  customer_owned_ipv4_pool                       = null
+  enable_dns64                                   = false
+  enable_resource_name_dns_a_record_on_launch    = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  ipv6_cidr_block                                = null
+  ipv6_native                                    = false
+  map_public_ip_on_launch                        = false
+  outpost_arn                                    = null
+  private_dns_hostname_type_on_launch            = "ip-name"
+  tags = {
+    Name        = "UID-Dev-SUBNET-DATABASE-PRIVATE-1-A"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Gary Gerber"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    subnet-type = "private-db"
+    supportcode = "hstsahsy"
+  }
+  tags_all = {
+    Name        = "UID-Dev-SUBNET-DATABASE-PRIVATE-1-A"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Gary Gerber"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    subnet-type = "private-db"
+    supportcode = "hstsahsy"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_route_table" "rtb_087c956287c13ef52" {
+  propagating_vgws = []
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "igw-005c82ba48e352e71"
+  }
+  tags = {
+    Name = "uid-portal-api-igw-rtb"
+  }
+  tags_all = {
+    Name = "uid-portal-api-igw-rtb"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_subnet" "subnet_0b211dae8ecd2e774" {
+  assign_ipv6_address_on_creation                = false
+  availability_zone                              = "us-west-2c"
+  cidr_block                                     = "10.192.6.96/27"
+  customer_owned_ipv4_pool                       = null
+  enable_dns64                                   = false
+  enable_resource_name_dns_a_record_on_launch    = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  ipv6_cidr_block                                = null
+  ipv6_native                                    = false
+  map_public_ip_on_launch                        = false
+  outpost_arn                                    = null
+  private_dns_hostname_type_on_launch            = "ip-name"
+  tags = {
+    Name        = "UID-Dev-SUBNET-DATABASE-PRIVATE-1-C"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Gary Gerber"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    subnet-type = "private-db"
+    supportcode = "hstsahsy"
+  }
+  tags_all = {
+    Name        = "UID-Dev-SUBNET-DATABASE-PRIVATE-1-C"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Gary Gerber"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    subnet-type = "private-db"
+    supportcode = "hstsahsy"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_subnet" "subnet_0f7fe43a4968bbefd" {
+  assign_ipv6_address_on_creation                = false
+  availability_zone                              = "us-west-2b"
+  cidr_block                                     = "10.192.6.16/28"
+  customer_owned_ipv4_pool                       = null
+  enable_dns64                                   = false
+  enable_resource_name_dns_a_record_on_launch    = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  ipv6_cidr_block                                = null
+  ipv6_native                                    = false
+  map_public_ip_on_launch                        = true
+  outpost_arn                                    = null
+  private_dns_hostname_type_on_launch            = "ip-name"
+  tags = {
+    Name        = "UID-Dev-SUBNET-PUBLIC-1-B"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Gary Gerber"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    subnet-type = "public"
+    supportcode = "hstsahsy"
+  }
+  tags_all = {
+    Name        = "UID-Dev-SUBNET-PUBLIC-1-B"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Gary Gerber"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    subnet-type = "public"
+    supportcode = "hstsahsy"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_route_table" "rtb_00f83bc1b800e256e" {
+  propagating_vgws = []
+  route {
+    cidr_block         = "0.0.0.0/0"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "10.0.0.0/8"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "161.119.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "165.239.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "168.177.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "168.178.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "168.179.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "168.180.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "172.16.0.0/12"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block = "172.16.17.0/24"
+    gateway_id = "vgw-0c016f35caa06e899"
+  }
+  route {
+    cidr_block         = "204.113.16.0/24"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "205.122.15.33/32"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "63.225.238.76/32"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "65.100.238.128/25"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  tags = {
+    Name = "UID-Dev-RTB-PRIVATE-1-B"
+  }
+  tags_all = {
+    Name = "UID-Dev-RTB-PRIVATE-1-B"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_subnet" "subnet_0e7b2c701fd53d4a9" {
+  assign_ipv6_address_on_creation                = false
+  availability_zone                              = "us-west-2a"
+  cidr_block                                     = "10.192.6.0/28"
+  customer_owned_ipv4_pool                       = null
+  enable_dns64                                   = false
+  enable_resource_name_dns_a_record_on_launch    = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  ipv6_cidr_block                                = null
+  ipv6_native                                    = false
+  map_public_ip_on_launch                        = true
+  outpost_arn                                    = null
+  private_dns_hostname_type_on_launch            = "ip-name"
+  tags = {
+    Name        = "UID-Dev-SUBNET-PUBLIC-1-A"
+    Tier        = "UID-Dev-SUBNET-PUBLIC-1-A"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Gary Gerber"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    subnet-type = "public"
+    supportcode = "hstsahsy"
+  }
+  tags_all = {
+    Name        = "UID-Dev-SUBNET-PUBLIC-1-A"
+    Tier        = "UID-Dev-SUBNET-PUBLIC-1-A"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Gary Gerber"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    subnet-type = "public"
+    supportcode = "hstsahsy"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_nat_gateway" "nat_00743b755f4914bc0" {
+  allocation_id                  = "eipalloc-06863fa21a50ea5f8"
+  connectivity_type              = "public"
+  private_ip                     = "10.192.6.14"
+  secondary_allocation_ids       = []
+  secondary_private_ip_addresses = []
+  subnet_id                      = "subnet-0e7b2c701fd53d4a9"
+  tags = {
+    Name = "uid-dev-nat-gateway-a"
+  }
+  tags_all = {
+    Name = "uid-dev-nat-gateway-a"
+  }
+}
+
+# __generated__ by Terraform
+resource "aws_route_table" "rtb_05baf67fbb981e644" {
+  propagating_vgws = []
+  route {
+    cidr_block         = "0.0.0.0/0"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "10.0.0.0/8"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "161.119.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "165.239.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "168.177.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "168.178.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "168.179.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "168.180.0.0/16"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "172.16.0.0/12"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block = "172.16.17.0/24"
+    gateway_id = "vgw-0c016f35caa06e899"
+  }
+  route {
+    cidr_block         = "204.113.16.0/24"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block = "204.113.19.52/32"
+    gateway_id = "igw-005c82ba48e352e71"
+  }
+  route {
+    cidr_block         = "205.122.15.33/32"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "63.225.238.76/32"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  route {
+    cidr_block         = "65.100.238.128/25"
+    transit_gateway_id = "tgw-0bd4c03dfbcf1e171"
+  }
+  tags = {
+    Name = "UID-Dev-RTB-PRIVATE-1-A"
+  }
+  tags_all = {
+    Name = "UID-Dev-RTB-PRIVATE-1-A"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform from "rtb-09559281d3a188e63"
+resource "aws_route_table" "rtb_09559281d3a188e63" {
+  propagating_vgws = []
+  route            = []
+  tags = {
+    Name = "UID-Dev-RTB-PRIVATE-1-B"
+  }
+  tags_all = {
+    Name = "UID-Dev-RTB-PRIVATE-1-B"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_nat_gateway" "nat_05d05279df2e9138f" {
+  allocation_id                  = "eipalloc-0a47505b6811f77f2"
+  connectivity_type              = "public"
+  private_ip                     = "10.192.6.24"
+  secondary_allocation_ids       = []
+  secondary_private_ip_addresses = []
+  subnet_id                      = "subnet-0f7fe43a4968bbefd"
+  tags = {
+    Name = "uid-dev-nat-gateway-b"
+  }
+  tags_all = {
+    Name = "uid-dev-nat-gateway-b"
+  }
+}
+
+# __generated__ by Terraform
+resource "aws_route_table" "rtb_0a9f752797dfdeac1" {
+  propagating_vgws = []
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "igw-005c82ba48e352e71"
+  }
+  route {
+    cidr_block = "8.42.63.240/29"
+    gateway_id = "vgw-0c016f35caa06e899"
+  }
+  tags = {
+    Name = "uid-portal-api-igw-rtb"
+  }
+  tags_all = {
+    Name = "uid-portal-api-igw-rtb"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform from "rtb-0ea019f19c7b0af79"
+resource "aws_route_table" "rtb_0ea019f19c7b0af79" {
+  propagating_vgws = []
+  route            = []
+  tags = {
+    Name = "uid-portal-api-igw-rtb"
+  }
+  tags_all = {
+    Name = "uid-portal-api-igw-rtb"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_subnet" "subnet_0ce32321a0899ce69" {
+  assign_ipv6_address_on_creation                = false
+  availability_zone                              = "us-west-2b"
+  cidr_block                                     = "10.192.6.64/27"
+  customer_owned_ipv4_pool                       = null
+  enable_dns64                                   = false
+  enable_resource_name_dns_a_record_on_launch    = false
+  enable_resource_name_dns_aaaa_record_on_launch = false
+  ipv6_cidr_block                                = null
+  ipv6_native                                    = false
+  map_public_ip_on_launch                        = false
+  outpost_arn                                    = null
+  private_dns_hostname_type_on_launch            = "ip-name"
+  tags = {
+    Name        = "UID-Dev-SUBNET-DATABASE-PRIVATE-1-B"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Gary Gerber"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    subnet-type = "private-db"
+    supportcode = "hstsahsy"
+  }
+  tags_all = {
+    Name        = "UID-Dev-SUBNET-DATABASE-PRIVATE-1-B"
+    app         = "UID-DEV AWS acct vpc"
+    contact     = "Gary Gerber"
+    dept        = "uid"
+    elcid       = "ID6903ALAA"
+    env         = "dev"
+    managedby   = "Terraform - State in S3 Bucket"
+    security    = "0"
+    subnet-type = "private-db"
+    supportcode = "hstsahsy"
+  }
+  vpc_id = "vpc-05d3e6ccb65d2d11c"
+}
+
+# __generated__ by Terraform
+resource "aws_vpc" "main" {
+  assign_generated_ipv6_cidr_block     = false
+  cidr_block                           = "10.192.6.0/23"
+  enable_dns_hostnames                 = true
+  enable_dns_support                   = true
+  enable_network_address_usage_metrics = false
+  instance_tenancy                     = "default"
+  ipv4_ipam_pool_id                    = null
+  ipv4_netmask_length                  = null
+  ipv6_ipam_pool_id                    = null
+  tags = {
+    Associate-with            = "Flat"
+    Name                      = "UID-Dev-VPC"
+    Propagate-to              = "Flat, Infrastructure, On-premises"
+    STNOStatus-VPCAssociation = "2021-01-26T13:40:21Z: VPC has been associated with the Transit Gateway Routing Table/Domain"
+    STNOStatus-VPCPropagation = "2021-01-26T14:23:52Z: Request to propagate this VPC to requested TGW Routing Table is PENDING APPROVAL. Contact your network admin for more information."
+    app                       = "UID-DEV AWS acct vpc"
+    contact                   = "Gary Gerber"
+    dept                      = "uid"
+    elcid                     = "ID6903ALAA"
+    env                       = "dev"
+    managedby                 = "Terraform - State in S3 Bucket"
+    security                  = "0"
+    supportcode               = "hstsahsy"
+  }
+  tags_all = {
+    Associate-with            = "Flat"
+    Name                      = "UID-Dev-VPC"
+    Propagate-to              = "Flat, Infrastructure, On-premises"
+    STNOStatus-VPCAssociation = "2021-01-26T13:40:21Z: VPC has been associated with the Transit Gateway Routing Table/Domain"
+    STNOStatus-VPCPropagation = "2021-01-26T14:23:52Z: Request to propagate this VPC to requested TGW Routing Table is PENDING APPROVAL. Contact your network admin for more information."
+    app                       = "UID-DEV AWS acct vpc"
+    contact                   = "Gary Gerber"
+    dept                      = "uid"
+    elcid                     = "ID6903ALAA"
+    env                       = "dev"
+    managedby                 = "Terraform - State in S3 Bucket"
+    security                  = "0"
+    supportcode               = "hstsahsy"
+  }
+}

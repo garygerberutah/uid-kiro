@@ -1,0 +1,77 @@
+# HISTORICAL INVENTORY ONLY — these import blocks are intentionally inert.
+import {
+  to = aws_vpc.main
+  id = "vpc-05d3e6ccb65d2d11c"
+}
+import {
+  to = aws_subnet.subnet_0ab8d2f30f6d4934d
+  id = "subnet-0ab8d2f30f6d4934d"
+}
+import {
+  to = aws_subnet.subnet_0ce32321a0899ce69
+  id = "subnet-0ce32321a0899ce69"
+}
+import {
+  to = aws_subnet.subnet_0f7fe43a4968bbefd
+  id = "subnet-0f7fe43a4968bbefd"
+}
+import {
+  to = aws_subnet.subnet_0e7b2c701fd53d4a9
+  id = "subnet-0e7b2c701fd53d4a9"
+}
+import {
+  to = aws_subnet.subnet_0c6272b1eea00003c
+  id = "subnet-0c6272b1eea00003c"
+}
+import {
+  to = aws_subnet.subnet_0b211dae8ecd2e774
+  id = "subnet-0b211dae8ecd2e774"
+}
+import {
+  to = aws_subnet.subnet_0a1e2c8e6751b6833
+  id = "subnet-0a1e2c8e6751b6833"
+}
+import {
+  to = aws_internet_gateway.igw_005c82ba48e352e71
+  id = "igw-005c82ba48e352e71"
+}
+import {
+  to = aws_route_table.rtb_05baf67fbb981e644
+  id = "rtb-05baf67fbb981e644"
+}
+import {
+  to = aws_route_table.rtb_0a9f752797dfdeac1
+  id = "rtb-0a9f752797dfdeac1"
+}
+import {
+  to = aws_route_table.rtb_050ad2b35aeaf1689
+  id = "rtb-050ad2b35aeaf1689"
+}
+import {
+  to = aws_route_table.rtb_05bcba1d2ce5dd301
+  id = "rtb-05bcba1d2ce5dd301"
+}
+import {
+  to = aws_route_table.rtb_087c956287c13ef52
+  id = "rtb-087c956287c13ef52"
+}
+import {
+  to = aws_route_table.rtb_09559281d3a188e63
+  id = "rtb-09559281d3a188e63"
+}
+import {
+  to = aws_route_table.rtb_0ea019f19c7b0af79
+  id = "rtb-0ea019f19c7b0af79"
+}
+import {
+  to = aws_route_table.rtb_00f83bc1b800e256e
+  id = "rtb-00f83bc1b800e256e"
+}
+import {
+  to = aws_nat_gateway.nat_05d05279df2e9138f
+  id = "nat-05d05279df2e9138f"
+}
+import {
+  to = aws_nat_gateway.nat_00743b755f4914bc0
+  id = "nat-00743b755f4914bc0"
+}
