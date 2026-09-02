@@ -27,7 +27,7 @@ SMA_PATTERN = re.compile(
 #
 # A flag token is `-` plus greedy non-whitespace, so it has exactly one possible
 # parse; an optional value token must not itself start with `-`. Both properties,
-# plus the bounded repetition, keep this linear — an ambiguous flag pattern here
+# plus the bounded repetition, keep this linear -- an ambiguous flag pattern here
 # backtracks catastrophically on long flag runs, and because the hook has a 5s
 # timeout in hooks.json, a hang would let the tool call through (fail-open).
 _CLI_FLAGS = r'(?:-\S+(?:\s+[^-\s]\S*)?\s+){0,12}'
@@ -39,7 +39,7 @@ CLI_GSV_PATTERN = re.compile(
 # Structured operation names normalized to lowercase, no separators.
 GSV_OPERATIONS = ("getsecretvalue", "batchgetsecretvalue")
 
-# SDK call invocation shapes — matches actual method calls / constructors, not bare text.
+# SDK call invocation shapes -- matches actual method calls / constructors, not bare text.
 # boto3:  client.get_secret_value(...)
 # JS v3:  GetSecretValueCommand(...)
 # Generic SDK: (Batch)GetSecretValue(Request|Command)?(...)

@@ -14,8 +14,8 @@ Build resilient multi-step applications and AI workflows that can execute for up
 
 Read these before writing any code. Each one is a constraint that will silently break a function if violated.
 
-1. **Durable execution must be enabled at function creation time — it cannot be retrofitted.** A new Lambda function must be created with durable execution turned on. Migrate the logic into the new function; do not attempt to install the SDK and wrap the handler of the existing function and expect it to work.
-2. **Durable functions must be invoked with a qualified ARN** — a specific version, an alias, or the literal `$LATEST` suffix. An unqualified function name will fail. See the *Invocation Requirements* section below for examples.
+1. **Durable execution must be enabled at function creation time -- it cannot be retrofitted.** A new Lambda function must be created with durable execution turned on. Migrate the logic into the new function; do not attempt to install the SDK and wrap the handler of the existing function and expect it to work.
+2. **Durable functions must be invoked with a qualified ARN** -- a specific version, an alias, or the literal `$LATEST` suffix. An unqualified function name will fail. See the *Invocation Requirements* section below for examples.
 3. **Durable operations cannot be nested.** You cannot call `context.step()`, `context.wait()`, or `context.invoke()` from inside another step's callback. Use `context.runInChildContext()` to group operations instead.
 4. **All non-deterministic code must run inside steps.** `Date.now()`, `Math.random()`, UUID generation, API calls, and database queries outside a step will produce different values on replay and corrupt execution state.
 5. **Closure mutations are lost on replay** - return values from steps
@@ -103,8 +103,8 @@ Your Lambda execution role MUST have the `AWSLambdaBasicDurableExecutionRolePoli
 When writing or reviewing durable function code, ALWAYS check for these replay model violations:
 
 1. **Non-deterministic code outside steps**: `Date.now()`, `Math.random()`, UUID generation, API calls, database queries must all be inside steps
-2. **Nested durable operations in step functions**: Cannot call `context.step()`, `context.wait()`, or `context.invoke()` inside a step function — use `context.runInChildContext()` instead
-3. **Closure mutations that won't persist**: Variables mutated inside steps are NOT preserved across replays — return values from steps instead
+2. **Nested durable operations in step functions**: Cannot call `context.step()`, `context.wait()`, or `context.invoke()` inside a step function -- use `context.runInChildContext()` instead
+3. **Closure mutations that won't persist**: Variables mutated inside steps are NOT preserved across replays -- return values from steps instead
 4. **Side effects outside steps that repeat on replay**: Use `context.logger` for logging (it is replay-aware and deduplicates automatically)
 
 When implementing or modifying tests for durable functions, ALWAYS verify:
@@ -117,10 +117,10 @@ When implementing or modifying tests for durable functions, ALWAYS verify:
 ## Security Considerations
 
 - **Checkpoint data encryption**: Execution state is persisted automatically. Enable KMS encryption on associated CloudWatch Log Groups to protect checkpointed data at rest.
-- **Sensitive data in step results**: Step return values are checkpointed and persisted. Do not return secrets, raw credentials, or PII from steps — store sensitive data in Secrets Manager or SSM Parameter Store and return references instead.
+- **Sensitive data in step results**: Step return values are checkpointed and persisted. Do not return secrets, raw credentials, or PII from steps -- store sensitive data in Secrets Manager or SSM Parameter Store and return references instead.
 - **Input validation**: Validate and sanitize event payloads at the handler entry point before passing data to steps.
 - **Credential management**: Retrieve secrets from AWS Secrets Manager or SSM Parameter Store within steps.
-- **Callback payload validation**: Data received via `waitForCallback` originates from external systems — validate and sanitize before processing.
+- **Callback payload validation**: Data received via `waitForCallback` originates from external systems -- validate and sanitize before processing.
 - **Logging**: Avoid `DEBUG` log level in non-development environments as it may expose step results and execution state. Enable CloudWatch Logs encryption with KMS.
 
 ## Resources

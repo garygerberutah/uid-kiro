@@ -12,7 +12,7 @@ Flow:
 Transient settlement: the SDK builds a valid header, but the merchant's
 on-chain settlement is occasionally transient and the paid retry still returns
 402. The SDK does not make the merchant HTTP call (it only builds the header),
-so it cannot retry that — this tool re-runs the settle+replay flow up to
+so it cannot retry that -- this tool re-runs the settle+replay flow up to
 X402_MAX_PAYMENT_ATTEMPTS times before giving up. A single idempotency token
 (client_token) is reused across all attempts of one fetch, so ProcessPayment is
 idempotent: every retry replays the SAME on-chain authorization/nonce. That
@@ -44,7 +44,7 @@ from bedrock_agentcore.payments import PaymentManager
 PAYMENT_MANAGER_ARN = os.getenv("PAYMENT_MANAGER_ARN")
 PAYMENT_INSTRUMENT_ID = os.getenv("PAYMENT_INSTRUMENT_ID")
 PAYMENT_SESSION_ID = os.getenv("PAYMENT_SESSION_ID")
-PAYMENT_USER_ID = os.environ.get("PAYMENT_USER_ID")  # required — no insecure default
+PAYMENT_USER_ID = os.environ.get("PAYMENT_USER_ID")  # required -- no insecure default
 REGION = os.getenv("AWS_REGION", "us-west-2")
 # Transient on-chain settlement can leave the paid retry at 402 even though the
 # header was valid; re-settle (fresh header + idempotency token) up to this many times.
@@ -76,7 +76,7 @@ def _settle_and_retry(url, method, response, client_token):
     402, pick the network, ProcessPayment, build the v1 `X-PAYMENT` / v2
     `PAYMENT-SIGNATURE` proof) and returns {header_name: header_value}. We pass a
     STABLE client_token (the same one for every attempt of a single fetch) so
-    ProcessPayment is idempotent — each retry replays the same authorization/nonce
+    ProcessPayment is idempotent -- each retry replays the same authorization/nonce
     and can never double-charge.
     Returns the retry httpx.Response. Raises on a header-generation failure.
     """
@@ -128,7 +128,7 @@ def x402_fetch(url, method="GET"):
             return json.dumps({"status_code": 402, "error": f"Payment header generation failed: {e}"})
 
         if retry_response.status_code != 402:
-            # Success (2xx) or a non-transient error — return it; payment_made reflects the actual status.
+            # Success (2xx) or a non-transient error -- return it; payment_made reflects the actual status.
             return json.dumps({
                 "status_code": retry_response.status_code,
                 "body": retry_response.text,
@@ -136,7 +136,7 @@ def x402_fetch(url, method="GET"):
                 "payment_attempts": attempt,
             })
 
-        # Transient post-payment 402 — retry with the same idempotency token (same
+        # Transient post-payment 402 -- retry with the same idempotency token (same
         # authorization/nonce), giving settlement another chance without double-charging.
         response = retry_response
 

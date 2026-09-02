@@ -51,7 +51,7 @@ Macie assigns severity (1-3 scale) based on **sensitive data type** and context,
 - Severity increases when multiple sensitive data categories appear in the same S3 object
 - Custom data identifiers inherit the severity configured at creation time
 - Policy findings (bucket-level) use a separate severity scale based on bucket exposure
-- Automated discovery findings aggregate across objects — severity reflects bucket-level risk
+- Automated discovery findings aggregate across objects -- severity reflects bucket-level risk
 
 Refer to [Macie severity scoring documentation](https://docs.aws.amazon.com/macie/latest/user/findings-severity.html) for complete per-finding-type breakdown.
 

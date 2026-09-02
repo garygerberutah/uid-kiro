@@ -18,7 +18,7 @@ GUC (Grand Unified Configuration) experiments temporarily disable specific plann
 
 Per SKILL.md Phase 1, the `{original_sql}` reaching this phase is always a **SELECT** (DML is rewritten to SELECT before plan capture, INSERT and pl/pgsql are rejected). Execute two variants against that SELECT:
 
-**Experiment 1 — Default baseline** (read-only):
+**Experiment 1 -- Default baseline** (read-only):
 
 ```sql
 EXPLAIN ANALYZE VERBOSE {original_sql};
@@ -26,13 +26,13 @@ EXPLAIN ANALYZE VERBOSE {original_sql};
 
 Run via `./scripts/psql-connect.sh --cluster <id> --command "EXPLAIN ANALYZE VERBOSE {original_sql}"` (the wrapper accepts a single trailing semicolon) or your driver's read path.
 
-**Experiment 2 — Merge join only.** Needs `SET LOCAL` to scope GUC changes to a single transaction. The four statements MUST execute in one transaction so `SET LOCAL` takes effect. Use `--script` mode (multi-statement file via stdin); `--command` rejects multi-statement input.
+**Experiment 2 -- Merge join only.** Needs `SET LOCAL` to scope GUC changes to a single transaction. The four statements MUST execute in one transaction so `SET LOCAL` takes effect. Use `--script` mode (multi-statement file via stdin); `--command` rejects multi-statement input.
 
 **Safety rules the caller MUST apply:**
 
-- `{original_sql}` **MUST** be a SELECT — verify by reading the first non-comment token. Reject and abort otherwise.
+- `{original_sql}` **MUST** be a SELECT -- verify by reading the first non-comment token. Reject and abort otherwise.
 - **MUST** interpolate `{original_sql}` only as a single trusted SELECT body. Do not concatenate it with another statement.
-- The script file MUST contain only the three `SET LOCAL` + one `EXPLAIN ANALYZE VERBOSE SELECT` statements wrapped in `BEGIN`/`COMMIT` — no INSERT/UPDATE/DELETE/DDL.
+- The script file MUST contain only the three `SET LOCAL` + one `EXPLAIN ANALYZE VERBOSE SELECT` statements wrapped in `BEGIN`/`COMMIT` -- no INSERT/UPDATE/DELETE/DDL.
 - If any statement fails (the `EXPLAIN` errors, etc.), halt and report; do not chain additional recovery SQL.
 
 Write the script then run it:
@@ -57,10 +57,10 @@ COMMIT;
 
 | Original query time | Action                                                         |
 | ------------------- | -------------------------------------------------------------- |
-| ≤30 seconds         | Perform both experiments                                       |
+| <=30 seconds         | Perform both experiments                                       |
 | >30 seconds         | Skip experimentation; note in report; recommend manual testing |
 
-**When original query ran >30 seconds**, the report **MUST** include a section explicitly stating that GUC experimentation was skipped due to execution time exceeding the 30-second threshold, and **MUST** provide the manual testing SQL verbatim so the customer can run it themselves in psql (session scope — no `BEGIN`/`COMMIT` needed when run interactively):
+**When original query ran >30 seconds**, the report **MUST** include a section explicitly stating that GUC experimentation was skipped due to execution time exceeding the 30-second threshold, and **MUST** provide the manual testing SQL verbatim so the customer can run it themselves in psql (session scope -- no `BEGIN`/`COMMIT` needed when run interactively):
 
 ```sql
 SET enable_hashjoin = off;
@@ -69,7 +69,7 @@ SET enable_mergejoin = on;
 EXPLAIN ANALYZE VERBOSE {original_sql};
 ```
 
-Do not re-run the original query for redundant predicate testing either when execution exceeded 30s — recommend rewrites and explain expected impact from statistics.
+Do not re-run the original query for redundant predicate testing either when execution exceeded 30s -- recommend rewrites and explain expected impact from statistics.
 
 ## Transaction Isolation
 
@@ -77,7 +77,7 @@ Do not re-run the original query for redundant predicate testing either when exe
 
 ## Handling experiment failures
 
-If a transaction returns an error mid-batch (e.g., a `SET` is rejected, or the EXPLAIN fails), record the error under a "GUC experiment failed" finding in the report and **do not** compare partial results against the default baseline. The transaction auto-rolls back on any error, so session state is clean — but the missing plan means you cannot claim the planner chose suboptimally; surface the error verbatim instead.
+If a transaction returns an error mid-batch (e.g., a `SET` is rejected, or the EXPLAIN fails), record the error under a "GUC experiment failed" finding in the report and **do not** compare partial results against the default baseline. The transaction auto-rolls back on any error, so session state is clean -- but the missing plan means you cannot claim the planner chose suboptimally; surface the error verbatim instead.
 
 ## Interpreting GUC Results
 
@@ -135,7 +135,7 @@ The optimizer **cannot** infer business-rule relationships (e.g., "all orders fo
 
 ### Testing Procedure
 
-**When original query ran ≤30s:**
+**When original query ran <=30s:**
 
 1. Identify all redundant predicates
 2. Add all simultaneously to the SQL statement

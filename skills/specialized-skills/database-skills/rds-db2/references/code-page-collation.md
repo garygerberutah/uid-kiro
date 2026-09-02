@@ -1,4 +1,4 @@
-# RDS for Db2 — Code Page and Collation Selection
+# RDS for Db2 -- Code Page and Collation Selection
 
 > **Source:** `04-db2-client/choose-proper-code-page-and-collation/choose-codepage-improved.md`
 > (blog DBBLOG-5218, "Choosing the Right Code Page and Collation for Migrating from Mainframe Db2 to
@@ -6,7 +6,7 @@
 > https://aws.amazon.com/blogs/database/choosing-the-right-code-page-and-collation-for-migration-from-mainframe-db2-to-amazon-rds-for-db2/).
 > Placeholders `<DBNAME>`, `<MasterUserName>`, `<MasterUserPassword>` stand in for real values.
 
-## Immutable after creation — choose carefully
+## Immutable after creation -- choose carefully
 
 **Code page, collation, and territory cannot be modified after database creation** in Amazon RDS for
 Db2. A wrong choice forces database recreation and re-migration, so decide before you create the
@@ -19,14 +19,15 @@ Mainframe Db2 (z/OS) uses EBCDIC code pages by region:
 
 - **Latin / Western European:** CCSID 37 (CP037, US/Canada/Netherlands/Portugal), 500 (CP500,
   international), 1047 (CP1047, Open Systems/USS), 273 (CP273, German/Austrian).
-- **Euro-enabled:** CCSID 1141 (German/Austrian + €), 1390 (Japanese + €).
+- **Euro-enabled:** CCSID 1141 (German/Austrian plus the Euro currency character), 1390
+  (Japanese plus the Euro currency character).
 - **Japanese:** CCSID 930 (Katakana), 939 (Latin); 5026/5035 are *collation* sequences (not code
   pages) used with 930 and 939 respectively.
 
 ISO-8859-1 (IBM code page 819) is the direct ASCII equivalent of Latin CCSIDs 37, 500, 1047, and 273,
-enabling lossless conversion — but it **excludes the Euro symbol** (€).
+enabling lossless conversion -- but it **excludes the Euro currency character**.
 
-## CCSID → code page → collation decision matrix
+## CCSID -> code page -> collation decision matrix
 
 | Mainframe CCSID | RDS code set | Collation | Notes |
 |---|---|---|---|
@@ -42,7 +43,7 @@ The fifth `create_database` parameter is the collation sequence. Full set of sou
 `EBCDIC_932_5035`, `EBCDIC_1252_037`, `EBCDIC_1252_500`. Use ISO-8859-1 for exact mainframe
 compatibility, zero data loss, and preserved sorting; use UTF-8 for Japanese or multi-language data.
 
-## Creating the database — `rdsadmin.create_database`
+## Creating the database -- `rdsadmin.create_database`
 
 Parameter order from source: `create_database(name, pagesize, codeset, territory, collation)`.
 
@@ -67,15 +68,16 @@ IT, JP, KR, NL, NO, PT, TW, US, ZA. Consult IBM documentation for valid territor
 
 ## CODEUNITS32 vs OCTETS trade-offs
 
-UTF-8 expands storage: Latin accented characters (à, é, ß, ¬, µ, ¼) use 1 byte on mainframe but 2 in
-UTF-8; Japanese characters use 3 bytes. To avoid editing every CHAR/VARCHAR length, switch the default
-string measurement to CODEUNITS32:
+UTF-8 expands storage: Latin accented and special characters such as letters with grave or acute
+accents, sharp s, the not sign, the micro sign, and one-quarter use 1 byte on mainframe but 2 in
+UTF-8; Japanese characters use 3 bytes. To avoid editing every CHAR/VARCHAR length, switch the
+default string measurement to CODEUNITS32:
 
 ```bash
 db2 "call rdsadmin.update_db_param('<DBNAME>','STRING_UNITS','CODEUNITS32','NO')"
 ```
 
-`STRING_UNITS` is not dynamic — this requires an instance restart, and DDL objects must be created
+`STRING_UNITS` is not dynamic -- this requires an instance restart, and DDL objects must be created
 **after** the change.
 
 **Database-level CODEUNITS32 is costly:** default allocation grows from 1 to 4 bytes per character,
@@ -87,26 +89,26 @@ mostly-ASCII database can expand ~3.8x. Prefer adjusting OCTETS lengths over COD
 -- Recommended: CHAR(4 OCTETS) allocates exactly 4 bytes
 ```
 
-Use CODEUNITS32 only when you are certain you will store 3–4 byte characters (e.g., East Asian text).
+Use CODEUNITS32 only when you are certain you will store 3-4 byte characters (e.g., East Asian text).
 
 ## EBCDIC vs SYSTEM collation ordering
 
 The collation choice changes sort order:
 
-- **EBCDIC:** special characters → lowercase → uppercase → numerals.
-- **SYSTEM:** numerals → uppercase → lowercase → special characters.
+- **EBCDIC:** special characters -> lowercase -> uppercase -> numerals.
+- **SYSTEM:** numerals -> uppercase -> lowercase -> special characters.
 
 Choose EBCDIC collation to preserve the exact mainframe sort order; choose SYSTEM for standard
 ASCII/Unicode ordering.
 
 ## ISO-8859-1 silent `0x1A` substitution
 
-ISO-8859-1 cannot store characters outside its range (e.g., Japanese 常). On insert, Db2 performs
-**silent substitution with no error or warning** — the character becomes SUB (`0x1A`) and remaining
-byte positions are filled with spaces (`0x20`):
+ISO-8859-1 cannot store characters outside its range, including Japanese characters. On insert, Db2
+performs **silent substitution with no error or warning** -- the character becomes SUB (`0x1A`) and
+remaining byte positions are filled with spaces (`0x20`). Supply the Japanese character as external
+test data rather than embedding it in this repository:
 
 ```sql
-db2 "insert into t1 values ('常')"
 db2 "select c1, hex(c1) hex from t1"   -- hex shows 1A202020
 ```
 
@@ -129,7 +131,8 @@ SELECT NAME, CCSID FROM SYSIBM.SYSCOLUMNS
 
 ## Validation
 
-Insert international characters (for example 'café', 'niño') on the source, export, import into RDS for
-Db2, and confirm display with a GUI client (DBeaver, DataGrip, IBM Data Studio). Round-trip
-conversions (EBCDIC → ASCII → EBCDIC) can lose variants without exact mappings, so always verify
-against IBM's official CCSID tables. Address code page and collation early — the choice is immutable.
+Insert representative international characters from an external test fixture, including accented
+forms of words such as "cafe" and "nino," on the source. Export and import them into RDS for Db2,
+then confirm display with a GUI client (DBeaver, DataGrip, IBM Data Studio). Round-trip conversions
+(EBCDIC -> ASCII -> EBCDIC) can lose variants without exact mappings, so always verify against IBM's
+official CCSID tables. Address code page and collation early -- the choice is immutable.

@@ -81,7 +81,7 @@ def audit_serverless(client, ec2_client, cache_name):
         info["auth_mode"] = "RBAC"
         info["user_group"] = user_group
     else:
-        findings.append({"check": "Authentication", "status": "WARN", "detail": "No user group attached — using default user only"})
+        findings.append({"check": "Authentication", "status": "WARN", "detail": "No user group attached -- using default user only"})
         info["auth_mode"] = "default-user-only"
 
     # Encryption at rest: check KMS
@@ -117,12 +117,12 @@ def audit_serverless(client, ec2_client, cache_name):
         info["max_data_gb"] = data_limit["Maximum"]
         findings.append({"check": "Data storage limit", "status": "PASS", "detail": f"{data_limit['Maximum']} {data_limit.get('Unit', 'GB')} max"})
     else:
-        findings.append({"check": "Data storage limit", "status": "WARN", "detail": "No data storage limit set — costs could grow unbounded"})
+        findings.append({"check": "Data storage limit", "status": "WARN", "detail": "No data storage limit set -- costs could grow unbounded"})
     if ecpu_limit.get("Maximum"):
         info["max_ecpu_per_sec"] = ecpu_limit["Maximum"]
         findings.append({"check": "ECPU limit", "status": "PASS", "detail": f"{ecpu_limit['Maximum']} ECPUs/sec max"})
     else:
-        findings.append({"check": "ECPU limit", "status": "WARN", "detail": "No ECPU limit set — costs could grow unbounded"})
+        findings.append({"check": "ECPU limit", "status": "WARN", "detail": "No ECPU limit set -- costs could grow unbounded"})
 
     # Security groups
     sg_ids = cache.get("SecurityGroupIds", [])
@@ -187,7 +187,7 @@ def audit_replication_group(client, ec2_client, rg_id):
     if tls:
         findings.append({"check": "TLS in-transit encryption", "status": "PASS", "detail": "Enabled"})
     else:
-        findings.append({"check": "TLS in-transit encryption", "status": "FAIL", "detail": "Not enabled — data in transit is unencrypted"})
+        findings.append({"check": "TLS in-transit encryption", "status": "FAIL", "detail": "Not enabled -- data in transit is unencrypted"})
 
     # Encryption at rest
     at_rest = rg.get("AtRestEncryptionEnabled", False)
@@ -197,7 +197,7 @@ def audit_replication_group(client, ec2_client, rg_id):
         findings.append({"check": "Encryption at rest", "status": "PASS", "detail": f"Enabled (key: {kms})"})
         info["kms_key"] = kms
     else:
-        findings.append({"check": "Encryption at rest", "status": "FAIL", "detail": "Not enabled — data at rest is unencrypted"})
+        findings.append({"check": "Encryption at rest", "status": "FAIL", "detail": "Not enabled -- data at rest is unencrypted"})
 
     # Auth
     auth_token = rg.get("AuthTokenEnabled", False)
@@ -208,10 +208,10 @@ def audit_replication_group(client, ec2_client, rg_id):
         findings.append({"check": "Authentication", "status": "PASS", "detail": f"RBAC user groups: {', '.join(user_group_ids)}"})
     elif auth_token:
         info["auth_mode"] = "AUTH-token"
-        findings.append({"check": "Authentication", "status": "WARN", "detail": "Using legacy AUTH token — consider migrating to RBAC"})
+        findings.append({"check": "Authentication", "status": "WARN", "detail": "Using legacy AUTH token -- consider migrating to RBAC"})
     else:
         info["auth_mode"] = "none"
-        findings.append({"check": "Authentication", "status": "FAIL", "detail": "No authentication configured — any VPC client can access data"})
+        findings.append({"check": "Authentication", "status": "FAIL", "detail": "No authentication configured -- any VPC client can access data"})
 
     # Multi-AZ
     multi_az = rg.get("MultiAZ", "disabled")
@@ -219,7 +219,7 @@ def audit_replication_group(client, ec2_client, rg_id):
     if multi_az == "enabled":
         findings.append({"check": "Multi-AZ", "status": "PASS", "detail": "Enabled"})
     else:
-        findings.append({"check": "Multi-AZ", "status": "WARN", "detail": "Not enabled — single-AZ failure risk"})
+        findings.append({"check": "Multi-AZ", "status": "WARN", "detail": "Not enabled -- single-AZ failure risk"})
 
     # Automatic failover
     failover = rg.get("AutomaticFailover", "disabled")
@@ -227,7 +227,7 @@ def audit_replication_group(client, ec2_client, rg_id):
     if failover == "enabled":
         findings.append({"check": "Automatic failover", "status": "PASS", "detail": "Enabled"})
     else:
-        findings.append({"check": "Automatic failover", "status": "WARN", "detail": "Not enabled — manual intervention needed on primary failure"})
+        findings.append({"check": "Automatic failover", "status": "WARN", "detail": "Not enabled -- manual intervention needed on primary failure"})
 
     # Backups
     retention = rg.get("SnapshotRetentionLimit", 0)
@@ -235,7 +235,7 @@ def audit_replication_group(client, ec2_client, rg_id):
     if retention > 0:
         findings.append({"check": "Automatic backups", "status": "PASS", "detail": f"Retention: {retention} days"})
     else:
-        findings.append({"check": "Automatic backups", "status": "FAIL", "detail": "No automatic backups — data loss risk on failure"})
+        findings.append({"check": "Automatic backups", "status": "FAIL", "detail": "No automatic backups -- data loss risk on failure"})
 
     # Security groups from node groups
     sg_ids = set()

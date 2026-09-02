@@ -22,7 +22,7 @@ Availability depends on the AWS region and Bedrock model access enablement.
 
 Some older or restricted models require explicit enablement in the AWS Bedrock console (Model access). On-demand foundation models (Claude Sonnet 4+, Nova) are available immediately. Amplify uses global inference profiles for cross-region model access.
 
-If you get `AccessDeniedException: Could not access the model with the specified model ID`, check **Bedrock → Model access** in your region.
+If you get `AccessDeniedException: Could not access the model with the specified model ID`, check **Bedrock -> Model access** in your region.
 
 ## Backend: Conversation Routes
 
@@ -61,8 +61,8 @@ const schema = a.schema({
 
 **Authorization constraints (these cause TypeError at CDK assembly if violated):**
 
-- **Conversation routes** (`a.conversation()`) require `allow.owner()` authorization — `allow.authenticated()` and other non-owner strategies throw a TypeError at CDK assembly time.
-- **Generation routes** (`a.generation()`) require non-owner authorization (`allow.authenticated()`, `allow.guest()`, `allow.group()`, or `allow.publicApiKey()`) — `allow.owner()` throws a TypeError at CDK assembly time.
+- **Conversation routes** (`a.conversation()`) require `allow.owner()` authorization -- `allow.authenticated()` and other non-owner strategies throw a TypeError at CDK assembly time.
+- **Generation routes** (`a.generation()`) require non-owner authorization (`allow.authenticated()`, `allow.guest()`, `allow.group()`, or `allow.publicApiKey()`) -- `allow.owner()` throws a TypeError at CDK assembly time.
 
 These constraints are asymmetric and frequently confused. Getting them wrong
 causes the CDK synthesis to fail with a non-obvious TypeError.
@@ -186,7 +186,7 @@ useEffect(() => {
 
 > **UI note:** Amplify AI Kit provides pre-built UI components for React and
 > React Native only. Flutter, Swift, and Android apps can invoke AI
-> conversation/generation routes via manual GraphQL client calls — see
+> conversation/generation routes via manual GraphQL client calls -- see
 > [data-mobile.md](data-mobile.md) patterns for the equivalent approach.
 
 ## Pitfalls

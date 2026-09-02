@@ -101,7 +101,7 @@ aws elasticache delete-serverless-cache \
 3. Create a snapshot before the upgrade.
 4. Check for deprecated commands or behavior changes in the target version.
 5. Verify client library compatibility with the new engine version.
-6. For Redis OSS to Valkey migration, versions 5.0.6+ support zero-downtime migration with Multi-AZ enabled; earlier versions are supported but may experience 30–60 seconds of failover during DNS propagation. Still recommend a snapshot.
+6. For Redis OSS to Valkey migration, versions 5.0.6+ support zero-downtime migration with Multi-AZ enabled; earlier versions are supported but may experience 30-60 seconds of failover during DNS propagation. Still recommend a snapshot.
 
 **Implementation:**
 

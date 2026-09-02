@@ -13,8 +13,8 @@
     - [Error variants](#error-variants-1)
     - [Fixes](#fixes)
   - [Unresolved Account](#unresolved-account)
-    - [Fix — set explicit environment](#fix--set-explicit-environment)
-    - [Fix — commit context](#fix--commit-context)
+    - [Fix -- set explicit environment](#fix--set-explicit-environment)
+    - [Fix -- commit context](#fix--commit-context)
     - [Alternatives to context providers](#alternatives-to-context-providers)
   - [Account/Region Tokens](#accountregion-tokens)
     - [Problem](#problem)
@@ -84,9 +84,9 @@ The CDK CLI assumes roles created by `cdk bootstrap`. If the calling principal l
 
 ### Error variants
 
-- `BootstrapVersionValidation` — the deployed bootstrap stack version is too old for the constructs being deployed.
-- `SSM parameter /cdk-bootstrap/$QUALIFIER/version not found` — the bootstrap stack does not exist in the target account/region, or the qualifier does not match.
-- `Cloud assembly schema version mismatch` — the CLI version is incompatible with the cloud assembly produced by the CDK library.
+- `BootstrapVersionValidation` -- the deployed bootstrap stack version is too old for the constructs being deployed.
+- `SSM parameter /cdk-bootstrap/$QUALIFIER/version not found` -- the bootstrap stack does not exist in the target account/region, or the qualifier does not match.
+- `Cloud assembly schema version mismatch` -- the CLI version is incompatible with the cloud assembly produced by the CDK library.
 
 ### Fixes
 
@@ -127,7 +127,7 @@ Cannot determine account/region; context providers need concrete values
 
 Context providers (e.g., `Vpc.fromLookup`) make API calls at synth time and MUST know the target account and region. Env-agnostic stacks (no explicit `env`) cannot use context providers.
 
-### Fix — set explicit environment
+### Fix -- set explicit environment
 
 ```typescript
 new MyStack(app, 'MyStack', {
@@ -140,7 +140,7 @@ new MyStack(app, 'MyStack', {
 
 `CDK_DEFAULT_ACCOUNT` and `CDK_DEFAULT_REGION` are set automatically by the CDK CLI from your current credentials.
 
-### Fix — commit context
+### Fix -- commit context
 
 You MUST commit `cdk.context.json` to version control. This file caches the results of context provider lookups so that synth is reproducible without live API calls.
 
@@ -148,8 +148,8 @@ You MUST commit `cdk.context.json` to version control. This file caches the resu
 
 If you cannot set an explicit environment, you SHOULD use one of:
 
-- `ec2.Vpc.fromVpcAttributes()` — provide VPC ID, AZs, and subnet IDs directly.
-- SSM Parameter Store lookups at deploy time — store infrastructure values in SSM and read them with `ssm.StringParameter.valueForStringParameter()`.
+- `ec2.Vpc.fromVpcAttributes()` -- provide VPC ID, AZs, and subnet IDs directly.
+- SSM Parameter Store lookups at deploy time -- store infrastructure values in SSM and read them with `ssm.StringParameter.valueForStringParameter()`.
 
 ---
 
@@ -161,7 +161,7 @@ If you cannot set an explicit environment, you SHOULD use one of:
 
 ```typescript
 if (stack.region === 'us-east-1') {
-  // This NEVER matches — stack.region is a Token string like ${Token[AWS.Region.1234]}
+  // This NEVER matches -- stack.region is a Token string like ${Token[AWS.Region.1234]}
 }
 ```
 

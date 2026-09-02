@@ -87,9 +87,9 @@ aws cloudformation deploy \
 
 | Destination | Integration |
 |---|---|
-| Slack | SNS → AWS Chatbot → Slack channel |
-| PagerDuty | SNS → PagerDuty Events API v2 (HTTPS subscription) |
-| Email | SNS → Email subscription (confirm required) |
+| Slack | SNS -> AWS Chatbot -> Slack channel |
+| PagerDuty | SNS -> PagerDuty Events API v2 (HTTPS subscription) |
+| Email | SNS -> Email subscription (confirm required) |
 
 **Restrict who can subscribe.** Attach an SNS topic access policy that limits `sns:Subscribe` to authorized principals or accounts only. Operational alerts carry infrastructure details (cache names, ARNs, thresholds), so an open subscribe policy lets unauthorized parties receive them.
 

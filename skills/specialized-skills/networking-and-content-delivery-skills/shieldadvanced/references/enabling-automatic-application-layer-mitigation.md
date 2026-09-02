@@ -69,8 +69,8 @@ Without a v2 web ACL, or with an older AWS WAF Classic web ACL, enabling does no
 
 ## Always tell the customer (state all of these)
 
-When advising on automatic application layer mitigation — especially when asked why no tailored
-custom rules appeared, or before any cleanup — you MUST state ALL of the following points together,
+When advising on automatic application layer mitigation -- especially when asked why no tailored
+custom rules appeared, or before any cleanup -- you MUST state ALL of the following points together,
 not a subset:
 
 1. Tailored custom rules require a baseline period of roughly **24 to 30 days** of traffic; they are
@@ -256,7 +256,7 @@ has an AWS WAF (v2) web ACL, in the chosen mode, then surfaces the console link 
 
 ```
 Enabled automatic application layer mitigation in Count mode on my-app-alb.
-Shield added the ShieldMitigationRuleGroup rule group to the web ACL — do not remove it.
+Shield added the ShieldMitigationRuleGroup rule group to the web ACL -- do not remove it.
 Custom tailored rules become available after the ~24-30 day baseline; switch to Block once traffic is validated.
 Open the Shield console and confirm the automatic mitigation status:
 https://us-east-1.console.aws.amazon.com/wafv2/shieldv2#/protections

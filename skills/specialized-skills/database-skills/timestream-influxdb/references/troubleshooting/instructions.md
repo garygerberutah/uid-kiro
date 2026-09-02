@@ -6,8 +6,8 @@ User reports errors, connection failures, query problems, write failures, perfor
 
 ## Diagnostic Workflow
 
-1. **Identify the engine** — V2, V2 Read Replica, or V3. Error formats and APIs differ.
-2. **Classify the error** — Connection, write, query, or operational.
+1. **Identify the engine** -- V2, V2 Read Replica, or V3. Error formats and APIs differ.
+2. **Classify the error** -- Connection, write, query, or operational.
 3. **Check the error table below** for known issues and fixes.
 4. **If not found**, check CloudWatch metrics (route to `monitoring`) and instance status.
 
@@ -15,7 +15,7 @@ User reports errors, connection failures, query problems, write failures, perfor
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `connection refused` on port 8086/8181 | Security group missing inbound rule | Add inbound rule for port 8086 (V2) or 8181 (V3) from client CIDR. For publicly accessible instances, the default SG blocks all inbound — you must explicitly allow traffic. For private instances, client must be in the same VPC or connected network |
+| `connection refused` on port 8086/8181 | Security group missing inbound rule | Add inbound rule for port 8086 (V2) or 8181 (V3) from client CIDR. For publicly accessible instances, the default SG blocks all inbound -- you must explicitly allow traffic. For private instances, client must be in the same VPC or connected network |
 | `TLS handshake failure` | Certificate mismatch or expired | Use the endpoint's TLS certificate; verify system CA bundle is current |
 | `connection timeout` | Instance in different VPC or subnet | Verify VPC peering, route tables, and NACLs. Private instances are not reachable from the public internet |
 | `401 Unauthorized` | Invalid or expired API token | Regenerate token via console or API. V2: org-scoped tokens. V3: database-scoped tokens |
@@ -27,7 +27,7 @@ User reports errors, connection failures, query problems, write failures, perfor
 |-------|-------|-----|
 | `413 Request Entity Too Large` | Batch exceeds max payload size | Reduce batch size. V2: 50MB max. V3: check current limits |
 | `429 Too Many Requests` | Write rate limit exceeded | Implement exponential backoff. Consider larger instance type |
-| `partial write: field type conflict` (V2) | Field type changed (int → float) | Field types are immutable per measurement in V2. Drop and recreate, or use a new field name |
+| `partial write: field type conflict` (V2) | Field type changed (int -> float) | Field types are immutable per measurement in V2. Drop and recreate, or use a new field name |
 | `write timeout` | Instance under heavy load or undersized | Check CPU/memory metrics. Scale up instance type or reduce write batch size |
 
 ## Query Errors

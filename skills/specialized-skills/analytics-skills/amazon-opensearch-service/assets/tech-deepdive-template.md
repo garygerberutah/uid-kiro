@@ -1,4 +1,4 @@
-# Migration Assessment — Technical Deep Dive
+# Migration Assessment -- Technical Deep Dive
 
 **Date**: {{ date }}  
 **Skill**: amazon-opensearch-service v{{ skill_version }}  
@@ -14,7 +14,7 @@ Migrate from {{ fingerprint.source_engine }} {{ fingerprint.version | default:'?
 
 ---
 
-## Source — full fingerprint
+## Source -- full fingerprint
 
 ```json
 {{ fingerprint | json }}
@@ -22,13 +22,13 @@ Migrate from {{ fingerprint.source_engine }} {{ fingerprint.version | default:'?
 
 ### Notable observations
 
-{% if fingerprint.summary.dih_used %}- **DIH in use** — Solr 9.0 removed DIH. Migrate ingest pipelines to OSI / DMS / Logstash before cutover.{% endif %}
-{% if fingerprint.summary.velocity_response_writer %}- **Velocity Response Writer** — deprecated/removed in modern Solr; OpenSearch has no equivalent. Move templating into the application layer.{% endif %}
-{% if fingerprint.summary.xslt_response_writer %}- **XSLT Response Writer** — same as Velocity. App-layer templating.{% endif %}
+{% if fingerprint.summary.dih_used %}- **DIH in use** -- Solr 9.0 removed DIH. Migrate ingest pipelines to OSI / DMS / Logstash before cutover.{% endif %}
+{% if fingerprint.summary.velocity_response_writer %}- **Velocity Response Writer** -- deprecated/removed in modern Solr; OpenSearch has no equivalent. Move templating into the application layer.{% endif %}
+{% if fingerprint.summary.xslt_response_writer %}- **XSLT Response Writer** -- same as Velocity. App-layer templating.{% endif %}
 
 ---
 
-## Target — Managed Domain or Serverless NextGen
+## Target -- Managed Domain or Serverless NextGen
 
 Recommended: **{{ migration_path.decision_inputs.target | default:'managed' }}**.
 
@@ -36,8 +36,8 @@ Recommended: **{{ migration_path.decision_inputs.target | default:'managed' }}**
 
 {% if sizing.compute.data_node_instance %}
 
-- Data nodes: {{ sizing.compute.data_node_count }}× {{ sizing.compute.data_node_instance }}
-- Cluster managers: {{ sizing.compute.cluster_manager_count }}× {{ sizing.compute.cluster_manager_instance }}
+- Data nodes: {{ sizing.compute.data_node_count }}x {{ sizing.compute.data_node_instance }}
+- Cluster managers: {{ sizing.compute.cluster_manager_count }}x {{ sizing.compute.cluster_manager_instance }}
 - Storage: {{ sizing.storage.gb_per_node }} GB {{ sizing.storage.type }} per node
 - Region: {{ sizing.region }}
 {% endif %}
@@ -48,7 +48,7 @@ For the formulas, shard rules, JVM thresholds, k-NN engine selection, OCU model,
 
 ---
 
-## Migration Path — full ranking
+## Migration Path -- full ranking
 
 ```json
 {{ migration_path | json }}
@@ -64,13 +64,13 @@ For the formulas, shard rules, JVM thresholds, k-NN engine selection, OCU model,
    - For Snapshot/Restore: you MUST register S3 repo on source and target, snapshot, then restore
    - For OSI: you MUST create the pipeline via blueprint
    - For Reindex from Remote: you MUST pre-create the destination, configure the destination's `reindex.remote.allowlist`, then trigger reindex
-5. **Validation**: doc-count parity, top-N query parity (Jaccard ≥95%), p99 latency parity
+5. **Validation**: doc-count parity, top-N query parity (Jaccard >=95%), p99 latency parity
 6. **Cutover**: read-only on source, drain in-flight, flip clients
 7. **Decommission**: you MUST schedule source teardown after the rollback window
 
 ---
 
-## Sizing — recommendations the customer plugs into the AWS Pricing Calculator
+## Sizing -- recommendations the customer plugs into the AWS Pricing Calculator
 
 ```json
 {{ sizing | json }}
@@ -82,7 +82,7 @@ You MUST plug the sizing JSON above into the **AWS Pricing Calculator** at <http
 
 ---
 
-## Readiness — full breakdown
+## Readiness -- full breakdown
 
 ```json
 {{ readiness | json }}
@@ -92,7 +92,7 @@ You MUST plug the sizing JSON above into the **AWS Pricing Calculator** at <http
 
 ## Risks & migration specifics (full register)
 
-Two-table section. Items with a documented remediation that the migration plan already handles go under **Migration specifics** — frame as *"this is how the migration handles X"*, not as risks. Items that genuinely constrain the migration (no fix, capacity implications, target-choice or customer-action dependencies) go under **Risks/blockers**. Within each table: BLOCKING → HIGH → MEDIUM → LOW. See [`compatibility-rubric.md`](../references/compatibility-rubric.md) for the canonical Severity + Lane vocabulary and [`assessment-gotchas.md`](../references/assessment-gotchas.md) for general anti-patterns.
+Two-table section. Items with a documented remediation that the migration plan already handles go under **Migration specifics** -- frame as *"this is how the migration handles X"*, not as risks. Items that genuinely constrain the migration (no fix, capacity implications, target-choice or customer-action dependencies) go under **Risks/blockers**. Within each table: BLOCKING -> HIGH -> MEDIUM -> LOW. See [`compatibility-rubric.md`](../references/compatibility-rubric.md) for the canonical Severity + Lane vocabulary and [`assessment-gotchas.md`](../references/assessment-gotchas.md) for general anti-patterns.
 
 ---
 
@@ -100,8 +100,8 @@ Two-table section. Items with a documented remediation that the migration plan a
 
 - [ ] Index counts match between source and target
 - [ ] Doc counts within 0.1%
-- [ ] Top-N query parity ≥ 95% Jaccard
-- [ ] p50/p99 latency within 1.2× of source
+- [ ] Top-N query parity >= 95% Jaccard
+- [ ] p50/p99 latency within 1.2x of source
 - [ ] Shard health green; 0 unassigned
 - [ ] ISM policies migrated and attached
 - [ ] Role mappings + SAML/OIDC tested

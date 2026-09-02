@@ -67,7 +67,7 @@ if [[ "$FORCE" != "true" ]]; then
     echo "Error: No TTY available for confirmation. Use --force to skip." >&2
     exit 1
   fi
-  echo "⚠️  WARNING: This will permanently delete cluster: $CLUSTER_ID"
+  echo "[WARNING]  WARNING: This will permanently delete cluster: $CLUSTER_ID"
   echo ""
   read -p "Are you sure you want to continue? (type 'yes' to confirm): " CONFIRM
 
@@ -85,7 +85,7 @@ aws dsql delete-cluster \
   --region "$REGION"
 
 echo ""
-echo "✓ Cluster deletion initiated!"
+echo "[OK] Cluster deletion initiated!"
 echo ""
 echo "Note: The cluster may take a few minutes to fully delete."
 echo "Check status with: aws dsql get-cluster --identifier $CLUSTER_ID --region $REGION"

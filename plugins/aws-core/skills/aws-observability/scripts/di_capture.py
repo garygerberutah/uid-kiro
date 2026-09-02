@@ -4,16 +4,16 @@ Mirrors the ``Location`` design: a sealed sum type covers the two
 ``CaptureConfiguration`` variants the ``application-signals`` API exposes,
 plus an ``UnknownCapture`` fallback so renderers stay forward-compatible.
 
-The type owns the API shape — payload assembly via ``to_api_payload`` and
+The type owns the API shape -- payload assembly via ``to_api_payload`` and
 inverse parsing via ``capture_from_response``. It does *not* own prose
 rendering (renderers keep their CAPTURE SETTINGS / CAPTURE CONFIGURATION
 blocks) and it does *not* fill in tool-input defaults (defaults like
 ``capture_return=True`` resolve at the tool layer where the success-message
 prose can read the resolved value).
 
-The ADT preserves the distinction between an *omitted* list (``None`` — key
-absent from the API payload) and a *present-but-empty* list (``()`` — key
-emitted as ``[]``) so an API response round-trips parse → payload → parse
+The ADT preserves the distinction between an *omitted* list (``None`` -- key
+absent from the API payload) and a *present-but-empty* list (``()`` -- key
+emitted as ``[]``) so an API response round-trips parse -> payload -> parse
 without losing information. It does *not* assert what the backend means by
 either shape. The *create* operation deliberately does not expose both shapes:
 it rejects empty lists and the ``*`` wildcard and treats an omitted list as
@@ -84,8 +84,8 @@ class CodeCapture:
     ``capture_arguments`` and ``capture_locals`` are stored as tuples so the
     ``frozen=True`` immutability contract holds against mutation through the
     container (a caller's reference to the source list cannot mutate this
-    instance). Constructors still accept any iterable of strings — including
-    a list — and ``__post_init__`` converts to ``tuple``. This is the same
+    instance). Constructors still accept any iterable of strings -- including
+    a list -- and ``__post_init__`` converts to ``tuple``. This is the same
     discipline ``Location`` applies to ``extra_fields`` via
     ``MappingProxyType``.
 
@@ -131,7 +131,7 @@ class UnknownCapture:
     """A CaptureConfiguration union that did not match a known variant.
 
     ``raw`` is wrapped in ``MappingProxyType`` to keep the ``frozen=True``
-    contract intact against mutation through the source dict — the same
+    contract intact against mutation through the source dict -- the same
     discipline applied to ``Location.extra_fields`` and
     ``CodeCapture.capture_arguments``.
     """
@@ -159,7 +159,7 @@ def capture_from_response(union_dict: Optional[Dict[str, Any]]) -> Capture:
     """Parse a ``CaptureConfiguration`` union returned by the API into the ADT.
 
     Falls back to inferring a ``CodeCapture`` if a CodeCapture-shaped dict
-    is passed without the ``CodeCapture`` wrapper key — this matches the
+    is passed without the ``CodeCapture`` wrapper key -- this matches the
     legacy ``extract_capture_variant`` fallback that some response shapes
     relied on.
     """

@@ -15,10 +15,10 @@ import { Construct } from 'constructs';
  * Create Lambda monitoring with best-practice defaults.
  *
  * Best-practice defaults (vs common defaults):
- * - evaluationPeriods: 3 (not 1) — reduces false positives
- * - datapointsToAlarm: 2 (not 1) — M-of-N prevents flapping
- * - treatMissingData: NOT_BREACHING (not MISSING) — absence of errors = OK
- * - period: 60s (not 300s) — faster detection
+ * - evaluationPeriods: 3 (not 1) -- reduces false positives
+ * - datapointsToAlarm: 2 (not 1) -- M-of-N prevents flapping
+ * - treatMissingData: NOT_BREACHING (not MISSING) -- absence of errors = OK
+ * - period: 60s (not 300s) -- faster detection
  * - error rate uses math expression (not raw Errors count)
  * - duration uses p99 (not Average)
  */
@@ -73,7 +73,7 @@ export function createLambdaMonitoring(
     treatMissingData: TreatMissingData.NOT_BREACHING,
   });
 
-  // Composite alarm — only page when service is unhealthy
+  // Composite alarm -- only page when service is unhealthy
   const serviceHealthAlarm = new CompositeAlarm(scope, 'ServiceHealthAlarm', {
     alarmRule: AlarmRule.anyOf(
       AlarmRule.fromAlarm(errorRateAlarm, AlarmState.ALARM),

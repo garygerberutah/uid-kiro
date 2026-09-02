@@ -1,4 +1,4 @@
-# Data — Backend
+# Data -- Backend
 
 > **Prerequisites:** Backend defined in `amplify/backend.ts` with `defineBackend({ auth, data })`.
 
@@ -37,13 +37,13 @@ import { data } from './data/resource';
 defineBackend({ auth, data });
 ```
 
-Export `Schema` as `ClientSchema<typeof schema>` — without this export,
+Export `Schema` as `ClientSchema<typeof schema>` -- without this export,
 frontend clients lose all type inference.
 **Field types:** `a.string()`, `a.integer()`, `a.float()`, `a.boolean()`,
 `a.date()`, `a.datetime()`, `a.timestamp()`, `a.time()`, `a.email()`,
 `a.url()`, `a.phone()`, `a.ipAddress()`, `a.json()`, `a.id()`,
 `a.enum([...])`. Chain `.required()` or `.array()` on any field;
-`.default(value)` on scalar fields only (not enums — see Pitfalls).
+`.default(value)` on scalar fields only (not enums -- see Pitfalls).
 
 > **`a.phone()`:** Only accepts E.164 format (`+15551234567`). Hyphens (`+1-555-0101`) and short formats are rejected.
 
@@ -110,7 +110,7 @@ string field to control access via group names stored on each record.
 
 ### Authorization Rule Combining
 
-When multiple rules are applied, the **most permissive wins**. You cannot use `deny` rules — if `allow.authenticated()` grants full CRUD, you cannot selectively deny `delete` for non-owners. Structure rules from most restrictive:
+When multiple rules are applied, the **most permissive wins**. You cannot use `deny` rules -- if `allow.authenticated()` grants full CRUD, you cannot selectively deny `delete` for non-owners. Structure rules from most restrictive:
 
 ```typescript
 .authorization(allow => [
@@ -119,7 +119,7 @@ When multiple rules are applied, the **most permissive wins**. You cannot use `d
 ])
 ```
 
-> **Pitfall:** `groupsDefinedIn('fieldName')` automatically creates an implicit field on the model. Do NOT also declare that field explicitly — this causes: `"Implicit field conflicts with explicit field definition."`
+> **Pitfall:** `groupsDefinedIn('fieldName')` automatically creates an implicit field on the model. Do NOT also declare that field explicitly -- this causes: `"Implicit field conflicts with explicit field definition."`
 >
 > **Type system gap:** The implicit field from `groupsDefinedIn('fieldName')` is NOT exposed in generated TypeScript client types. To set the field programmatically, use an untyped approach:
 >
@@ -132,12 +132,12 @@ When multiple rules are applied, the **most permissive wins**. You cannot use `d
 
 | Pattern | Use Case | Field Type | Who Gets Access |
 |---------|----------|------------|-----------------|
-| `allow.ownersDefinedIn('editors')` | Multiple named users own the resource | `a.string().array()` — declare explicitly | Specific users listed in the array |
-| `allow.groupsDefinedIn('teamGroups')` | Access by Cognito group membership | Implicit — do NOT declare | Any user in the named Cognito group |
+| `allow.ownersDefinedIn('editors')` | Multiple named users own the resource | `a.string().array()` -- declare explicitly | Specific users listed in the array |
+| `allow.groupsDefinedIn('teamGroups')` | Access by Cognito group membership | Implicit -- do NOT declare | Any user in the named Cognito group |
 
 ## Relationships
 
-Three types — reference field types must match the related model's
+Three types -- reference field types must match the related model's
 identifier type.
 
 > **Foreign key fields must use `a.id()`**, not `a.string()`. Using `a.string()` causes silent relationship resolution failures.
@@ -167,14 +167,14 @@ const schema = a.schema({
 The second argument to `hasMany`/`belongsTo`/`hasOne` is the foreign key
 field name. That field must be declared explicitly on the child model.
 
-Declare **both sides** of every relationship — the parent model
+Declare **both sides** of every relationship -- the parent model
 needs `a.hasMany('Child', 'fkField')` AND the child model needs
 `a.belongsTo('Parent', 'fkField')`. Omitting either side causes silent
 query failures (e.g., lazy-loading the relation returns `undefined`).
 
-### Deletion Behavior — No Referential Integrity
+### Deletion Behavior -- No Referential Integrity
 
-Deleting a parent record does NOT cascade to children and does NOT fail. Child records become orphaned silently — manually delete children first or implement a soft-delete pattern.
+Deleting a parent record does NOT cascade to children and does NOT fail. Child records become orphaned silently -- manually delete children first or implement a soft-delete pattern.
 
 ```typescript
 // Delete children before parent
@@ -210,7 +210,7 @@ Todo: a.model({
 
 Indexes enable `client.models.Todo.listByStatus({ status: 'active' })`.
 Composite sort keys allow multi-field sorting within a partition. You
-**SHOULD** name the `queryField` descriptively — it becomes the typed
+**SHOULD** name the `queryField` descriptively -- it becomes the typed
 client method name.
 
 ## Enum Types
@@ -237,16 +237,16 @@ Todo: a.model({
 })
 ```
 
-> ⚠️ **Pitfall:** `.default()` does not work on `a.enum()` fields — default values are only supported on scalar types (`a.string()`, `a.integer()`, etc.). Applying `.default()` to an enum field silently fails at deployment.
+> [WARNING] **Pitfall:** `.default()` does not work on `a.enum()` fields -- default values are only supported on scalar types (`a.string()`, `a.integer()`, etc.). Applying `.default()` to an enum field silently fails at deployment.
 >
-> **`.required()` on enums:** `a.enum(['A','B']).required()` does NOT work — `.required()` doesn't exist on EnumType. Define the enum separately and use `a.ref()`:
+> **`.required()` on enums:** `a.enum(['A','B']).required()` does NOT work -- `.required()` doesn't exist on EnumType. Define the enum separately and use `a.ref()`:
 >
 > ```typescript
 > const Priority = a.enum(['low', 'medium', 'high']);
 > const schema = a.schema({
 >   Todo: a.model({
->     priority: a.ref('Priority').required(), // ✅ Works
->     // priority: Priority.required(),       // ❌ Fails
+>     priority: a.ref('Priority').required(), // [YES] Works
+>     // priority: Priority.required(),       // [NO] Fails
 >   })
 > });
 > ```
@@ -322,12 +322,12 @@ export const data = defineData({
 ```
 
 The `defaultAuthorizationMode` must match at least one strategy used in
-your model `authorization()` rules (e.g., `userPool` ↔ `owner()` /
-`authenticated()` / `group()`; `apiKey` ↔ `publicApiKey()`; `iam` ↔ `guest()`).
+your model `authorization()` rules (e.g., `userPool` <-> `owner()` /
+`authenticated()` / `group()`; `apiKey` <-> `publicApiKey()`; `iam` <-> `guest()`).
 
-Guest access is enabled by default in Amplify Gen2 — see [auth-backend.md](auth-backend.md) for details and how to disable it.
+Guest access is enabled by default in Amplify Gen2 -- see [auth-backend.md](auth-backend.md) for details and how to disable it.
 
-> Guest access configuration: see [auth-backend.md](auth-backend.md) § Guest Access.
+> Guest access configuration: see [auth-backend.md](auth-backend.md) Section Guest Access.
 
 ## Pitfalls
 
@@ -337,14 +337,14 @@ Guest access is enabled by default in Amplify Gen2 — see [auth-backend.md](aut
 - **Auth mode conflict:** Using `allow.publicApiKey()` in model rules but
   setting `defaultAuthorizationMode: 'userPool'` without adding
   `apiKeyAuthorizationMode` causes API key requests to be rejected.
-- **Per-field auth + `.required()`:** Fields with owner-only authorization (`allow.owner()`) cannot be `.required()` — other users can't provide a value on create. Make private fields optional.
+- **Per-field auth + `.required()`:** Fields with owner-only authorization (`allow.owner()`) cannot be `.required()` -- other users can't provide a value on create. Make private fields optional.
 
 ## Links
 
 - [Data Overview](https://docs.amplify.aws/react/build-a-backend/data/)
 - [Set Up Data](https://docs.amplify.aws/react/build-a-backend/data/set-up-data/)
 - [Data Modeling](https://docs.amplify.aws/react/build-a-backend/data/data-modeling/)
-- [Data Modeling — Relationships](https://docs.amplify.aws/react/build-a-backend/data/data-modeling/relationships/)
-- [Data Modeling — Add Fields](https://docs.amplify.aws/react/build-a-backend/data/data-modeling/add-fields/)
+- [Data Modeling -- Relationships](https://docs.amplify.aws/react/build-a-backend/data/data-modeling/relationships/)
+- [Data Modeling -- Add Fields](https://docs.amplify.aws/react/build-a-backend/data/data-modeling/add-fields/)
 - [Customize Authorization](https://docs.amplify.aws/react/build-a-backend/data/customize-authz/)
 - [Connect to Existing Data Sources](https://docs.amplify.aws/react/build-a-backend/data/connect-to-existing-data-sources/)

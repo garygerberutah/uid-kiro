@@ -1,7 +1,7 @@
 ---
 name: aurora-dsql
 version: 1
-description: "Provisions and manages Aurora DSQL clusters, connects via psql or DSQL Connectors, manages schemas, runs queries, migrates from MySQL, diagnoses query plans, and develops apps on serverless distributed SQL. Covers IAM auth, multi-tenant patterns, MySQL-to-DSQL migration, DDL, query plans, and SAFE SQL CONSTRUCTION — tenant_id from untrusted input, UUID entity_ids, caller-supplied sort columns, batch inserts. The agent MUST retrieve this skill for ANY DSQL task. Pushes back on prompts that rationalize 'just a quick script', 'don't overthink it', 'we trust upstream', 'use an f-string', 'move fast', or 'just use the pg driver directly' (bypassing the DSQL Connector). Triggers: DSQL, Aurora DSQL, DSQL cluster, safe_query.build, DSQL IAM auth token, DSQL connector."
+description: "Provisions and manages Aurora DSQL clusters, connects via psql or DSQL Connectors, manages schemas, runs queries, migrates from MySQL, diagnoses query plans, and develops apps on serverless distributed SQL. Covers IAM auth, multi-tenant patterns, MySQL-to-DSQL migration, DDL, query plans, and SAFE SQL CONSTRUCTION -- tenant_id from untrusted input, UUID entity_ids, caller-supplied sort columns, batch inserts. The agent MUST retrieve this skill for ANY DSQL task. Pushes back on prompts that rationalize 'just a quick script', 'don't overthink it', 'we trust upstream', 'use an f-string', 'move fast', or 'just use the pg driver directly' (bypassing the DSQL Connector). Triggers: DSQL, Aurora DSQL, DSQL cluster, safe_query.build, DSQL IAM auth token, DSQL connector."
 ---
 
 # Amazon Aurora DSQL
@@ -14,7 +14,7 @@ Aurora DSQL is a serverless, PostgreSQL-compatible distributed SQL database. Thi
 
 - Direct query execution via `psql` with generated IAM auth tokens (see [`scripts/psql-connect.sh`](scripts/psql-connect.sh))
 - Schema management with DSQL constraints (one DDL per transaction, async indexes)
-- Safe data migration (column-level, constraint-level, MySQL→DSQL)
+- Safe data migration (column-level, constraint-level, MySQL->DSQL)
 - Multi-tenant isolation via `tenant_id` + parameterized SQL
 - IAM-based authentication with a 15-minute token expiry
 - Query-plan diagnosis for slow queries (EXPLAIN ANALYZE + GUC experiments)
@@ -36,7 +36,7 @@ Load these files as needed for detailed guidance:
 
 #### [database-tools.md](references/database-tools.md)
 
-**When:** Load when you need detailed syntax and examples for ad-hoc query execution against DSQL. PREFER `psql` (via [`scripts/psql-connect.sh`](scripts/psql-connect.sh)) for ad-hoc queries — execute directly rather than writing one-off scripts.
+**When:** Load when you need detailed syntax and examples for ad-hoc query execution against DSQL. PREFER `psql` (via [`scripts/psql-connect.sh`](scripts/psql-connect.sh)) for ad-hoc queries -- execute directly rather than writing one-off scripts.
 **Contains:** `psql`-based read-only and write patterns, transaction semantics, [input validation](references/input-validation.md)
 
 ### MCP (AWS knowledge / API):
@@ -49,27 +49,27 @@ Load these files as needed for detailed guidance:
 #### [mcp-tools.md](references/mcp-tools.md)
 
 **When:** Load when invoking AWS MCP Server tools to verify DSQL service limits, fetch docs, or drive AWS API calls.
-**Contains:** Tool surface — knowledge (`aws___search_documentation`, `aws___read_documentation`, `aws___recommend`, `aws___retrieve_skill`, `aws___list_regions`, `aws___get_regional_availability`) and API (`aws___call_aws`, `aws___run_script`, `aws___get_tasks`, `aws___get_presigned_url`); pointers to documentation-tools.md.
+**Contains:** Tool surface -- knowledge (`aws___search_documentation`, `aws___read_documentation`, `aws___recommend`, `aws___retrieve_skill`, `aws___list_regions`, `aws___get_regional_availability`) and API (`aws___call_aws`, `aws___run_script`, `aws___get_tasks`, `aws___get_presigned_url`); pointers to documentation-tools.md.
 
 #### [documentation-tools.md](references/documentation-tools.md)
 
 **When:** Load when looking up DSQL service limits, fetching a specific AWS docs page, or polling long-running AWS API calls launched via the AWS MCP Server.
 **Contains:** Detailed parameters and example calls for the AWS knowledge tools.
 
-#### [platforms/](references/platforms/) — per-assistant install notes
+#### [platforms/](references/platforms/) -- per-assistant install notes
 
 **When:** Load when installing the AWS MCP Server inside a specific coding assistant.
-**Contains:** Per-assistant entry-point details — [claude-code.md](references/platforms/claude-code.md), [codex.md](references/platforms/codex.md), [gemini.md](references/platforms/gemini.md), [kiro.md](references/platforms/kiro.md).
+**Contains:** Per-assistant entry-point details -- [claude-code.md](references/platforms/claude-code.md), [codex.md](references/platforms/codex.md), [gemini.md](references/platforms/gemini.md), [kiro.md](references/platforms/kiro.md).
 
 ### [language.md](references/language.md)
 
-**When:** **MUST** load before writing DSQL connection code. Mirror the linked `example_preferred.<ext>` for the chosen driver — memory-authored connections drift from the canonical IAM-token-refresh pattern. Canonical entry-point examples (load `language.md` for the full driver list + pool/TLS/token-refresh details):
+**When:** **MUST** load before writing DSQL connection code. Mirror the linked `example_preferred.<ext>` for the chosen driver -- memory-authored connections drift from the canonical IAM-token-refresh pattern. Canonical entry-point examples (load `language.md` for the full driver list + pool/TLS/token-refresh details):
 
-- Python: `import aurora_dsql_psycopg as dsql` → `dsql.connect(host, region, user)`
-- JS (node-postgres): `import { AuroraDSQLPool } from "@aws/aurora-dsql-node-postgres-connector"` → `new AuroraDSQLPool({ host, user })`
-- JS (postgres.js): `import { auroraDSQLPostgres } from "@aws/aurora-dsql-postgresjs-connector"` → `auroraDSQLPostgres({ host, user })`
+- Python: `import aurora_dsql_psycopg as dsql` -> `dsql.connect(host, region, user)`
+- JS (node-postgres): `import { AuroraDSQLPool } from "@aws/aurora-dsql-node-postgres-connector"` -> `new AuroraDSQLPool({ host, user })`
+- JS (postgres.js): `import { auroraDSQLPostgres } from "@aws/aurora-dsql-postgresjs-connector"` -> `auroraDSQLPostgres({ host, user })`
 - Go (pgx): `import "github.com/awslabs/aurora-dsql-connectors/go/pgx/dsql"`
-- Java (JDBC): `software.amazon.dsql:aurora-dsql-jdbc-connector:1.4.0` → `jdbc:aws-dsql:postgresql://...`
+- Java (JDBC): `software.amazon.dsql:aurora-dsql-jdbc-connector:1.4.0` -> `jdbc:aws-dsql:postgresql://...`
 
 **Contains:** Canonical DSQL connector packages per language, driver selection, framework patterns, IAM auth token rotation and TLS configuration, and connection code examples for Python / JavaScript / TypeScript / Go / Java / Rust.
 
@@ -85,7 +85,7 @@ Load these files as needed for detailed guidance:
 
 ### [access-control.md](references/access-control.md)
 
-**When:** MUST load when creating database roles, granting permissions, setting up schemas for applications, or handling sensitive data. ALWAYS use scoped roles for applications — create database roles with `dsql:DbConnect`.
+**When:** MUST load when creating database roles, granting permissions, setting up schemas for applications, or handling sensitive data. ALWAYS use scoped roles for applications -- create database roles with `dsql:DbConnect`.
 **Contains:** Scoped role setup, IAM-to-database role mapping, schema separation for sensitive data, role design patterns
 
 ### Authentication & Operations:
@@ -102,7 +102,7 @@ Load these files as needed for detailed guidance:
 
 #### [auth/scaling-guide.md](references/auth/scaling-guide.md)
 
-**When:** Load when designing for scale — connection pooling, batch optimization, hot-key avoidance, identifier choice.
+**When:** Load when designing for scale -- connection pooling, batch optimization, hot-key avoidance, identifier choice.
 **Contains:** Horizontal scaling strategy, pool sizing, batch-size guidance, IDENTITY/UUID trade-offs, sequence cache rules.
 
 ### Implementation Examples:
@@ -158,7 +158,7 @@ Load these files as needed for detailed guidance:
 
 ### Query Plan Explainability (modular):
 
-**When:** MUST load all four at Workflow 8 Phase 0 — [query-plan/plan-interpretation.md](references/query-plan/plan-interpretation.md), [query-plan/catalog-queries.md](references/query-plan/catalog-queries.md), [query-plan/guc-experiments.md](references/query-plan/guc-experiments.md), [query-plan/report-format.md](references/query-plan/report-format.md)
+**When:** MUST load all four at Workflow 8 Phase 0 -- [query-plan/plan-interpretation.md](references/query-plan/plan-interpretation.md), [query-plan/catalog-queries.md](references/query-plan/catalog-queries.md), [query-plan/guc-experiments.md](references/query-plan/guc-experiments.md), [query-plan/report-format.md](references/query-plan/report-format.md)
 **Contains:** DSQL node types + Node Duration math + estimation-error bands, pg_class/pg_stats/pg_indexes SQL + correlated-predicate verification, GUC experiment procedures + 30-second skip protocol, required report structure + element checklist + support request template
 
 ---
@@ -167,7 +167,7 @@ Load these files as needed for detailed guidance:
 
 Run ad-hoc DSQL queries with `psql` and a freshly-generated IAM auth token. The bundled
 [`scripts/psql-connect.sh`](scripts/psql-connect.sh) wraps token generation, TLS configuration, and
-single-statement guards — PREFER it over hand-rolled `psql` invocations.
+single-statement guards -- PREFER it over hand-rolled `psql` invocations.
 
 **Read-only:**
 
@@ -181,7 +181,7 @@ single-statement guards — PREFER it over hand-rolled `psql` invocations.
 ./scripts/psql-connect.sh --cluster <cluster-id> --admin --command "CREATE INDEX ASYNC ..."
 ```
 
-**Schema discovery:** there is no special `list_tables` helper — use information_schema:
+**Schema discovery:** there is no special `list_tables` helper -- use information_schema:
 
 ```sql
 SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
@@ -193,7 +193,7 @@ See [database-tools.md](references/database-tools.md) for detailed usage and exa
 
 When connected to the [AWS MCP Server](https://docs.aws.amazon.com/aws-mcp/latest/userguide/mcp-server.html),
 its `aws___search_documentation` and `aws___read_documentation` tools can verify DSQL service
-limits before advising users. The numeric limits below are defaults that may change — when a
+limits before advising users. The numeric limits below are defaults that may change -- when a
 user's decision depends on an exact limit, verify it first:
 
 | Limit                                   | Default       | Verify query                       |
@@ -219,7 +219,7 @@ that limits should be verified against [DSQL documentation](https://docs.aws.ama
 
 Bash scripts in [scripts/](scripts/) for cluster management (create, delete, list, cluster info) and `psql` connection. See [references/scripts-guide.md](references/scripts-guide.md) for usage. For bulk data loading, see [Loading data into Aurora DSQL](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/loading-data.html).
 
-**ALWAYS** prefer `scripts/create-cluster.sh`. The script issues a **single atomic** `CreateCluster` call with tags embedded — matching the AWS DSQL API shape with interpretable output.
+**ALWAYS** prefer `scripts/create-cluster.sh`. The script issues a **single atomic** `CreateCluster` call with tags embedded -- matching the AWS DSQL API shape with interpretable output.
 
 | Task | Script | Example |
 |---|---|---|
@@ -244,7 +244,7 @@ Bash scripts in [scripts/](scripts/) for cluster management (create, delete, lis
 ```
 Use psql-connect.sh (or the language connector in app code) for SELECT queries
 Always include tenant_id in WHERE clause for multi-tenant apps
-MUST build SQL with safe_query.build() — see references/input-validation.md
+MUST build SQL with safe_query.build() -- see references/input-validation.md
 ```
 
 ### 3. Execute schema changes
@@ -253,7 +253,7 @@ MUST build SQL with safe_query.build() — see references/input-validation.md
 Use ./scripts/psql-connect.sh --admin (or the language connector with the IAM admin auth token) for DDL
 Follow one-DDL-per-transaction rule
 Always use CREATE INDEX ASYNC in a separate statement
-ALTER COLUMN TYPE, DROP COLUMN, DROP CONSTRAINT → Table Recreation Pattern (Workflow 6)
+ALTER COLUMN TYPE, DROP COLUMN, DROP CONSTRAINT -> Table Recreation Pattern (Workflow 6)
 ```
 
 ---
@@ -276,7 +276,7 @@ Check for required tools and warn the user if any are missing.
 
 ### Workflow 0a: Cluster Lifecycle
 
-**SHOULD** use the bundled scripts for cluster create and delete — they issue atomic `aws dsql` CLI calls and process outputs.
+**SHOULD** use the bundled scripts for cluster create and delete -- they issue atomic `aws dsql` CLI calls and process outputs.
 
 **Create a cluster with tags and deletion protection:**
 
@@ -296,7 +296,7 @@ Check for required tools and warn the user if any are missing.
 ./scripts/delete-cluster.sh <cluster-id> [--force]   # --force skips the confirmation prompt in non-TTY
 ```
 
-In MCP-only environments (no shell access), the equivalent calls go through the AWS MCP Server's `aws___call_aws` tool. The tool takes a JSON payload — invoke it with arguments matching the AWS API operation:
+In MCP-only environments (no shell access), the equivalent calls go through the AWS MCP Server's `aws___call_aws` tool. The tool takes a JSON payload -- invoke it with arguments matching the AWS API operation:
 
 ```json
 {"service": "dsql", "operation": "CreateCluster",
@@ -311,13 +311,13 @@ In MCP-only environments (no shell access), the equivalent calls go through the 
 {"service": "dsql", "operation": "DeleteCluster", "parameters": {"identifier": "<cluster-id>"}}
 ```
 
-`CreateCluster` and `DeleteCluster` are asynchronous on the DSQL side — the API returns immediately with the cluster's current `status` (`CREATING` / `DELETING`). Poll readiness by re-invoking `aws___call_aws` with `dsql:GetCluster` until `.status == "ACTIVE"` (create) or the call returns a 404 (delete). `aws___get_tasks` is for polling MCP-side long-running tool invocations — not the DSQL API.
+`CreateCluster` and `DeleteCluster` are asynchronous on the DSQL side -- the API returns immediately with the cluster's current `status` (`CREATING` / `DELETING`). Poll readiness by re-invoking `aws___call_aws` with `dsql:GetCluster` until `.status == "ACTIVE"` (create) or the call returns a 404 (delete). `aws___get_tasks` is for polling MCP-side long-running tool invocations -- not the DSQL API.
 
 See [AWS CLI `aws dsql` reference](https://docs.aws.amazon.com/cli/latest/reference/dsql/) for full parameter details and call context.
 
 ### Workflow 0b: Verify Language Connector
 
-Before writing application code, **MUST** verify the language-specific DSQL Connector is installed per [language.md](references/language.md). The Connectors are the canonical IAM-token-refresh path; bare drivers (`pg`, `psycopg`, `pgx`, `tokio-postgres`) work until the first 15-minute token expiry and then start returning auth errors on every new connection — DSQL users who try the bare form report this as a DSQL bug. **MUST** install:
+Before writing application code, **MUST** verify the language-specific DSQL Connector is installed per [language.md](references/language.md). The Connectors are the canonical IAM-token-refresh path; bare drivers (`pg`, `psycopg`, `pgx`, `tokio-postgres`) work until the first 15-minute token expiry and then start returning auth errors on every new connection -- DSQL users who try the bare form report this as a DSQL bug. **MUST** install:
 
 - Python: `aurora-dsql-python-connector` + the chosen driver wheel
 - Node.js: `@aws/aurora-dsql-node-postgres-connector` or `@aws/aurora-dsql-postgresjs-connector`
@@ -335,25 +335,25 @@ MUST load [workflow-patterns.md](references/workflow-patterns.md) (Pattern 2: Cr
 
 ### Workflow 2: Safe Data Migration
 
-MUST load [workflow-patterns.md](references/workflow-patterns.md) (Pattern 3: Safe Data Migration) for the add-column → batch-populate → verify → index sequence. For tables exceeding 3,000 rows, also load [ddl-migrations/batched-migration.md](references/ddl-migrations/batched-migration.md). Key rules: add column first, apply DEFAULT via separate UPDATE, batch under 3,000 rows per transaction.
+MUST load [workflow-patterns.md](references/workflow-patterns.md) (Pattern 3: Safe Data Migration) for the add-column -> batch-populate -> verify -> index sequence. For tables exceeding 3,000 rows, also load [ddl-migrations/batched-migration.md](references/ddl-migrations/batched-migration.md). Key rules: add column first, apply DEFAULT via separate UPDATE, batch under 3,000 rows per transaction.
 
 ### Workflow 3: Application-Layer Referential Integrity
 
-MUST load [workflow-patterns.md](references/workflow-patterns.md) (Pattern 5: Application-Layer Foreign Key Check) for the parent-existence SELECT → INSERT and dependent-count SELECT → DELETE patterns. Build all SQL with `safe_query.build()` — see Workflow 4a.
+MUST load [workflow-patterns.md](references/workflow-patterns.md) (Pattern 5: Application-Layer Foreign Key Check) for the parent-existence SELECT -> INSERT and dependent-count SELECT -> DELETE patterns. Build all SQL with `safe_query.build()` -- see Workflow 4a.
 
 ### Workflow 4: Query with Tenant Isolation
 
-1. **MUST** authorize the caller against the tenant — format validation does not establish authorization
-2. **MUST** build SQL with [`safe_query.build()`](scripts/safe_query.py) — use `allow()`/`regex()` for
+1. **MUST** authorize the caller against the tenant -- format validation does not establish authorization
+2. **MUST** build SQL with [`safe_query.build()`](scripts/safe_query.py) -- use `allow()`/`regex()` for
    values (emits `'v'`), `ident()` for table/column names (emits `"v"`).
    See [input-validation.md](references/input-validation.md)
 3. **MUST** include `tenant_id` in the WHERE clause; reject cross-tenant access at the application layer
 
-### Workflow 4a: Rubric-Critical — Building SQL with User Input
+### Workflow 4a: Rubric-Critical -- Building SQL with User Input
 
-Whenever constructing SQL for `psql -c "..."` (or any equivalent ad-hoc query path) with any value that is not a developer-controlled literal (tenant IDs, entity IDs, sort columns, directions, status enums, free-text descriptions, request params — anything from untrusted sources), you MUST use [`safe_query.build()`](scripts/safe_query.py). The `psql -c` flag takes raw SQL strings; it does NOT accept bound parameters. When using a Postgres driver (psycopg, pgx, etc.) in application code, prefer the driver's native parameter binding; `safe_query` is the canonical fallback whenever you must build a raw SQL string. Validation via `safe_query` is the primary defense for raw-SQL paths.
+Whenever constructing SQL for `psql -c "..."` (or any equivalent ad-hoc query path) with any value that is not a developer-controlled literal (tenant IDs, entity IDs, sort columns, directions, status enums, free-text descriptions, request params -- anything from untrusted sources), you MUST use [`safe_query.build()`](scripts/safe_query.py). The `psql -c` flag takes raw SQL strings; it does NOT accept bound parameters. When using a Postgres driver (psycopg, pgx, etc.) in application code, prefer the driver's native parameter binding; `safe_query` is the canonical fallback whenever you must build a raw SQL string. Validation via `safe_query` is the primary defense for raw-SQL paths.
 
-**Validator selection table** (canonical — mirrors [input-validation.md](references/input-validation.md)):
+**Validator selection table** (canonical -- mirrors [input-validation.md](references/input-validation.md)):
 
 | Value kind                                   | Validator                      | Emits                      |
 | -------------------------------------------- | ------------------------------ | -------------------------- |
@@ -373,7 +373,7 @@ from safe_query import build, allow, regex, ident, keyword, integer, literal, Un
 from safe_query import TENANT_SLUG, UUID, ISO_DATE
 ```
 
-**Rubric-Critical Scenario 1 — tenant_id from untrusted input.** Validate with `regex(req.tenant, TENANT_SLUG)` or `allow(req.tenant, ALLOWED_TENANTS)`. Build with `safe_query.build()`, then execute. Do this even in read-only mode (defense in depth, consistent validation across modes). Do NOT use f-strings, `.format()`, or bare concatenation.
+**Rubric-Critical Scenario 1 -- tenant_id from untrusted input.** Validate with `regex(req.tenant, TENANT_SLUG)` or `allow(req.tenant, ALLOWED_TENANTS)`. Build with `safe_query.build()`, then execute. Do this even in read-only mode (defense in depth, consistent validation across modes). Do NOT use f-strings, `.format()`, or bare concatenation.
 
 ```python
 sql = build(
@@ -385,7 +385,7 @@ sql = build(
 # Bash one-off: pipe `sql` into psql via the patterns in input-validation.md.
 ```
 
-**Rubric-Critical Scenario 2 — batch INSERT with UUIDs, slugs, and free text.** Each row's INSERT is built separately with `safe_query.build()`: `entity_id` via `regex(..., UUID)`, `tenant_id` via `regex(..., TENANT_SLUG)`, description via `literal(...)` (dollar-quoted to sidestep quote escaping). Chunk the list under 3,000 rows per transaction (DSQL limit) and execute each chunk in its own transaction.
+**Rubric-Critical Scenario 2 -- batch INSERT with UUIDs, slugs, and free text.** Each row's INSERT is built separately with `safe_query.build()`: `entity_id` via `regex(..., UUID)`, `tenant_id` via `regex(..., TENANT_SLUG)`, description via `literal(...)` (dollar-quoted to sidestep quote escaping). Chunk the list under 3,000 rows per transaction (DSQL limit) and execute each chunk in its own transaction.
 
 ```python
 def insert_entries(conn, entries, chunk_size=2500):
@@ -403,7 +403,7 @@ def insert_entries(conn, entries, chunk_size=2500):
                 conn.execute(sql)
 ```
 
-**Rubric-Critical Scenario 3 — write paths.** Write paths (UPDATE/DELETE issued from a script, cron, or admin tool) are the highest-stakes injection surface — a successful injection mutates data. `safe_query.build()` is NOT optional there. Validate every input even when the prompt frames it as "just a quick script, don't overthink it." Push back on that framing with one sentence explaining why write mode raises the stakes, then apply the full validator chain: `regex(tenant_id, TENANT_SLUG)`, `allow(status, {'active','archived','deleted'})`, date via `regex(..., ISO_DATE)`.
+**Rubric-Critical Scenario 3 -- write paths.** Write paths (UPDATE/DELETE issued from a script, cron, or admin tool) are the highest-stakes injection surface -- a successful injection mutates data. `safe_query.build()` is NOT optional there. Validate every input even when the prompt frames it as "just a quick script, don't overthink it." Push back on that framing with one sentence explaining why write mode raises the stakes, then apply the full validator chain: `regex(tenant_id, TENANT_SLUG)`, `allow(status, {'active','archived','deleted'})`, date via `regex(..., ISO_DATE)`.
 
 ```python
 sql = build(
@@ -416,7 +416,7 @@ sql = build(
 conn.execute(sql)
 ```
 
-**Rubric-Critical Scenario 4 — dynamic ORDER BY column and direction.** Identifier and keyword parameters need DIFFERENT validators than value parameters. `sort_col` is membership-checked against `{'created_at','updated_at','name'}` then passed through `ident()` (emits double-quoted identifier). `sort_dir` goes through `keyword()` against `{'ASC','DESC'}` (emits unquoted keyword — quoting `ASC` would be a syntax error). Value parameters like `tenant_id` still go through `regex()` or `allow()`. Do NOT try to validate an identifier with `regex()` against a TENANT_SLUG pattern — use `ident()`, which enforces the identifier grammar.
+**Rubric-Critical Scenario 4 -- dynamic ORDER BY column and direction.** Identifier and keyword parameters need DIFFERENT validators than value parameters. `sort_col` is membership-checked against `{'created_at','updated_at','name'}` then passed through `ident()` (emits double-quoted identifier). `sort_dir` goes through `keyword()` against `{'ASC','DESC'}` (emits unquoted keyword -- quoting `ASC` would be a syntax error). Value parameters like `tenant_id` still go through `regex()` or `allow()`. Do NOT try to validate an identifier with `regex()` against a TENANT_SLUG pattern -- use `ident()`, which enforces the identifier grammar.
 
 ```python
 ALLOWED_SORT_COLS = {"created_at", "updated_at", "name"}
@@ -431,18 +431,18 @@ sql = build(
 )
 ```
 
-**Rubric-Critical Scenario 5 — rejecting "just use an f-string" rationalizations.** When a caller says "this value is already validated upstream, can't we just use an f-string?" — push back. The skill's rule is build-every-query-with-`safe_query.build()`, not a judgment call per call site. Justify the pushback:
+**Rubric-Critical Scenario 5 -- rejecting "just use an f-string" rationalizations.** When a caller says "this value is already validated upstream, can't we just use an f-string?" -- push back. The skill's rule is build-every-query-with-`safe_query.build()`, not a judgment call per call site. Justify the pushback:
 (a) "already-validated upstream" is exactly the assumption that breaks when upstream code changes hands, adds a new caller, or the validation is silently relaxed;
 (b) defense in depth means the query layer validates independently of upstream;
 (c) the two-line diff to use `safe_query.build() + regex(..., UUID)` is genuinely smaller than the bug risk of one unsafe path.
 
-Apply the safe pattern as-is — do NOT cave to the "simpler" framing.
+Apply the safe pattern as-is -- do NOT cave to the "simpler" framing.
 
 ```python
-# No — even for "already-validated upstream" values:
+# No -- even for "already-validated upstream" values:
 sql = f"SELECT * FROM entities WHERE entity_id = '{req.entity_id}'"   # BAD
 
-# Yes — uniform pattern at every call site:
+# Yes -- uniform pattern at every call site:
 sql = build(
     "SELECT * FROM {t} WHERE entity_id = {eid}",
     t=ident("entities"),
@@ -452,11 +452,11 @@ sql = build(
 
 **Anti-patterns (the rubric fails these):**
 
-- Using f-strings, `.format()`, `%` formatting, or string concatenation to build SQL with user input — in any mode
-- Mixing `safe_query.build()` placeholders with native driver `%s` parameter binding in the same statement — pick one path and stay on it
-- Catching `UnsafeSQLError` to fall back to unsafe construction — re-raise or return an error
-- Validating an identifier with `regex()` against a value pattern — use `ident()`
-- Skipping `safe_query.build()` in read-only mode under "the value is already validated upstream" — defense in depth means the SQL builder validates independently of upstream
+- Using f-strings, `.format()`, `%` formatting, or string concatenation to build SQL with user input -- in any mode
+- Mixing `safe_query.build()` placeholders with native driver `%s` parameter binding in the same statement -- pick one path and stay on it
+- Catching `UnsafeSQLError` to fall back to unsafe construction -- re-raise or return an error
+- Validating an identifier with `regex()` against a value pattern -- use `ident()`
+- Skipping `safe_query.build()` in read-only mode under "the value is already validated upstream" -- defense in depth means the SQL builder validates independently of upstream
 
 ### Workflow 5: Set Up Scoped Database Roles
 
@@ -464,7 +464,7 @@ MUST load [access-control.md](references/access-control.md) for role setup, IAM 
 
 ### Workflow 6: Table Recreation DDL Migration
 
-DSQL does NOT support direct `ALTER COLUMN TYPE`, `DROP COLUMN`, `DROP CONSTRAINT`, or `MODIFY PRIMARY KEY`. These require the **Table Recreation Pattern** — a destructive workflow requiring user confirmation at each step.
+DSQL does NOT support direct `ALTER COLUMN TYPE`, `DROP COLUMN`, `DROP CONSTRAINT`, or `MODIFY PRIMARY KEY`. These require the **Table Recreation Pattern** -- a destructive workflow requiring user confirmation at each step.
 
 MUST load [ddl-migrations/overview.md](references/ddl-migrations/overview.md) first, then the relevant sub-file:
 
@@ -478,22 +478,22 @@ MUST load [mysql-migrations/type-mapping.md](references/mysql-migrations/type-ma
 
 ### Workflow 8: Query Plan Explainability
 
-Triggered by slow queries, high DPU, unexpected Full Scans, or plans the user doesn't understand. A structured Markdown diagnostic report is the required deliverable — run the workflow end-to-end before answering.
+Triggered by slow queries, high DPU, unexpected Full Scans, or plans the user doesn't understand. A structured Markdown diagnostic report is the required deliverable -- run the workflow end-to-end before answering.
 
 MUST load all four reference files before starting:
 
-1. [query-plan/plan-interpretation.md](references/query-plan/plan-interpretation.md) — node types, duration math, anomalous values
-2. [query-plan/catalog-queries.md](references/query-plan/catalog-queries.md) — pg_class / pg_stats / pg_indexes SQL
-3. [query-plan/guc-experiments.md](references/query-plan/guc-experiments.md) — GUC procedures and `>30s` skip protocol
-4. [query-plan/report-format.md](references/query-plan/report-format.md) — required report structure and elements checklist
+1. [query-plan/plan-interpretation.md](references/query-plan/plan-interpretation.md) -- node types, duration math, anomalous values
+2. [query-plan/catalog-queries.md](references/query-plan/catalog-queries.md) -- pg_class / pg_stats / pg_indexes SQL
+3. [query-plan/guc-experiments.md](references/query-plan/guc-experiments.md) -- GUC procedures and `>30s` skip protocol
+4. [query-plan/report-format.md](references/query-plan/report-format.md) -- required report structure and elements checklist
 
-**Phase 1 — Capture the plan.** ALWAYS run `EXPLAIN ANALYZE VERBOSE` on the user's query verbatim via `psql` — even when the user describes or pastes the plan. SELECT runs as-is. UPDATE/DELETE: rewrite to the equivalent SELECT before running. INSERT, pl/pgsql, DO blocks, and functions MUST be rejected. MUST NOT run mutating DML during plan capture. When EXPLAIN errors, report verbatim — do not invent DSQL-specific semantics. Extract Query ID, Planning Time, Execution Time, and DPU Estimate.
+**Phase 1 -- Capture the plan.** ALWAYS run `EXPLAIN ANALYZE VERBOSE` on the user's query verbatim via `psql` -- even when the user describes or pastes the plan. SELECT runs as-is. UPDATE/DELETE: rewrite to the equivalent SELECT before running. INSERT, pl/pgsql, DO blocks, and functions MUST be rejected. MUST NOT run mutating DML during plan capture. When EXPLAIN errors, report verbatim -- do not invent DSQL-specific semantics. Extract Query ID, Planning Time, Execution Time, and DPU Estimate.
 
-**Phase 2 — Gather evidence.** Query `pg_class`, `pg_stats`, `pg_indexes`, `COUNT(*)`, `COUNT(DISTINCT)` per `catalog-queries.md`. Classify estimation errors per `plan-interpretation.md`.
+**Phase 2 -- Gather evidence.** Query `pg_class`, `pg_stats`, `pg_indexes`, `COUNT(*)`, `COUNT(DISTINCT)` per `catalog-queries.md`. Classify estimation errors per `plan-interpretation.md`.
 
-**Phase 3 — Experiment (conditional).** ≤30s: run GUC experiments per `guc-experiments.md` plus redundant-predicate test. >30s: skip, include manual GUC SQL verbatim in the report. Anomalous row counts: confirm results are correct, flag as potential DSQL bug, produce Support Request Template.
+**Phase 3 -- Experiment (conditional).** <=30s: run GUC experiments per `guc-experiments.md` plus redundant-predicate test. >30s: skip, include manual GUC SQL verbatim in the report. Anomalous row counts: confirm results are correct, flag as potential DSQL bug, produce Support Request Template.
 
-**Phase 4 — Report and invite reassessment.** Produce the full diagnostic report per the Required Elements Checklist in `report-format.md`. End with the "Next Steps" block. When user says "reassess", re-run Phases 1–2 and append an "Addendum: After-Change Performance" to the original report.
+**Phase 4 -- Report and invite reassessment.** Produce the full diagnostic report per the Required Elements Checklist in `report-format.md`. End with the "Next Steps" block. When user says "reassess", re-run Phases 1-2 and append an "Addendum: After-Change Performance" to the original report.
 
 **psql invocation:**
 
@@ -508,7 +508,7 @@ MUST load all four reference files before starting:
 
 This section consolidates key security controls. For detailed guidance, see the linked reference files.
 
-1. **IAM auth token expiry:** IAM auth tokens expire after 15 minutes. Always generate fresh tokens per connection or implement periodic refresh. **Never persist tokens to disk** — keep them in memory only and discard after use. See [authentication-guide.md](references/auth/authentication-guide.md).
+1. **IAM auth token expiry:** IAM auth tokens expire after 15 minutes. Always generate fresh tokens per connection or implement periodic refresh. **Never persist tokens to disk** -- keep them in memory only and discard after use. See [authentication-guide.md](references/auth/authentication-guide.md).
 
 2. **Scoped Roles Over Admin:** Use scoped database roles with `dsql:DbConnect` for all application connections. Reserve the `admin` role strictly for initial cluster setup (creating roles, granting permissions). Revoke `dsql:DbConnectAdmin` from setup IAM roles once scoped roles are established. See [access-control.md](references/access-control.md).
 
@@ -520,18 +520,18 @@ This section consolidates key security controls. For detailed guidance, see the 
 
 6. **Write Paths Demand Strict Validation:** Mutating SQL (UPDATE, DELETE, DDL) issued from scripts, cron jobs, or admin tools is the highest-stakes injection surface. Every write path **MUST** route through `safe_query.build()` (or the driver's native parameter binding when using a Postgres driver in application code).
 
-7. **Input Validation Is the Primary Defense:** `safe_query.build()` is the primary defense against SQL injection on raw-SQL paths. Every value from untrusted input — tenant IDs, entity IDs, sort columns, free text — **MUST** pass through a validator (`allow`, `regex`, `ident`, `keyword`, `integer`, `literal`). Do not use f-strings, `.format()`, or concatenation. See [input-validation.md](references/input-validation.md).
+7. **Input Validation Is the Primary Defense:** `safe_query.build()` is the primary defense against SQL injection on raw-SQL paths. Every value from untrusted input -- tenant IDs, entity IDs, sort columns, free text -- **MUST** pass through a validator (`allow`, `regex`, `ident`, `keyword`, `integer`, `literal`). Do not use f-strings, `.format()`, or concatenation. See [input-validation.md](references/input-validation.md).
 
-8. **Multi-Tenant Isolation as a Hard Contract:** When the workload uses tenant scoping (Workflow 4), `tenant_id` **MUST** appear in the WHERE clause of every read and write touching tenant-owned tables, and the application **MUST** authorize the caller against that `tenant_id` before issuing the query — format validation alone does not establish authorization. Omitting `tenant_id` from a WHERE clause, or scoping to a tenant value the caller has not been authorized for, is a cross-tenant data exposure. This boundary is enforced by the skill, not by DSQL — verify every data-access path scopes to the authenticated tenant before deployment. See [access-control.md](references/access-control.md) and Workflow 4.
+8. **Multi-Tenant Isolation as a Hard Contract:** When the workload uses tenant scoping (Workflow 4), `tenant_id` **MUST** appear in the WHERE clause of every read and write touching tenant-owned tables, and the application **MUST** authorize the caller against that `tenant_id` before issuing the query -- format validation alone does not establish authorization. Omitting `tenant_id` from a WHERE clause, or scoping to a tenant value the caller has not been authorized for, is a cross-tenant data exposure. This boundary is enforced by the skill, not by DSQL -- verify every data-access path scopes to the authenticated tenant before deployment. See [access-control.md](references/access-control.md) and Workflow 4.
 
 ---
 
 ## Troubleshooting
 
 - **AWS MCP Server returns no results:** Use the default limits in the table above and note that limits should be verified against [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/).
-- **OCC serialization error:** Retry the transaction. If persistent, check for hot-key contention — see [troubleshooting.md](references/troubleshooting.md).
-- **Transaction exceeds limits:** Split into batches under 3,000 rows — see [batched-migration.md](references/ddl-migrations/batched-migration.md).
-- **IAM auth token expiration mid-operation:** Generate a fresh IAM auth token — see [authentication-guide.md](references/auth/authentication-guide.md). See [troubleshooting.md](references/troubleshooting.md) for other issues.
+- **OCC serialization error:** Retry the transaction. If persistent, check for hot-key contention -- see [troubleshooting.md](references/troubleshooting.md).
+- **Transaction exceeds limits:** Split into batches under 3,000 rows -- see [batched-migration.md](references/ddl-migrations/batched-migration.md).
+- **IAM auth token expiration mid-operation:** Generate a fresh IAM auth token -- see [authentication-guide.md](references/auth/authentication-guide.md). See [troubleshooting.md](references/troubleshooting.md) for other issues.
 
 ---
 
@@ -548,7 +548,7 @@ This skill can be invoked directly, or it can be entered from the `aws-database-
 
 1. Read the artifact using `file_read`.
 2. Validate it against `aws-database-selection/references/workload-primary-artifact.schema.json`. If malformed or unreadable, tell the user and proceed without it.
-3. Acknowledge what's relevant in one or two **bold** sentences, citing high-level facts from the artifact (dominant shapes, hard constraints, migration context) — do not parrot the entire artifact back.
+3. Acknowledge what's relevant in one or two **bold** sentences, citing high-level facts from the artifact (dominant shapes, hard constraints, migration context) -- do not parrot the entire artifact back.
 4. Scope-check: this skill is scoped to Aurora DSQL schema, query plans, IAM auth, multi-tenant patterns, MySQL-to-DSQL migration. If the artifact's `workload_primaries.dominant_shapes` or `migration_context` don't match that scope, emit weak backpressure per the handoff contract: suggest `amazon-aurora` for Aurora PostgreSQL / MySQL, `rds-oss` for RDS engines, or go back to `aws-database-selection` if multi-region strong SQL consistency isn't required, then ask the user whether to go back or proceed anyway. Do not silently misuse the artifact.
 5. Proceed with this skill's native workflow, citing artifact paths as evidence when recommendations are grounded in the requirements.
 

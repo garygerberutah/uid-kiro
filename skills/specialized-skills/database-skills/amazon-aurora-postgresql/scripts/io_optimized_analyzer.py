@@ -223,13 +223,13 @@ def compute_comparison(
     savings = total_std - total_io_opt
 
     # Drive the recommendation off the ACTUAL dollar savings, not the 25% heuristic
-    # alone — near the breakeven boundary the two diverge, and gating purely on the
+    # alone -- near the breakeven boundary the two diverge, and gating purely on the
     # threshold can recommend I/O-Optimized while it actually costs more (and print a
     # nonsensical "saves $-N/mo"). The 25% rule is a useful rule-of-thumb but the real
     # decision is whether the I/O charges eliminated exceed the compute+storage premium.
     threshold_note = (
         f"I/O is {io_pct:.0f}% of total cost "
-        f"({'≥' if io_pct >= IO_OPT_BREAKEVEN_PCT else 'below '}{IO_OPT_BREAKEVEN_PCT:.0f}% rule-of-thumb)."
+        f"({'>=' if io_pct >= IO_OPT_BREAKEVEN_PCT else 'below '}{IO_OPT_BREAKEVEN_PCT:.0f}% rule-of-thumb)."
     )
     if savings > 0:
         rec = "io_optimized"
@@ -312,7 +312,7 @@ def _is_empty_cluster(cluster: dict) -> bool:
     or an Aurora Limitless cluster (which is locked to I/O-Optimized and uses a
     different pricing model). Note: an auto-paused (scale-to-zero) Aurora
     serverless instance still appears in DBClusterMembers and is analyzable, so
-    it is NOT an empty cluster. The cost comparison doesn't apply here — skip.
+    it is NOT an empty cluster. The cost comparison doesn't apply here -- skip.
     """
     return len(cluster.get("DBClusterMembers", [])) == 0
 
@@ -342,7 +342,7 @@ def analyze_cluster_live(cluster_id: str, region: str, days: int) -> dict:
             "current_storage_type": current_storage_type,
             "skipped": True,
             "reason": (
-                "Cluster has no DB instances — no compute to analyze. "
+                "Cluster has no DB instances -- no compute to analyze. "
                 "This usually means the cluster's last writer/reader instance "
                 "was deleted, or it is an Aurora Limitless cluster (locked to "
                 "I/O-Optimized, different pricing model). The Standard vs "
@@ -360,7 +360,7 @@ def analyze_cluster_live(cluster_id: str, region: str, days: int) -> dict:
             inst_resp = rds.describe_db_instances(DBInstanceIdentifier=mid)
             for inst in inst_resp.get("DBInstances", []):
                 itype = inst.get("DBInstanceClass", "")
-                # Aurora Serverless v2 (db.serverless) has no fixed hourly rate — it bills
+                # Aurora Serverless v2 (db.serverless) has no fixed hourly rate -- it bills
                 # per-ACU-hour from a CloudWatch metric, not from INSTANCE_PRICES. Counting it
                 # at $0 would silently understate compute and skew the I/O-cost percentage, so
                 # exclude it and flag the estimate as partial rather than emit a wrong number.
@@ -369,17 +369,17 @@ def analyze_cluster_live(cluster_id: str, region: str, days: int) -> dict:
                         {"id": mid, "type": itype, "note": "serverless_excluded"}
                     )
                     compute_warnings.append(
-                        f"{mid} is Aurora Serverless v2 (db.serverless) — its ACU-based compute "
+                        f"{mid} is Aurora Serverless v2 (db.serverless) -- its ACU-based compute "
                         "cost is not included (it has no fixed hourly rate); the Standard vs "
                         "I/O-Optimized compute figures below cover provisioned instances only."
                     )
                     continue
                 price = INSTANCE_PRICES.get(itype, 0.0)
                 if price == 0.0:
-                    # Unknown/unpriced provisioned type — don't silently add $0.
+                    # Unknown/unpriced provisioned type -- don't silently add $0.
                     instance_summary.append({"id": mid, "type": itype, "note": "unknown_price"})
                     compute_warnings.append(
-                        f"{mid} ({itype}) has no known hourly price in the static/live table — "
+                        f"{mid} ({itype}) has no known hourly price in the static/live table -- "
                         "excluded from the compute estimate; results are partial."
                     )
                     continue
@@ -599,7 +599,7 @@ def _emit(result: dict, fmt: str, fleet: bool = False) -> None:
                 continue
             if r.get("skipped"):
                 print(
-                    f"{r['cluster_id']:<30} {'—':>6} {'—':>10} {'—':>12} {'skipped (limitless)':>20}"
+                    f"{r['cluster_id']:<30} {'--':>6} {'--':>10} {'--':>12} {'skipped (limitless)':>20}"
                 )
                 continue
             print(
@@ -614,7 +614,7 @@ def _emit(result: dict, fmt: str, fleet: bool = False) -> None:
     if r.get("skipped"):
         print(f"Cluster: {r.get('cluster_id', '?')}")
         print(f"  Engine: {r.get('engine', '?')} {r.get('engine_version', '')}")
-        print(f"  Status: SKIPPED — not applicable")
+        print(f"  Status: SKIPPED -- not applicable")
         print(f"  {r.get('reason', '')}")
         return
     print(f"Cluster: {r.get('cluster_id', '?')}  ({r.get('data_quality', '?')} data)")

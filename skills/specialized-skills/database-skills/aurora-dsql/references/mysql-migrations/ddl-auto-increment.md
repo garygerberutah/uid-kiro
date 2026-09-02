@@ -33,7 +33,7 @@ CREATE TABLE users (
 > **DSQL: `gen_random_uuid()` is built-in; do NOT run `CREATE EXTENSION pgcrypto`.** DSQL ships
 > PostgreSQL 16's core `gen_random_uuid()`, so the extension is unnecessary AND `CREATE EXTENSION`
 > is rejected by DSQL (`ERROR: unsupported statement: CreateExtension`). Other `pgcrypto`
-> functions (`crypt()`, `digest()`, `hmac()`, etc.) are unavailable — implement those at the
+> functions (`crypt()`, `digest()`, `hmac()`, etc.) are unavailable -- implement those at the
 > application layer.
 
 ### Option 2: IDENTITY Column (Recommended for Integer Auto-Increment)
@@ -46,7 +46,7 @@ are needed.
 > please define CACHE greater than or equal to 65536 or equal to 1`. A migration tool replaying
 > a vanilla PostgreSQL dump (where `CACHE` defaults to 1) will fail at the first `IDENTITY`
 > column. Always include `(CACHE 1)` for strict ordering or `(CACHE 65536)` (or higher) for
-> high-throughput workloads — see [scaling-guide.md](../auth/scaling-guide.md#choosing-identifier-types).
+> high-throughput workloads -- see [scaling-guide.md](../auth/scaling-guide.md#choosing-identifier-types).
 
 ```sql
 -- GENERATED ALWAYS: DSQL always generates the value; explicit inserts rejected unless OVERRIDING SYSTEM VALUE
@@ -66,8 +66,8 @@ CREATE TABLE users (
 
 **REQUIRED:** Specify CACHE explicitly. Supported values are `1` or `>= 65536`.
 
-- **CACHE >= 65536** — High-frequency inserts, many concurrent sessions, tolerates gaps and ordering effects (e.g., IoT/telemetry, job IDs, order numbers)
-- **CACHE = 1** — Low allocation rates, identifiers should follow allocation order closely, minimizing gaps matters more than throughput (e.g., account numbers, reference numbers)
+- **CACHE >= 65536** -- High-frequency inserts, many concurrent sessions, tolerates gaps and ordering effects (e.g., IoT/telemetry, job IDs, order numbers)
+- **CACHE = 1** -- Low allocation rates, identifiers should follow allocation order closely, minimizing gaps matters more than throughput (e.g., account numbers, reference numbers)
 
 ### Option 3: Explicit SEQUENCE
 

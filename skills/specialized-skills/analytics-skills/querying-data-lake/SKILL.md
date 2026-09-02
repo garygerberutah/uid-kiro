@@ -36,7 +36,7 @@ Check for required tools and AWS access before running queries.
 **Constraints:**
 
 - You MUST verify AWS MCP server tools are available (`aws___call_aws`) and run queries through them when present; fall back to AWS CLI only if the MCP server is unavailable
-- You MUST NOT fall back to shell or Bash for query execution — results must be captured via the MCP tool or `aws athena` CLI so output location and cost are tracked
+- You MUST NOT fall back to shell or Bash for query execution -- results must be captured via the MCP tool or `aws athena` CLI so output location and cost are tracked
 - You MUST confirm credentials with `aws sts get-caller-identity` and inform the user about any missing tools
 
 ### 2. Resolve Workgroup
@@ -55,7 +55,7 @@ If the user refers to a table by name, by business concept ("our quarterly repor
 
 **Constraints:**
 
-- You MUST NOT attempt to resolve fuzzy asset references with `athena list-data-catalogs` or by iterating `get-tables` — those miss federated catalogs and waste tokens
+- You MUST NOT attempt to resolve fuzzy asset references with `athena list-data-catalogs` or by iterating `get-tables` -- those miss federated catalogs and waste tokens
 - You SHOULD skip this step only when the user provides a fully-qualified reference (exact `database.table`) or raw SQL they want executed as-is
 - You MUST state the resolved asset explicitly before building the query: "Found [table] in [catalog]. Using this for the query."
 - You SHOULD default to the default Glue catalog unless the user mentions "federated", "Redshift", "S3 Tables", or `finding-data-lake-assets` returns a different catalog
@@ -78,8 +78,8 @@ Classify the SQL statement before executing:
 
 | Statement | Behavior |
 |---|---|
-| `SELECT`, `SHOW`, `DESCRIBE`, `EXPLAIN` | Safe — execute |
-| `INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, `CREATE`, `TRUNCATE`, `MERGE` | Destructive — warn the user and require explicit confirmation |
+| `SELECT`, `SHOW`, `DESCRIBE`, `EXPLAIN` | Safe -- execute |
+| `INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, `CREATE`, `TRUNCATE`, `MERGE` | Destructive -- warn the user and require explicit confirmation |
 | Unsure | Treat as destructive; confirm |
 
 Example tool call (via AWS MCP server):
@@ -92,7 +92,7 @@ For federated or S3 Tables catalogs, also set `Catalog=<CATALOG_PATH>` in the ex
 
 **Constraints:**
 
-- You MUST warn the user before executing when the target is Redshift-federated ("No partition pruning — every query scans the full table")
+- You MUST warn the user before executing when the target is Redshift-federated ("No partition pruning -- every query scans the full table")
 - You MUST warn the user before executing a cross-catalog join ("Cross-catalog joins incur network overhead and may be slow")
 - You MUST confirm the output S3 location before executing
 - You MUST explain which tool is being called before executing
@@ -106,12 +106,12 @@ Present results with cost, data scanned, duration, and actionable insights. On f
 
 Resolve in this order; stop at the first match:
 
-1. Contains SQL keywords (`SELECT`, `SHOW`, `DESCRIBE`, `INSERT`, etc.) — SQL text, execute directly
-2. `profile TABLE_NAME` — run comprehensive table profiling (see [query-patterns.md](references/query-patterns.md))
-3. Matches a known named query — look up and execute
-4. Matches a known workgroup — show workgroup status and recent queries
-5. Matches a known catalog — delegate to `exploring-data-catalog` to enumerate databases and tables
-6. No args — show recent query activity and available tables
+1. Contains SQL keywords (`SELECT`, `SHOW`, `DESCRIBE`, `INSERT`, etc.) -- SQL text, execute directly
+2. `profile TABLE_NAME` -- run comprehensive table profiling (see [query-patterns.md](references/query-patterns.md))
+3. Matches a known named query -- look up and execute
+4. Matches a known workgroup -- show workgroup status and recent queries
+5. Matches a known catalog -- delegate to `exploring-data-catalog` to enumerate databases and tables
+6. No args -- show recent query activity and available tables
 
 ### Principles
 

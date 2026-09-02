@@ -10,7 +10,7 @@ Errors are identified by case-sensitive strings. Step Functions defines these bu
 
 | Error Code | Description |
 |-----------|-------------|
-| `States.ALL` | Wildcard — matches any error |
+| `States.ALL` | Wildcard -- matches any error |
 | `States.Timeout` | Task exceeded `TimeoutSeconds` or missed heartbeat |
 | `States.HeartbeatTimeout` | Task missed heartbeat interval |
 | `States.TaskFailed` | Task failed during execution |
@@ -37,9 +37,9 @@ The `Retry` field is an array of Retrier objects. The interpreter scans retriers
 | `ErrorEquals` | string[] | Required | Error names to match |
 | `IntervalSeconds` | integer | 1 | Seconds before first retry |
 | `MaxAttempts` | integer | 3 | Maximum retry attempts (0 = never retry) |
-| `BackoffRate` | number | 2.0 | Multiplier for retry interval (must be ≥ 1.0) |
-| `MaxDelaySeconds` | integer | — | Cap on retry interval |
-| `JitterStrategy` | string | — | Jitter strategy (e.g., `"FULL"`) |
+| `BackoffRate` | number | 2.0 | Multiplier for retry interval (must be >= 1.0) |
+| `MaxDelaySeconds` | integer | -- | Cap on retry interval |
+| `JitterStrategy` | string | -- | Jitter strategy (e.g., `"FULL"`) |
 
 Rules:
 
@@ -68,16 +68,16 @@ The `Catch` field is an array of Catcher objects. After retries are exhausted (o
 
 When a state fails and matches a Catcher, `$states.errorOutput` is a JSON object with:
 
-- `Error` (string) — the error name
-- `Cause` (string) — human-readable error description
+- `Error` (string) -- the error name
+- `Cause` (string) -- human-readable error description
 
 In a Catch block, `Assign` and `Output` can reference:
 
-- `$states.input` — the original state input
-- `$states.errorOutput` — the error details
-- `$states.context` — execution context
+- `$states.input` -- the original state input
+- `$states.errorOutput` -- the error details
+- `$states.context` -- execution context
 
-If a Catcher matches, the state's top-level `Assign` is NOT evaluated — only the Catcher's `Assign` runs. If no `Output` is provided in the Catcher, the state output is the raw Error Output object.
+If a Catcher matches, the state's top-level `Assign` is NOT evaluated -- only the Catcher's `Assign` runs. If no `Output` is provided in the Catcher, the state output is the raw Error Output object.
 
 When both Retry and Catch are present, retries are attempted first. Only if retries are exhausted does the Catch apply.
 
@@ -87,12 +87,12 @@ When both Retry and Catch are present, retries are attempted first. Only if retr
 
 JSONata expressions can fail at runtime. Common causes:
 
-1. Type error — `{% $x + $y %}` where `$x` or `$y` is not a number
-2. Type incompatibility — `"TimeoutSeconds": "{% $name %}"` where `$name` is a string
-3. Value out of range — negative number for `TimeoutSeconds`
-4. Undefined result — `{% $data.nonExistentField %}` — JSON cannot represent undefined
+1. Type error -- `{% $x + $y %}` where `$x` or `$y` is not a number
+2. Type incompatibility -- `"TimeoutSeconds": "{% $name %}"` where `$name` is a string
+3. Value out of range -- negative number for `TimeoutSeconds`
+4. Undefined result -- `{% $data.nonExistentField %}` -- JSON cannot represent undefined
 
-Prevent these errors with defensive expressions: use `$exists()` before accessing fields evaluated at runtime, `$type()` before arithmetic, and guard filtered results that may return a single object instead of an array. Always guard with `$exists()` — if a variable was never assigned (e.g., the Catch didn't fire for that path), referencing it directly throws `States.QueryEvaluationError`. See `transforming-data.md` for defensive JSONata examples.
+Prevent these errors with defensive expressions: use `$exists()` before accessing fields evaluated at runtime, `$type()` before arithmetic, and guard filtered results that may return a single object instead of an array. Always guard with `$exists()` -- if a variable was never assigned (e.g., the Catch didn't fire for that path), referencing it directly throws `States.QueryEvaluationError`. See `transforming-data.md` for defensive JSONata examples.
 
 ---
 

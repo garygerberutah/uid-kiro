@@ -1,9 +1,9 @@
-# Data — Web
+# Data -- Web
 
 > **Prerequisites:** Project initialized, `amplify_outputs.json` exists (from `npx ampx sandbox`), and `Amplify.configure(outputs)` called in app entry point.
 >
 > **Backend required:** Data must be defined in `amplify/data/resource.ts`
-> using `defineData` — see [data-backend.md](data-backend.md).
+> using `defineData` -- see [data-backend.md](data-backend.md).
 
 ## Client Setup
 
@@ -13,7 +13,7 @@
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../amplify/data/resource';
 
-// Module scope — called once
+// Module scope -- called once
 const client = generateClient<Schema>();
 ```
 
@@ -45,8 +45,8 @@ try {
 
 ## Real-Time
 
-- **`observeQuery()`** — auto-updating list, returns `{ items }` snapshots. Recommended default.
-- **`onCreate()` / `onUpdate()` / `onDelete()`** — per-event subscriptions.
+- **`observeQuery()`** -- auto-updating list, returns `{ items }` snapshots. Recommended default.
+- **`onCreate()` / `onUpdate()` / `onDelete()`** -- per-event subscriptions.
 
 Both return an observable; call `.subscribe({ next })` and call `sub.unsubscribe()` in cleanup.
 
@@ -76,8 +76,8 @@ useEffect(() => {
 
 | Pattern | Best For |
 |---------|----------|
-| `observeQuery()` | Continuously updated lists — handles pagination, filtering, deduplication. **Use by default.** |
-| `onCreate` / `onUpdate` / `onDelete` | Fine-grained control — animations, toasts, or single event type only. |
+| `observeQuery()` | Continuously updated lists -- handles pagination, filtering, deduplication. **Use by default.** |
+| `onCreate` / `onUpdate` / `onDelete` | Fine-grained control -- animations, toasts, or single event type only. |
 
 > `observeQuery` does NOT support server-side sorting. Sort results client-side after receiving them.
 
@@ -96,7 +96,7 @@ Use `cookieClient.models.*` the same as the browser client. Works in Server Comp
 
 ## React Native
 
-Identical to the web client — uses `generateClient<Schema>()` from `aws-amplify/data`.
+Identical to the web client -- uses `generateClient<Schema>()` from `aws-amplify/data`.
 All CRUD, `observeQuery()`, and subscription APIs (`onCreate`, `onUpdate`, `onDelete`) are the same.
 
 ## Querying a Secondary Index
@@ -114,7 +114,7 @@ const { data } = await client.models.Vote.votesByPollAndVoter({
 });
 ```
 
-### JSON Fields — Serialization Asymmetry
+### JSON Fields -- Serialization Asymmetry
 
 `a.json()` fields require `JSON.stringify()` on write but auto-parse on read:
 
@@ -126,7 +126,7 @@ await client.models.Config.create({
 
 // Read: auto-parsed back to object
 const { data } = await client.models.Config.get({ id });
-console.log(data.metadata.key); // "val" — already an object
+console.log(data.metadata.key); // "val" -- already an object
 ```
 
 > Passing a raw object on write fails silently with: `"Variable 'metadata' has an invalid value"`
@@ -153,9 +153,9 @@ console.log(data.metadata.key); // "val" — already an object
   WebSocket-compatible auth mode (`userPool` or `iam`). API key auth on
   subscriptions fails silently.
 - **Missing `<Schema>` generic:** `generateClient()` without `<Schema>`
-  returns an untyped client — all operations lose autocomplete and type checking.
+  returns an untyped client -- all operations lose autocomplete and type checking.
 - **Server client without cookies:** Using `generateClient()` in Next.js
-  server components fails (no browser session) — use
+  server components fails (no browser session) -- use
   `generateServerClientUsingCookies` instead.
 
 ## Links

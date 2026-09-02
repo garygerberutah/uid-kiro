@@ -2,11 +2,11 @@
 
 ## First Check These 5 Things
 
-1. **Connection status**: `aws codeconnections get-connection --connection-arn ARN` — if PENDING, complete OAuth in console
-2. **Pipeline state**: `aws codepipeline get-pipeline-state --name NAME` — find which action failed and why
-3. **Build logs**: `aws codebuild batch-get-builds --ids BUILD_ID` — check `phases` array for first failed phase
-4. **Deployment status**: `aws deploy get-deployment --deployment-id ID` — check `deploymentOverview` and `errorInformation`
-5. **Service role permissions**: `aws iam simulate-principal-policy --policy-source-arn ROLE_ARN --action-names ACTION` — verify IAM
+1. **Connection status**: `aws codeconnections get-connection --connection-arn ARN` -- if PENDING, complete OAuth in console
+2. **Pipeline state**: `aws codepipeline get-pipeline-state --name NAME` -- find which action failed and why
+3. **Build logs**: `aws codebuild batch-get-builds --ids BUILD_ID` -- check `phases` array for first failed phase
+4. **Deployment status**: `aws deploy get-deployment --deployment-id ID` -- check `deploymentOverview` and `errorInformation`
+5. **Service role permissions**: `aws iam simulate-principal-policy --policy-source-arn ROLE_ARN --action-names ACTION` -- verify IAM
 
 ## Error Table
 
@@ -18,7 +18,7 @@
 | `ActionConfigurationError` | Referenced resource deleted (CodeBuild project, deployment group) | Verify all resource names in action config still exist |
 | `AccessDeniedException` on action | Service role missing permissions for the action's provider | Add required permissions to pipeline service role |
 | Pipeline stuck InProgress | Disabled transition, waiting approval, or slow action | Check `get-pipeline-state` for `actionStates`; look for PENDING approval |
-| `PipelineExecutionNotStoppableException` | Execution in terminal state (Succeeded/Failed) | Already finished — no action needed |
+| `PipelineExecutionNotStoppableException` | Execution in terminal state (Succeeded/Failed) | Already finished -- no action needed |
 | `InvalidStructureException` on create/update | Malformed pipeline JSON | Validate JSON; check all required fields per action type |
 | `StageNotRetryableException` | Stage not in Failed state | Only failed stages can be retried |
 | `RevisionOutOfSyncException` | PARALLEL mode race between executions | Use QUEUED mode for sequential consistency |
@@ -96,8 +96,8 @@ aws codeconnections list-connections --query "Connections[].[ConnectionName,Conn
 
 When a pipeline fails and you don't know which service caused it:
 
-1. `aws codepipeline get-pipeline-state --name NAME` → find failed stage/action
-2. Check `latestExecution.externalExecutionId` on the failed action — this is the build ID or deployment ID
+1. `aws codepipeline get-pipeline-state --name NAME` -> find failed stage/action
+2. Check `latestExecution.externalExecutionId` on the failed action -- this is the build ID or deployment ID
 3. For build actions: `aws codebuild batch-get-builds --ids BUILD_ID`
 4. For deploy actions: `aws deploy get-deployment --deployment-id DEPLOY_ID`
 5. For source actions: `aws codeconnections get-connection --connection-arn ARN` (check status)

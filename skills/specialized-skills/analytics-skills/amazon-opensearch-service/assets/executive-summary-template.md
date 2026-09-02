@@ -1,4 +1,4 @@
-# Migration Assessment — Executive Summary
+# Migration Assessment -- Executive Summary
 
 **Date**: {{ date }}  
 **Skill**: amazon-opensearch-service v{{ skill_version }}  
@@ -12,7 +12,7 @@
 - **Recommendation**: Proceed with **{{ migration_path.recommended }}** for the data movement.
 - **Readiness Score**: **{{ readiness.overall_score }}/100** ({{ readiness.tier }})
 - **Sizing inputs for Pricing Calculator**: see Sizing section in the full report; plug values into <https://calculator.aws> for monthly cost.
-- This skill MUST NOT estimate dollar costs because pricing changes monthly and account-specific RI / Savings Plan / EDP discounts are out of scope — those route to <https://calculator.aws>.
+- This skill MUST NOT estimate dollar costs because pricing changes monthly and account-specific RI / Savings Plan / EDP discounts are out of scope -- those route to <https://calculator.aws>.
 
 ## Why migrate
 
@@ -24,21 +24,21 @@ Frame items with a known remediation as **migration specifics** (the path alread
 
 1. _Add the top risk-blocker (BLOCKING with no clean remediation) here_
 2. _Add the top migration specific (HIGH item the path already handles) OR the second risk-blocker, whichever has higher impact_
-3. _Add the top operational/cost item here — frame per its lane_
+3. _Add the top operational/cost item here -- frame per its lane_
 
 ## Decision
 
 | Tier | Action |
 |---|---|
-| GREEN (≥80) | You MUST proceed; assign owner, target date |
-| YELLOW (60–79) | You MUST PoC + spike on the lowest-scoring dimension before committing |
+| GREEN (>=80) | You MUST proceed; assign owner, target date |
+| YELLOW (60-79) | You MUST PoC + spike on the lowest-scoring dimension before committing |
 | RED (<60) | You MUST NOT commit because the readiness score is below the safe-migration threshold; revisit the weakest dimension first |
 
 **Current tier**: **{{ readiness.tier }}**
 
 ## Citations
 
-For the canonical retrieval recipe (every URL the skill ever cites — AWS Prescriptive Guidance for Solr → OpenSearch, OpenSearch Service pricing, Migration Assistant for Amazon OpenSearch Service, sizing-domains, serverless-overview, …) see [`knowledge-retrieval.md`](../references/assessment-knowledge-retrieval.md). You MUST cite the live URLs you actually retrieved here, with retrieval timestamps; <https://calculator.aws> is the cost handoff.
+For the canonical retrieval recipe (every URL the skill ever cites -- AWS Prescriptive Guidance for Solr -> OpenSearch, OpenSearch Service pricing, Migration Assistant for Amazon OpenSearch Service, sizing-domains, serverless-overview, ...) see [`knowledge-retrieval.md`](../references/assessment-knowledge-retrieval.md). You MUST cite the live URLs you actually retrieved here, with retrieval timestamps; <https://calculator.aws> is the cost handoff.
 
 ---
 

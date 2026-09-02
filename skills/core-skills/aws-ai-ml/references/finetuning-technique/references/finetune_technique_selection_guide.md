@@ -58,7 +58,7 @@ Not all models support all techniques. Always validate technique availability ag
 
 **When NOT to use RLAIF:**
 
-- Task has objectively verifiable answers → use RLVR instead
-- You already have high-quality human preference data → use DPO instead
-- You have clear gold-standard outputs → use SFT instead
+- Task has objectively verifiable answers -> use RLVR instead
+- You already have high-quality human preference data -> use DPO instead
+- You have clear gold-standard outputs -> use SFT instead
 - The AI judge model is weaker than the model being trained (judge quality bounds training quality)

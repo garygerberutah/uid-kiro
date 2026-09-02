@@ -1,7 +1,7 @@
 """Consolidated status assessment for dynamic instrumentation.
 
-The "consolidated status check" answers a single question — *what is the
-high-level state of this instrumentation right now?* — by querying three
+The "consolidated status check" answers a single question -- *what is the
+high-level state of this instrumentation right now?* -- by querying three
 status signals (ACTIVE, READY, ERROR) in priority order over a time window.
 
 This module owns:
@@ -24,7 +24,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Callable, List, Optional, Tuple, Union
 
-# A single check call: (status_label, start, end) → (has_events, events, error_or_None).
+# A single check call: (status_label, start, end) -> (has_events, events, error_or_None).
 # Matches the existing ``_check_status_with_time_range`` shape.
 CheckStatus = Callable[[str, datetime, datetime], Tuple[bool, List[dict], Optional[str]]]
 
@@ -101,7 +101,7 @@ def assess(
 
     * Parsing ISO inputs into ``datetime`` objects (string parsing is an input
       concern, not policy).
-    * Verifying ``query_end > requested_start`` before calling — that error
+    * Verifying ``query_end > requested_start`` before calling -- that error
       message is owned by the tool layer.
     * Providing a ``check_status`` callable that issues the AWS query.
 

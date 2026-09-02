@@ -1,11 +1,11 @@
-# DocumentDB — Connection Drivers
+# DocumentDB -- Connection Drivers
 
 Language-specific driver snippets. All require:
 
 - `global-bundle.pem` downloaded (`curl -s https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem -o global-bundle.pem`)
 - Five required connection params: `tls=true`, `tlsCAFile=global-bundle.pem`, `replicaSet=rs0`, `readPreference=secondaryPreferred`, `retryWrites=false`
 
-Replace `<endpoint>`, `<password>`, `<db-name>` with actual values. **Create the client once at module scope** and reuse across requests — per-request clients cause connection spikes and high CPU.
+Replace `<endpoint>`, `<password>`, `<db-name>` with actual values. **Create the client once at module scope** and reuse across requests -- per-request clients cause connection spikes and high CPU.
 
 ## Python (PyMongo)
 
@@ -38,7 +38,7 @@ await client.db("admin").command({ ping: 1 });
 
 ## Java (MongoDB Driver 4.x)
 
-Use `applyConnectionString` — do NOT use `applyToClusterSettings` with a single host (sets SINGLE mode and breaks failover):
+Use `applyConnectionString` -- do NOT use `applyToClusterSettings` with a single host (sets SINGLE mode and breaks failover):
 
 ```java
 import com.mongodb.client.MongoClient;
@@ -60,7 +60,7 @@ Java requires the RDS bundle converted to a JKS truststore:
 
 ```bash
 mydir=/tmp/certs && truststore=${mydir}/rds-truststore.jks
-# Generate a strong, unique truststore password — never hardcode one.
+# Generate a strong, unique truststore password -- never hardcode one.
 # Store it in Secrets Manager / Parameter Store and reference it from your app config.
 storepassword=$(openssl rand -base64 24) && mkdir -p ${mydir}
 
@@ -74,7 +74,7 @@ for CERT in rds-ca-*; do
 done
 ```
 
-JVM flags (reference the same `$storepassword` generated above — never hardcode it; source it from Secrets Manager / Parameter Store in production):
+JVM flags (reference the same `$storepassword` generated above -- never hardcode it; source it from Secrets Manager / Parameter Store in production):
 
 ```
 -Djavax.net.ssl.trustStore=/tmp/certs/rds-truststore.jks
@@ -104,7 +104,7 @@ client, err := mongo.Connect(context.TODO(), opts)
 
 Download the .p7b variant: `wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.p7b`
 
-Validate the RDS CA **per-connection** — do not import it into the machine's system `Root` store (that needs admin rights, persists after exit, and affects every other app on the host).
+Validate the RDS CA **per-connection** -- do not import it into the machine's system `Root` store (that needs admin rights, persists after exit, and affects every other app on the host).
 
 ```csharp
 using MongoDB.Driver;

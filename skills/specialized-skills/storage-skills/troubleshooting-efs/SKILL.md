@@ -24,7 +24,7 @@ For authoritative guidance, see [EFS Troubleshooting](https://docs.aws.amazon.co
 
 - You MUST verify `aws` CLI is available
 - You MUST check if `amazon-efs-utils` or `nfs-utils` is installed on the instance
-- You MUST ONLY check for tool existence and version — MUST NOT execute destructive or mutating commands during verification
+- You MUST ONLY check for tool existence and version -- MUST NOT execute destructive or mutating commands during verification
 - You MUST inform the user if any required tools are missing
 - You MUST respect the user's decision to abort if tools are unavailable
 - You SHOULD explain what each step does and why before executing it
@@ -41,7 +41,7 @@ For authoritative guidance, see [EFS Troubleshooting](https://docs.aws.amazon.co
 | NFS server error on encrypted FS | E: Encryption/KMS |
 | DNS name resolution fails | F: VPC DNS |
 
-### 2. Category A — Missing NFS Client
+### 2. Category A -- Missing NFS Client
 
 ```bash
 # Amazon Linux / RHEL / CentOS
@@ -53,9 +53,9 @@ sudo yum -y install nfs-utils
 sudo apt-get install nfs-common
 ```
 
-### 3. Category B — Network/Security Group
+### 3. Category B -- Network/Security Group
 
-Connection timeout is the #1 EFS mount failure — almost always security groups.
+Connection timeout is the #1 EFS mount failure -- almost always security groups.
 
 1. Verify mount target exists in the instance's AZ:
 
@@ -63,8 +63,8 @@ Connection timeout is the #1 EFS mount failure — almost always security groups
 aws efs describe-mount-targets --file-system-id fs-ID --region REGION
 ```
 
-1. Verify security groups — check BOTH directions:
-   - Mount target SG: `aws ec2 describe-security-groups --group-ids sg-MT` — MUST have inbound TCP 2049 from compute SG
+1. Verify security groups -- check BOTH directions:
+   - Mount target SG: `aws ec2 describe-security-groups --group-ids sg-MT` -- MUST have inbound TCP 2049 from compute SG
    - Compute SG: MUST have outbound TCP 2049 to mount target SG
    - Quick fix: `aws ec2 authorize-security-group-ingress --group-id sg-MT --protocol tcp --port 2049 --source-group sg-COMPUTE`
 
@@ -76,7 +76,7 @@ nc -zv fs-ID.efs.REGION.amazonaws.com 2049
 
 > **Note:** These security group troubleshooting steps also apply to S3 Files. The only difference is S3 Files uses `aws s3files list-mount-targets` instead of `aws efs describe-mount-targets`.
 
-### 4. Category C — IAM/Permissions
+### 4. Category C -- IAM/Permissions
 
 **"access denied by server" with `-o iam`:**
 
@@ -87,14 +87,14 @@ nc -zv fs-ID.efs.REGION.amazonaws.com 2049
 aws efs describe-file-system-policy --file-system-id fs-ID --region REGION
 ```
 
-**Note:** IAM authorization is only enforced when a file system policy exists that requires it. Without a file system policy, any client in the VPC with port 2049 access can mount — even with `-o iam`. To enforce IAM, you MUST create a file system policy that denies anonymous access.
+**Note:** IAM authorization is only enforced when a file system policy exists that requires it. Without a file system policy, any client in the VPC with port 2049 access can mount -- even with `-o iam`. To enforce IAM, you MUST create a file system policy that denies anonymous access.
 
 **POSIX permission denied (not IAM):**
 
 - Check file/directory ownership: `ls -la /mnt/efs/`
 - Use access points to enforce UID/GID for consistent permissions
 
-### 5. Category D — Performance
+### 5. Category D -- Performance
 
 **Check throughput mode:**
 
@@ -116,10 +116,10 @@ aws efs update-file-system --file-system-id fs-ID --throughput-mode elastic --re
 
 **General Purpose vs Max I/O:**
 
-- Check `PercentIOLimit` metric — if consistently >80%, consider Max I/O
-- Note: performance mode is IMMUTABLE — must create new FS and migrate
+- Check `PercentIOLimit` metric -- if consistently >80%, consider Max I/O
+- Note: performance mode is IMMUTABLE -- must create new FS and migrate
 
-### 6. Category E — Encryption/KMS
+### 6. Category E -- Encryption/KMS
 
 NFS server error on encrypted FS = KMS key issue.
 
@@ -127,7 +127,7 @@ NFS server error on encrypted FS = KMS key issue.
 - Verify EFS service-linked role has KMS permissions
 - If key deleted: cancel deletion if within grace period
 
-### 7. Category F — VPC DNS
+### 7. Category F -- VPC DNS
 
 DNS resolution failure = VPC DNS settings disabled.
 
@@ -166,10 +166,10 @@ sudo tar -czf /tmp/efs-logs.tar.gz /var/log/amazon/efs/ /etc/amazon/efs/efs-util
 
 ## Security Considerations
 
-- IAM authorization is only enforced when a file system policy exists — without one, any VPC client with port 2049 access can mount
+- IAM authorization is only enforced when a file system policy exists -- without one, any VPC client with port 2049 access can mount
 - When troubleshooting access denied, verify both identity-based and resource-based policies
-- Use `-o tls` for encryption in transit — unencrypted NFS traffic is visible on the network
-- Restrict `/var/log/amazon/efs/` access — logs may contain file system IDs and mount target IPs
+- Use `-o tls` for encryption in transit -- unencrypted NFS traffic is visible on the network
+- Restrict `/var/log/amazon/efs/` access -- logs may contain file system IDs and mount target IPs
 
 ## Additional Resources
 

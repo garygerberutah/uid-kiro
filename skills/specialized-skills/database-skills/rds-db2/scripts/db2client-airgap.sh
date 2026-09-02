@@ -9,9 +9,9 @@ INCLUDE_LICENSED_TOOLS=${INCLUDE_LICENSED_TOOLS:-FALSE}
 JQ_BINARY="jq-linux-amd64"
 JQ_VERSION="jq-1.7.1"
 
-# Db2 version selection — set DB2_VER before running:
-#   DB2_VER=11.5  (default) → downloads Db2 11.5.9 RT client + db211.5.9-tools.zip
-#   DB2_VER=12.1            → downloads Db2 12.1.3 RT client + db212.1-tools.zip
+# Db2 version selection -- set DB2_VER before running:
+#   DB2_VER=11.5  (default) -> downloads Db2 11.5.9 RT client + db211.5.9-tools.zip
+#   DB2_VER=12.1            -> downloads Db2 12.1.3 RT client + db212.1-tools.zip
 DB2_VER=${DB2_VER:-"11.5"}
 
 case "$DB2_VER" in
@@ -30,11 +30,11 @@ case "$DB2_VER" in
 esac
 
 # =============================================================================
-# db2client-airgap.sh  —  Populate private bucket for air-gapped deployments
+# db2client-airgap.sh  --  Populate private bucket for air-gapped deployments
 # =============================================================================
-# MODE: download  — download all artifacts to ./db2client-artifacts/ (needs internet)
-# MODE: upload    — create bucket and upload from ./db2client-artifacts/ (needs AWS)
-# MODE: both      — download then upload in one shot (default)
+# MODE: download  -- download all artifacts to ./db2client-artifacts/ (needs internet)
+# MODE: upload    -- create bucket and upload from ./db2client-artifacts/ (needs AWS)
+# MODE: both      -- download then upload in one shot (default)
 #
 # Usage:
 #   ./$SCRIPT_AIRGAP --mode download --region us-east-1   # step 1: laptop with internet
@@ -85,17 +85,17 @@ handle_curl_pipe_download() {
   echo "  Downloaded. Steps for air-gapped deployment:"
   echo "============================================================="
   echo
-  echo "STEP 1a — Download all artifacts on this machine (needs internet):"
+  echo "STEP 1a -- Download all artifacts on this machine (needs internet):"
   echo "   ./$SCRIPT_AIRGAP --mode download --region <your-region>"
   echo
-  echo "STEP 1b — Copy $SCRIPT_AIRGAP, $SCRIPT_CLIENT and db2client-artifacts/"
+  echo "STEP 1b -- Copy $SCRIPT_AIRGAP, $SCRIPT_CLIENT and db2client-artifacts/"
   echo "   to a machine with AWS access (private subnet). Then upload:"
   echo "   ./$SCRIPT_AIRGAP --mode upload --region <your-region>"
   echo
   echo "   Or if this machine also has AWS access, run both in one shot:"
   echo "   ./$SCRIPT_AIRGAP --mode both --region <your-region>"
   echo
-  echo "STEP 2 — On the target Linux machine, pull the install script and run it:"
+  echo "STEP 2 -- On the target Linux machine, pull the install script and run it:"
   echo "   aws s3 cp s3://db2client-artifacts-<account>-<region>/$SCRIPT_CLIENT . && chmod +x $SCRIPT_CLIENT"
   echo "   BUCKET=db2client-artifacts-<account>-<region> ./$SCRIPT_CLIENT --region <your-region>"
   echo "============================================================="
@@ -191,7 +191,7 @@ setup_aws() {
 }
 
 # =============================================================================
-# STEP 1 — Download all artifacts to ARTIFACTS_DIR (internet-connected laptop)
+# STEP 1 -- Download all artifacts to ARTIFACTS_DIR (internet-connected laptop)
 # =============================================================================
 do_download() {
   mkdir -p "${ARTIFACTS_DIR}/scripts" "${ARTIFACTS_DIR}/drivers" "${ARTIFACTS_DIR}/ssl"
@@ -212,7 +212,7 @@ do_download() {
       -o "${ARTIFACTS_DIR}/scripts/${TOOLS_ZIP}"
     log_success "Downloaded: scripts/${TOOLS_ZIP}"
   else
-    log_info "Skipping tools zip (${TOOLS_ZIP}) — set INCLUDE_LICENSED_TOOLS=TRUE to enable"
+    log_info "Skipping tools zip (${TOOLS_ZIP}) -- set INCLUDE_LICENSED_TOOLS=TRUE to enable"
   fi
 
   log_info "Downloading ${SCRIPT_CONFIGURE} ..."
@@ -245,7 +245,7 @@ do_download() {
 }
 
 # =============================================================================
-# STEP 2 — Create bucket and upload from ARTIFACTS_DIR (AWS-connected machine)
+# STEP 2 -- Create bucket and upload from ARTIFACTS_DIR (AWS-connected machine)
 # =============================================================================
 do_upload() {
   setup_aws
@@ -308,17 +308,17 @@ do_upload() {
       missing=true
     fi
   done
-  [ "$missing" = "true" ] && log_warning "Some artifacts missing — check errors above."
+  [ "$missing" = "true" ] && log_warning "Some artifacts missing -- check errors above."
 
   echo
   echo "============================================================="
   echo "  Bucket ready : s3://${TARGET_BUCKET}"
   echo "  SSL cert     : s3://${TARGET_BUCKET}/ssl/${REGION}-bundle.pem"
   echo
-  echo "  STEP 1b (continued) — On the private subnet machine, download the install script:"
+  echo "  STEP 1b (continued) -- On the private subnet machine, download the install script:"
   echo "    aws s3 cp s3://${TARGET_BUCKET}/${SCRIPT_CLIENT} . && chmod +x ${SCRIPT_CLIENT}"
   echo
-  echo "  STEP 2 — Install the DB2 client:"
+  echo "  STEP 2 -- Install the DB2 client:"
   echo "    export BUCKET=${TARGET_BUCKET} REGION=${REGION}"
   echo "    ./$SCRIPT_CLIENT"
   echo "============================================================="

@@ -15,7 +15,7 @@ Usage:
         eid=regex(user_eid, UUID),
     )
     # Pass `sql` to your driver: cur.execute(sql), conn.Query(ctx, sql), etc.
-    # Or `psql -c "$sql"` after composing in a python3 subshell — see the
+    # Or `psql -c "$sql"` after composing in a python3 subshell -- see the
     # bash-deliverables block in references/input-validation.md.
 
     sql = build(
@@ -23,7 +23,7 @@ Usage:
         "VALUES ({eid}, {tid}, {name})",
         eid=regex(new_id, UUID),
         tid=regex(tenant, TENANT_SLUG),
-        name=literal(user_supplied_name),   # free text — dollar-quoted
+        name=literal(user_supplied_name),   # free text -- dollar-quoted
     )
 
 Design rules:
@@ -50,7 +50,7 @@ _IDENT: Pattern[str] = re.compile(r"[a-z_][a-z0-9_]{0,62}", re.IGNORECASE)
 
 
 class UnsafeSQLError(ValueError):
-    """A value failed validation. Never catch and fall back — fix the caller."""
+    """A value failed validation. Never catch and fall back -- fix the caller."""
 
 
 class Safe:
@@ -133,7 +133,7 @@ def literal(value: str) -> Safe:
     """Emit free text as a PostgreSQL dollar-quoted literal.
 
     Picks a random tag until it does not appear inside `value`, which sidesteps
-    quote-escaping entirely. Use for descriptions, names, comments — values
+    quote-escaping entirely. Use for descriptions, names, comments -- values
     without a strict format.
     """
     if not isinstance(value, str):
@@ -156,7 +156,7 @@ def build(template: str, **parts: Safe) -> str:
 
     Also rejects template/kwargs mismatch: a missing key would otherwise raise
     `KeyError` (invisible to callers catching `UnsafeSQLError`), and an extra
-    key would be silently ignored — dropping, for example, a tenant filter
+    key would be silently ignored -- dropping, for example, a tenant filter
     from the query.
     """
     for key, value in parts.items():

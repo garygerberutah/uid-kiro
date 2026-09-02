@@ -63,20 +63,20 @@ availability checks.
 
 **Use for:** authenticated AWS API calls. Useful for `dsql:CreateCluster`, `dsql:GetCluster`,
 `dsql:ListClusters`, `dsql:DeleteCluster`, etc., when the assistant should drive cluster
-lifecycle directly. Long-running calls return a task ID — poll it with `aws___get_tasks`.
+lifecycle directly. Long-running calls return a task ID -- poll it with `aws___get_tasks`.
 
 ### `aws___run_script`
 
 **Use for:** sandboxed Python with AWS API access. Useful for multi-step or parallel workflows
 ("list every cluster in the region, check whose tags include `Environment=eval`, then call
-`GetCluster` on the matching ones"). Long-running scripts return a task ID — poll with
+`GetCluster` on the matching ones"). Long-running scripts return a task ID -- poll with
 `aws___get_tasks`.
 
 ### `aws___get_tasks`
 
 **Use for:** polling the status of long-running tasks started by `aws___call_aws` or
 `aws___run_script`. **MUST** call when a previous tool invocation returned a task ID with a
-working status — without this, the agent can't observe completion or final output.
+working status -- without this, the agent can't observe completion or final output.
 
 ### `aws___get_presigned_url`
 

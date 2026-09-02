@@ -46,7 +46,7 @@ def validate_capture_names(field_name: str, names: Optional[List[str]]) -> Optio
 
     Returns an error string if invalid, else ``None``. An omitted list
     (``None``) is valid and means "capture nothing for that field". A provided
-    list must be non-empty and may not contain the ``*`` wildcard — both the
+    list must be non-empty and may not contain the ``*`` wildcard -- both the
     empty list and ``*`` are rejected so the ambiguous "capture all" shapes
     never reach the API.
     """
@@ -75,7 +75,7 @@ def validate_probe_constraints(
     PROBE differs from BREAKPOINT in two ways the SDKs enforce:
 
     * PROBE is not supported for JavaScript.
-    * PROBE is method/function-level only — the SDKs ignore line_number, so a
+    * PROBE is method/function-level only -- the SDKs ignore line_number, so a
       PROBE with line_number set would silently not behave as written.
     """
     if normalized_type != "PROBE":
@@ -89,7 +89,7 @@ def validate_probe_constraints(
     if line_number is not None:
         return (
             "ERROR: PROBE does not support line_number (the SDKs ignore it). "
-            "Omit line_number for PROBE — it is method/function-level only."
+            "Omit line_number for PROBE -- it is method/function-level only."
         )
     return None
 
@@ -100,7 +100,7 @@ def is_valid_location_hash(location_hash: Optional[str]) -> bool:
     Location hashes are 16 lowercase hex characters by API design. Validating
     against this shape (rather than only checking length) lets snapshot/status
     tools reject malformed input before it is interpolated into a CloudWatch
-    Logs Insights query — hex can never contain the double-quote that would
+    Logs Insights query -- hex can never contain the double-quote that would
     otherwise break out of a query string literal.
     """
     return bool(location_hash and _LOCATION_HASH_RE.fullmatch(location_hash))
@@ -152,7 +152,7 @@ def _format_code_location_troubleshooting(
         elif lang == "javascript":
             lines.append(
                 "  * NOTE: in JavaScript a breakpoint on a non-executable line slides to the "
-                "next parseable line and fires there — verify it lands where you intend."
+                "next parseable line and fires there -- verify it lands where you intend."
             )
 
     if lang == "python":
@@ -213,9 +213,9 @@ def _validate_location_inputs(
     Enforces the per-language fields the SDK needs to bind the instrumentation;
     without them the SDK silently drops the configuration and nothing fires:
 
-    * Java       — requires code_unit, class_name, and method_name.
-    * Python     — requires code_unit and method_name (class_name optional).
-    * JavaScript — requires line_number (>= 1); binds by file + line.
+    * Java       -- requires code_unit, class_name, and method_name.
+    * Python     -- requires code_unit and method_name (class_name optional).
+    * JavaScript -- requires line_number (>= 1); binds by file + line.
     """
     lang = (language or "").strip().lower()
 

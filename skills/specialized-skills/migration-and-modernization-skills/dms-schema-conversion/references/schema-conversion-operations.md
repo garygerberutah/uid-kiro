@@ -16,7 +16,7 @@
 | [cancel-metadata-model-conversion](https://docs.aws.amazon.com/cli/latest/reference/dms/cancel-metadata-model-conversion.html) | Cancel running conversion | Yes* | N/A | [`metadata-model-conversion-cancelled`](https://docs.aws.amazon.com/cli/latest/reference/dms/wait/metadata-model-conversion-cancelled.html) |
 | [cancel-metadata-model-creation](https://docs.aws.amazon.com/cli/latest/reference/dms/cancel-metadata-model-creation.html) | Cancel running creation | Yes* | N/A | [`metadata-model-creation-cancelled`](https://docs.aws.amazon.com/cli/latest/reference/dms/wait/metadata-model-creation-cancelled.html) |
 
-> \* The cancel API call returns synchronously, but the cancellation state transition is async (`CANCEL_RECEIVED` → `CANCELING` → `CANCELED`). Use the corresponding waiter to confirm the operation reached the `CANCELED` state.
+> \* The cancel API call returns synchronously, but the cancellation state transition is async (`CANCEL_RECEIVED` -> `CANCELING` -> `CANCELED`). Use the corresponding waiter to confirm the operation reached the `CANCELED` state.
 >
 > **Note:** All waiters require `--filter 'Name=schema-conversion-operation-id,Values=<RequestId>'` in addition to `--migration-project-identifier`.
 
@@ -53,7 +53,7 @@ All async operations use the same status values:
 | `RECEIVED` | Request received, queued |
 | `IN_PROGRESS` | Operation is running |
 | `SUCCESS` | Operation completed successfully |
-| `FAILED` | Operation failed — check error details |
+| `FAILED` | Operation failed -- check error details |
 | `CANCEL_RECEIVED` | Cancellation request received |
 | `CANCELING` | Cancellation in progress |
 | `CANCELED` | Operation was cancelled |
@@ -64,10 +64,10 @@ All async operations use the same status values:
 
 ## Execution Pattern
 
-1. Call `start-*` → extract `RequestIdentifier`
+1. Call `start-*` -> extract `RequestIdentifier`
 2. Wait for completion using the corresponding `aws dms wait` command (see DMS Waiters table)
-3. If the waiter returns successfully → proceed to next step
-4. If the waiter fails or is unavailable (e.g., `Invalid choice` due to outdated CLI) → fall back to manual polling with the corresponding `describe-*` command until status reaches `SUCCESS` or `FAILED`
+3. If the waiter returns successfully -> proceed to next step
+4. If the waiter fails or is unavailable (e.g., `Invalid choice` due to outdated CLI) -> fall back to manual polling with the corresponding `describe-*` command until status reaches `SUCCESS` or `FAILED`
 
 **Fallback polling pattern** (use when waiter is not available):
 
@@ -77,7 +77,7 @@ aws dms describe-metadata-model-<operation>s \
   --filter Name=request-id,Values=<RequestIdentifier>
 ```
 
-Check `Requests[0].Status` — repeat every 30 seconds until it reaches `SUCCESS` or `FAILED`.
+Check `Requests[0].Status` -- repeat every 30 seconds until it reaches `SUCCESS` or `FAILED`.
 
 **Constraint:** You MUST NOT proceed to the next step until the operation has completed. If the waiter fails or times out, you MUST fall back to polling with the describe command. Never assume an operation succeeded without confirming its status.
 
@@ -85,7 +85,7 @@ Check `Requests[0].Status` — repeat every 30 seconds until it reaches `SUCCESS
 
 ## Key Notes
 
-- `describe-metadata-model` returns `TargetMetadataModels` with target `SelectionRules` — use these to query the TARGET tree (do NOT reuse source selection rules for target)
-- `describe-metadata-model-children` returns `MetadataModelChildren[]` with `MetadataModelName` and `SelectionRules` — use the child's `SelectionRules` to drill deeper
-- `export-metadata-model-assessment` is synchronous — returns S3 links immediately (`PdfReport.S3ObjectKey`, `CsvReport.S3ObjectKey`)
-- `start-metadata-model-creation` only supports **SQL Server → PostgreSQL/Aurora PostgreSQL**
+- `describe-metadata-model` returns `TargetMetadataModels` with target `SelectionRules` -- use these to query the TARGET tree (do NOT reuse source selection rules for target)
+- `describe-metadata-model-children` returns `MetadataModelChildren[]` with `MetadataModelName` and `SelectionRules` -- use the child's `SelectionRules` to drill deeper
+- `export-metadata-model-assessment` is synchronous -- returns S3 links immediately (`PdfReport.S3ObjectKey`, `CsvReport.S3ObjectKey`)
+- `start-metadata-model-creation` only supports **SQL Server -> PostgreSQL/Aurora PostgreSQL**

@@ -61,9 +61,9 @@ CREATE INDEX ASYNC idx_target_tenant ON target_table(tenant_id);
 
 Load the relevant file for the specific MySQL DDL operation you need to migrate:
 
-- **[ddl-column-changes.md](ddl-column-changes.md)** — ALTER COLUMN type, DROP COLUMN
-- **[ddl-auto-increment.md](ddl-auto-increment.md)** — AUTO_INCREMENT to UUID/IDENTITY/SEQUENCE
-- **[ddl-type-alternatives.md](ddl-type-alternatives.md)** — ENUM, SET, ON UPDATE CURRENT_TIMESTAMP, FOREIGN KEY
-- **[ddl-constraints.md](ddl-constraints.md)** — SET/DROP NOT NULL, SET/DROP DEFAULT
-- **[ddl-structural.md](ddl-structural.md)** — ADD/DROP CONSTRAINT, MODIFY PRIMARY KEY
-- **[ddl-batching.md](ddl-batching.md)** — Batched migration pattern, error handling and recovery
+- **[ddl-column-changes.md](ddl-column-changes.md)** -- ALTER COLUMN type, DROP COLUMN
+- **[ddl-auto-increment.md](ddl-auto-increment.md)** -- AUTO_INCREMENT to UUID/IDENTITY/SEQUENCE
+- **[ddl-type-alternatives.md](ddl-type-alternatives.md)** -- ENUM, SET, ON UPDATE CURRENT_TIMESTAMP, FOREIGN KEY
+- **[ddl-constraints.md](ddl-constraints.md)** -- SET/DROP NOT NULL, SET/DROP DEFAULT
+- **[ddl-structural.md](ddl-structural.md)** -- ADD/DROP CONSTRAINT, MODIFY PRIMARY KEY
+- **[ddl-batching.md](ddl-batching.md)** -- Batched migration pattern, error handling and recovery

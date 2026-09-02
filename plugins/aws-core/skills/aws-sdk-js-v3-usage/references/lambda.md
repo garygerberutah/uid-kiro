@@ -2,7 +2,7 @@
 
 ## SDK Version in Lambda Runtimes
 
-Lambda bundles a specific SDK version — not the latest. To control the version, bundle the SDK with your function or use a Lambda layer.
+Lambda bundles a specific SDK version -- not the latest. To control the version, bundle the SDK with your function or use a Lambda layer.
 
 Check the installed version:
 
@@ -27,7 +27,7 @@ Run `npm install`, then zip as:
 
 ```text
 layer_content.zip
-└ nodejs/node_modules/@aws-sdk/...
++ nodejs/node_modules/@aws-sdk/...
 ```
 
 Deploy:
@@ -47,10 +47,10 @@ await lambda.publishLayerVersion({
 
 ## One-Time Async Initialization
 
-Don't call async setup outside the handler — signed requests may expire during provisioned concurrency pre-warming. Use a lazy flag inside the handler instead:
+Don't call async setup outside the handler -- signed requests may expire during provisioned concurrency pre-warming. Use a lazy flag inside the handler instead:
 
 ```js
-// WRONG: risky — network requests may be frozen pre-flight
+// WRONG: risky -- network requests may be frozen pre-flight
 const ready = prepare();
 export const handler = async (event) => { await ready; ... };
 
@@ -65,7 +65,7 @@ export const handler = async (event) => {
 SDK clients themselves (no async setup) are safe to initialize outside the handler:
 
 ```js
-const s3 = new S3Client({}); // OK: outside handler — reused across invocations
+const s3 = new S3Client({}); // OK: outside handler -- reused across invocations
 export const handler = async (event) => {
   return s3.send(new GetObjectCommand({ ... }));
 };

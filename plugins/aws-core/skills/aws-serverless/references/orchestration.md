@@ -1,6 +1,6 @@
 # Orchestration Reference
 
-Step Functions and EventBridge decision matrices, error semantics, and limits. Assumes you can write Amazon States Language (Saga/Parallel/Map/Choice JSON) and EventBridge patterns — this file focuses on the choices and gotchas.
+Step Functions and EventBridge decision matrices, error semantics, and limits. Assumes you can write Amazon States Language (Saga/Parallel/Map/Choice JSON) and EventBridge patterns -- this file focuses on the choices and gotchas.
 
 ## Contents
 
@@ -38,14 +38,14 @@ Express sub-types: **Async** (fire-and-forget, results via CloudWatch Logs); **S
 
 ## State machine limits and patterns
 
-- **Payload limit: 256 KiB between states** — store large data in S3, pass S3 keys.
+- **Payload limit: 256 KiB between states** -- store large data in S3, pass S3 keys.
 - **Inline Map:** max **40 concurrent** iterations, same execution.
 - **Distributed Map:** up to **10,000 parallel child executions**, reads from S3 (JSON/CSV/inventory), supports `ItemBatcher`/`ItemReader`/`ResultWriter`. **Standard workflows only.**
-- **25,000 execution-history entries** (Standard) — split long workflows into child executions.
+- **25,000 execution-history entries** (Standard) -- split long workflows into child executions.
 - **Parallel state output is an array** (one element per branch); all branches must succeed or the state fails.
 - **Choice state:** always include a `Default` branch.
 
-Common patterns (write the ASL directly): **Saga** (each step has a compensating undo via `Catch`, chained in reverse); **Parallel** (concurrent branches); **Map** (iterate an array); **Agentic AI loop** (`bedrock:invokeModel` → Choice on `stop_reason = 'tool_use'` → execute tool → loop). Prefer **direct SDK integrations** (200+ services) over Lambda intermediaries to cut latency, and prefer **JSONata** for inline transforms over a Lambda task.
+Common patterns (write the ASL directly): **Saga** (each step has a compensating undo via `Catch`, chained in reverse); **Parallel** (concurrent branches); **Map** (iterate an array); **Agentic AI loop** (`bedrock:invokeModel` -> Choice on `stop_reason = 'tool_use'` -> execute tool -> loop). Prefer **direct SDK integrations** (200+ services) over Lambda intermediaries to cut latency, and prefer **JSONata** for inline transforms over a Lambda task.
 
 ---
 
@@ -55,12 +55,12 @@ Common patterns (write the ASL directly): **Saga** (each step has a compensating
 
 | Error Name | Retriable? | Notes |
 |---|:---:|---|
-| `States.ALL` | Yes | Wildcard — but does **NOT** match the two terminal errors below |
+| `States.ALL` | Yes | Wildcard -- but does **NOT** match the two terminal errors below |
 | `States.TaskFailed` | Yes | Wildcard for task errors (except `States.Timeout`) |
 | `States.Timeout` / `States.HeartbeatTimeout` | Yes | Exceeded `TimeoutSeconds` / missed `HeartbeatSeconds` |
 | `States.Permissions` | Yes | Insufficient IAM privileges |
-| `States.DataLimitExceeded` | **No** | Payload > 256 KiB — **terminal** |
-| `States.Runtime` | **No** | Invalid JSONPath, null payload — **terminal** |
+| `States.DataLimitExceeded` | **No** | Payload > 256 KiB -- **terminal** |
+| `States.Runtime` | **No** | Invalid JSONPath, null payload -- **terminal** |
 | `States.ItemReaderFailed` / `States.ResultWriterFailed` | Yes | Map source/destination errors |
 
 > **`States.ALL` does NOT catch `States.DataLimitExceeded` or `States.Runtime`.** These are terminal and must be designed around, not retried.
@@ -98,9 +98,9 @@ All specified fields must match (AND); values within an array are OR'd. Operator
 
 ### Best practices
 
-1. **Dedicated event bus per application domain** — default bus for AWS service events only.
-2. **Be precise with patterns** — broad patterns risk infinite loops.
-3. **One target per rule** — simplifies debugging and IAM.
+1. **Dedicated event bus per application domain** -- default bus for AWS service events only.
+2. **Be precise with patterns** -- broad patterns risk infinite loops.
+3. **One target per rule** -- simplifies debugging and IAM.
 4. **DLQs on all targets.**
 5. Use the EventBridge Sandbox to test patterns before deploying.
 
@@ -108,19 +108,19 @@ All specified fields must match (AND); values within an array are OR'd. Operator
 
 | Dimension | Pipes | Rules |
 |---|---|---|
-| Topology | Point-to-point (1→1) | Fan-out (1→N) |
-| Flow | Source → Filter → Enrichment → Transform → Target | Event routing on a bus |
+| Topology | Point-to-point (1->1) | Fan-out (1->N) |
+| Flow | Source -> Filter -> Enrichment -> Transform -> Target | Event routing on a bus |
 | Sources | SQS, Kinesis, DynamoDB Streams, MSK, MQ | Any event on a bus |
 | Enrichment | Built-in (Lambda, API GW, API Destinations, Sync Express SFN) | Not built-in |
-| Use case | **Replace Lambda glue** for source→target | Event routing and distribution |
+| Use case | **Replace Lambda glue** for source->target | Event routing and distribution |
 
-Pipes filtering happens **at the source** — you pay only for matched events — with built-in retry + DLQ.
+Pipes filtering happens **at the source** -- you pay only for matched events -- with built-in retry + DLQ.
 
 ---
 
 ## Step Functions vs Lambda durable functions
 
-Lambda durable functions let you write reliable multi-step workflows as **plain code** (TS/Python/Java) with automatic checkpointing — the SDK persists each step and replays from the checkpoint on interruption, enabling executions up to 1 year with zero compute during waits. **For full guidance use the aws-lambda-durable-functions skill** (see SKILL.md routing).
+Lambda durable functions let you write reliable multi-step workflows as **plain code** (TS/Python/Java) with automatic checkpointing -- the SDK persists each step and replays from the checkpoint on interruption, enabling executions up to 1 year with zero compute during waits. **For full guidance use the aws-lambda-durable-functions skill** (see SKILL.md routing).
 
 | Question | Lambda durable functions | Step Functions |
 |---|---|---|

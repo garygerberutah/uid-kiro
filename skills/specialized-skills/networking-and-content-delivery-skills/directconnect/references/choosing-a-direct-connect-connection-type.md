@@ -189,8 +189,8 @@ network provider, and surfaces the console link to track state.
     --query loaContent --output text --region {region} | base64 --decode > loa.pdf
   ```
 
-- You SHOULD warn the customer to treat the LOA-CFA as sensitive — it carries facility assignment
-  details (cage, rack, panel, and port identifiers) — restrict access to the decoded PDF, do not
+- You SHOULD warn the customer to treat the LOA-CFA as sensitive -- it carries facility assignment
+  details (cage, rack, panel, and port identifiers) -- restrict access to the decoded PDF, do not
   transmit it over unencrypted email, and delete local copies after handoff to the network provider.
 - You MUST explain that a customer without equipment at the Direct Connect location has to engage a
   partner before the cross connect can be ordered.

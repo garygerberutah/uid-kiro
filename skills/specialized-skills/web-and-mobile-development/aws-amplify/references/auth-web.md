@@ -1,9 +1,9 @@
-# Auth — Web
+# Auth -- Web
 
 > **Prerequisites:** Project initialized, `amplify_outputs.json` exists (from `npx ampx sandbox`), and `Amplify.configure(outputs)` called in app entry point.
 >
 > **Backend required:** Auth must be defined in `amplify/auth/resource.ts`
-> using `defineAuth` — see [auth-backend.md](auth-backend.md).
+> using `defineAuth` -- see [auth-backend.md](auth-backend.md).
 
 ## Authenticator Component
 
@@ -14,7 +14,7 @@
 | Angular | `@aws-amplify/ui-angular` | `<amplify-authenticator>` + `AmplifyAuthenticatorModule` | `@aws-amplify/ui-angular/theme.css` |
 
 Props: `loginMechanisms={['email']}`, `socialProviders={['google']}`.
-Slot: `{({ signOut, user }) => ...}` — access `user?.signInDetails?.loginId`.
+Slot: `{({ signOut, user }) => ...}` -- access `user?.signInDetails?.loginId`.
 Next.js SSR: wrap layout in `<Authenticator.Provider>`, use `useAuthenticator` hook.
 
 ### Angular
@@ -59,7 +59,7 @@ OAuth/social: `signInWithRedirect({ provider: 'Google' })`.
 | API (from `aws-amplify/auth`) | Returns                                                                                                |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `getCurrentUser()`            | `{ userId, username, signInDetails? }`                                                                 |
-| `fetchAuthSession()`          | `{ tokens?, credentials?, identityId?, userSub? }` — access `.tokens?.idToken`, `.tokens?.accessToken` |
+| `fetchAuthSession()`          | `{ tokens?, credentials?, identityId?, userSub? }` -- access `.tokens?.idToken`, `.tokens?.accessToken` |
 | `fetchUserAttributes()`       | `{ email, phone_number, ... }`                                                                         |
 
 Tokens refresh automatically.
@@ -78,7 +78,7 @@ const { devices } = await fetchDevices();  // List remembered devices
 
 For server components and route handlers, use cookie-based auth:
 
-> For server-side auth + data access in Next.js, see [data-web.md](data-web.md) § Server-Side (Next.js).
+> For server-side auth + data access in Next.js, see [data-web.md](data-web.md) Section Server-Side (Next.js).
 
 For server actions and middleware, use `createServerRunner` from `@aws-amplify/adapter-nextjs`:
 
@@ -98,10 +98,10 @@ APIs work identically.
 ### Setup
 
 **Import order matters:** `react-native-get-random-values` must be
-the FIRST import in the entry file — it polyfills `crypto.getRandomValues()`
+the FIRST import in the entry file -- it polyfills `crypto.getRandomValues()`
 which the Amplify SDK requires for token generation and is missing in
 React Native's JavaScript runtime. `@aws-amplify/react-native` must
-come before `aws-amplify`. See SKILL.md § Framework Setup for the
+come before `aws-amplify`. See SKILL.md Section Framework Setup for the
 full required import order.
 
 ```bash
@@ -113,7 +113,7 @@ Same `<Authenticator>` prop API as web React (from `@aws-amplify/ui-react-native
 
 ### Social Login
 
-`signInWithRedirect({ provider: 'Google' })` — same as web. Ensure
+`signInWithRedirect({ provider: 'Google' })` -- same as web. Ensure
 callback URLs in `defineAuth` include your Expo scheme.
 
 ## Pitfalls
@@ -122,7 +122,7 @@ callback URLs in `defineAuth` include your Expo scheme.
   `<Authenticator>` renders as unstyled HTML.
 - **Unhandled sign-in steps:** Not switching on ALL `signInStep` values
   causes the flow to silently stall on MFA or password-reset challenges.
-  Handle every possible value — missing any causes the auth
+  Handle every possible value -- missing any causes the auth
   flow to hang with no visible error.
 - **MFA timing:** Calling `updateMFAPreference()` before authentication
   completes fails silently because the user is not yet authenticated.

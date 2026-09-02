@@ -1,4 +1,4 @@
-# DocumentDB — Migration Executor
+# DocumentDB -- Migration Executor
 
 End-to-end migration from MongoDB to DocumentDB using AWS DMS for data, the index tool for indexes, and manual steps for users/roles. Produces `artifacts/{app-name}/migration-plan.md`.
 
@@ -68,7 +68,7 @@ Add `--shorten-index-name` for long names and `--support-2dsphere` for 2dsphere 
 
 ### Step 3: Users and roles
 
-DocumentDB built-in roles: `read`, `readWrite`, `dbAdmin`, `dbAdminAnyDatabase`, `readAnyDatabase`, `readWriteAnyDatabase`. Custom roles are not supported — map each MongoDB custom role to the nearest built-in.
+DocumentDB built-in roles: `read`, `readWrite`, `dbAdmin`, `dbAdminAnyDatabase`, `readAnyDatabase`, `readWriteAnyDatabase`. Custom roles are not supported -- map each MongoDB custom role to the nearest built-in.
 
 ```javascript
 db.createUser({
@@ -138,9 +138,9 @@ aws dms create-endpoint --endpoint-identifier <app>-source \
   --username <u> --password '<pw>' --database-name admin --region <region>
 ```
 
-For production, keep credentials off the command line: replace `--username/--password` with `--mongo-db-settings` referencing a Secrets Manager secret — `'ServerName=<host>,Port=27017,DatabaseName=admin,SecretsManagerAccessRoleArn=<role-arn>,SecretsManagerSecretId=<secret-arn>'`. The role needs `secretsmanager:GetSecretValue` plus `iam:PassRole`.
+For production, keep credentials off the command line: replace `--username/--password` with `--mongo-db-settings` referencing a Secrets Manager secret -- `'ServerName=<host>,Port=27017,DatabaseName=admin,SecretsManagerAccessRoleArn=<role-arn>,SecretsManagerSecretId=<secret-arn>'`. The role needs `secretsmanager:GetSecretValue` plus `iam:PassRole`.
 
-**4f. Target endpoint (DocumentDB).** MUST use `--ssl-mode verify-full` with `--certificate-arn` — without TLS DMS hits socket timeouts:
+**4f. Target endpoint (DocumentDB).** MUST use `--ssl-mode verify-full` with `--certificate-arn` -- without TLS DMS hits socket timeouts:
 
 ```bash
 aws dms create-endpoint --endpoint-identifier <app>-target \
@@ -174,7 +174,7 @@ aws dms describe-connections \
   --filters Name=endpoint-arn,Values=$SRC_ARN,$TGT_ARN --region <region>
 ```
 
-**4h. Migration task** — set `FailOnNoTablesCaptured: false` or the task fails fatally on an empty source:
+**4h. Migration task** -- set `FailOnNoTablesCaptured: false` or the task fails fatally on an empty source:
 
 ```bash
 TASK_ARN=$(aws dms create-replication-task \
@@ -195,7 +195,7 @@ aws dms start-replication-task \
   --start-replication-task-type start-replication --region <region>
 ```
 
-Default 32 KB LOB limit truncates larger documents — check the user's largest docs and adjust if needed.
+Default 32 KB LOB limit truncates larger documents -- check the user's largest docs and adjust if needed.
 
 ### Step 5: Monitor
 
@@ -214,7 +214,7 @@ Compare counts and sample documents on MongoDB and DocumentDB. Acceptable varian
 
 ### Step 7: Write the migration plan
 
-`artifacts/{app-name}/migration-plan.md` — collections migrated with counts, indexes restored/skipped, users created, DMS task ARN + status, validation results, planned cutover time.
+`artifacts/{app-name}/migration-plan.md` -- collections migrated with counts, indexes restored/skipped, users created, DMS task ARN + status, validation results, planned cutover time.
 
 ### Step 8: Cutover
 
@@ -246,7 +246,7 @@ Before switching traffic, complete every item:
 4. Final count check on both sides
 5. Update app connection strings to the DocumentDB endpoint
 6. Start the app, run smoke tests
-7. Monitor CloudWatch for 15–30 minutes (`CPUUtilization`, `DatabaseConnections`)
-8. Keep MongoDB read-only for 24–48 hours as rollback — do NOT write to it
+7. Monitor CloudWatch for 15-30 minutes (`CPUUtilization`, `DatabaseConnections`)
+8. Keep MongoDB read-only for 24-48 hours as rollback -- do NOT write to it
 
-**Rollback within 24–48 hours:** point app back at MongoDB, fix the issue in staging, re-plan cutover.
+**Rollback within 24-48 hours:** point app back at MongoDB, fix the issue in staging, re-plan cutover.

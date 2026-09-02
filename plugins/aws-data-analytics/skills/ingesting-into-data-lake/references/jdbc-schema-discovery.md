@@ -236,7 +236,7 @@ obj = s3.get_object(Bucket='<bucket>', Key='queries/customer-import.sql')
 source_query = obj['Body'].read().decode('utf-8')
 ```
 
-## Type Mapping: Source Database → Iceberg
+## Type Mapping: Source Database -> Iceberg
 
 Map source database types to Iceberg types for the target S3 Table.
 
@@ -282,8 +282,8 @@ Map source database types to Iceberg types for the target S3 Table.
 | NVARCHAR, VARCHAR | STRING | Unicode or ASCII string |
 | INT | INTEGER | 32-bit integer |
 | BIGINT | BIGINT | 64-bit integer |
-| SMALLINT | INTEGER | 16-bit → 32-bit |
-| TINYINT | INTEGER | 8-bit → 32-bit |
+| SMALLINT | INTEGER | 16-bit -> 32-bit |
+| TINYINT | INTEGER | 8-bit -> 32-bit |
 | DECIMAL, NUMERIC | DECIMAL(p,s) | Preserve precision |
 | MONEY, SMALLMONEY | DECIMAL(19,4) | Currency |
 | DATETIME, DATETIME2 | TIMESTAMP | Date and time |
@@ -298,7 +298,7 @@ Map source database types to Iceberg types for the target S3 Table.
 |-----------------|--------------|-------|
 | INTEGER | INTEGER | 32-bit integer |
 | BIGINT | BIGINT | 64-bit integer |
-| SMALLINT | INTEGER | 16-bit → 32-bit |
+| SMALLINT | INTEGER | 16-bit -> 32-bit |
 | NUMERIC | DECIMAL(p,s) | Arbitrary precision |
 | REAL | FLOAT | 32-bit floating |
 | DOUBLE PRECISION | DOUBLE | 64-bit floating |
@@ -318,8 +318,8 @@ Map source database types to Iceberg types for the target S3 Table.
 |------------|--------------|-------|
 | INT, INTEGER | INTEGER | 32-bit integer |
 | BIGINT | BIGINT | 64-bit integer |
-| SMALLINT | INTEGER | 16-bit → 32-bit |
-| TINYINT | INTEGER | 8-bit → 32-bit (or BOOLEAN if TINYINT(1)) |
+| SMALLINT | INTEGER | 16-bit -> 32-bit |
+| TINYINT | INTEGER | 8-bit -> 32-bit (or BOOLEAN if TINYINT(1)) |
 | DECIMAL, NUMERIC | DECIMAL(p,s) | Preserve precision |
 | FLOAT | FLOAT | 32-bit floating |
 | DOUBLE | DOUBLE | 64-bit floating |
@@ -339,14 +339,14 @@ Based on the source schema, propose the target S3 Table schema to the user.
 
 **Source table**: `CUSTOMERS` in Oracle database
 
-- CUSTOMER_ID: NUMBER(10) → BIGINT
-- CUSTOMER_NAME: VARCHAR2(200) → STRING
-- EMAIL: VARCHAR2(255) → STRING
-- PHONE: VARCHAR2(20) → STRING
-- STATUS: VARCHAR2(20) → STRING
-- CREDIT_LIMIT: NUMBER(10,2) → DECIMAL(10,2)
-- CREATED_DATE: DATE → TIMESTAMP
-- LAST_PURCHASE_DATE: DATE → TIMESTAMP
+- CUSTOMER_ID: NUMBER(10) -> BIGINT
+- CUSTOMER_NAME: VARCHAR2(200) -> STRING
+- EMAIL: VARCHAR2(255) -> STRING
+- PHONE: VARCHAR2(20) -> STRING
+- STATUS: VARCHAR2(20) -> STRING
+- CREDIT_LIMIT: NUMBER(10,2) -> DECIMAL(10,2)
+- CREATED_DATE: DATE -> TIMESTAMP
+- LAST_PURCHASE_DATE: DATE -> TIMESTAMP
 
 **Proposed S3 Table schema**:
 
@@ -372,15 +372,15 @@ TBLPROPERTIES ('table_type' = 'ICEBERG')
 ```
 I've mapped the Oracle CUSTOMERS table to this Iceberg schema:
 
-Source (Oracle)                  → Target (Iceberg)
-CUSTOMER_ID (NUMBER(10))         → customer_id (BIGINT)
-CUSTOMER_NAME (VARCHAR2(200))    → customer_name (STRING)
-EMAIL (VARCHAR2(255))            → email (STRING)
-PHONE (VARCHAR2(20))             → phone (STRING)
-STATUS (VARCHAR2(20))            → status (STRING)
-CREDIT_LIMIT (NUMBER(10,2))      → credit_limit (DECIMAL(10,2))
-CREATED_DATE (DATE)              → created_date (TIMESTAMP)
-LAST_PURCHASE_DATE (DATE)        → last_purchase_date (TIMESTAMP)
+Source (Oracle)                  -> Target (Iceberg)
+CUSTOMER_ID (NUMBER(10))         -> customer_id (BIGINT)
+CUSTOMER_NAME (VARCHAR2(200))    -> customer_name (STRING)
+EMAIL (VARCHAR2(255))            -> email (STRING)
+PHONE (VARCHAR2(20))             -> phone (STRING)
+STATUS (VARCHAR2(20))            -> status (STRING)
+CREDIT_LIMIT (NUMBER(10,2))      -> credit_limit (DECIMAL(10,2))
+CREATED_DATE (DATE)              -> created_date (TIMESTAMP)
+LAST_PURCHASE_DATE (DATE)        -> last_purchase_date (TIMESTAMP)
 
 Added columns:
 - load_timestamp (TIMESTAMP): Tracks when record was loaded
@@ -451,7 +451,7 @@ document_s3_key STRING  -- "s3://docs-bucket/doc123.pdf"
 2. **Add metadata columns**: `load_timestamp`, `load_date`, `source_system`
 3. **Consider partitioning**: Partition by load date for incremental loads
 4. **Handle nullability**: Make most columns nullable unless user specifies otherwise
-5. **Document type conversions**: Note any lossy conversions (e.g., TIME → STRING)
+5. **Document type conversions**: Note any lossy conversions (e.g., TIME -> STRING)
 6. **Test with sample data**: Load a small batch to verify types work correctly
 
 ## Summary

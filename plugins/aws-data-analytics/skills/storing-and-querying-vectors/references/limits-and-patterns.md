@@ -63,5 +63,5 @@ When migrating from another vector DB (pgVector, AOSS, etc.):
 2. Export vectors from source (with metadata)
 3. Batch PutVectors into S3 Vectors
 4. Verify with QueryVectors using known test vectors
-5. S3 Vectors only supports `cosine` and `euclidean` — if source used dotProduct,
+5. S3 Vectors only supports `cosine` and `euclidean` -- if source used dotProduct,
    use `cosine` on normalized vectors as equivalent

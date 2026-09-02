@@ -352,7 +352,7 @@ def best_dsp(rates: list[DSPRate], term_years: int = 1) -> DSPRate | None:
 
 
 # ---------------------------------------------------------------------------
-# Comparison builder — single workload
+# Comparison builder -- single workload
 # ---------------------------------------------------------------------------
 
 
@@ -371,7 +371,7 @@ def build_comparison(
 
     if is_serverless:
         od_hourly = ACU_PRICE_IO_OPTIMIZED if io_optimized else ACU_PRICE_STANDARD
-        # For Serverless v2, "number of instances" is irrelevant — we price avg ACU continuously
+        # For Serverless v2, "number of instances" is irrelevant -- we price avg ACU continuously
         units = avg_acu
         od_monthly = od_hourly * units * HOURS_PER_MONTH
 
@@ -410,12 +410,12 @@ def build_comparison(
     ri_3yr = best_ri(ri_offerings, 3)
 
     # I/O-Optimized RI coverage (AWS Compute Optimizer, verified): an I/O-Optimized
-    # instance is FULLY covered by Reserved Instances — no portion is forced to
-    # on-demand — but it "consumes 30% more normalized units per hour than Aurora
-    # Standard", i.e. it draws down RI capacity at 1.30×. So the effective RI cost is
-    # the (Standard-normalized) RI rate × 1.30. Equivalently: buy ~30% more normalized
+    # instance is FULLY covered by Reserved Instances -- no portion is forced to
+    # on-demand -- but it "consumes 30% more normalized units per hour than Aurora
+    # Standard", i.e. it draws down RI capacity at 1.30x. So the effective RI cost is
+    # the (Standard-normalized) RI rate x 1.30. Equivalently: buy ~30% more normalized
     # RI units to cover the same I/O-Optimized fleet.
-    #   io-opt RI monthly = ri_rate × 1.30 × hours × N
+    #   io-opt RI monthly = ri_rate x 1.30 x hours x N
     def ri_adjusted_monthly(ri: RIOffering | None) -> float | None:
         if ri is None:
             return None
@@ -438,8 +438,8 @@ def build_comparison(
     if io_optimized:
         notes.append(
             "Cluster is I/O-Optimized (30% compute premium). Both RI and DSP cover the "
-            "full I/O-Optimized instance price — I/O-Optimized consumes 30% more "
-            "normalized units per hour, so an RI draws down capacity at 1.30× (buy ~30% "
+            "full I/O-Optimized instance price -- I/O-Optimized consumes 30% more "
+            "normalized units per hour, so an RI draws down capacity at 1.30x (buy ~30% "
             "more normalized RI units to fully cover the fleet); no portion is on-demand."
         )
 
@@ -536,7 +536,7 @@ def _recommend_provisioned(
         )
     elif best_label == "1yr DSP":
         reasons.append(
-            "Offers flexibility — covers any eligible Aurora instance family in the account, including future upgrades."
+            "Offers flexibility -- covers any eligible Aurora instance family in the account, including future upgrades."
         )
         if io_optimized:
             reasons.append(
@@ -579,7 +579,7 @@ def _recommend_serverless(dsp_savings: float | None, od_monthly: float) -> dict:
         "savings_pct": round(pct, 1),
         "reason": (
             f"1yr DSP saves ${dsp_savings:.0f}/mo ({pct:.0f}%). "
-            "Size the commitment to your steady baseline ACU — DSP bills the committed $/hr "
+            "Size the commitment to your steady baseline ACU -- DSP bills the committed $/hr "
             "continuously, even during idle periods."
         ),
     }
@@ -626,7 +626,7 @@ def analyze_cluster_live(cluster_id: str, region: str) -> dict:
             "storage_type": storage_type,
             "skipped": True,
             "reason": (
-                "Cluster has no DB instances — no compute to price. "
+                "Cluster has no DB instances -- no compute to price. "
                 "RI and DSP commitment analysis does not apply. "
                 "This typically indicates the last instance was deleted, a paused "
                 "cluster, or a cluster mid-migration."
@@ -664,7 +664,7 @@ def analyze_cluster_live(cluster_id: str, region: str) -> dict:
             )
         )
     if serverless_instances > 0:
-        # Without observed ACU metrics, we can't price serverless exactly — note it
+        # Without observed ACU metrics, we can't price serverless exactly -- note it
         sub_workloads.append(
             {
                 "workload_type": "serverless_v2",
@@ -714,8 +714,8 @@ def _format_table_single(result: dict) -> str:
         )
     else:
         lines.append(
-            f"Aurora Commitment Pricing — "
-            f"{result.get('num_instances', 1)}× {result.get('instance_type', '?')}"
+            f"Aurora Commitment Pricing -- "
+            f"{result.get('num_instances', 1)}x {result.get('instance_type', '?')}"
         )
         if result.get("io_optimized"):
             lines.append("  Storage: I/O-Optimized (30% compute premium applied)")
@@ -724,7 +724,7 @@ def _format_table_single(result: dict) -> str:
     lines.append("")
     lines.append(f"  {'Option':<28} {'Monthly':>12} {'Savings':>12} {'Upfront':>12}  Term")
     lines.append("  " + "-" * 70)
-    lines.append(f"  {'On-Demand':<28} ${od_monthly:>11,.0f} {'—':>12} {'$0':>12}  —")
+    lines.append(f"  {'On-Demand':<28} ${od_monthly:>11,.0f} {'--':>12} {'$0':>12}  --")
 
     for key, label, term_hint in (
         ("ri_1yr", "1yr RI", "1 year"),
@@ -740,7 +740,7 @@ def _format_table_single(result: dict) -> str:
         savings = entry.get("savings_monthly", 0)
         pct = entry.get("savings_pct", 0)
         upfront = entry.get("upfront_total", 0)
-        savings_str = f"${savings:,.0f} ({pct:.0f}%)" if savings else "—"
+        savings_str = f"${savings:,.0f} ({pct:.0f}%)" if savings else "--"
         upfront_str = f"${upfront:,.0f}" if upfront else "$0"
         lines.append(
             f"  {display:<28} ${monthly:>11,.0f} {savings_str:>12} {upfront_str:>12}  {term_hint}"
@@ -771,7 +771,7 @@ def _format_cluster(result: dict) -> str:
     for wl in workloads:
         if wl.get("workload_type") == "serverless_v2" and "note" in wl:
             lines.append("")
-            lines.append(f"  [Serverless v2 — {wl.get('instance_count', 0)} instance(s)]")
+            lines.append(f"  [Serverless v2 -- {wl.get('instance_count', 0)} instance(s)]")
             lines.append(f"  {wl['note']}")
             continue
         lines.append("")
@@ -834,7 +834,7 @@ def main():
         "--io-optimized", action="store_true", help="Workload uses Aurora I/O-Optimized storage"
     )
     off.add_argument(
-        "--serverless", action="store_true", help="Serverless v2 workload — requires --avg-acu"
+        "--serverless", action="store_true", help="Serverless v2 workload -- requires --avg-acu"
     )
     off.add_argument(
         "--avg-acu", type=float, default=0.0, help="Average ACU for serverless workload"

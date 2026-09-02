@@ -3,7 +3,7 @@
 The single seam where dynamic-instrumentation tools touch botocore. Each
 operation here issues one boto3 call, wraps any raised exception in a
 ``GatewayError``, and lets the caller render the failure through
-``render_error``. Tool functions never import ``botocore.exceptions`` — that
+``render_error``. Tool functions never import ``botocore.exceptions`` -- that
 contract belongs to this module.
 """
 
@@ -32,7 +32,7 @@ class GatewayError(Exception):
 # wrapper functions below pass only these hardcoded names, but ``_call`` validates against
 # this frozen set before dispatch so the seam cannot be turned into an arbitrary-method
 # dispatcher by any (future) caller. ``_bind_method`` then selects the bound method by LITERAL
-# attribute access (one ``if`` per op) — never ``getattr(client, name)`` — so there is no
+# attribute access (one ``if`` per op) -- never ``getattr(client, name)`` -- so there is no
 # string-driven dispatch. The two are kept in lockstep by the gateway sync-guard test.
 _ALLOWED_OPERATIONS = frozenset(
     {
@@ -132,8 +132,8 @@ def render_error(
 
     Callers that want tailored prose for a ``ClientError`` pass
     ``possible_causes`` / ``troubleshooting`` / ``trailer``; those flow
-    through ``render_client_error``. Callers that pass none of those — and
-    every non-``ClientError`` exception regardless — fall through to
+    through ``render_client_error``. Callers that pass none of those -- and
+    every non-``ClientError`` exception regardless -- fall through to
     ``translate_aws_error``, which carries its own canned bullets per
     exception type. This preserves the per-tool rendering contract that
     existed before tools were routed through the gateway.

@@ -122,10 +122,10 @@ Works from both standalone accounts and delegated administrator accounts.
 
 | Symptom | Resolution |
 |---|---|
-| batch-get-account-status returns DISABLED | Inspector not enabled — report as not configured |
-| Access denied on list-members | Not a delegated admin — run Workflow A instead |
+| batch-get-account-status returns DISABLED | Inspector not enabled -- report as not configured |
+| Access denied on list-members | Not a delegated admin -- run Workflow A instead |
 | list-coverage returns empty | No supported resources in account |
-| SUSPENDED status | Account suspended from Inspector — report with note |
+| SUSPENDED status | Account suspended from Inspector -- report with note |
 
 ## Output Sensitivity
 

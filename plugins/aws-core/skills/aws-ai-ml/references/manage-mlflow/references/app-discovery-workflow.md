@@ -2,7 +2,7 @@
 
 Discovers existing MLflow apps in the user's account and helps them select one.
 
-> **IMPORTANT:** Use only the MLflow **App** APIs (`ListMlflowApps`, `DescribeMlflowApp`, `CreateMlflowApp`, etc.). Do NOT use the legacy MLflow **Tracking Server** APIs (`ListMlflowTrackingServers`, `CreateMlflowTrackingServer`, `DescribeMlflowTrackingServer`, etc.) — those are deprecated for new deployments.
+> **IMPORTANT:** Use only the MLflow **App** APIs (`ListMlflowApps`, `DescribeMlflowApp`, `CreateMlflowApp`, etc.). Do NOT use the legacy MLflow **Tracking Server** APIs (`ListMlflowTrackingServers`, `CreateMlflowTrackingServer`, `DescribeMlflowTrackingServer`, etc.) -- those are deprecated for new deployments.
 
 ## Steps
 
@@ -18,9 +18,9 @@ Discovers existing MLflow apps in the user's account and helps them select one.
 
 4. **Present to user:**
    - Show: name, ARN, status, MLflow version, creation time
-   - If exactly one ACTIVE app: suggest it directly — "You have one MLflow app: {name}. Use this one?"
+   - If exactly one ACTIVE app: suggest it directly -- "You have one MLflow app: {name}. Use this one?"
    - If multiple ACTIVE apps: present a numbered list, ask user to choose
-   - If zero apps found: inform user — "No MLflow apps found in {region}. Would you like me to create one?"
+   - If zero apps found: inform user -- "No MLflow apps found in {region}. Would you like me to create one?"
 
 ## Edge Cases
 

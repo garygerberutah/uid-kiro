@@ -14,7 +14,7 @@ Build AgentCore systems where agents delegate work to other agents.
 `$ARGUMENTS` is optional:
 
 ```
-/multi-agent              # interactive — asks which pattern you need
+/multi-agent              # interactive -- asks which pattern you need
 /multi-agent a2a          # A2A protocol setup
 /multi-agent direct       # direct invocation pattern
 /multi-agent memory       # shared memory across agents
@@ -70,13 +70,13 @@ def call_specialist(prompt: str, session_id: str = None) -> str:
         kwargs["runtimeSessionId"] = session_id
 
     response = client.invoke_agent_runtime(**kwargs)
-    # response["response"] is a StreamingBody — read, then parse JSON
+    # response["response"] is a StreamingBody -- read, then parse JSON
     body = response["response"].read()
     result = json.loads(body.decode() if isinstance(body, bytes) else body)
     return result.get("response", result.get("result", str(result)))
 ```
 
-Passing `"DEFAULT"` as the qualifier calls the live version. To pin to a specific version (staging pin, canary, or rollback), pass a numeric version string instead — see [`agents-deploy/references/versioning.md`](../../agents-deploy/references/versioning.md) for the full workflow.
+Passing `"DEFAULT"` as the qualifier calls the live version. To pin to a specific version (staging pin, canary, or rollback), pass a numeric version string instead -- see [`agents-deploy/references/versioning.md`](../../agents-deploy/references/versioning.md) for the full workflow.
 
 **For Strands**, register it as a `@tool`:
 
@@ -151,7 +151,7 @@ async def invoke(payload, context):
     return {"response": result.final_output}
 ```
 
-**For Google ADK**, pass as a plain function in the agent's `tools=[]` list. Note: the official samples use A2A for ADK multi-agent patterns (see `awslabs/agentcore-samples/02-use-cases/A2A-multi-agent-incident-response/host_adk_agent/`). The direct-invocation pattern below is extrapolated from the ADK base template — validate against your ADK version before relying on it in production:
+**For Google ADK**, pass as a plain function in the agent's `tools=[]` list. Note: the official samples use A2A for ADK multi-agent patterns (see `awslabs/agentcore-samples/02-use-cases/A2A-multi-agent-incident-response/host_adk_agent/`). The direct-invocation pattern below is extrapolated from the ADK base template -- validate against your ADK version before relying on it in production:
 
 ```python
 from google.adk.agents import Agent
@@ -186,7 +186,7 @@ async def invoke(payload, context):
             return {"response": event.content.parts[0].text}
 ```
 
-For a validated ADK multi-agent pattern, use A2A instead of direct invocation — see the A2A section below and the sample linked above.
+For a validated ADK multi-agent pattern, use A2A instead of direct invocation -- see the A2A section below and the sample linked above.
 
 **For Claude Agent SDK:** See [`awslabs/agentcore-samples/03-integrations/agentic-frameworks/claude-agent/claude-sub-agents/`](https://github.com/awslabs/agentcore-samples/tree/main/03-integrations/agentic-frameworks/claude-agent/claude-sub-agents) for the official sub-agent pattern. This plugin doesn't ship a Claude SDK delegation pattern because the sample is more current than anything we could extrapolate.
 
@@ -218,14 +218,14 @@ echo "SPECIALIST_AGENT_ARN=$SPECIALIST_ARN" >> agentcore/.env.local
 
 **For the deployed orchestrator**, the specialist ARN needs to be available as an environment variable. The recommended pattern is:
 
-1. **Edit `agentcore/agentcore.json`** — find the orchestrator agent's entry and add the env var to its configuration (the exact field name depends on your CLI version; run `agentcore validate` after editing). In current CLI versions, agent environment variables are typically managed through the deployment config.
+1. **Edit `agentcore/agentcore.json`** -- find the orchestrator agent's entry and add the env var to its configuration (the exact field name depends on your CLI version; run `agentcore validate` after editing). In current CLI versions, agent environment variables are typically managed through the deployment config.
 
-2. **Or use CDK overrides** — for teams using the CDK constructs directly, set the env var in the Runtime construct's environment property.
+2. **Or use CDK overrides** -- for teams using the CDK constructs directly, set the env var in the Runtime construct's environment property.
 
-3. **Or write the env var at deploy time** — some teams use a pre-deploy script that generates `agentcore/.env.local` and `agentcore/agentcore.json` updates together:
+3. **Or write the env var at deploy time** -- some teams use a pre-deploy script that generates `agentcore/.env.local` and `agentcore/agentcore.json` updates together:
 
 ```bash
-# pre-deploy.sh — run before every orchestrator deploy
+# pre-deploy.sh -- run before every orchestrator deploy
 SPECIALIST_ARN=$(agentcore status --runtime SpecialistAgent --json | jq -r '.runtimes[0].arn')
 echo "SPECIALIST_AGENT_ARN=$SPECIALIST_ARN" >> agentcore/.env.local
 
@@ -239,11 +239,11 @@ The CLI does not currently provide a dedicated `--env` flag on `agentcore add ag
 
 ## Pattern 2: A2A protocol
 
-The specialist exposes the A2A standard — discoverable via an agent card, callable via JSON-RPC. AgentCore's A2A runtime handles the HTTP server, port binding (9000), and agent card serving for you.
+The specialist exposes the A2A standard -- discoverable via an agent card, callable via JSON-RPC. AgentCore's A2A runtime handles the HTTP server, port binding (9000), and agent card serving for you.
 
 ### Step 1: Build the A2A specialist
 
-Use the `serve_a2a` helper from `bedrock-agentcore` — this matches what the CLI scaffolds via `agentcore create --protocol A2A`.
+Use the `serve_a2a` helper from `bedrock-agentcore` -- this matches what the CLI scaffolds via `agentcore create --protocol A2A`.
 
 ```python
 # app/SpecialistA2A/main.py
@@ -282,7 +282,7 @@ bedrock-agentcore
 
 ```bash
 agentcore create --name SpecialistA2A --protocol A2A
-# The CLI scaffolds app/SpecialistA2A/main.py with the serve_a2a pattern shown above — customize it with your specialist logic
+# The CLI scaffolds app/SpecialistA2A/main.py with the serve_a2a pattern shown above -- customize it with your specialist logic
 agentcore deploy -y
 ```
 
@@ -320,7 +320,7 @@ curl -X POST http://localhost:9000 \
 
 ### Step 4: Call the A2A specialist from the orchestrator
 
-The specialist URL is a non-secret identifier, so pass it via an env var in the orchestrator's deployment config. The bearer token **is** a secret — do **not** stash it in `os.getenv(...)` on the deployed runtime (runtime env vars are not vault-backed). Register an OAuth M2M provider once, then use `@requires_access_token` to fetch a fresh token at call time:
+The specialist URL is a non-secret identifier, so pass it via an env var in the orchestrator's deployment config. The bearer token **is** a secret -- do **not** stash it in `os.getenv(...)` on the deployed runtime (runtime env vars are not vault-backed). Register an OAuth M2M provider once, then use `@requires_access_token` to fetch a fresh token at call time:
 
 ```bash
 # One-time: register the OAuth provider that issues tokens for the specialist.
@@ -342,7 +342,7 @@ from a2a.client import A2ACardResolver, ClientConfig, ClientFactory
 from a2a.types import Message, Part, Role, TextPart
 from bedrock_agentcore.identity.auth import requires_access_token
 
-# Non-secret identifier — fine to pull from the environment.
+# Non-secret identifier -- fine to pull from the environment.
 SPECIALIST_URL = os.getenv("SPECIALIST_A2A_URL")
 
 @requires_access_token(
@@ -383,13 +383,13 @@ def invoke(payload, context):
     return {"response": result}
 ```
 
-The decorator handles caching and refresh. For local dev, put the OAuth values in `agentcore/.env.local` so `agentcore dev` can resolve the decorator — the deployed runtime reads them from the credential provider instead.
+The decorator handles caching and refresh. For local dev, put the OAuth values in `agentcore/.env.local` so `agentcore dev` can resolve the decorator -- the deployed runtime reads them from the credential provider instead.
 
 ---
 
 ## Shared memory across agents
 
-Memory is a top-level resource — not nested under a single agent. Multiple agents can share it by reading the same env var.
+Memory is a top-level resource -- not nested under a single agent. Multiple agents can share it by reading the same env var.
 
 ### Setup
 
@@ -405,7 +405,7 @@ agentcore add memory --name SharedMemory --strategies SEMANTIC,USER_PREFERENCE
 MEMORY_ID = os.getenv("MEMORY_SHAREDMEMORY_ID")
 ```
 
-1. Use a consistent `actor_id` scheme — typically the end user's ID — so both agents read and write the same user's memory.
+1. Use a consistent `actor_id` scheme -- typically the end user's ID -- so both agents read and write the same user's memory.
 
 ### Key consideration
 
@@ -437,7 +437,7 @@ turns = memory_client.get_last_k_turns(
 
 - Verify it's running on port 9000 (not 8080)
 - Check the agent card endpoint returns: `curl http://localhost:9000/.well-known/agent-card.json`
-- Verify your `main.py` uses `serve_a2a(StrandsA2AExecutor(agent))` — the older `A2AServer + FastAPI` pattern is deprecated in favor of this
+- Verify your `main.py` uses `serve_a2a(StrandsA2AExecutor(agent))` -- the older `A2AServer + FastAPI` pattern is deprecated in favor of this
 
 **Direct invocation permission denied:**
 
@@ -452,7 +452,7 @@ turns = memory_client.get_last_k_turns(
 
 **A2A auth errors:**
 
-- A2A supports SigV4 and OAuth 2.0 — make sure you're using the right auth method
+- A2A supports SigV4 and OAuth 2.0 -- make sure you're using the right auth method
 - Get the correct bearer token: `agentcore fetch access --name SpecialistA2A --type agent`
 
 ## Output

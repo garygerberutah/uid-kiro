@@ -3,9 +3,9 @@ name: diff-scanning-with-aws-security-agent
 description: Run a fast AWS Security Agent diff scan on only the changed code since a git ref. Use when the user asks to scan changes, run a diff scan, check what changed for security issues, scan before committing, scan before PR, or any pre-commit/pre-push security check.
 ---
 
-# AWS Security Agent — Diff Scan
+# AWS Security Agent -- Diff Scan
 
-Scan only the code that changed since a git ref. Faster than a full scan — focuses findings on the diff. No prior full scan needed.
+Scan only the code that changed since a git ref. Faster than a full scan -- focuses findings on the diff. No prior full scan needed.
 
 ## Local state
 
@@ -28,12 +28,12 @@ Track scans in `.security-agent/scans.json`.
 
 ## Workflow
 
-1. **Pre-scan checks.** Same as full scan — read config, verify agent space, resolve values, generate workspace ID.
+1. **Pre-scan checks.** Same as full scan -- read config, verify agent space, resolve values, generate workspace ID.
 
 2. **Ask what to scan against:**
-   - Uncommitted changes → `BASE_REF=HEAD` (default)
-   - Branch vs main → `BASE_REF=main`
-   - Custom ref → user provides
+   - Uncommitted changes -> `BASE_REF=HEAD` (default)
+   - Branch vs main -> `BASE_REF=main`
+   - Custom ref -> user provides
 
 3. **Generate diff (fail fast if empty):**
 
@@ -67,7 +67,7 @@ Track scans in `.security-agent/scans.json`.
    aws s3 cp /tmp/diff.patch s3://<bucket>/security-scans/diffs/${SCAN_ID}/diff.patch
    ```
 
-6. **Get or create per-workspace CodeReview** (same logic as full scan — lookup `config.json → code_reviews[<abs_path>]`, create if absent):
+6. **Get or create per-workspace CodeReview** (same logic as full scan -- lookup `config.json -> code_reviews[<abs_path>]`, create if absent):
 
    ```bash
    aws securityagent create-code-review --agent-space-id <id> --title <title> \
@@ -86,7 +86,7 @@ Track scans in `.security-agent/scans.json`.
 
 8. Capture `codeReviewJobId`. Persist to `scans.json` with `scan_type: "DIFF"` and `base_ref`.
 
-9. Tell user: "Diff scan started. Takes a few minutes. I'll check every 2 minutes — say 'stop polling' to opt out."
+9. Tell user: "Diff scan started. Takes a few minutes. I'll check every 2 minutes -- say 'stop polling' to opt out."
 
 10. **Poll** every 2 minutes:
 
@@ -94,16 +94,16 @@ Track scans in `.security-agent/scans.json`.
     aws securityagent batch-get-code-review-jobs --agent-space-id <id> --code-review-job-ids <job_id>
     ```
 
-    Only respond when status changes. On COMPLETED → fetch findings.
+    Only respond when status changes. On COMPLETED -> fetch findings.
 
-11. **Findings:** same presentation as full scan — grouped by severity, report written to `.security-agent/findings-{scan_id}.md`.
+11. **Findings:** same presentation as full scan -- grouped by severity, report written to `.security-agent/findings-{scan_id}.md`.
 
 ---
 
 ## Rules
 
-- Diff scans are standalone — no prior full scan needed
+- Diff scans are standalone -- no prior full scan needed
 - Poll every 2 minutes, not faster
 - Default to `BASE_REF=HEAD` if user doesn't specify
 - Title: `diff-<git-branch>-<timestamp>` (no spaces)
-- If diff is empty, tell user and stop — don't start a scan
+- If diff is empty, tell user and stop -- don't start a scan

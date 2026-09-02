@@ -6,12 +6,12 @@
 - **Query language**: MongoDB Query Language (MQL), aggregation pipeline
 - **Compatibility**: MongoDB 4.0/5.0/6.0/7.0/8.0 compatible (drivers, tools, aggregation pipeline)
 - **Serverless**: Yes (elastic clusters, available on DocumentDB 8.0)
-- **Serverless type**: Capacity — elastic clusters auto-scale storage and compute, but you still manage a cluster (no scale to zero)
+- **Serverless type**: Capacity -- elastic clusters auto-scale storage and compute, but you still manage a cluster (no scale to zero)
 - **Scale to zero**: No
 - **VPC required**: Yes
 - **Multi-region**: Global clusters
 - **Free Tier**: 12 months (750 hrs db.t3.medium + 30 GB storage)
-- **Min cost**: ~$0 (free tier) → ~$55/month after
+- **Min cost**: ~$0 (free tier) -> ~$55/month after
 - **Time to first query**: 10-15 min (VPC + cluster)
 - **Key features**: MongoDB compatibility, elastic clusters (sharding up to 32 shards), change streams, ACID transactions, flexible schema, vector search (30x faster index builds on 8.0), Serverless auto-scaling (up to 90% savings vs provisioned peak)
 - **Limitations**: Not full MongoDB (some operators unsupported), VPC required, no serverless scale-to-zero

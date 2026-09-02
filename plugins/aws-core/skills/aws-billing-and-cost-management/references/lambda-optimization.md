@@ -9,11 +9,11 @@ Lambda allocates CPU proportional to memory:
 - 1,769 MB = 1 full vCPU
 - 10,240 MB = 6 vCPUs
 
-Over-provisioning memory gives more CPU, which can reduce duration enough to lower total cost. Cost = Invocations × Duration(ms) × Memory(GB) × Price/GB-ms + Request charges.
+Over-provisioning memory gives more CPU, which can reduce duration enough to lower total cost. Cost = Invocations x Duration(ms) x Memory(GB) x Price/GB-ms + Request charges.
 
 ## Compute Optimizer for Lambda
 
-**Requirements:** ≤1,792 MB memory AND ≥50 invocations in the lookback period.
+**Requirements:** <=1,792 MB memory AND >=50 invocations in the lookback period.
 
 Metrics analyzed: Invocations, Duration, Errors, Throttles, Memory Utilization. The engine simulates candidate memory sizes, projects duration, and selects the size that finishes within timeout and produces greatest monthly savings.
 
@@ -28,7 +28,7 @@ aws compute-optimizer get-lambda-function-recommendations \
 
 | Strategy | Savings | Effort |
 |----------|---------|--------|
-| Switch to arm64 (Graviton) | ~20% cost + ~10-15% faster | Low — config change |
+| Switch to arm64 (Graviton) | ~20% cost + ~10-15% faster | Low -- config change |
 | Right-size memory with Power Tuning | 10-50% | Medium |
 | Use SnapStart (Java/Python/.NET) | Eliminates provisioned concurrency cost | Low |
 
@@ -41,7 +41,7 @@ aws lambda update-function-configuration \
 ## Gotchas
 
 - arm64 not available in all regions; native compiled dependencies need arm64 builds
-- Reserved concurrency (free) ≠ Provisioned concurrency (paid) — most common Lambda cost confusion
-- Provisioned concurrency costs ~$0.015/GB-hour even when idle — use SnapStart instead where possible
+- Reserved concurrency (free) != Provisioned concurrency (paid) -- most common Lambda cost confusion
+- Provisioned concurrency costs ~$0.015/GB-hour even when idle -- use SnapStart instead where possible
 - Lambda needs 14 days of CloudWatch metrics before Compute Optimizer generates recommendations
 - Use `alexcasalboni/aws-lambda-power-tuning` Step Functions state machine for systematic memory optimization

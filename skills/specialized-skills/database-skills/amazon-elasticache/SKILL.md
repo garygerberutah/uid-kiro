@@ -28,20 +28,20 @@ Each entry has: an ID (directory name under `references/`), a domain description
 
 | ID | Name | Domain | Semantic Categories | Upstream | Downstream |
 |----|------|--------|--------------------|----------|------------|
-| `requirements` | Solution Fit | Gathers workload, stack, scale, latency, persistence, and budget through workspace scan + structured interview. Decides whether ElastiCache is the right service and hands off with a routing recommendation. | I need a cache, speed up my app, reduce database load, lower Bedrock cost, should I use ElastiCache, what's best for my workload, evaluating cache options, ElastiCache vs X, Valkey vs X, vague new workload | — | `setup`, `data-modeling`, `genai`, `monitoring`, `migration` |
+| `requirements` | Solution Fit | Gathers workload, stack, scale, latency, persistence, and budget through workspace scan + structured interview. Decides whether ElastiCache is the right service and hands off with a routing recommendation. | I need a cache, speed up my app, reduce database load, lower Bedrock cost, should I use ElastiCache, what's best for my workload, evaluating cache options, ElastiCache vs X, Valkey vs X, vague new workload | -- | `setup`, `data-modeling`, `genai`, `monitoring`, `migration` |
 | `setup` | Create and Connect | Provisioning, connectivity, security, authentication, IaC, deployment choice. Gets the user to a working cache with least friction. Covers engine selection, serverless vs node-based, VPC, TLS, RBAC/IAM, jump-host/SSM tunnels, CLI/SDK/CFN/CDK/Terraform starters. | create a cache, set up ElastiCache, provision, Valkey cluster, connect Lambda/ECS/EKS/EC2, VPC, security groups, TLS, RBAC, IAM auth, jump host, SSM tunnel, CloudFormation, CDK, Terraform, engine selection, serverless vs node-based, backup, snapshot, restore, export | `requirements` (optional) | `data-modeling`, `genai`, `monitoring` |
 | `data-modeling` | Application Patterns | Picks data structures, key schema, TTL strategy, invalidation approach, and client code for non-AI patterns: cache-aside, session store, rate limiting, leaderboards, counters, pub/sub, streams, shopping carts, job queues, activity feeds. | session store, rate limiting, leaderboard, cache-aside, query caching, counters, streams, pub/sub, shopping cart, job queue, activity feed, key schema, TTL, invalidation, data structures | `setup` (cache must exist) | `monitoring` |
 | `genai` | AI and Vector Workloads | Classifies request into Mode 1 (plain cache), Mode 2 (semantic response cache), or Mode 3 (full vector search). Selects Valkey and forces node-based Valkey 8.2 or above (recommend 9.0) when server-side vector similarity is needed. Covers semantic caching, agent memory, RAG retrieval, recommendation, personalization, conversation/session persistence for AI agents, and framework wiring (Strands, mem0, LangChain). | semantic cache, RAG, agent memory, conversational memory, vector search, embeddings, recommendation, personalization, Bedrock latency, Bedrock cost, LLM caching, Strands, mem0, LangChain, conversation history, AI session store, embedding provider, framework integration | `setup` (cache must exist) | `monitoring` |
-| `monitoring` | Operate and Observe | Diagnoses performance, cost, and reliability using metrics first, then recommends the smallest change. Covers dashboards, alarms, log delivery, cost reporting, event routing, troubleshooting high CPU / memory / replication lag / connection spikes / low hit rate / hot keys / big keys / slot imbalance / latency spike root cause. | cache is slow, cost too high, hit rate low, high CPU, memory pressure, replication lag, connection spikes, dashboards, alarms, CloudWatch, cost comparison, troubleshoot, hot key, uneven shard load, one node pinned, big key, memory bloat, which key is biggest, keyspace distribution, prefix analysis, cost attribution by tenant, memory imbalance, one shard full, slot memory skew, latency spike, slow command incident, root cause for latency bump | — | `setup`, `migration` |
-| `migration` | Engine and Platform Migration | Selects the migration path and sequences preflight, validation, cutover, and rollback. Covers self-managed Redis → ElastiCache, Redis OSS → Valkey, node-based ↔ serverless, version upgrades. Hard validate-before-migrate gate. | migrate, Redis OSS to Valkey, self-managed to ElastiCache, node-based to serverless, serverless to node-based, engine upgrade, version upgrade, zero-downtime cutover, rollback | — | `setup`, `monitoring` |
+| `monitoring` | Operate and Observe | Diagnoses performance, cost, and reliability using metrics first, then recommends the smallest change. Covers dashboards, alarms, log delivery, cost reporting, event routing, troubleshooting high CPU / memory / replication lag / connection spikes / low hit rate / hot keys / big keys / slot imbalance / latency spike root cause. | cache is slow, cost too high, hit rate low, high CPU, memory pressure, replication lag, connection spikes, dashboards, alarms, CloudWatch, cost comparison, troubleshoot, hot key, uneven shard load, one node pinned, big key, memory bloat, which key is biggest, keyspace distribution, prefix analysis, cost attribution by tenant, memory imbalance, one shard full, slot memory skew, latency spike, slow command incident, root cause for latency bump | -- | `setup`, `migration` |
+| `migration` | Engine and Platform Migration | Selects the migration path and sequences preflight, validation, cutover, and rollback. Covers self-managed Redis -> ElastiCache, Redis OSS -> Valkey, node-based <-> serverless, version upgrades. Hard validate-before-migrate gate. | migrate, Redis OSS to Valkey, self-managed to ElastiCache, node-based to serverless, serverless to node-based, engine upgrade, version upgrade, zero-downtime cutover, rollback | -- | `setup`, `monitoring` |
 
 ## Pipeline order
 
 Sub-skills run independently, but common multi-step journeys follow these pipelines:
 
-- `requirements` → `setup` → (`data-modeling` | `genai`) → `monitoring`
-- `migration` → `setup` → `monitoring`
-- `monitoring` → `setup` | `migration` (if metrics indicate)
+- `requirements` -> `setup` -> (`data-modeling` | `genai`) -> `monitoring`
+- `migration` -> `setup` -> `monitoring`
+- `monitoring` -> `setup` | `migration` (if metrics indicate)
 
 ## State handoff: requirements.json
 
@@ -94,21 +94,21 @@ Load additional references only when the current turn's answer requires them.
 
 On-demand pointers (not preloaded; fetch when the trigger applies):
 
-- `references/shared-ux/production-readiness.md` — when the user asks if their cache is ready for production, or after setup completes and the user wants to go to production
-- `references/shared-ux/action-safety.md` — before any destructive action (risk levels, never-auto-execute list)
-- `references/shared-ux/error-remediation.md` — when the user hits a specific ElastiCache error code (MOVED, CROSSSLOT, CLUSTERDOWN, MULTI/EXEC+IAM, etc.)
-- `references/shared-foundation/boundary-doc.md` — when the user asks what this skill covers
-- `references/shared-foundation/attribution.md` — when generating CLI commands, SDK code, or IaC templates
-- `references/shared-foundation/architecture-diagrams.md` — when the user asks for architecture diagrams or visual reference
-- `references/shared-runtime/lambda.md` — when connecting from Lambda (cold start gotchas, IAM auth code, lazy init)
-- `references/shared-runtime/ecs.md` — when connecting from ECS (SIGTERM shutdown, connection pool drain, task definition)
-- `references/shared-runtime/eks.md` — when connecting from EKS (IRSA, service mesh bypass, SecurityGroupPolicy CRD)
-- `references/shared-runtime/api-gateway.md` — when integrating with API Gateway (no direct path, caching layers comparison)
-- `references/shared-runtime/rds-acceleration.md` — when caching RDS/Aurora queries (thundering herd, stampede protection, invalidation)
-- `references/shared-runtime/secret-injection.md` — when the user asks about credential management per compute platform
-- `references/shared-security/encryption-defaults.md` — when adding encryption to an existing unencrypted cluster (TLS two-step migration, at-rest immutability)
-- `references/shared-security/config-guardrails.md` — when the user wants continuous compliance monitoring (AWS Config rules, custom Lambda rules)
-- `references/shared-security/vpc-patterns.md` — when debugging port/security-group issues (port 6380 serverless reader, anti-patterns)
+- `references/shared-ux/production-readiness.md` -- when the user asks if their cache is ready for production, or after setup completes and the user wants to go to production
+- `references/shared-ux/action-safety.md` -- before any destructive action (risk levels, never-auto-execute list)
+- `references/shared-ux/error-remediation.md` -- when the user hits a specific ElastiCache error code (MOVED, CROSSSLOT, CLUSTERDOWN, MULTI/EXEC+IAM, etc.)
+- `references/shared-foundation/boundary-doc.md` -- when the user asks what this skill covers
+- `references/shared-foundation/attribution.md` -- when generating CLI commands, SDK code, or IaC templates
+- `references/shared-foundation/architecture-diagrams.md` -- when the user asks for architecture diagrams or visual reference
+- `references/shared-runtime/lambda.md` -- when connecting from Lambda (cold start gotchas, IAM auth code, lazy init)
+- `references/shared-runtime/ecs.md` -- when connecting from ECS (SIGTERM shutdown, connection pool drain, task definition)
+- `references/shared-runtime/eks.md` -- when connecting from EKS (IRSA, service mesh bypass, SecurityGroupPolicy CRD)
+- `references/shared-runtime/api-gateway.md` -- when integrating with API Gateway (no direct path, caching layers comparison)
+- `references/shared-runtime/rds-acceleration.md` -- when caching RDS/Aurora queries (thundering herd, stampede protection, invalidation)
+- `references/shared-runtime/secret-injection.md` -- when the user asks about credential management per compute platform
+- `references/shared-security/encryption-defaults.md` -- when adding encryption to an existing unencrypted cluster (TLS two-step migration, at-rest immutability)
+- `references/shared-security/config-guardrails.md` -- when the user wants continuous compliance monitoring (AWS Config rules, custom Lambda rules)
+- `references/shared-security/vpc-patterns.md` -- when debugging port/security-group issues (port 6380 serverless reader, anti-patterns)
 
 > **Folder convention:** `references/` contains 10 folders. 6 match the sub-skills (`requirements`, `setup`, `data-modeling`, `genai`, `monitoring`, `migration`) and are routing destinations. The 4 `shared-*` folders (`shared-foundation`, `shared-ux`, `shared-security`, `shared-runtime`) are cross-cutting material loaded on demand, not routing destinations.
 

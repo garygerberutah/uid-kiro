@@ -10,21 +10,21 @@
      --output json --region {region}
    ```
 
-2. **Preserve the rollback window — do NOT delete pre-upgrade snapshots immediately.** Major version upgrades are **one-way** in-place. Rollback requires restoring from a snapshot or PITR, and both restore the **old** major version:
-   - Any **pre-upgrade manual snapshot** restores to the engine version it was taken on (e.g., an Aurora PostgreSQL 15.4 snapshot restores to 15.4 — not to a post-upgrade 16.4).
+2. **Preserve the rollback window -- do NOT delete pre-upgrade snapshots immediately.** Major version upgrades are **one-way** in-place. Rollback requires restoring from a snapshot or PITR, and both restore the **old** major version:
+   - Any **pre-upgrade manual snapshot** restores to the engine version it was taken on (e.g., an Aurora PostgreSQL 15.4 snapshot restores to 15.4 -- not to a post-upgrade 16.4).
    - **PITR to any time before the upgrade completed** restores the pre-upgrade major version, not the new one.
    - After the upgrade, Aurora cannot restore backward-in-time into the new major version; that timeline starts at the upgrade's completion.
 
-   Keep the pre-upgrade manual snapshot for **at least 7–14 days of stable production traffic** (longer for regulated workloads) before deleting it. Deleting it early forecloses the cheapest rollback path. Document the snapshot identifier and retain-until date in your change record.
+   Keep the pre-upgrade manual snapshot for **at least 7-14 days of stable production traffic** (longer for regulated workloads) before deleting it. Deleting it early forecloses the cheapest rollback path. Document the snapshot identifier and retain-until date in your change record.
 
-3. **Check performance discrepancies** — Compare CloudWatch metrics against baseline: CPUUtilization, DatabaseConnections, ReadLatency, WriteLatency, FreeableMemory, BufferCacheHitRatio, DMLLatency, SelectLatency. Use Performance Insights to compare database load.
+3. **Check performance discrepancies** -- Compare CloudWatch metrics against baseline: CPUUtilization, DatabaseConnections, ReadLatency, WriteLatency, FreeableMemory, BufferCacheHitRatio, DMLLatency, SelectLatency. Use Performance Insights to compare database load.
 
 4. **Compare EXPLAIN plans** for critical queries. Look for: different join strategies, missing index usage, full table scans.
    - `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) SELECT ...;`
 
-5. **Monitor CloudWatch 24-72 hours** — Watch: CPUUtilization, FreeableMemory, DatabaseConnections, ReadLatency, WriteLatency, AuroraReplicaLag, Deadlocks, LoginFailures.
+5. **Monitor CloudWatch 24-72 hours** -- Watch: CPUUtilization, FreeableMemory, DatabaseConnections, ReadLatency, WriteLatency, AuroraReplicaLag, Deadlocks, LoginFailures.
 
-6. **Validate application connectivity** — connections, pooling, SSL/TLS.
+6. **Validate application connectivity** -- connections, pooling, SSL/TLS.
 
 7. **Verify parameter group** applied correctly:
 
@@ -34,7 +34,7 @@
      --output table --region {region}
    ```
 
-8. **Update statistics** — run `ANALYZE` (Aurora autovacuum runs it too, but a one-time manual pass post-upgrade is insurance).
+8. **Update statistics** -- run `ANALYZE` (Aurora autovacuum runs it too, but a one-time manual pass post-upgrade is insurance).
 
 9. **Check error logs**
 
@@ -44,7 +44,7 @@
 
 ## Aurora PostgreSQL-Specific
 
-1. **Verify extensions working** — `SELECT extname, extversion FROM pg_extension;` Update if needed: `ALTER EXTENSION {name} UPDATE;`
+1. **Verify extensions working** -- `SELECT extname, extversion FROM pg_extension;` Update if needed: `ALTER EXTENSION {name} UPDATE;`
 
 2. **REINDEX hash indexes** if upgrading from < PG 10.
 

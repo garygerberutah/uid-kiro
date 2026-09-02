@@ -1,4 +1,4 @@
-# ARC Region switch — Positioning
+# ARC Region switch -- Positioning
 
 Customer-facing framing, competitive comparison, and analyst/customer talking points for
 Amazon Application Recovery Controller (ARC) Region switch. Load this when answering customer
@@ -10,7 +10,7 @@ Use this language in all customer-facing and public contexts:
 
 > "Region switch in ARC enables you to build comprehensive multi-Region recovery plans that include traffic shift, scaling, and database failover."
 >
-> "ARC Region switch provides centralized, observable recovery orchestration — replacing custom scripts with managed plans that execute automatically or on-demand."
+> "ARC Region switch provides centralized, observable recovery orchestration -- replacing custom scripts with managed plans that execute automatically or on-demand."
 >
 > "With Region switch, you define your recovery logic once as a plan, and ARC handles execution, monitoring, and compliance reporting."
 
@@ -36,22 +36,22 @@ Use this language in all customer-facing and public contexts:
 
 For Gartner SCCPS, Forrester, and similar analyst briefings, emphasize:
 
-1. **Plan-based orchestration** — Full recovery workflow with compute scaling, DB failover, custom logic
-2. **Automatic execution** — CloudWatch alarm triggers remove human latency from recovery
-3. **Compliance reporting** — Automatic PDF execution reports to S3 for audit evidence
-4. **Full lifecycle** — Failover → recovery → post-recovery preparation (e.g., recreate replicas)
-5. **Cross-account** — Enterprise-grade multi-account orchestration
-6. **Data-plane isolation** — Per-Region endpoints; no dependency on impaired Region
-7. **Continuous validation** — Plan evaluation catches drift before incidents occur
+1. **Plan-based orchestration** -- Full recovery workflow with compute scaling, DB failover, custom logic
+2. **Automatic execution** -- CloudWatch alarm triggers remove human latency from recovery
+3. **Compliance reporting** -- Automatic PDF execution reports to S3 for audit evidence
+4. **Full lifecycle** -- Failover -> recovery -> post-recovery preparation (e.g., recreate replicas)
+5. **Cross-account** -- Enterprise-grade multi-account orchestration
+6. **Data-plane isolation** -- Per-Region endpoints; no dependency on impaired Region
+7. **Continuous validation** -- Plan evaluation catches drift before incidents occur
 
 ## Customer Conversation Guidance
 
-**New to multi-Region DR** → Lead with value prop: managed, tested recovery plan vs hoping runbooks work. Focus on plan evaluation and execution reports.
+**New to multi-Region DR** -> Lead with value prop: managed, tested recovery plan vs hoping runbooks work. Focus on plan evaluation and execution reports.
 
-**Migrating from routing controls** → Position as upgrade: same reliable data plane, now with orchestration (scaling, DB failover, custom actions alongside traffic shift).
+**Migrating from routing controls** -> Position as upgrade: same reliable data plane, now with orchestration (scaling, DB failover, custom actions alongside traffic shift).
 
-**Compliance-focused (financial services, healthcare)** → Lead with execution reports, RTO tracking, plan evaluation, cross-account support.
+**Compliance-focused (financial services, healthcare)** -> Lead with execution reports, RTO tracking, plan evaluation, cross-account support.
 
-**Comparing to third-party DR tools** → Differentiate on native AWS integration, data-plane-per-Region, fully managed, tight CloudWatch/EventBridge/IAM integration.
+**Comparing to third-party DR tools** -> Differentiate on native AWS integration, data-plane-per-Region, fully managed, tight CloudWatch/EventBridge/IAM integration.
 
-**Infrastructure-as-Code** → Reference the [Terraform provider for Region switch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/arcregionswitch_plan) for incorporating Region switch into IaC workflows.
+**Infrastructure-as-Code** -> Reference the [Terraform provider for Region switch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/arcregionswitch_plan) for incorporating Region switch into IaC workflows.

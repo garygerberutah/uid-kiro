@@ -24,21 +24,21 @@ Setup sequence:
 
 **Constraints:**
 
-- You MUST NOT pass the API key as a literal value on the command line — shell history exposes it
+- You MUST NOT pass the API key as a literal value on the command line -- shell history exposes it
 - You MUST ask the user to set the key as an environment variable: `export API_KEY=<their-key>`
 - You MUST create the credential provider: `aws bedrock-agentcore-control create-api-key-credential-provider --name <name> --api-key "$API_KEY"`
 - The service stores the key in Secrets Manager internally (response includes `apiKeySecretArn`)
-- For rotation: update the API key through the service's control plane: `aws bedrock-agentcore-control update-api-key-credential-provider --name <name> --api-key "$NEW_API_KEY"` — the service re-encrypts and stores the new key internally. Do not call `secretsmanager rotate-secret` directly on the service-managed secret.
+- For rotation: update the API key through the service's control plane: `aws bedrock-agentcore-control update-api-key-credential-provider --name <name> --api-key "$NEW_API_KEY"` -- the service re-encrypts and stores the new key internally. Do not call `secretsmanager rotate-secret` directly on the service-managed secret.
 - You MUST NOT hardcode API keys in agent code or configuration
 - You MUST NOT log or display the API key value in agent output
-- You SHOULD enable CloudTrail logging to audit all credential provider API calls — these are control plane management events (`CreateApiKeyCredentialProvider`, `UpdateApiKeyCredentialProvider`, `DeleteApiKeyCredentialProvider`) logged under `eventSource: bedrock-agentcore.amazonaws.com`
+- You SHOULD enable CloudTrail logging to audit all credential provider API calls -- these are control plane management events (`CreateApiKeyCredentialProvider`, `UpdateApiKeyCredentialProvider`, `DeleteApiKeyCredentialProvider`) logged under `eventSource: bedrock-agentcore.amazonaws.com`
 - Refer to [AWS security best practices for AgentCore](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/security.html)
 
 ### OAuth Authentication
 
 **Constraints:**
 
-- The client secret is passed via the `create-oauth2-credential-provider` API call (the service encrypts and stores it in Secrets Manager automatically — response includes `clientSecretArn`)
+- The client secret is passed via the `create-oauth2-credential-provider` API call (the service encrypts and stores it in Secrets Manager automatically -- response includes `clientSecretArn`)
 - You MUST NOT hardcode client secrets in agent code or configuration
 - You MUST NOT log or display client secret values in agent output
 - Configure: token endpoint URL, client ID, scopes, grant type
@@ -50,19 +50,19 @@ Setup sequence:
 For Lambda targets and cross-service communication:
 
 - Service roles for AgentCore services
-- Cross-service permissions: Runtime → Gateway → external API
+- Cross-service permissions: Runtime -> Gateway -> external API
 - Resource-based policies for cross-account access
-- No credential provider needed — IAM handles authentication
+- No credential provider needed -- IAM handles authentication
 
 ## OAuth Three-Layer Architecture
 
-AgentCore has three distinct OAuth layers — agents confuse these:
+AgentCore has three distinct OAuth layers -- agents confuse these:
 
 | Layer | Direction | Purpose |
 |-------|-----------|---------|
-| **Inbound JWT** | Caller → AgentCore | Validate tokens from callers (Cognito, external IdPs) |
-| **Outbound Credential Provider** | Agent → External API | Agent authenticating to external APIs via Gateway |
-| **Gateway OAuth** | Gateway → Upstream MCP | Gateway authenticating to upstream MCP servers |
+| **Inbound JWT** | Caller -> AgentCore | Validate tokens from callers (Cognito, external IdPs) |
+| **Outbound Credential Provider** | Agent -> External API | Agent authenticating to external APIs via Gateway |
+| **Gateway OAuth** | Gateway -> Upstream MCP | Gateway authenticating to upstream MCP servers |
 
 Each layer is configured independently. Getting the wrong layer causes auth failures that look identical (401/403) but have different root causes.
 
@@ -96,7 +96,7 @@ Cross-account Bedrock access requires IAM trust policies on both sides.
 
 Include `sts:ExternalId` for confused deputy protection. For service-to-service access, use `aws:SourceArn` and `aws:SourceAccount` conditions instead.
 
-**Common failure**: `AccessDeniedException` when calling Bedrock from a different account — verify:
+**Common failure**: `AccessDeniedException` when calling Bedrock from a different account -- verify:
 
 - Trust policy includes the calling account's principal ARN (not just account ID)
 - The assumed role has `bedrock:InvokeModel` permission in the target account

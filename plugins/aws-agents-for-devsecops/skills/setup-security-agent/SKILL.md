@@ -1,9 +1,9 @@
 ---
 name: setup-security-agent
-description: Configure AWS Security Agent for the current workspace — provision or reuse an agent space, IAM service role, and S3 bucket. Use when the user asks to "set up security agent", "configure security scanner", "is security agent configured", or on first-time use before any scan or pentest.
+description: Configure AWS Security Agent for the current workspace -- provision or reuse an agent space, IAM service role, and S3 bucket. Use when the user asks to "set up security agent", "configure security scanner", "is security agent configured", or on first-time use before any scan or pentest.
 ---
 
-# AWS Security Agent — Setup
+# AWS Security Agent -- Setup
 
 This skill handles ONE thing: making sure the workspace has a working agent space, IAM service role, and S3 bucket linked together. Scans and pentests live in separate skills and assume this is done.
 
@@ -13,11 +13,11 @@ This skill handles ONE thing: making sure the workspace has a working agent spac
 
 All Security Agent skills share workspace-local state at `.security-agent/`:
 
-- `config.json` — `{ "agent_space_id": "as-...", "region": "us-east-1", "code_reviews": { "<abs_path>": "cr-..." } }`. Account ID, role ARN, and bucket name are derived by convention. The `code_reviews` map lets scans reuse the same CodeReview for a workspace.
-- `scans.json` — array of `{ scan_id, code_review_id, job_id, agent_space_id, scan_type, title, started_at, status, path }` (keep last 50)
-- `pentests.json` — same shape, for pentest jobs
-- `.gitignore` — contents `*` so this directory stays untracked
-- `findings-{scan_id}.md` — written by the scan skill after each scan completes
+- `config.json` -- `{ "agent_space_id": "as-...", "region": "us-east-1", "code_reviews": { "<abs_path>": "cr-..." } }`. Account ID, role ARN, and bucket name are derived by convention. The `code_reviews` map lets scans reuse the same CodeReview for a workspace.
+- `scans.json` -- array of `{ scan_id, code_review_id, job_id, agent_space_id, scan_type, title, started_at, status, path }` (keep last 50)
+- `pentests.json` -- same shape, for pentest jobs
+- `.gitignore` -- contents `*` so this directory stays untracked
+- `findings-{scan_id}.md` -- written by the scan skill after each scan completes
 
 This skill's job is to populate `config.json` and create `.gitignore`.
 
@@ -60,7 +60,7 @@ Why minimal config: the role name and bucket name are deterministic, so storing 
      aws securityagent list-agent-spaces
      ```
 
-     - If any exist → **show them to the user** with name + id and ask: "Would you like to reuse one of these, or should I create a new one?" Wait for the answer. **Do not auto-select.**
+     - If any exist -> **show them to the user** with name + id and ask: "Would you like to reuse one of these, or should I create a new one?" Wait for the answer. **Do not auto-select.**
      - If user picks one, use that `agentSpaceId`.
      - If user wants new, or none exist:
 
@@ -79,7 +79,7 @@ Why minimal config: the role name and bucket name are deterministic, so storing 
    - If `NoSuchEntity` is returned, create the role. **Idempotency note:** `create-role` will fail with `EntityAlreadyExists` if the role already exists. If that happens, fall through to `update-assume-role-policy` to ensure the trust policy is correct.
 
      ```bash
-     # Trust policy — includes aws:SourceAccount confused-deputy guard
+     # Trust policy -- includes aws:SourceAccount confused-deputy guard
      cat > /tmp/sa-trust.json <<EOF
      {"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"securityagent.amazonaws.com"},"Action":"sts:AssumeRole","Condition":{"StringEquals":{"aws:SourceAccount":"${ACCOUNT}"}}}]}
      EOF
@@ -142,7 +142,7 @@ Why minimal config: the role name and bucket name are deterministic, so storing 
        --aws-resources iamRoles=[<arn1>,<arn2>...],s3Buckets=[<bucket1>,<bucket2>...]
      ```
 
-7. **Persist** to `.security-agent/config.json` (minimal — account/role/bucket are derived):
+7. **Persist** to `.security-agent/config.json` (minimal -- account/role/bucket are derived):
 
    ```json
    {
@@ -164,17 +164,17 @@ Why minimal config: the role name and bucket name are deterministic, so storing 
 
 ## Rules
 
-- Never auto-select an agent space when multiple exist — always ask the user
+- Never auto-select an agent space when multiple exist -- always ask the user
 - Never disable safety protections (the public-access-block stays on)
 - Trust policy must allow `securityagent.amazonaws.com` (production service principal) and include the `aws:SourceAccount` confused-deputy guard
-- If the user provides their own role name or bucket name (different from the conventional defaults), tell them: this plugin uses convention-based defaults (`SecurityAgentScanRole` / `security-agent-scans-${ACCOUNT}-${REGION}`). Either accept those defaults or extend the skill — the other skills derive these names rather than reading them from config.
-- The scan and pentest skills can call this skill inline if `config.json` is missing — first-time users don't need to run setup separately.
+- If the user provides their own role name or bucket name (different from the conventional defaults), tell them: this plugin uses convention-based defaults (`SecurityAgentScanRole` / `security-agent-scans-${ACCOUNT}-${REGION}`). Either accept those defaults or extend the skill -- the other skills derive these names rather than reading them from config.
+- The scan and pentest skills can call this skill inline if `config.json` is missing -- first-time users don't need to run setup separately.
 
 ---
 
 ## Troubleshooting
 
-- **`AccessDenied` calling `iam:CreateRole`** → user lacks IAM permissions. Ask them to run setup with their own role ARN, or to grant `iam:CreateRole` + `iam:PutRolePolicy`.
-- **`AccessDenied` on `s3api create-bucket`** → either the bucket name is taken globally, or the user lacks `s3:CreateBucket`. Suggest using an existing bucket they own and pass it explicitly.
-- **Role exists but trust policy is wrong** → `update-assume-role-policy` (step 4 fallback). If they don't want that role updated, ask them for a different role ARN.
-- **Agent space exists but in a different region** → tell the user; suggest using the right region or creating a new space in the current region.
+- **`AccessDenied` calling `iam:CreateRole`** -> user lacks IAM permissions. Ask them to run setup with their own role ARN, or to grant `iam:CreateRole` + `iam:PutRolePolicy`.
+- **`AccessDenied` on `s3api create-bucket`** -> either the bucket name is taken globally, or the user lacks `s3:CreateBucket`. Suggest using an existing bucket they own and pass it explicitly.
+- **Role exists but trust policy is wrong** -> `update-assume-role-policy` (step 4 fallback). If they don't want that role updated, ask them for a different role ARN.
+- **Agent space exists but in a different region** -> tell the user; suggest using the right region or creating a new space in the current region.

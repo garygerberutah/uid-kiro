@@ -35,13 +35,13 @@ Check which validation mechanism is available.
   `cfn-lint` from PyPI via `pip install 'cfn-lint>=1,<2'`. Do you want me to
   install it, or would you prefer to install it manually?"
 - You MUST install ONLY the `cfn-lint` package from PyPI, with no extra
-  packages. If installation is not possible — pip missing, PyPI unreachable, or
-  the user declines — You MUST NOT attempt an alternative installation
+  packages. If installation is not possible -- pip missing, PyPI unreachable, or
+  the user declines -- You MUST NOT attempt an alternative installation
   mechanism. Tell the user that cfn-lint cannot be installed and note the
   reduced validation coverage. If the environment still has AWS connectivity,
   continue with the validation steps that do not need cfn-lint: the
   `aws cloudformation validate-template` and change-set paths. If AWS API calls
-  are also unreachable, no validation layer can run — say so and stop rather
+  are also unreachable, no validation layer can run -- say so and stop rather
   than reporting an unvalidated template as validated.
 - You MUST NOT execute validation or run any install command without the user's explicit approval because this changes the user's environment
 - If no mechanism is available and the user declines installation, You MUST ask whether to abort or proceed anyway (knowing the SOP cannot complete)
@@ -128,7 +128,7 @@ Your template has 1 error, 0 warnings, 0 info messages.
 - E3002 at line 6: Invalid Property Resources/MyFunction/Properties/FunctionNam
 
 Fix (line 6):
-  FunctionName: my-function  # Typo: FunctionNam → FunctionName
+  FunctionName: my-function  # Typo: FunctionNam -> FunctionName
 ```
 
 ## Troubleshooting
@@ -149,5 +149,5 @@ is not possible (pip missing, PyPI unreachable, or the user declines), do not
 try another installation mechanism. Tell the user cfn-lint cannot be installed
 and note the reduced coverage. With AWS connectivity still available, continue
 with `aws cloudformation validate-template` and the change-set path; if AWS API
-calls are also unreachable, no validation layer can run — report that instead of
+calls are also unreachable, no validation layer can run -- report that instead of
 treating the template as validated.

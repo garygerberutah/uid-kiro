@@ -5,7 +5,7 @@
 An identity pool exchanges a proof of authentication (a user pool token, a third-party OIDC/SAML
 token, or a social access token) for **temporary AWS credentials** from AWS STS. Use it only when
 the client must call AWS services (S3, DynamoDB, etc.) **directly**. If the client only calls your
-own backend/API, you do not need an identity pool — send the user pool token to your API instead.
+own backend/API, you do not need an identity pool -- send the user pool token to your API instead.
 
 ## User pool vs identity pool (the core distinction)
 
@@ -18,7 +18,7 @@ pool, which returns temporary AWS credentials.
 
 ## What each provider passes to an identity pool
 
-The token type is **provider-specific** — get it wrong and identity resolution fails at
+The token type is **provider-specific** -- get it wrong and identity resolution fails at
 configuration time.
 
 | Provider | Authentication artifact |
@@ -47,7 +47,7 @@ aws cognito-identity set-identity-pool-roles \
   --roles authenticated=<auth-role-arn>
 ```
 
-**`set-identity-pool-roles` replaces the entire roles + `RoleMappings` structure — it is a full
+**`set-identity-pool-roles` replaces the entire roles + `RoleMappings` structure -- it is a full
 replace, not a merge.** To add or change one role mapping on a pool that already has roles or
 mappings, first read the current state with `aws cognito-identity get-identity-pool-roles
 --identity-pool-id <id>`, then re-send **all** existing roles and `RoleMappings` plus your addition
@@ -76,20 +76,20 @@ access is genuinely required.
 
 ## Two credential flows
 
-- **Enhanced (simplified) flow** — the recommended default. `GetCredentialsForIdentity` returns
+- **Enhanced (simplified) flow** -- the recommended default. `GetCredentialsForIdentity` returns
   credentials in one step; the pool decides the role.
-- **Basic (classic) flow** — the app calls `GetOpenIdToken` then `sts:AssumeRoleWithWebIdentity`
+- **Basic (classic) flow** -- the app calls `GetOpenIdToken` then `sts:AssumeRoleWithWebIdentity`
   itself, for full control over the assumed role.
 
 ## Role selection
 
 - **Default role** for all authenticated users.
-- **Rules-based** — choose a role from claims (e.g. a group claim).
-- **Role from token (`cognito:preferred_role`)** — the user pool group's associated role. When a
+- **Rules-based** -- choose a role from claims (e.g. a group claim).
+- **Role from token (`cognito:preferred_role`)** -- the user pool group's associated role. When a
   user is in multiple groups, the group with the **lowest `Precedence`** value wins; see the
   "User pool groups" section in [user-pools.md](user-pools.md) for `create-group` /
   `admin-add-user-to-group` and the `--precedence` field.
-- **Attributes for access control** — map user claims to STS **principal tags**, then gate access
+- **Attributes for access control** -- map user claims to STS **principal tags**, then gate access
   in resource policies with `aws:PrincipalTag/...`. This is app-level ABAC via Cognito.
 
 Scope the authenticated role tightly (least privilege). The IAM policy language and role authoring
@@ -107,4 +107,4 @@ itself belong to the `aws-iam` skill.
 
 - [tokens-and-sessions.md](tokens-and-sessions.md) for the token you feed in.
 - `aws-iam` skill for authoring the authenticated/guest IAM roles and their trust policies.
-- **Authoritative sources** (for guest access details, basic vs enhanced flow, developer-authenticated identities, and multi-provider linking — topics this skill intentionally does not cover): [Amazon Cognito identity pools (developer guide)](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html) and [External identity providers](https://docs.aws.amazon.com/cognito/latest/developerguide/external-identity-providers.html).
+- **Authoritative sources** (for guest access details, basic vs enhanced flow, developer-authenticated identities, and multi-provider linking -- topics this skill intentionally does not cover): [Amazon Cognito identity pools (developer guide)](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html) and [External identity providers](https://docs.aws.amazon.com/cognito/latest/developerguide/external-identity-providers.html).

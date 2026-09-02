@@ -757,7 +757,7 @@ if __name__ == "__main__":
         else:
             print(f"Format: {result.format_type.value}")
             print(
-                f"Valid: {'✓' if result.is_valid else '✗'}"
+                f"Valid: {'[OK]' if result.is_valid else '[FAIL]'}"
             )  # nosemgrep: python.lang.maintainability.is-function-without-parentheses -- dataclass field, not a method
             print(f"Confidence: {result.confidence.name}")
             print(f"Lines sampled: {result.lines_sampled}")

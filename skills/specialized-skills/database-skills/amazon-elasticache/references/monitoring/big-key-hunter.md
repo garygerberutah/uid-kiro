@@ -67,7 +67,7 @@ aws logs filter-log-events \
   --start-time <1h-ago-ms> --region <region>
 ```
 
-The log group name is user-specified when configuring log delivery (retrieve via `describe-replication-groups` → `LogDeliveryConfigurations`).
+The log group name is user-specified when configuring log delivery (retrieve via `describe-replication-groups` -> `LogDeliveryConfigurations`).
 
 First argument of each entry is the key. Keys appearing repeatedly with O(N) commands are big-key candidates. Serverless: skip (slow-log not delivered).
 

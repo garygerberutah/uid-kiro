@@ -34,7 +34,7 @@ try:
     sys.exit(1)
 except json.JSONDecodeError:
     print(raw)
-") || { echo "ERROR: Could not parse token from secret. Check secret format — any 'Available keys' line above shows what was found."; exit 1; }
+") || { echo "ERROR: Could not parse token from secret. Check secret format -- any 'Available keys' line above shows what was found."; exit 1; }
 
 # Write token to a restricted file (umask ensures 600 from creation, no race window)
 (umask 077; echo "$TOKEN" > "$TOKEN_FILE")

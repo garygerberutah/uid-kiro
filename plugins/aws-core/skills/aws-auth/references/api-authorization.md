@@ -14,7 +14,7 @@ routes, integrations, and backing Lambda belongs to the `aws-serverless` skill.
 | **REST API** (API Gateway v1) | **Cognito user pools authorizer** (`COGNITO_USER_POOLS`) | ID token by default |
 | Application Load Balancer | ALB built-in `authenticate-cognito` action | Performs the OIDC login itself |
 
-## HTTP API — JWT authorizer
+## HTTP API -- JWT authorizer
 
 The JWT authorizer validates the token's signature, issuer, and audience with no Lambda.
 
@@ -32,13 +32,13 @@ aws apigatewayv2 create-authorizer \
 - Attach the authorizer to a route and (optionally) require scopes on the route.
 - Audience matching: the **ID token** carries `aud` = client id; the **access token** carries
   `client_id` and `scope`. If you send access tokens, the JWT authorizer still validates against
-  the configured audience/issuer — send the token type your configuration expects and, for
+  the configured audience/issuer -- send the token type your configuration expects and, for
   scope-based authorization, use the access token.
 
 ### What the JWT authorizer does NOT enforce
 
 The HTTP-API JWT authorizer validates only the signature, `iss`, `aud` / `client_id`,
-`exp`/`nbf`/`iat`, and — if you set `authorizationScopes` on the route — the `scope` /
+`exp`/`nbf`/`iat`, and -- if you set `authorizationScopes` on the route -- the `scope` /
 `scp` claim. It does **not** enforce arbitrary custom claims like `custom:tenant_id`,
 `cognito:groups`, or attributes added by a pre-token-generation Lambda. Those must be
 inspected in the backend / integration.
@@ -57,7 +57,7 @@ if (tenantId !== requestedTenant) {
 For heavier claim-based policy, use a Lambda authorizer (any custom logic) or Amazon
 Verified Permissions (Cedar policies over token claims) instead.
 
-## REST API — Cognito user pools authorizer
+## REST API -- Cognito user pools authorizer
 
 ```
 aws apigateway create-authorizer \

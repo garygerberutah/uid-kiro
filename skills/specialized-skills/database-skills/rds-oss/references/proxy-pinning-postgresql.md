@@ -9,7 +9,7 @@ RDS Proxy for PostgreSQL uses connection multiplexing at the session level. Cert
 | Prepared statements (PREPARE/EXECUTE) | Server-side prepared state is session-scoped | `SELECT name, statement FROM pg_prepared_statements;` (run per-session) |
 | Advisory locks (pg_advisory_lock) | Lock is held on a specific backend | `SELECT * FROM pg_locks WHERE locktype = 'advisory';` |
 | LISTEN/NOTIFY | LISTEN registers on a specific backend connection | `SELECT * FROM pg_listening_channels();` |
-| SET (session parameters) | e.g., `SET search_path`, `SET work_mem` — session-scoped | `SHOW search_path;` — if app sets this per-connection, every connection pins |
+| SET (session parameters) | e.g., `SET search_path`, `SET work_mem` -- session-scoped | `SHOW search_path;` -- if app sets this per-connection, every connection pins |
 | Temporary tables | Session-scoped, can't be transferred | Check application code for `CREATE TEMP TABLE` |
 | DECLARE CURSOR WITH HOLD (without CLOSE) | Holdable cursor survives the transaction and is session-scoped | Check for open holdable cursors: `SELECT * FROM pg_cursors WHERE is_holdable = true;` |
 | Sequence manipulation (CURRVAL) | CURRVAL depends on session's last NEXTVAL call | Check application code for `CURRVAL()` usage |
@@ -48,10 +48,10 @@ Mitigation:
 - JDBC: set `prepareThreshold=0` to disable server-side prepared statements
 - node-postgres: avoid passing a `name` property in query config objects (named queries create persistent server-side prepared statements that pin connections)
 - Python psycopg2: uses simple query protocol by default (no pinning)
-- Python psycopg3: uses extended protocol by default (pins) — set `prepare_threshold=None`
+- Python psycopg3: uses extended protocol by default (pins) -- set `prepare_threshold=None`
 
 ### PgBouncer vs RDS Proxy
-If already using PgBouncer in transaction mode, RDS Proxy adds little value — both do connection multiplexing. RDS Proxy's advantage is managed infrastructure + IAM auth + automatic failover handling. But PgBouncer in transaction mode is more aggressive at multiplexing (no pinning on SET).
+If already using PgBouncer in transaction mode, RDS Proxy adds little value -- both do connection multiplexing. RDS Proxy's advantage is managed infrastructure + IAM auth + automatic failover handling. But PgBouncer in transaction mode is more aggressive at multiplexing (no pinning on SET).
 
 ## Diagnostic: Check Pinning Potential
 
@@ -64,7 +64,7 @@ SELECT COUNT(*) AS advisory_locks FROM pg_locks WHERE locktype = 'advisory';
 -- Check for active LISTEN channels
 SELECT COUNT(*) AS listen_channels FROM pg_listening_channels();
 
--- Check for prepared statements (current session — ask app team to check during peak)
+-- Check for prepared statements (current session -- ask app team to check during peak)
 SELECT COUNT(*) AS prepared_stmts FROM pg_prepared_statements;
 
 -- Check for temp tables in current sessions
@@ -80,5 +80,5 @@ SELECT COUNT(*) AS open_cursors FROM pg_cursors WHERE is_holdable = true;
 2. Disable server-side prepared statements in the driver (see above)
 3. Replace advisory locks with application-level locking (Redis, DynamoDB)
 4. Replace LISTEN/NOTIFY with SQS, SNS, or EventBridge
-5. Avoid DECLARE CURSOR WITH HOLD — use LIMIT/OFFSET or keyset pagination
+5. Avoid DECLARE CURSOR WITH HOLD -- use LIMIT/OFFSET or keyset pagination
 6. Keep transactions short to minimize pin duration

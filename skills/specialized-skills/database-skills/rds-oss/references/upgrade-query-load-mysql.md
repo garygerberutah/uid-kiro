@@ -1,4 +1,4 @@
-# RDS MySQL/MariaDB — Query Load Analysis & Explain Plan Review
+# RDS MySQL/MariaDB -- Query Load Analysis & Explain Plan Review
 
 ## Step 1: Get Top 5 Queries by Load
 
@@ -19,7 +19,7 @@ EXPLAIN FORMAT=JSON <query>;
 
 ## Step 3: Flag Upgrade-Impacting Patterns
 
-### 🔴 Critical
+### [RED] Critical
 
 | Pattern | Why It Matters in 8.0 | Action |
 |---|---|---|
@@ -27,7 +27,7 @@ EXPLAIN FORMAT=JSON <query>;
 | `using_filesort: true` + large rows | Sort algorithm changed. | Benchmark on test instance. |
 | GROUP BY implicit sort relied upon | 8.0 no longer implicitly sorts GROUP BY. | Add explicit ORDER BY. |
 
-### 🟡 Warning
+### [YELLOW] Warning
 
 | Pattern | Why It Matters | Action |
 |---|---|---|
@@ -35,7 +35,7 @@ EXPLAIN FORMAT=JSON <query>;
 | Derived table materialization | 8.0 improved derived table merging. | Usually beneficial. Monitor. |
 | `index_merge` usage | Behavior refined in 8.0. | Verify same indexes used post-upgrade. |
 
-### 🟢 Clean
+### [GREEN] Clean
 
 | Pattern | Notes |
 |---|---|

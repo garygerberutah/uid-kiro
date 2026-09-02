@@ -35,7 +35,7 @@ aws dms wait metadata-model-creation-cancelled \
   --migration-project-identifier <project_arn>
 ```
 
-All other operations (import, assessment, export) are non-cancellable — inform the customer they must wait for completion.
+All other operations (import, assessment, export) are non-cancellable -- inform the customer they must wait for completion.
 
 ---
 

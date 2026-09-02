@@ -8,7 +8,7 @@ ElastiCache-specific gotchas, resource/construct names, and property mappings ac
 - **Subnet handling differs by deployment**: Serverless accepts subnet IDs directly. Node-based requires a separate subnet group resource.
 - **Dependency ordering**: The cache resource must depend on its user group. Without explicit dependency, the cache may be created before RBAC is ready.
 - **Serverless uses two ports**: Port 6379 (read/write) and port 6380 (reader). Security groups must allow both.
-- **Encryption defaults are hard to change**: At-rest encryption cannot be changed after creation. Transit encryption can be enabled on existing node-based clusters via a two-step migration (`preferred` → `required` mode), but cannot be disabled once required. For serverless, TLS is always on. Always set encryption at creation time when possible.
+- **Encryption defaults are hard to change**: At-rest encryption cannot be changed after creation. Transit encryption can be enabled on existing node-based clusters via a two-step migration (`preferred` -> `required` mode), but cannot be disabled once required. For serverless, TLS is always on. Always set encryption at creation time when possible.
 - **CacheName restrictions**: Serverless cache names must be lowercase, start with a letter, letters/numbers/hyphens only, max 40 characters.
 - **CDK L2 constructs**: ElastiCache has only L1 constructs in CDK (`CfnServerlessCache`, `CfnReplicationGroup`, `CfnCacheCluster`). No stable L2 construct module is available.
 
@@ -66,7 +66,7 @@ ElastiCache-specific gotchas, resource/construct names, and property mappings ac
 - Transit encryption enabled (node-based) / always-on (serverless)
 - At-rest encryption enabled with optional KMS key
 - Multi-AZ with automatic failover (node-based)
-- RBAC user group with restricted default user (`off ~* -@all`). Note: for Redis OSS user groups, the `default` user ID must be included in every user group; omitting it causes `CreateUserGroup` to fail with `DefaultUserRequired`. Valkey user groups do not have this requirement — the default user is automatically disabled when a Valkey user group is attached.
+- RBAC user group with restricted default user (`off ~* -@all`). Note: for Redis OSS user groups, the `default` user ID must be included in every user group; omitting it causes `CreateUserGroup` to fail with `DefaultUserRequired`. Valkey user groups do not have this requirement -- the default user is automatically disabled when a Valkey user group is attached.
 - Serverless caches operate in cluster-mode-enabled only; clients must support cluster protocol
 - IAM auth for application users (Valkey 7.2+ or Redis OSS 7.0+); RBAC available from Redis OSS 6.0+
 - Private subnets only

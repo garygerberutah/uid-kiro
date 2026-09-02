@@ -57,7 +57,7 @@ You MUST also remove all `@aws-cdk/*` packages from `package.json` dependencies 
 Argument of type 'this' is not assignable to parameter of type 'Construct'
 ```
 
-This error appears even though the code looks correct — the types have the same name but come from different packages.
+This error appears even though the code looks correct -- the types have the same name but come from different packages.
 
 ### Cause
 
@@ -110,7 +110,7 @@ If more than one version appears, you have duplicates.
 1. You MUST make `aws-cdk-lib` and `constructs` **peer dependencies** in shared construct libraries
 2. Run `npm dedupe` to collapse duplicates
 3. In monorepos, hoist `aws-cdk-lib` to the root workspace
-4. Verify with `npm ls aws-cdk-lib` — only one copy SHOULD appear
+4. Verify with `npm ls aws-cdk-lib` -- only one copy SHOULD appear
 
 If `npm dedupe` alone does not resolve it, reset the install:
 

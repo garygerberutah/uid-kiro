@@ -1,10 +1,10 @@
-# Data — Mobile
+# Data -- Mobile
 
 ## Prerequisites
 
 Initialize Amplify with Auth and API plugins before using this feature:
 
-**Flutter** — `lib/main.dart`:
+**Flutter** -- `lib/main.dart`:
 
 ```dart
 await Amplify.addPlugins([AmplifyAuthCognito(), AmplifyAPI()]);
@@ -34,19 +34,19 @@ Amplify.configure(AmplifyOutputs(R.raw.amplify_outputs), applicationContext)
 > Place `amplify_outputs.json` in `app/src/main/res/raw/`. Enable core library desugaring for API level < 26.
 >
 > **Backend required:** Data must be defined in `amplify/data/resource.ts`
-> using `defineData` — see [data-backend.md](data-backend.md).
+> using `defineData` -- see [data-backend.md](data-backend.md).
 
 ## Flutter
 
 Import `package:amplify_flutter/amplify_flutter.dart`. All operations go through `Amplify.API`.
 
-**Queries:** `Amplify.API.query(request: ModelQueries.list(Todo.classType))` — response in `.response.data?.items`.
+**Queries:** `Amplify.API.query(request: ModelQueries.list(Todo.classType))` -- response in `.response.data?.items`.
 Same pattern for `.get()`.
 
-**Mutations:** `Amplify.API.mutate(request: ModelMutations.create(todo))` — same shape for `.update()`, `.delete()`.
+**Mutations:** `Amplify.API.mutate(request: ModelMutations.create(todo))` -- same shape for `.update()`, `.delete()`.
 Build updated models with `todo.copyWith(done: true)`.
 
-**Subscriptions:** `Amplify.API.subscribe(ModelSubscriptions.onCreate(Todo.classType))` → returns a stream. Listen with `.listen()`, cancel with `sub.cancel()`.
+**Subscriptions:** `Amplify.API.subscribe(ModelSubscriptions.onCreate(Todo.classType))` -> returns a stream. Listen with `.listen()`, cancel with `sub.cancel()`.
 
 ## Swift (Apple platforms)
 
@@ -55,12 +55,12 @@ Build updated models with `todo.copyWith(done: true)`.
 Uses `Amplify.API.query/mutate` with async/await.
 Swift uses shorthand request builders (`.list()`, `.create()`, `.subscription(of:type:)`) via `GraphQLRequest` extensions, unlike Flutter's explicit `ModelQueries`/`ModelMutations` classes.
 
-**Queries:** `try await Amplify.API.query(request: .list(Todo.self))` — result is `.success(let todos)`.
+**Queries:** `try await Amplify.API.query(request: .list(Todo.self))` -- result is `.success(let todos)`.
 
-**Mutations:** `try await Amplify.API.mutate(request: .create(newTodo))` — same for `.update()`, `.delete()`.
+**Mutations:** `try await Amplify.API.mutate(request: .create(newTodo))` -- same for `.update()`, `.delete()`.
 Modify models directly: `updated.done = true`.
 
-**Subscriptions:** `Amplify.API.subscribe(request: .subscription(of: Todo.self, type: .onCreate))` → use `for try await event in subscription`. Cancel via `task.cancel()` when the view disappears.
+**Subscriptions:** `Amplify.API.subscribe(request: .subscription(of: Todo.self, type: .onCreate))` -> use `for try await event in subscription`. Cancel via `task.cancel()` when the view disappears.
 
 ## Android (Kotlin)
 
@@ -97,7 +97,7 @@ try {
 Same pattern for `.update()` and `.delete()`.
 Build models via `Todo.builder().name("text").build()`; update via `todo.copyOfBuilder().done(true).build()`.
 
-**Subscriptions (coroutine — uses Kotlin Flow):**
+**Subscriptions (coroutine -- uses Kotlin Flow):**
 
 ```kotlin
 val job = scope.launch {
@@ -113,7 +113,7 @@ val job = scope.launch {
 job.cancel()
 ```
 
-**Callback alternative:** all operations also accept `onSuccess`/`onError` lambdas — e.g.
+**Callback alternative:** all operations also accept `onSuccess`/`onError` lambdas -- e.g.
 `Amplify.API.query(ModelQuery.list(Todo::class.java), { response -> ... }, { error -> ... })`.
 
 ## Pitfalls
@@ -127,7 +127,7 @@ job.cancel()
 - **Subscription cleanup:** Every platform requires explicit
   subscription cleanup (`.cancel()` on Swift tasks, `job.cancel()` for
   Kotlin coroutines, `subscription.cancel()` for callbacks, or
-  `sub.cancel()` for Flutter) — missing cleanup causes connection leaks and
+  `sub.cancel()` for Flutter) -- missing cleanup causes connection leaks and
   stale data.
 - **Offline sync (Flutter/Swift/Android):** DataStore is a separate API
   from direct API operations. Do not mix `DataStore.query()` with

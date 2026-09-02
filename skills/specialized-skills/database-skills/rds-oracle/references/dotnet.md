@@ -1,4 +1,4 @@
-# RDS for Oracle — .NET
+# RDS for Oracle -- .NET
 
 Driver: **`Oracle.ManagedDataAccess.Core`** (ODP.NET Core). Fully managed, cross-platform, no Oracle Client required.
 
@@ -11,7 +11,7 @@ dotnet add package Oracle.ManagedDataAccess.Core
 ```csharp
 using Oracle.ManagedDataAccess.Client;
 
-// Password is fetched from AWS Secrets Manager at runtime; see connection-auth.md section (b) — via AWS Secrets Manager
+// Password is fetched from AWS Secrets Manager at runtime; see connection-auth.md section (b) -- via AWS Secrets Manager
 var connString = "User Id=dbadmin;Password=<from-secrets-manager>;" +
     "Data Source=mydb.xxxxxxxxxxxx.us-east-1.rds.amazonaws.com:1521/ORCL;";
 
@@ -69,7 +69,7 @@ conn.Open();    // gets from pool
 | Medium | 2 | 10 |
 | High | 5 | 20 |
 
-`Max Pool Size` ≤ RDS `max_connections` / number of app instances.
+`Max Pool Size` <= RDS `max_connections` / number of app instances.
 
 ## Secrets Manager
 
@@ -195,7 +195,7 @@ RUN dotnet publish -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-# ODP.NET Core is fully managed — no Oracle Client needed
+# ODP.NET Core is fully managed -- no Oracle Client needed
 ENTRYPOINT ["dotnet", "MyApp.dll"]
 ```
 
@@ -207,9 +207,9 @@ try {
     conn.Open();
 } catch (OracleException ex) {
     switch (ex.Number) {
-        case 12170: Console.Error.WriteLine("TNS connect timeout — check SGs and network"); break;
+        case 12170: Console.Error.WriteLine("TNS connect timeout -- check SGs and network"); break;
         case 1017:  Console.Error.WriteLine("Invalid username/password"); break;
-        case 12541: Console.Error.WriteLine("No listener — check endpoint/port"); break;
+        case 12541: Console.Error.WriteLine("No listener -- check endpoint/port"); break;
         case 12514: Console.Error.WriteLine("Service name mismatch"); break;
         default:    Console.Error.WriteLine($"ORA-{ex.Number}: {ex.Message}"); break;
     }

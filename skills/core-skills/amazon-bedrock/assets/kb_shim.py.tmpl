@@ -1,5 +1,5 @@
 """
-Knowledge Base shim Lambda — AgentCore Gateway target.
+Knowledge Base shim Lambda -- AgentCore Gateway target.
 
 WHY: the native Gateway KB connector only takes a MANAGED Bedrock KB and a fixed
 retrieval contract. For VECTOR / KENDRA / SQL KBs, or to preserve a managed KB's
@@ -20,12 +20,12 @@ testing.
 # <<< /RENDER
 import boto3
 
-# Rendered at migration time — the Gateway lambda code target has no
+# Rendered at migration time -- the Gateway lambda code target has no
 # environment-variable support, so all config is baked in as literals.
 _KB_ID = "{{KB_ID}}"
 _TOP_K = int("{{TOP_K}}")
 _SEARCH_TYPE = "{{SEARCH_TYPE}}".strip().upper()
-_MAX_QUERY_LEN = 1000  # reject oversized queries — abuse / runaway retrieval cost
+_MAX_QUERY_LEN = 1000  # reject oversized queries -- abuse / runaway retrieval cost
 
 _runtime = boto3.client("bedrock-agent-runtime")
 
@@ -40,7 +40,7 @@ def _vector_search_config():
     # <<< /OPTIONAL: metadata_filter
     # <<< OPTIONAL: reranking
     # Render the source KB association's `rerankingConfiguration` here when present.
-    # (Set on retrievalConfiguration, not vectorSearchConfiguration — see the
+    # (Set on retrievalConfiguration, not vectorSearchConfiguration -- see the
     #  bedrock-agent-runtime Retrieve API shape.)
     # <<< /OPTIONAL: reranking
     return cfg
@@ -68,7 +68,7 @@ def lambda_handler(event, context):
     # Returns KB passage text + source location verbatim. If the KB holds
     # sensitive data (PII, financial records), review what it returns and redact
     # or filter fields here before returning, and keep this Lambda's CloudWatch
-    # log group KMS-encrypted (see references/deploy.md) — do not log full passages.
+    # log group KMS-encrypted (see references/deploy.md) -- do not log full passages.
     results = [
         {
             "text": r.get("content", {}).get("text", ""),

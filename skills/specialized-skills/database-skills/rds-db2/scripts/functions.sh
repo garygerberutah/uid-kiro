@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# functions.sh  —  DB2 helper functions for RDS DB2 RT client
+# functions.sh  --  DB2 helper functions for RDS DB2 RT client
 # =============================================================================
 # Source this file as db2inst1 to get all helper functions:
 #   source ~/functions.sh
@@ -73,7 +73,7 @@ detect_region() {
 }
 
 # =============================================================================
-# Persistent env file — ~/.db2env
+# Persistent env file -- ~/.db2env
 # =============================================================================
 
 # Save current instance credentials to ~/.db2env
@@ -100,7 +100,7 @@ db2_save_env() {
 # Load credentials from ~/.db2env
 db2_load_env() {
   if [ ! -f "$DB2_ENV_FILE" ]; then
-    log_warning "$DB2_ENV_FILE not found — run db2_use first"
+    log_warning "$DB2_ENV_FILE not found -- run db2_use first"
     return 1
   fi
   source "$DB2_ENV_FILE"
@@ -116,7 +116,7 @@ db2_show_env() {
   echo "  MASTER_USER_NAME   : ${MASTER_USER_NAME:-<not set>}"
   echo "  MASTER_USER_PASSWORD: ${MASTER_USER_PASSWORD:+<set>}${MASTER_USER_PASSWORD:-<not set>}"
 }
-# Switch active instance — fetches fresh password, rewrites ~/.db2env
+# Switch active instance -- fetches fresh password, rewrites ~/.db2env
 # Usage: db2_use [instance-id]
 db2_use() {
   local registry="$HOME/.db2instances"
@@ -171,7 +171,7 @@ db2_use() {
   [ -n "$region" ] && export REGION="$region"
   set_credentials
 
-  # Fetch password — Secrets Manager → ~/.need_password → prompt
+  # Fetch password -- Secrets Manager -> ~/.need_password -> prompt
   local secret_arn secret_json password
   secret_arn=$(aws rds describe-db-instances \
     --db-instance-identifier "$selected" \
@@ -198,7 +198,7 @@ db2_use() {
     file_password=$(grep "^${selected} " "$HOME/.need_password" 2>/dev/null | cut -d' ' -f2-)
     if [ -n "$file_password" ] && [ "$file_password" != "replace this with the master user password" ]; then
       password="$file_password"
-      log_warning "Password loaded from ~/.need_password (dev/test only — use --manage-master-user-password in production)"
+      log_warning "Password loaded from ~/.need_password (dev/test only -- use --manage-master-user-password in production)"
     fi
   fi
 
@@ -231,7 +231,7 @@ db2_use() {
 
 
 
-# Connect to a DSN — uses stored credentials, optional DSN override
+# Connect to a DSN -- uses stored credentials, optional DSN override
 # Usage: db2_connect [DSN]
 db2_connect() {
   local dsn="${1:-${DB_DSN:-${DB_SSL_DSN:-RDSADMIN}}}"
@@ -279,8 +279,8 @@ db2_test_connection() {
   # 1. Check DSN exists in db2dsdriver.cfg
   if db2cli validate -dsn "$dsn" 2>&1 | grep -q "not found\|invalid"; then
     log_error "DSN '$dsn' not found in db2dsdriver.cfg"
-    log_info  "Run: db2cli writecfg list  — to see configured DSNs"
-    log_info  "Run: BUCKET=... REGION=... source ~/db2client-configure.sh  — to reconfigure"
+    log_info  "Run: db2cli writecfg list  -- to see configured DSNs"
+    log_info  "Run: BUCKET=... REGION=... source ~/db2client-configure.sh  -- to reconfigure"
     return 1
   fi
   log_success "DSN '$dsn' found in db2dsdriver.cfg"
@@ -294,7 +294,7 @@ db2_test_connection() {
     if timeout 5 bash -c "echo >/dev/tcp/$host/$port" 2>/dev/null; then
       log_success "TCP connection to $host:$port OK"
     else
-      log_error "Cannot reach $host:$port — check security group / VPC routing"
+      log_error "Cannot reach $host:$port -- check security group / VPC routing"
       return 1
     fi
   fi
@@ -317,19 +317,19 @@ db2_test_connection() {
   echo "$out" >&2
 
   if echo "$out" | grep -q "SQL30082N"; then
-    log_error "Authentication failed — wrong username or password"
+    log_error "Authentication failed -- wrong username or password"
     log_info  "Check: MASTER_USER_NAME=$MASTER_USER_NAME"
     log_info  "Run db2_use to refresh credentials"
   elif echo "$out" | grep -q "SQL08001N\|SQL30061N"; then
-    log_error "Database not found — DSN may point to wrong database name"
-    log_info  "Run: BUCKET=... REGION=... source ~/db2client-configure.sh  — to reconfigure DSNs"
+    log_error "Database not found -- DSN may point to wrong database name"
+    log_info  "Run: BUCKET=... REGION=... source ~/db2client-configure.sh  -- to reconfigure DSNs"
   elif echo "$out" | grep -q "SQL01013N\|TCP"; then
-    log_error "Network error — cannot reach DB2 server"
+    log_error "Network error -- cannot reach DB2 server"
     log_info  "Check security group allows port $port from this host"
   elif echo "$out" | grep -q "GSKit\|SSL\|certificate"; then
     log_error "SSL certificate error"
     log_info  "Check: ls -la ~/$REGION-bundle.pem"
-    log_info  "Run: BUCKET=... REGION=... source ~/db2client-configure.sh  — to re-download cert"
+    log_info  "Run: BUCKET=... REGION=... source ~/db2client-configure.sh  -- to re-download cert"
   fi
   return 1
 }
@@ -398,7 +398,7 @@ monitor_db_instance_creation() {
     if [ "$status" = "available" ]; then
       log_success "Instance '$DB_INSTANCE_ID' is available"
     else
-      log_info "$(date '+%H:%M:%S') status: $status — waiting 30s ..."
+      log_info "$(date '+%H:%M:%S') status: $status -- waiting 30s ..."
       sleep 30
     fi
   done
@@ -413,7 +413,7 @@ db2_help() {
   echo "  ======================================================"
   echo
   echo "  Setup"
-  echo "    db2_use [instance-id]     Switch active instance — fetches fresh password, rewrites ~/.db2env"
+  echo "    db2_use [instance-id]     Switch active instance -- fetches fresh password, rewrites ~/.db2env"
   echo "    db2_load_env              Load saved credentials from ~/.db2env"
   echo "    db2_save_env              Save current credentials to ~/.db2env"
   echo "    db2_show_env              Show current instance/credentials in use"
@@ -424,7 +424,7 @@ db2_help() {
   echo "    db2_list_dsns             List all configured DSNs from db2dsdriver.cfg"
   echo
   echo "  Diagnostics"
-  echo "    db2_test_connection [DSN] Test connectivity — checks DSN, TCP, auth, SSL"
+  echo "    db2_test_connection [DSN] Test connectivity -- checks DSN, TCP, auth, SSL"
   echo
   echo "  RDS Tasks"
   echo "    get_task_status           Show RDS task status (connects to RDSADMIN)"

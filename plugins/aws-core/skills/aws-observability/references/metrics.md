@@ -1,6 +1,6 @@
 # CloudWatch Custom Metrics
 
-Publishing, querying, and managing custom metrics — EMF, PutMetricData, metric filters, and retention.
+Publishing, querying, and managing custom metrics -- EMF, PutMetricData, metric filters, and retention.
 
 ## Contents
 
@@ -20,9 +20,9 @@ Publishing, querying, and managing custom metrics — EMF, PutMetricData, metric
 | Criteria | EMF | PutMetricData |
 |----------|-----|---------------|
 | Latency impact | None (async via logs) | Synchronous API call |
-| Log correlation | Yes — Metrics + logs in same event | No — Separate |
+| Log correlation | Yes -- Metrics + logs in same event | No -- Separate |
 | Max metrics per call | 100 per MetricDirective | 1,000 MetricDatum per request |
-| High-resolution | Yes — StorageResolution=1 | Yes — StorageResolution=1 |
+| High-resolution | Yes -- StorageResolution=1 | Yes -- StorageResolution=1 |
 | Cost model | Log ingestion pricing | Per-metric API charges |
 | Best for | **Lambda, containers** | Batch jobs, custom agents |
 
@@ -62,8 +62,8 @@ Publishing, querying, and managing custom metrics — EMF, PutMetricData, metric
 - Dimension value: max **1024 characters**, must be string
 - Metric value: must be numeric or array of numerics (max **100 values**)
 - Max log event size: **1 MB**
-- Namespace: 1–1024 characters, should not start with `AWS/`
-- `Timestamp` in `_aws` is **required** per the EMF spec and JSON schema (milliseconds since epoch). In practice, if omitted, CloudWatch uses the log event's ingestion time — but explicitly setting it is recommended to avoid clock-skew issues.
+- Namespace: 1-1024 characters, should not start with `AWS/`
+- `Timestamp` in `_aws` is **required** per the EMF spec and JSON schema (milliseconds since epoch). In practice, if omitted, CloudWatch uses the log event's ingestion time -- but explicitly setting it is recommended to avoid clock-skew issues.
 
 ### EMF libraries
 
@@ -75,7 +75,7 @@ For Lambda/containers, use a library that handles EMF serialization (e.g., Lambd
 
 ### Limits
 
-- **500 TPS** per account per region (adjustable via Service Quotas) — NOT 150 TPS
+- **500 TPS** per account per region (adjustable via Service Quotas) -- NOT 150 TPS
 - Up to **1,000 MetricDatum** items per request
 - Up to **150 values** per MetricDatum (for percentile statistics support)
 - Max **30 dimensions** per metric
@@ -109,7 +109,7 @@ Extract metrics from log events automatically.
 - **Max 100 metric filters per log group**
 - Filter pattern: space-delimited terms or JSON property matching
 - PutMetricFilter API: 5 TPS
-- Metric filter → CloudWatch metric → alarm pipeline is the standard log-to-alert pattern
+- Metric filter -> CloudWatch metric -> alarm pipeline is the standard log-to-alert pattern
 
 ### Example: count 5xx errors from access logs
 
@@ -130,11 +130,11 @@ Publishes a metric with value 1 for each matching log event.
 | < 60s (high-res) | **3 hours** | 1-minute |
 | 60s (1 min) | **15 days** | 5-minute |
 | 300s (5 min) | **63 days** | 1-hour |
-| 3600s (1 hr) | **455 days (15 months)** | — |
+| 3600s (1 hr) | **455 days (15 months)** | -- |
 
 **Key insight**: You cannot query 1-minute data from 2 months ago. It has been automatically aggregated to 5-minute resolution. High-resolution (1-second) data is only available for 3 hours.
 
-**OTel metrics**: Only **30 days** retention (public preview) — significantly shorter than traditional CloudWatch metrics (15 months).
+**OTel metrics**: Only **30 days** retention (public preview) -- significantly shorter than traditional CloudWatch metrics (15 months).
 
 ### Metric expiry
 
@@ -149,16 +149,16 @@ Publishes a metric with value 1 for each matching log event.
 
 ### Anti-patterns
 
-- Do not use `requestId`, `userId`, `sessionId` as dimensions — creates millions of metrics
-- Do not publish `{InstanceId, InstanceType}` and expect to query by `InstanceId` alone — must publish both combinations separately
-- Do not use inconsistent units — metrics with different units are separate data streams
+- Do not use `requestId`, `userId`, `sessionId` as dimensions -- creates millions of metrics
+- Do not publish `{InstanceId, InstanceType}` and expect to query by `InstanceId` alone -- must publish both combinations separately
+- Do not use inconsistent units -- metrics with different units are separate data streams
 
 ### Best practices
 
 - Use low-cardinality dimensions: `ServiceName`, `Environment`, `Operation`, `StatusCode`
 - Use the `SEARCH` function for cross-dimension queries
 - Always specify units consistently
-- Audit custom metrics regularly — remove unused ones
+- Audit custom metrics regularly -- remove unused ones
 
 ---
 
@@ -181,7 +181,7 @@ errors * 100 / invocations
 SEARCH('{AWS/Lambda,FunctionName} MetricName="Errors"', 'Sum', 300)
 ```
 
-Automatically includes new functions matching the pattern — useful in dashboards and graphs (SEARCH cannot be used in alarms).
+Automatically includes new functions matching the pattern -- useful in dashboards and graphs (SEARCH cannot be used in alarms).
 
 ### Limits
 
@@ -190,7 +190,7 @@ Automatically includes new functions matching the pattern — useful in dashboar
 - Metrics Insights alarm data window: **3 hours** only
 - Max **500 metrics+expressions** per dashboard graph
 
-### Metric math in alarms — constraints
+### Metric math in alarms -- constraints
 
 - **`FILL` can permanently stick an alarm**: If a metric is published with slight delay, `FILL` replaces the missing latest point with the fill value, keeping the alarm in a fixed state. Use M-of-N alarms instead.
 - **`RATE` on sparse metrics is unpredictable**: The evaluation range varies, causing inconsistent rate calculations. Avoid `RATE` in alarms on metrics that don't publish every period.
@@ -200,7 +200,7 @@ Automatically includes new functions matching the pattern — useful in dashboar
 
 ## EMF constraints
 
-- **Flush interval affects alarms**: Flush EMF logs to CloudWatch at ≤5 second intervals. Longer intervals cause alarms to evaluate partial or missing data. In Lambda (where flush is automatic), use M-of-N alarms to compensate.
+- **Flush interval affects alarms**: Flush EMF logs to CloudWatch at <=5 second intervals. Longer intervals cause alarms to evaluate partial or missing data. In Lambda (where flush is automatic), use M-of-N alarms to compensate.
 - **Monitor EMF parsing failures**: `AWS/Logs` namespace publishes `EMFValidationErrors` and `EMFParsingErrors` metrics. Check these if metrics aren't appearing.
 - **Target values cannot be nested**: `"A.a"` matches `{ "A.a": 1 }`, NOT `{ "A": { "a": 1 } }`. Metric and dimension values must be on the root node.
 - **Multiple DimensionSets multiply metrics**: `Dimensions: [["Service"], ["Service", "Operation"]]` creates 2 metrics per data point, not 1. Libraries like Powertools do this by default.

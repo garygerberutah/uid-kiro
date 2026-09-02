@@ -11,7 +11,7 @@ atx --version
 ```
 
 ### 2. Verify Language Version
-The active language runtime must match the transformation's target version so that builds and tests run correctly. For example, a Java 8 → 17 upgrade needs Java 17 available locally.
+The active language runtime must match the transformation's target version so that builds and tests run correctly. For example, a Java 8 -> 17 upgrade needs Java 17 available locally.
 
 Check the installed version matches the target:
 
@@ -32,7 +32,7 @@ If there is a mismatch, resolve it before proceeding:
 
 If the user provided a git URL (HTTPS or SSH) instead of a local path, clone it
 locally first. The user's local git config handles authentication for private repos
-— no Secrets Manager setup needed in local mode.
+-- no Secrets Manager setup needed in local mode.
 
 ```bash
 CLONE_DIR=~/.aws/atx/custom/atx-agent-session/repos/<repo-name>-$SESSION_TS
@@ -63,8 +63,8 @@ If not a git repo: `cd <repo-path> && git init && git add . && git commit -m "In
 When running `atx custom def exec`, always include the `--telemetry` flag (see the Telemetry section in SKILL.md). Format:
 `--telemetry "client=<client>,agent=<agent>,executionMode=<local|remote>"`
 
-- `client` is the MCP client or tool hosting this session (lowercase, no spaces) — e.g., `kiro`, `vscode`, `cursor`, `windsurf`, `claudecode`. Use the real tool name, not a default.
-- `agent` is the AI assistant driving this session (lowercase, no spaces) — e.g., `kiro`, `amazonq`, `claude`, `copilot`, `cline`, `codex`. Use the real assistant name, not a default.
+- `client` is the MCP client or tool hosting this session (lowercase, no spaces) -- e.g., `kiro`, `vscode`, `cursor`, `windsurf`, `claudecode`. Use the real tool name, not a default.
+- `agent` is the AI assistant driving this session (lowercase, no spaces) -- e.g., `kiro`, `amazonq`, `claude`, `copilot`, `cline`, `codex`. Use the real assistant name, not a default.
 - `executionMode` is `local` for direct CLI invocation, `remote` when submitting via Lambda
 
 ### 5. Execute and Monitor
@@ -88,13 +88,13 @@ echo $! > ~/.aws/atx/custom/atx-agent-session/transform.pid
 cat ~/.aws/atx/custom/atx-agent-session/transform.pid
 ```
 
-Omit `--configuration` if no config is needed. The `--telemetry` flag is always included — see the Telemetry section above for field values.
+Omit `--configuration` if no config is needed. The `--telemetry` flag is always included -- see the Telemetry section above for field values.
 
 This backgrounds the runner script (not ATX directly), so the exit code is
 captured to `~/.aws/atx/custom/atx-agent-session/transform.exit` when ATX finishes. The PID file tracks
 the runner process.
 
-**As soon as you have the PID, immediately run the next command** — do NOT stop
+**As soon as you have the PID, immediately run the next command** -- do NOT stop
 and wait for the user. The ATX CLI outputs the conversation log path within
 30-60 seconds of starting. Read it from the process log:
 
@@ -109,7 +109,7 @@ output looks like:
 Conversation log: /Users/<user>/.aws/atx/custom/20260319_063712_e3479843/logs/2026-03-19T06-37-26-conversation.log
 ```
 
-Extract the full path from this line — this is the conversation log for THIS
+Extract the full path from this line -- this is the conversation log for THIS
 specific run. Do NOT use `ls -t` to find the most recent log across all
 conversations, as that may return a log from a previous run.
 
@@ -129,12 +129,12 @@ CRITICAL rules:
    the conversation log line in stdout:
 
    ```
-   📝 Conversation log: /Users/<user>/.aws/atx/custom/<conversation-id>/logs/<timestamp>-conversation.log
+   [LOG] Conversation log: /Users/<user>/.aws/atx/custom/<conversation-id>/logs/<timestamp>-conversation.log
    ```
 
    Extract the `<conversation-id>` (e.g., `20260311_233325_21bb5ef0`) and the full
    log file path. Report the conversation ID to the user immediately. Example:
-   "Transformation started — conversation ID: `20260311_233325_21bb5ef0`"
+   "Transformation started -- conversation ID: `20260311_233325_21bb5ef0`"
 
 2. **Tail the conversation log.** Once the log path is known, read new lines from
    the conversation log on each polling cycle and relay meaningful progress to the
@@ -142,7 +142,7 @@ CRITICAL rules:
    (e.g., planning steps, applying changes, running builds, encountering errors).
 
 3. **Filter out noise.** When reading the conversation log or process stdout,
-   silently IGNORE any lines containing "Thinking" — these are animated spinner
+   silently IGNORE any lines containing "Thinking" -- these are animated spinner
    indicators that repeat dozens of times and must NOT be echoed to the user.
    Surface everything else: planning output, file changes, build results, errors,
    and completion summaries.
@@ -151,14 +151,14 @@ CRITICAL rules:
    background process exits (i.e., `kill -0` returns non-zero). Do NOT treat
    exit code 0 from any other command (grep, cat, test, etc.) as transformation
    completion. Do NOT treat log messages like "TRANSFORMATION COMPLETE" as
-   completion — ATX performs additional steps after that (validation summary
-   generation). Check the process exit code — do NOT parse terminal
+   completion -- ATX performs additional steps after that (validation summary
+   generation). Check the process exit code -- do NOT parse terminal
    output or log content to determine completion. ATX prints progress messages
    and spinner animations throughout execution that do NOT indicate completion.
 
 5. **Polling interval.** Check the background process status and tail the
    conversation log every 60 seconds. Do NOT use escalating backoff for local
-   mode — a fixed 60-second interval is sufficient. Do NOT sleep in the foreground
+   mode -- a fixed 60-second interval is sufficient. Do NOT sleep in the foreground
    terminal.
 
 6. **Exit code determines success.** Once `kill -0` confirms the process has
@@ -184,11 +184,11 @@ If NOT_DEPLOYED: get user consent, then deploy. See [remote-execution.md](remote
 
 | Source Type | Action |
 |-------------|--------|
-| HTTPS git URL (public) | Use directly — container clones it |
-| HTTPS git URL (private) | Verify `atx/github-token` exists in Secrets Manager (see Step 1 in SKILL.md), then use directly — container fetches PAT and clones |
-| SSH git URL (public or private) | Verify `atx/ssh-key` exists in Secrets Manager (see Step 1 in SKILL.md), then use directly — container fetches SSH key and clones |
+| HTTPS git URL (public) | Use directly -- container clones it |
+| HTTPS git URL (private) | Verify `atx/github-token` exists in Secrets Manager (see Step 1 in SKILL.md), then use directly -- container fetches PAT and clones |
+| SSH git URL (public or private) | Verify `atx/ssh-key` exists in Secrets Manager (see Step 1 in SKILL.md), then use directly -- container fetches SSH key and clones |
 | S3 bucket with zips | Copy zips from user's bucket to managed source bucket (`atx-source-code-{account}`), then use managed S3 paths |
-| Local repo | Zip → upload to S3 → use S3 path |
+| Local repo | Zip -> upload to S3 -> use S3 path |
 
 For local sources:
 
@@ -200,7 +200,7 @@ aws s3 cp ~/.aws/atx/custom/atx-agent-session/<project>-$SESSION_TS.zip s3://atx
 ```
 
 **Important:** Only the CDK-managed source bucket (`atx-source-code-{account}`) is
-accessible to the remote container. Do NOT pass arbitrary S3 bucket paths as source —
+accessible to the remote container. Do NOT pass arbitrary S3 bucket paths as source --
 the container's IAM role cannot read from them.
 
 ### 3. Submit Job
@@ -212,13 +212,13 @@ aws lambda invoke --function-name atx-trigger-job \
 ```
 
 Add `--configuration \"additionalPlanContext=<config>\"` to the command string if config is needed.
-The `--telemetry` flag is always included — see the Telemetry section for field values.
+The `--telemetry` flag is always included -- see the Telemetry section for field values.
 
 Set the appropriate version environment variable to match the transformation's target version:
 
-- `JAVA_VERSION` for Java transformations (e.g., `"21"` for a Java 8 → 21 upgrade)
-- `PYTHON_VERSION` for Python transformations (e.g., `"3.12"` for a Python 3.8 → 3.12 upgrade)
-- `NODE_VERSION` for Node.js transformations (e.g., `"22"` for a Node.js 18 → 22 upgrade)
+- `JAVA_VERSION` for Java transformations (e.g., `"21"` for a Java 8 -> 21 upgrade)
+- `PYTHON_VERSION` for Python transformations (e.g., `"3.12"` for a Python 3.8 -> 3.12 upgrade)
+- `NODE_VERSION` for Node.js transformations (e.g., `"22"` for a Node.js 18 -> 22 upgrade)
 
 Only include the variable relevant to the transformation language. The Lambda whitelists these keys and passes them as Batch container overrides; the entrypoint switches the active runtime at startup.
 
@@ -244,7 +244,7 @@ echo "Results: s3://atx-custom-output-${ACCOUNT_ID}/transformations/<job-name>/"
 
 If the user wants to download results, first list the S3 path to discover the
 conversation ID (generated at runtime inside the container). Use the actual
-job name and account ID — do NOT leave placeholders in commands given to the user:
+job name and account ID -- do NOT leave placeholders in commands given to the user:
 
 ```bash
 aws s3 ls s3://atx-custom-output-{account-id}/transformations/<job-name>/ --region <region>

@@ -15,32 +15,32 @@ Domain expertise for CDK construct authoring, deployment workflows, compliance, 
 
 ## Critical Warnings
 
-**Deadly embrace**: Removing a cross-stack reference deadlocks deployment (`Export ... cannot be deleted as it is in use by ...`). Preferred fix: weaken the reference first — `CrossStackReferences.of($RESOURCE).produce(ReferenceStrength.BOTH)` then `WEAK`, then remove (three deploys). Legacy fallback: two-deploy `this.exportValue()` recipe. See [troubleshooting-deployment](references/troubleshooting-deployment.md).
+**Deadly embrace**: Removing a cross-stack reference deadlocks deployment (`Export ... cannot be deleted as it is in use by ...`). Preferred fix: weaken the reference first -- `CrossStackReferences.of($RESOURCE).produce(ReferenceStrength.BOTH)` then `WEAK`, then remove (three deploys). Legacy fallback: two-deploy `this.exportValue()` recipe. See [troubleshooting-deployment](references/troubleshooting-deployment.md).
 
-**Construct ID changes cause replacement**: Renaming/moving a construct changes its logical ID → CloudFormation replaces the resource (data loss for stateful resources). Always `cdk diff` before deploy. See [refactor-and-prevent-replacement](references/refactor-and-prevent-replacement.md).
+**Construct ID changes cause replacement**: Renaming/moving a construct changes its logical ID -> CloudFormation replaces the resource (data loss for stateful resources). Always `cdk diff` before deploy. See [refactor-and-prevent-replacement](references/refactor-and-prevent-replacement.md).
 
 **UPDATE_ROLLBACK_FAILED**: Stack is stuck. Fix with `cdk rollback $STACK` or `cdk rollback $STACK --orphan <LogicalId>`. See [troubleshooting-deployment](references/troubleshooting-deployment.md).
 
-**Non-empty S3 buckets persist after destroy**: You MUST set both `removalPolicy: DESTROY` and `autoDeleteObjects: true`. Versioned buckets are worse — delete markers persist even after apparent deletion.
+**Non-empty S3 buckets persist after destroy**: You MUST set both `removalPolicy: DESTROY` and `autoDeleteObjects: true`. Versioned buckets are worse -- delete markers persist even after apparent deletion.
 
 ## Common Workflows
 
 | Task | Quick Command | Details |
 |------|--------------|---------|
 | Bootstrap | `cdk bootstrap aws://$ACCOUNT/$REGION` | [bootstrap-and-project-setup](references/bootstrap-and-project-setup.md) |
-| New TS project | `cdk init app --language typescript` — use `tsx`, `eslint-plugin-awscdk` | [bootstrap-and-project-setup](references/bootstrap-and-project-setup.md) |
-| New Python project | `cdk init app --language python` — pin deps, use virtualenv | [bootstrap-and-project-setup](references/bootstrap-and-project-setup.md) |
-| Deploy | `cdk synth --strict` → `cdk diff` → `cdk deploy` | Always diff before deploy to prod |
+| New TS project | `cdk init app --language typescript` -- use `tsx`, `eslint-plugin-awscdk` | [bootstrap-and-project-setup](references/bootstrap-and-project-setup.md) |
+| New Python project | `cdk init app --language python` -- pin deps, use virtualenv | [bootstrap-and-project-setup](references/bootstrap-and-project-setup.md) |
+| Deploy | `cdk synth --strict` -> `cdk diff` -> `cdk deploy` | Always diff before deploy to prod |
 | cdk-nag | `Aspects.of(app).add(new AwsSolutionsChecks())` | [compliance-and-drift](references/compliance-and-drift.md) |
 | Drift | `cdk drift $STACK` (use `--fail` in CI) | [compliance-and-drift](references/compliance-and-drift.md) |
 | Import resource | `cdk import` (interactive or `--resource-mapping` for CI), `cdk deploy --import-existing-resources` | [import-and-migrate](references/import-and-migrate.md) |
-| Refactor safely | `cdk refactor --unstable=refactor` — no property changes in same deploy | [refactor-and-prevent-replacement](references/refactor-and-prevent-replacement.md) |
+| Refactor safely | `cdk refactor --unstable=refactor` -- no property changes in same deploy | [refactor-and-prevent-replacement](references/refactor-and-prevent-replacement.md) |
 
 ## Troubleshooting
 
-| Error | Cause → Fix |
+| Error | Cause -> Fix |
 |-------|------------|
-| **DeployFailed / DeploymentError** | CDK error isn't the root cause. `cdk deploy $STACK --verbose`, then `cdk --unstable=diagnose diagnose $STACK` (CLI ≥ 2.1120.0); else `aws cloudformation describe-events --stack-name $STACK --filters FailedEvents=true` — the first `_FAILED` event is the cause. [Details](references/troubleshooting-deployment.md) |
+| **DeployFailed / DeploymentError** | CDK error isn't the root cause. `cdk deploy $STACK --verbose`, then `cdk --unstable=diagnose diagnose $STACK` (CLI >= 2.1120.0); else `aws cloudformation describe-events --stack-name $STACK --filters FailedEvents=true` -- the first `_FAILED` event is the cause. [Details](references/troubleshooting-deployment.md) |
 | **NoCredentials / ExpiredToken / AssumeRoleFailed** | `aws sts get-caller-identity` + `cdk doctor`. Expired SSO, missing `env`, missing `sts:AssumeRole`. [Details](references/troubleshooting-credentials.md) |
 | **Asset errors** (CannotFindAsset, FailedToBundleAsset, AssetBuildFailed, AssetPublishFailed) | Path wrong, Docker not running, or bootstrap bucket perms. Use `path.join(__dirname, ...)`. [Details](references/troubleshooting-synth.md) |
 | **AppRequired** | Add `"app": "npx tsx bin/my-app.ts"` to `cdk.json`. [Details](references/troubleshooting-synth.md) |
@@ -57,7 +57,7 @@ Domain expertise for CDK construct authoring, deployment workflows, compliance, 
 
 ## Construct Patterns
 
-Prefer L2. Use L1 with Mixins/Facades when L2 lacks a property. Escape hatches: `node.defaultChild` → `addPropertyOverride`. See [construct-patterns](references/construct-patterns.md).
+Prefer L2. Use L1 with Mixins/Facades when L2 lacks a property. Escape hatches: `node.defaultChild` -> `addPropertyOverride`. See [construct-patterns](references/construct-patterns.md).
 
 ## Additional Resources
 

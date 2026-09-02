@@ -1,6 +1,6 @@
 # memory
 
-Add, configure, and debug AgentCore Memory — the managed service that lets your agent remember things across sessions.
+Add, configure, and debug AgentCore Memory -- the managed service that lets your agent remember things across sessions.
 
 ## When to use
 
@@ -9,7 +9,7 @@ Add, configure, and debug AgentCore Memory — the managed service that lets you
 - Memory recall isn't working as expected
 - You want to share memory across multiple agents
 
-Do NOT use this skill for within-session conversation history. That's handled automatically by the runtime — no configuration needed.
+Do NOT use this skill for within-session conversation history. That's handled automatically by the runtime -- no configuration needed.
 
 ## Input
 
@@ -26,30 +26,30 @@ Do NOT use this skill for within-session conversation history. That's handled au
 
 Read `agentcore/agentcore.json`. Look for:
 
-- The `memories` array — is memory already configured?
-- The `runtimes` array — what agents are in the project and what framework do they use?
-- The project `name` — needed for env var construction
+- The `memories` array -- is memory already configured?
+- The `runtimes` array -- what agents are in the project and what framework do they use?
+- The project `name` -- needed for env var construction
 
-**If `agentcore/agentcore.json` does not exist**, check if there's any AgentCore project structure nearby (look for `agentcore/` directory). If none found, proceed with the most helpful answer possible based on what the developer asked — don't block on missing context. If the question is about strategy selection or code patterns, answer it directly. Only ask "which situation are you in?" if the answer genuinely depends on it (e.g., they need CLI commands that differ by setup type).
+**If `agentcore/agentcore.json` does not exist**, check if there's any AgentCore project structure nearby (look for `agentcore/` directory). If none found, proceed with the most helpful answer possible based on what the developer asked -- don't block on missing context. If the question is about strategy selection or code patterns, answer it directly. Only ask "which situation are you in?" if the answer genuinely depends on it (e.g., they need CLI commands that differ by setup type).
 
 ### Step 2: Determine the situation
 
-**Case A — No memory configured yet**
+**Case A -- No memory configured yet**
 The `memories` array is empty or missing. Proceed to Step 3 (strategy selection).
 
-**Case B — Memory configured, needs wiring**
+**Case B -- Memory configured, needs wiring**
 Memory exists in `agentcore.json` but the agent code doesn't use it yet. Skip to Step 5 (generate wiring code).
 
-**Case C — Memory configured and wired, debugging recall**
+**Case C -- Memory configured and wired, debugging recall**
 Ask: "What's happening? What did you expect the agent to remember, and what did it actually do?"
 Then diagnose using the patterns in the Debugging section below.
 
-**Case D — Developer asking about memory without a project**
+**Case D -- Developer asking about memory without a project**
 Answer the question directly. For strategy questions, explain the options. For code questions, show the pattern with a note that they'll need to substitute their actual memory ID.
 
 ### Step 3: Choose a strategy
 
-Present the options and ask the developer which fits their use case. Don't skip this — the wrong strategy wastes money and produces worse results.
+Present the options and ask the developer which fits their use case. Don't skip this -- the wrong strategy wastes money and produces worse results.
 
 ```
 Which memory strategy fits your use case?
@@ -82,9 +82,9 @@ EPISODIC
   Cost: medium
 
 Common combinations:
-  SEMANTIC + USER_PREFERENCE  →  facts + preferences (most common)
-  SEMANTIC + SUMMARIZATION    →  full episodic memory (highest capability, highest cost)
-  USER_PREFERENCE alone       →  lightweight preference store
+  SEMANTIC + USER_PREFERENCE  ->  facts + preferences (most common)
+  SEMANTIC + SUMMARIZATION    ->  full episodic memory (highest capability, highest cost)
+  USER_PREFERENCE alone       ->  lightweight preference store
 
 Which strategy (or combination) do you want?
 ```
@@ -97,7 +97,7 @@ Run the CLI command to add memory to the project config:
 agentcore add memory --name <MemoryName> --strategies <STRATEGY1,STRATEGY2> --expiry 30
 ```
 
-This updates `agentcore/agentcore.json`. The memory resource is provisioned when you next run `agentcore deploy` — it takes 2–5 minutes to become active.
+This updates `agentcore/agentcore.json`. The memory resource is provisioned when you next run `agentcore deploy` -- it takes 2-5 minutes to become active.
 
 The resulting config entry looks like:
 
@@ -118,25 +118,25 @@ The resulting config entry looks like:
 **Memory name rules:** alphanumeric + underscores, max 48 chars, starts with a letter.
 
 **Env var injected at deploy time:** `MEMORY_<UPPERCASENAME>_ID`
-Example: memory named `UserContext` → env var `MEMORY_USERCONTEXT_ID`
+Example: memory named `UserContext` -> env var `MEMORY_USERCONTEXT_ID`
 
 ### Step 5: Generate wiring code
 
-Read `app/<AgentName>/main.py` (or the equivalent entrypoint) to detect the framework. Each framework has its own integration pattern — pick the one that matches:
+Read `app/<AgentName>/main.py` (or the equivalent entrypoint) to detect the framework. Each framework has its own integration pattern -- pick the one that matches:
 
 | Framework | Recommended integration | Source |
 |---|---|---|
 | Strands | `AgentCoreMemorySessionManager` (CLI template) | `bedrock_agentcore.memory.integrations.strands.*` |
 | LangGraph | `AgentCoreMemorySaver` + `AgentCoreMemoryStore` | `langgraph-checkpoint-aws` (official AWS-maintained) |
 | OpenAI Agents SDK | `MemoryClient` via `@function_tool` | `bedrock_agentcore.memory.MemoryClient` |
-| Google ADK / Claude Agent SDK | BYO — use `MemoryClient` directly | Validate end-to-end before shipping |
+| Google ADK / Claude Agent SDK | BYO -- use `MemoryClient` directly | Validate end-to-end before shipping |
 
 > [!WARNING]
 > Always check for the MEMORY_ID env var before initializing memory. Memory is NOT
-> available during `agentcore dev` — the env var is only set after deploy. Code that
+> available during `agentcore dev` -- the env var is only set after deploy. Code that
 > assumes memory is always available will fail silently in local development.
 
-#### Strands — Session Manager pattern (recommended for new projects)
+#### Strands -- Session Manager pattern (recommended for new projects)
 
 ```python
 import os
@@ -179,7 +179,7 @@ def invoke(payload, context):
 
     agent = Agent(
         model=load_model(),
-        session_manager=session_manager,  # None is safe — agent runs without memory
+        session_manager=session_manager,  # None is safe -- agent runs without memory
         system_prompt="You are a helpful assistant.",
     )
 
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     app.run()
 ```
 
-#### Strands — Hook pattern (for adding memory to an existing agent)
+#### Strands -- Hook pattern (for adding memory to an existing agent)
 
 ```python
 import os
@@ -244,14 +244,14 @@ agent = Agent(
 )
 ```
 
-#### LangGraph — `langgraph-checkpoint-aws` (recommended)
+#### LangGraph -- `langgraph-checkpoint-aws` (recommended)
 
 LangGraph has an **official AWS-maintained integration** via the [`langgraph-checkpoint-aws`](https://pypi.org/project/langgraph-checkpoint-aws/) package. It provides two integrations that map cleanly to LangGraph's memory model:
 
-- **`AgentCoreMemorySaver`** — persists LangGraph's checkpoint objects (conversation state, execution graph, metadata) to AgentCore Memory. This is LangGraph's short-term / session memory.
-- **`AgentCoreMemoryStore`** — saves conversational messages for AgentCore's long-term extraction (facts, preferences, summaries) and lets the agent search those memories in future sessions.
+- **`AgentCoreMemorySaver`** -- persists LangGraph's checkpoint objects (conversation state, execution graph, metadata) to AgentCore Memory. This is LangGraph's short-term / session memory.
+- **`AgentCoreMemoryStore`** -- saves conversational messages for AgentCore's long-term extraction (facts, preferences, summaries) and lets the agent search those memories in future sessions.
 
-Use these instead of wiring `MemoryClient` calls into your graph manually — they handle the protocol conversion, actor/session mapping, and retry logic for you.
+Use these instead of wiring `MemoryClient` calls into your graph manually -- they handle the protocol conversion, actor/session mapping, and retry logic for you.
 
 **Install:**
 
@@ -265,7 +265,7 @@ pip install langgraph-checkpoint-aws
 - `bedrock-agentcore:ListEvents`
 - `bedrock-agentcore:RetrieveMemories`
 
-**Basic pattern — short-term checkpointing only:**
+**Basic pattern -- short-term checkpointing only:**
 
 ```python
 import os
@@ -290,11 +290,11 @@ async def invoke(payload, context):
     graph = create_react_agent(
         model=load_model(),
         tools=tools,
-        checkpointer=checkpointer,  # None is safe — graph runs without persistence
+        checkpointer=checkpointer,  # None is safe -- graph runs without persistence
     )
 
-    # LangGraph's RunnableConfig maps thread_id → AgentCore session_id,
-    # actor_id → AgentCore actor_id under the hood
+    # LangGraph's RunnableConfig maps thread_id -> AgentCore session_id,
+    # actor_id -> AgentCore actor_id under the hood
     config = {
         "configurable": {
             "thread_id": session_id,
@@ -309,7 +309,7 @@ async def invoke(payload, context):
     return {"response": result["messages"][-1].content}
 ```
 
-**Full pattern — short-term + long-term retrieval:**
+**Full pattern -- short-term + long-term retrieval:**
 
 For long-term memory (facts, preferences, summaries extracted by AgentCore), add `AgentCoreMemoryStore` with a pre-model hook that saves messages for extraction and (optionally) retrieves relevant memories:
 
@@ -361,7 +361,7 @@ graph = create_react_agent(
 config = {"configurable": {"thread_id": "session-1", "actor_id": "user-alice"}}
 response = graph.invoke({"messages": [("human", "I prefer short answers.")]}, config=config)
 
-# New session for the same actor — long-term memories are retrieved
+# New session for the same actor -- long-term memories are retrieved
 new_config = {"configurable": {"thread_id": "session-2", "actor_id": "user-alice"}}
 response = graph.invoke({"messages": [("human", "Summarize my latest report.")]}, config=new_config)
 ```
@@ -379,7 +379,7 @@ client = MemoryClient(region_name=REGION)
 
 Use `MemoryClient` directly only when the checkpoint/store abstractions don't fit your use case.
 
-#### OpenAI Agents SDK — memory as function tools
+#### OpenAI Agents SDK -- memory as function tools
 
 The OpenAI Agents SDK pattern is to expose memory as `@function_tool` decorated functions. The agent decides when to read and write:
 
@@ -393,7 +393,7 @@ REGION = os.getenv("AWS_REGION", "us-east-1")
 _client = MemoryClient(region_name=REGION) if MEMORY_ID else None
 
 def _build_memory_tools(actor_id: str, session_id: str):
-    """Factory — binds actor/session into tool closures."""
+    """Factory -- binds actor/session into tool closures."""
 
     @function_tool
     def recall_context(query: str, top_k: int = 3) -> str:
@@ -443,14 +443,14 @@ async def invoke(payload, context):
     return {"response": result.final_output}
 ```
 
-#### Google ADK and Claude Agent SDK — bring your own memory integration
+#### Google ADK and Claude Agent SDK -- bring your own memory integration
 
 AgentCore Memory doesn't have a framework-specific integration for ADK or the Claude Agent SDK yet, and the samples repo doesn't contain a combined pattern we can point to. Use the general `MemoryClient` API and wire it into the framework's existing extension points:
 
 - **Google ADK:** Expose memory operations as ADK tools (functions passed to `Agent(tools=[...])`). The ADK agent decides when to call them.
 - **Claude Agent SDK:** Wrap `query()` with a pre-call memory load and a post-call memory save. The SDK's `ClaudeAgentOptions.system_prompt` is the injection point for retrieved context.
 
-For both frameworks, follow the `MemoryClient` API shown in the OpenAI Agents pattern above — the client calls (`retrieve_memories`, `create_event`, `get_last_k_turns`) are identical. The framework-specific part is just where you call them.
+For both frameworks, follow the `MemoryClient` API shown in the OpenAI Agents pattern above -- the client calls (`retrieve_memories`, `create_event`, `get_last_k_turns`) are identical. The framework-specific part is just where you call them.
 
 Before shipping a memory integration for ADK or Claude SDK, validate the end-to-end flow against a deployed agent:
 
@@ -467,21 +467,21 @@ If you build a working pattern, consider contributing it to [`awslabs/agentcore-
 Always include this note:
 
 ```
-⚠️  Memory is not available during local development (agentcore dev).
+[WARNING]  Memory is not available during local development (agentcore dev).
 
 The MEMORY_<NAME>_ID env var is only injected after deploy. The code above
-handles this gracefully — it runs without memory when the env var isn't set.
+handles this gracefully -- it runs without memory when the env var isn't set.
 
 To test memory:
   agentcore deploy -y
   agentcore invoke "My name is Alex and I prefer concise answers"
   agentcore invoke "What do you know about me?"
 
-If using long-term memory (SEMANTIC or USER_PREFERENCE), wait 5–30 seconds
-between the first and second invoke — extraction runs asynchronously after
+If using long-term memory (SEMANTIC or USER_PREFERENCE), wait 5-30 seconds
+between the first and second invoke -- extraction runs asynchronously after
 each session ends.
 
-Session ID note: use UUIDs (v4) for session IDs — they satisfy the platform's
+Session ID note: use UUIDs (v4) for session IDs -- they satisfy the platform's
 minimum length requirement (33 characters) and are what `agentcore invoke`
 generates by default. Short or sequential session IDs (e.g., "session-1",
 "test") can cause long-term memory extraction to fail silently.
@@ -523,24 +523,24 @@ Then use the same wiring code from Step 5, reading `MEMORY_ID` from the environm
 If memory was working and stopped, or never worked:
 
 **Agent keeps forgetting things even with memory set up:**
-Most common cause: the memory resource is configured but the code isn't reading from it at session start. Check that your entrypoint calls `get_last_k_turns` (or uses the session manager) before creating the agent, not after. Also verify the `MEMORY_<NAME>_ID` env var is set — it's only injected after deploy, not during `agentcore dev`.
+Most common cause: the memory resource is configured but the code isn't reading from it at session start. Check that your entrypoint calls `get_last_k_turns` (or uses the session manager) before creating the agent, not after. Also verify the `MEMORY_<NAME>_ID` env var is set -- it's only injected after deploy, not during `agentcore dev`.
 
 **Memory not persisting across sessions:**
 
-1. Check that LTM strategies (SEMANTIC, USER_PREFERENCE) are configured — not just SUMMARIZATION
-2. Wait 5–30 seconds after a session ends before starting a new one — extraction is async
+1. Check that LTM strategies (SEMANTIC, USER_PREFERENCE) are configured -- not just SUMMARIZATION
+2. Wait 5-30 seconds after a session ends before starting a new one -- extraction is async
 3. Verify the memory resource is ACTIVE: `agentcore status --type memory`
-4. Use UUIDs (v4) for session IDs — the platform requires a minimum of 33 characters. Short IDs like "session-1" or "test" cause LTM to fail silently. `agentcore invoke` generates compliant IDs by default.
+4. Use UUIDs (v4) for session IDs -- the platform requires a minimum of 33 characters. Short IDs like "session-1" or "test" cause LTM to fail silently. `agentcore invoke` generates compliant IDs by default.
 
 **Memory not loading at session start:**
 
 1. Verify `MEMORY_<NAME>_ID` env var is set: `agentcore status --type memory --json`
-2. Check the actor_id is consistent across sessions — memory is scoped per actor
-3. Confirm the namespace paths in retrieval_config match the namespaces used when writing — the retrieval namespace must exactly match the namespace the strategy extracts into
-4. CLI defaults use paths without trailing slashes (e.g., `/users/{actorId}/facts`). If you customized namespace templates when creating the memory resource, use whatever pattern you chose — consistency between writer and reader is what matters.
+2. Check the actor_id is consistent across sessions -- memory is scoped per actor
+3. Confirm the namespace paths in retrieval_config match the namespaces used when writing -- the retrieval namespace must exactly match the namespace the strategy extracts into
+4. CLI defaults use paths without trailing slashes (e.g., `/users/{actorId}/facts`). If you customized namespace templates when creating the memory resource, use whatever pattern you chose -- consistency between writer and reader is what matters.
 
 **Memory provisioning slow:**
-Memory takes 2–5 minutes to become ACTIVE after `agentcore deploy`. Check status:
+Memory takes 2-5 minutes to become ACTIVE after `agentcore deploy`. Check status:
 
 ```bash
 agentcore status --type memory
@@ -550,13 +550,13 @@ agentcore status --type memory
 
 If you're configuring S3 delivery for memory exports, session transcripts, or Browser recording output, the destination bucket must be in the **same AWS account** as the AgentCore resource. Cross-account S3 buckets are not supported as delivery destinations, even with correct bucket policies granting the service principal access.
 
-Symptom of attempting a cross-account bucket: `CreateMemory` (or the relevant resource creation call) fails with `ValidationException: Role does not have access to required S3 buckets` — even when IAM and bucket policies are correctly configured for cross-account access.
+Symptom of attempting a cross-account bucket: `CreateMemory` (or the relevant resource creation call) fails with `ValidationException: Role does not have access to required S3 buckets` -- even when IAM and bucket policies are correctly configured for cross-account access.
 
 **Workaround:** create a same-account bucket for the AgentCore resource to write to. If you need the data in a different account, replicate from the same-account bucket via S3 replication or a scheduled copy job.
 
 ## Sharing memory across agents
 
-Memory is a top-level resource — not nested under a single agent. To share:
+Memory is a top-level resource -- not nested under a single agent. To share:
 
 1. Create one memory resource: `agentcore add memory --name SharedMemory --strategies SEMANTIC`
 2. In each agent's code, read the same env var: `MEMORY_SHAREDMEMORY_ID`
@@ -564,11 +564,11 @@ Memory is a top-level resource — not nested under a single agent. To share:
 
 ## Cross-region inference (data residency)
 
-Memory consolidation (extraction + summarization for long-term strategies) uses cross-region inference by default. Your memory **data stays in your primary region**, but the **inference call** that extracts facts or summarizes a session may execute in another AWS region within the same geography (e.g., `us-east-1` → `us-east-2` or `us-west-2`; EU stays in EU; etc.).
+Memory consolidation (extraction + summarization for long-term strategies) uses cross-region inference by default. Your memory **data stays in your primary region**, but the **inference call** that extracts facts or summarizes a session may execute in another AWS region within the same geography (e.g., `us-east-1` -> `us-east-2` or `us-west-2`; EU stays in EU; etc.).
 
 This matters when:
 
-- You have a data-residency requirement that goes beyond storage — some regulations constrain where inference may run, not just where results land
+- You have a data-residency requirement that goes beyond storage -- some regulations constrain where inference may run, not just where results land
 - You're building for a customer whose contract pins processing to a single region
 - Your audit trail needs to show which region handled each prompt
 
@@ -576,11 +576,11 @@ This matters when:
 
 **To opt out for Memory:** use a **built-in-with-overrides** strategy (see [`memory-custom-strategy`](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory-custom-strategy.html)) and pin the model to a specific region. The overrides strategy lets you specify the exact model ID used for extraction and consolidation, which gives you region control.
 
-The supported geographies and inference-region mappings change as AgentCore expands — check [the cross-region inference docs](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/cross-region-inference.html) for the current list rather than baking it in here.
+The supported geographies and inference-region mappings change as AgentCore expands -- check [the cross-region inference docs](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/cross-region-inference.html) for the current list rather than baking it in here.
 
 ## Beyond the CLI: memory features that require the API
 
-The CLI's `agentcore add memory` and `agentcore.json` cover strategy selection, expiry, and basic configuration. Some memory capabilities are API/SDK-only — the CLI doesn't expose them. When the developer needs one of these, the graduation path is: create the memory via CLI as usual, deploy, then apply the additional config via boto3 or AWS CLI.
+The CLI's `agentcore add memory` and `agentcore.json` cover strategy selection, expiry, and basic configuration. Some memory capabilities are API/SDK-only -- the CLI doesn't expose them. When the developer needs one of these, the graduation path is: create the memory via CLI as usual, deploy, then apply the additional config via boto3 or AWS CLI.
 
 **Resource-based policies** (cross-account access, principal-level restrictions):
 
@@ -608,7 +608,7 @@ client.put_memory_resource_policy(
 )
 ```
 
-**Custom extraction models** (pin the model used for LTM extraction — e.g., for data residency):
+**Custom extraction models** (pin the model used for LTM extraction -- e.g., for data residency):
 
 Use the "built-in with overrides" strategy type via `UpdateMemory`. See the [custom memory strategy docs](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory-custom-strategy.html) for the full configuration shape.
 
@@ -616,7 +616,7 @@ Use the "built-in with overrides" strategy type via `UpdateMemory`. See the [cus
 
 Also API-only. See the AgentCore memory docs for the `selfManagedMemoryStrategy` configuration.
 
-**When you hit a memory capability not covered here**, use the `awsknowledge` MCP server if available — search for the specific API operation (e.g., "AgentCore PutMemoryResourcePolicy") to get the current parameter shapes. The API surface evolves between releases.
+**When you hit a memory capability not covered here**, use the `awsknowledge` MCP server if available -- search for the specific API operation (e.g., "AgentCore PutMemoryResourcePolicy") to get the current parameter shapes. The API surface evolves between releases.
 
 **General rule:** if `agentcore.json` has a field for it, use the CLI. If it doesn't, create the resource via CLI, deploy, then apply the additional config via boto3. Don't fight the CLI to do something it wasn't designed for.
 
@@ -630,6 +630,6 @@ Also API-only. See the AgentCore memory docs for the `selfManagedMemoryStrategy`
 
 - Generated code handles `MEMORY_ID` being None (local dev) without crashing
 - Env var name matches the memory resource name in `agentcore.json` (uppercase, underscores)
-- Framework-specific pattern is used — never generate Strands hooks for a LangGraph project
+- Framework-specific pattern is used -- never generate Strands hooks for a LangGraph project
 - LTM extraction delay is communicated
 - Session ID guidance recommends UUIDs (v4) when LTM strategies are used (minimum 33 characters)

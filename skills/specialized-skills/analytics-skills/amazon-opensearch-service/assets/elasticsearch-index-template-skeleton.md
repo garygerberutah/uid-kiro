@@ -1,8 +1,8 @@
-# Index Template Skeleton — Elasticsearch / OpenSearch source
+# Index Template Skeleton -- Elasticsearch / OpenSearch source
 
-Use this when the source is Elasticsearch or OpenSearch. Most ES/OS mappings carry over 1:1; this skeleton is the audit target for the handful of constructs that need action (see the *ES field/mapping → OpenSearch* table in [source-elasticsearch.md](../references/source-elasticsearch.md)). For Solr sources use [solr-index-template-skeleton.md](solr-index-template-skeleton.md) instead.
+Use this when the source is Elasticsearch or OpenSearch. Most ES/OS mappings carry over 1:1; this skeleton is the audit target for the handful of constructs that need action (see the *ES field/mapping -> OpenSearch* table in [source-elasticsearch.md](../references/source-elasticsearch.md)). For Solr sources use [solr-index-template-skeleton.md](solr-index-template-skeleton.md) instead.
 
-> **Migration Assistant for Amazon OpenSearch Service does this for you.** Historical Data Migration's metadata-migration phase translates the source mappings + index templates into OpenSearch-compatible form (stripping `_type`, converting `dense_vector`→`knn_vector`, `flattened`→`flat_object`) and reindexes documents. This skeleton is for **auditing** Migration Assistant for Amazon OpenSearch Service's output and for the rare override — NOT a manual step in the migration plan.
+> **Migration Assistant for Amazon OpenSearch Service does this for you.** Historical Data Migration's metadata-migration phase translates the source mappings + index templates into OpenSearch-compatible form (stripping `_type`, converting `dense_vector`->`knn_vector`, `flattened`->`flat_object`) and reindexes documents. This skeleton is for **auditing** Migration Assistant for Amazon OpenSearch Service's output and for the rare override -- NOT a manual step in the migration plan.
 
 ```json
 {
@@ -47,10 +47,10 @@ Use this when the source is Elasticsearch or OpenSearch. Most ES/OS mappings car
 
 - [ ] `index_patterns` matches the target index / alias name.
 - [ ] `number_of_shards` / `number_of_replicas` come from Step 5 (Estimate Sizing); `refresh_interval` defaults to `30s` for prod per [`sizing.md`](../references/sizing.md), not `1s`.
-- [ ] **`_type` removed.** Multi-type (ES 6.x) or `_doc`-placeholder (ES 7.x) mappings are flattened — types do not exist in OpenSearch (nugget #9).
+- [ ] **`_type` removed.** Multi-type (ES 6.x) or `_doc`-placeholder (ES 7.x) mappings are flattened -- types do not exist in OpenSearch (nugget #9).
 - [ ] **`fielddata: true` stripped** from text fields and replaced with a `.keyword` subfield + `doc_values` (nugget #8) or the node OOMs on first aggregation.
-- [ ] **`dense_vector` → `knn_vector`** with an explicit `method`/`engine` chosen per the k-NN engine table in [`vector-knn.md`](../references/vector-knn.md); recall validated against source. `[verify]` the current default engine for the target version.
-- [ ] **`flattened` → `flat_object`.**
+- [ ] **`dense_vector` -> `knn_vector`** with an explicit `method`/`engine` chosen per the k-NN engine table in [`vector-knn.md`](../references/vector-knn.md); recall validated against source. `[verify]` the current default engine for the target version.
+- [ ] **`flattened` -> `flat_object`.**
 - [ ] **Runtime fields** are pre-computed at ingest (no `runtime` mapping equivalent); reindex required.
 - [ ] **`_source: {enabled: false}`** indexes are migrated via Migration Assistant for Amazon OpenSearch Service Historical Data Migration only (nugget #22), and `_source` is re-enabled on the target.
 - [ ] Field aliases (`alias` type) carry over unchanged.

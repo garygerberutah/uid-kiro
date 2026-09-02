@@ -4,7 +4,7 @@
 # source and target formats. All other cells follow this skeleton.
 
 # Cell 0 [markdown]: Dataset Transformation
-# Description of the transformation (source format → target format)
+# Description of the transformation (source format -> target format)
 
 # Cell 1: Configuration
 
@@ -12,7 +12,7 @@ INPUT_LOCATION = "[INPUT_LOCATION]"  # S3 URI or local path to input dataset
 OUTPUT_LOCATION = "[OUTPUT_LOCATION]"  # S3 URI or local path for output
 
 # Cell 2: Transformation Function
-# This cell is generated dynamically based on the user's source → target format.
+# This cell is generated dynamically based on the user's source -> target format.
 # In notebook mode, it uses %%writefile to save the function to transform_fn.py.
 # In script mode, the function is written to disk directly.
 # It must define:

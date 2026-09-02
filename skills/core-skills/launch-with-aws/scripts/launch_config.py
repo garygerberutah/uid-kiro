@@ -12,7 +12,7 @@ from dataclasses import asdict, dataclass
 from typing import List
 from urllib.parse import urlparse
 
-# ── Constants ────────────────────────────────────────────────────────────
+# -- Constants ------------------------------------------------------------
 
 DEFAULT_BASE_URL = "https://launch-with-aws.us-east-1.api.aws"
 
@@ -51,7 +51,7 @@ MAX_UNCOMPRESSED_BYTES = 2 * 1024 * 1024 * 1024  # 2 GiB total decompressed
 MAX_ENTRY_UNCOMPRESSED_BYTES = 100 * 1024 * 1024  # 100 MiB per entry
 MAX_COMPRESSION_RATIO = 100  # decompressed/compressed per entry
 
-# ── Models ───────────────────────────────────────────────────────────────
+# -- Models ---------------------------------------------------------------
 
 
 @dataclass
@@ -82,7 +82,7 @@ class StoredSession(ClientCredentials):
         return cls(**json.loads(text))
 
 
-# ── Runtime config ───────────────────────────────────────────────────────
+# -- Runtime config -------------------------------------------------------
 
 logger = logging.getLogger(__name__)
 

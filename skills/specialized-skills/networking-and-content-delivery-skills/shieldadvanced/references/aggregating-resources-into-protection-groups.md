@@ -44,10 +44,10 @@ The procedure covers:
 When advising on protection groups, you MUST state ALL of the following points together, not a
 subset:
 
-1. Protection groups are **detection and reporting only** — they do NOT apply shared mitigation;
+1. Protection groups are **detection and reporting only** -- they do NOT apply shared mitigation;
    automatic mitigation still applies per individual resource, never to the group as a whole.
 2. **Every member must already be individually protected with Shield Advanced before it joins the
-   group** — a group built over unprotected resources shows **zero members** and aggregates nothing.
+   group** -- a group built over unprotected resources shows **zero members** and aggregates nothing.
 3. For a multi-tier topology (e.g. CloudFront in front of an Application Load Balancer in front of
    EC2), use **MAX aggregation** so one high-traffic tier is not diluted by the others.
 
@@ -241,7 +241,7 @@ with the chosen aggregation and membership pattern, then surfaces the console li
 ```
 Confirmed both members are individually protected.
 Created protection group edge-and-origin with MAX aggregation over the distribution and origin ALB.
-Note: this groups detection only — automatic mitigation still applies per resource.
+Note: this groups detection only -- automatic mitigation still applies per resource.
 Open the Shield console and confirm the protection group:
 https://us-east-1.console.aws.amazon.com/wafv2/shieldv2#/protections
 ```
@@ -262,7 +262,7 @@ https://us-east-1.console.aws.amazon.com/wafv2/shieldv2#/protections
 ```
 Confirmed protected Application Load Balancers exist.
 Created protection group all-albs with MEAN aggregation over every protected ALB.
-Note: this groups detection only — automatic mitigation still applies per resource.
+Note: this groups detection only -- automatic mitigation still applies per resource.
 Open the Shield console and confirm the protection group:
 https://us-east-1.console.aws.amazon.com/wafv2/shieldv2#/protections
 ```

@@ -27,7 +27,7 @@ set -euo pipefail
 
 CLUSTER_ID="${CLUSTER:-}"
 REGION="${REGION:-${AWS_REGION:-us-east-1}}"
-# Note: avoid using bare `USER` here — bash sets it automatically to the login
+# Note: avoid using bare `USER` here -- bash sets it automatically to the login
 # user, and overwriting it would clobber that for child processes.
 DB_USER_NAME="${DB_USER:-admin}"
 ADMIN=false
@@ -36,7 +36,7 @@ SCRIPT_FILE=""
 AI_MODEL=""
 SKIP_CERT_VERIFY=false
 
-# require_value FLAG NEXT — validate that a value-taking flag has a non-empty,
+# require_value FLAG NEXT -- validate that a value-taking flag has a non-empty,
 # non-flag argument following it. Aborts with a clean error otherwise.
 require_value() {
   local flag="$1"
@@ -56,7 +56,7 @@ require_value() {
 CLUSTER_FROM_FLAG=""
 CLUSTER_FROM_POSITIONAL=""
 
-# set_cluster SOURCE VALUE — record the cluster ID from a specific source and
+# set_cluster SOURCE VALUE -- record the cluster ID from a specific source and
 # reject conflicting values from a different source.
 set_cluster() {
   local src="$1"
@@ -122,7 +122,7 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --)
-      # End-of-options sentinel — remaining args are positional.
+      # End-of-options sentinel -- remaining args are positional.
       shift
       while [[ $# -gt 0 ]]; do
         set_cluster positional "$1"
@@ -167,7 +167,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Validate cluster ID — trim surrounding whitespace and enforce DSQL's
+# Validate cluster ID -- trim surrounding whitespace and enforce DSQL's
 # alphanumeric format. Catches `--cluster ""`, `--cluster "  "`, and accidental
 # slashes/dots in the ID before they reach the AWS CLI or psql.
 CLUSTER_ID="${CLUSTER_ID#"${CLUSTER_ID%%[![:space:]]*}"}"
@@ -189,7 +189,7 @@ ENDPOINT="${CLUSTER_ID}.dsql.${REGION}.on.aws"
 
 # Generate auth token. Capture stderr alongside stdout so an aws CLI failure
 # (expired creds, missing dsql:DbConnect, wrong region) surfaces a useful
-# message — under `set -e` the bare command-substitution would otherwise abort
+# message -- under `set -e` the bare command-substitution would otherwise abort
 # the script before the empty-token guard below could fire.
 echo "Generating IAM auth token for $ENDPOINT..." >&2
 
@@ -226,7 +226,7 @@ if [[ "$SKIP_CERT_VERIFY" == "true" ]]; then
   export PGSSLMODE=require
 else
   export PGSSLMODE=verify-full
-  # libpq defaults to ~/.postgresql/root.crt — fall back to the OS trust store
+  # libpq defaults to ~/.postgresql/root.crt -- fall back to the OS trust store
   # when the user has not provisioned a personal CA bundle. Honor any caller-
   # supplied PGSSLROOTCERT (e.g., a corporate bundle) by not overwriting it.
   : "${PGSSLROOTCERT:=system}"
@@ -247,7 +247,7 @@ export PGAPPNAME
 
 # Sanitize --command input: reject multi-statement chaining and comment injection.
 # psql -c runs a single command; allow at most ONE trailing semicolon.
-# This is a defense-in-depth measure — callers should also validate inputs.
+# This is a defense-in-depth measure -- callers should also validate inputs.
 # Limitations: does not handle escaped quotes (\' or ''), dollar-quoted strings
 # ($$...$$), or all edge cases. For complex queries, use --script PATH instead
 # to pipe a multi-statement file via stdin without the semicolon guard.
@@ -263,7 +263,7 @@ if [[ -n "$COMMAND" ]]; then
     echo "Error: --command is whitespace-only." >&2
     exit 1
   fi
-  # Reject newlines — sed processes the strip-quotes pipeline line by line, so a
+  # Reject newlines -- sed processes the strip-quotes pipeline line by line, so a
   # newline-spanning literal would defeat the multi-statement detector. Use
   # --script for SQL that needs to span multiple lines.
   if [[ "$COMMAND" == *$'\n'* ]]; then
@@ -305,7 +305,7 @@ if [[ -n "$COMMAND" ]]; then
     -d postgres \
     -c "$COMMAND"
 elif [[ -n "$SCRIPT_FILE" ]]; then
-  # Multi-statement file mode — no semicolon guard. Caller is responsible for
+  # Multi-statement file mode -- no semicolon guard. Caller is responsible for
   # the contents of the file; build the SQL with safe_query.build() upstream
   # whenever values come from untrusted input.
   if [[ ! -f "$SCRIPT_FILE" ]]; then

@@ -11,9 +11,9 @@ Check your environment and tell you exactly what's needed to use the AgentCore C
 
 Do NOT use for:
 
-- Creating a new project or getting started → use `agents-get-started`
-- Deploy failures that aren't environment-related (CDK errors, IAM) → use `agents-deploy`
-- Agent runtime errors → use `agents-debug`
+- Creating a new project or getting started -> use `agents-get-started`
+- Deploy failures that aren't environment-related (CDK errors, IAM) -> use `agents-deploy`
+- Agent runtime errors -> use `agents-debug`
 
 ## Input
 
@@ -21,7 +21,7 @@ No arguments required.
 
 ## Process
 
-Run each check and report the result. For anything missing, give the exact fix command — don't just say "install X."
+Run each check and report the result. For anything missing, give the exact fix command -- don't just say "install X."
 
 ### Check 1: AgentCore CLI
 
@@ -33,9 +33,9 @@ agentcore --version
 
 Run `which agentcore` to see what's installed:
 
-- Path in `/usr/local/lib/python*/site-packages/` or similar Python location → the old Starter Toolkit is shadowing the new CLI. Uninstall it (see below).
-- Path in a Node.js-based location but still errors → the Node.js version may be wrong. Continue to Check 2.
-- No path returned → the CLI isn't installed.
+- Path in `/usr/local/lib/python*/site-packages/` or similar Python location -> the old Starter Toolkit is shadowing the new CLI. Uninstall it (see below).
+- Path in a Node.js-based location but still errors -> the Node.js version may be wrong. Continue to Check 2.
+- No path returned -> the CLI isn't installed.
 
 **If not found:**
 
@@ -132,12 +132,12 @@ aws bedrock list-foundation-models \
 
 If no Claude models appear, or if you see access errors:
 
-1. Go to AWS Console → Amazon Bedrock → Model access
+1. Go to AWS Console -> Amazon Bedrock -> Model access
 2. Click "Manage model access"
 3. Enable "Anthropic Claude" models
-4. Click "Save changes" — access is usually granted within a minute
+4. Click "Save changes" -- access is usually granted within a minute
 
-**Required model for default projects:** The default model is a cross-region inference profile (e.g., `global.anthropic.claude-sonnet-4-5-20250929-v1:0` — the CLI scaffolds `global.` by default). The `global.` prefix routes to any commercial region; geographic prefixes (`us.`, `eu.`, `apac.`) keep inference within that geography. All prefixes require model access enabled in every destination region the profile covers. Check `agentcore.json` after `agentcore create` for the exact model ID used.
+**Required model for default projects:** The default model is a cross-region inference profile (e.g., `global.anthropic.claude-sonnet-4-5-20250929-v1:0` -- the CLI scaffolds `global.` by default). The `global.` prefix routes to any commercial region; geographic prefixes (`us.`, `eu.`, `apac.`) keep inference within that geography. All prefixes require model access enabled in every destination region the profile covers. Check `agentcore.json` after `agentcore create` for the exact model ID used.
 
 ### Check 6: IAM permissions
 
@@ -151,21 +151,21 @@ aws iam simulate-principal-policy \
 
 For deploy to work, you need:
 
-- `iam:CreateRole` — to create execution roles
-- `bedrock:InvokeModel` — to call Bedrock models
-- `ecr:CreateRepository`, `ecr:PutImage` — for container builds
-- `codebuild:StartBuild` — for remote builds
+- `iam:CreateRole` -- to create execution roles
+- `bedrock:InvokeModel` -- to call Bedrock models
+- `ecr:CreateRepository`, `ecr:PutImage` -- for container builds
+- `codebuild:StartBuild` -- for remote builds
 
 If permissions are missing, ask your AWS admin to attach `BedrockAgentCoreFullAccess` and `AmazonBedrockFullAccess` managed policies to your IAM user or role.
 
-### Check 7: Docker (optional — only needed for Container builds)
+### Check 7: Docker (optional -- only needed for Container builds)
 
 ```bash
 docker --version
 docker info 2>&1 | head -5
 ```
 
-Docker is only required if you're using `--build Container`. CodeZip builds (the default) don't need Docker locally — they use AWS CodeBuild.
+Docker is only required if you're using `--build Container`. CodeZip builds (the default) don't need Docker locally -- they use AWS CodeBuild.
 
 **If Docker not running:**
 
@@ -183,13 +183,13 @@ Report results as a clear checklist:
 ```
 AgentCore Environment Check
 
-✅ AgentCore CLI: 0.9.1
-✅ Node.js: v20.11.0
-✅ uv: 0.4.18
-✅ AWS credentials: configured (account: 123456789012, region: us-east-1)
-✅ Bedrock model access: Claude models enabled
-⚠️  IAM permissions: missing iam:CreateRole — deploy will fail
-❌ Docker: not running — needed for Container builds (optional)
+[YES] AgentCore CLI: 0.9.1
+[YES] Node.js: v20.11.0
+[YES] uv: 0.4.18
+[YES] AWS credentials: configured (account: 123456789012, region: us-east-1)
+[YES] Bedrock model access: Claude models enabled
+[WARNING]  IAM permissions: missing iam:CreateRole -- deploy will fail
+[NO] Docker: not running -- needed for Container builds (optional)
 
 Issues to fix:
 1. IAM: Ask your admin to attach BedrockAgentCoreFullAccess to your user

@@ -1,8 +1,8 @@
-# Aurora PostgreSQL — Query Load Analysis & Explain Plan Review
+# Aurora PostgreSQL -- Query Load Analysis & Explain Plan Review
 
 ## Purpose
 
-Identify the top queries generating load, run EXPLAIN on them, and flag plan patterns that behave differently after a major version upgrade (e.g., PG 14→15, 15→16, 16→17).
+Identify the top queries generating load, run EXPLAIN on them, and flag plan patterns that behave differently after a major version upgrade (e.g., PG 14->15, 15->16, 16->17).
 
 ## Step 1: Get Top 5 Queries by Load
 
@@ -52,27 +52,27 @@ EXPLAIN (FORMAT JSON) <query with literal values>;
 
 Analyze each EXPLAIN output for these patterns, by target version:
 
-### 🔴 Critical — Behavior Changes That Impact Performance
+### [RED] Critical -- Behavior Changes That Impact Performance
 
 | Pattern in EXPLAIN | Versions Affected | Why It Matters | Action |
 |---|---|---|---|
-| `Sort Method: external merge` (disk sort) | PG 15+ | PG 15 replaced polyphase merge sort with a balanced k-way merge and improved on-disk sorts exceeding `work_mem`; large sorts may spill differently. Per-operation hash memory accounting via `hash_mem_multiplier` arrived in PG 13; PG 15 only raised its default from 1.0 to 2.0, so hash-heavy plans get ~2x `work_mem` after a 14→15 upgrade. | Tune `work_mem` and `hash_mem_multiplier`. Test on snapshot cluster. |
+| `Sort Method: external merge` (disk sort) | PG 15+ | PG 15 replaced polyphase merge sort with a balanced k-way merge and improved on-disk sorts exceeding `work_mem`; large sorts may spill differently. Per-operation hash memory accounting via `hash_mem_multiplier` arrived in PG 13; PG 15 only raised its default from 1.0 to 2.0, so hash-heavy plans get ~2x `work_mem` after a 14->15 upgrade. | Tune `work_mem` and `hash_mem_multiplier`. Test on snapshot cluster. |
 | `HashAggregate` with `Batches > 1` (spilling) | PG 15+ | Hash aggregation disk spill improved but changed; memory accounting differs. | Monitor `temp_blks_written`. Tune `work_mem` or `hash_mem_multiplier`. |
 | Nested Loop with high `actual rows` on inner | PG 14+ | PG 14 introduced `enable_memoize`; optimizer may add Memoize nodes changing plan shape. | Usually beneficial. If regression, set `enable_memoize=off` per query. |
-| `JIT` compilation on short queries | PG 12+ (any upgrade) | JIT (LLVM expression/tuple compilation) arrived in PG 11, enabled by default since PG 12. On short/OLTP queries the planner can still trigger JIT when estimated cost exceeds `jit_above_cost`, adding compilation latency. Not PG14-specific — verify JIT thresholds on any upgrade from PG 12 onward. | Adjust `jit_above_cost`, `jit_inline_above_cost`, `jit_optimize_above_cost` or disable JIT for OLTP. |
+| `JIT` compilation on short queries | PG 12+ (any upgrade) | JIT (LLVM expression/tuple compilation) arrived in PG 11, enabled by default since PG 12. On short/OLTP queries the planner can still trigger JIT when estimated cost exceeds `jit_above_cost`, adding compilation latency. Not PG14-specific -- verify JIT thresholds on any upgrade from PG 12 onward. | Adjust `jit_above_cost`, `jit_inline_above_cost`, `jit_optimize_above_cost` or disable JIT for OLTP. |
 
-### 🟡 Warning — Optimizer Behavior Differences
+### [YELLOW] Warning -- Optimizer Behavior Differences
 
 | Pattern in EXPLAIN | Versions Affected | Why It Matters | Action |
 |---|---|---|---|
-| `Parallel Seq Scan` or `Parallel Hash Join` | PG 14→15→16 | Parallel thresholds and costing refined each version; plans may gain or lose parallelism. | Compare `max_parallel_workers_per_gather`. Test on snapshot. |
+| `Parallel Seq Scan` or `Parallel Hash Join` | PG 14->15->16 | Parallel thresholds and costing refined each version; plans may gain or lose parallelism. | Compare `max_parallel_workers_per_gather`. Test on snapshot. |
 | `Index Scan` vs `Bitmap Index Scan` choice | All major upgrades | Cost model updates may flip index scan strategy. | Compare via EXPLAIN on test cluster. Usually fine. |
 | `Incremental Sort` | PG 13+ | When upgrading from PG 12 or earlier, incremental sort may change plans for ORDER BY with partial indexes. | Usually beneficial. Monitor. |
 | `Merge Join` on large tables | PG 16+ | PG 16 improved merge join costing; may choose merge join where hash join ran before. | Benchmark on test cluster. |
 | Large `Rows Removed by Filter` (bad estimates) | All versions | A major upgrade does NOT carry over optimizer statistics (`pg_upgrade` does not transfer `pg_statistic`), so the planner has none until you run `ANALYZE`. Skipping this can cause severe plan regressions and slow queries. | Run `ANALYZE` on all tables post-upgrade. |
-| `SubPlan` (correlated scalar subquery) | Aurora PG 16.8+ (NOT core PG16) | Aurora can transform a single-aggregate correlated subquery in SELECT/WHERE into an outer join, and/or add a Memoize subquery cache. Aurora-specific, from Aurora PostgreSQL 16.8 (Babelfish 4.2.0), controlled by `apg_enable_correlated_scalar_transform` (default OFF) and `apg_enable_subquery_cache` (default OFF). Opt-in; do NOT activate automatically on a PG15→16 upgrade. | Optional: test on a snapshot, then set ON in the parameter group if beneficial. Validate per AWS-documented limitations (aggregate-only, plain equality correlation, no GROUP BY/HAVING). See [Aurora correlated subquery optimization](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/apg-correlated-subquery.html). |
+| `SubPlan` (correlated scalar subquery) | Aurora PG 16.8+ (NOT core PG16) | Aurora can transform a single-aggregate correlated subquery in SELECT/WHERE into an outer join, and/or add a Memoize subquery cache. Aurora-specific, from Aurora PostgreSQL 16.8 (Babelfish 4.2.0), controlled by `apg_enable_correlated_scalar_transform` (default OFF) and `apg_enable_subquery_cache` (default OFF). Opt-in; do NOT activate automatically on a PG15->16 upgrade. | Optional: test on a snapshot, then set ON in the parameter group if beneficial. Validate per AWS-documented limitations (aggregate-only, plain equality correlation, no GROUP BY/HAVING). See [Aurora correlated subquery optimization](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/apg-correlated-subquery.html). |
 
-### 🟢 Clean — No Upgrade Impact
+### [GREEN] Clean -- No Upgrade Impact
 
 | Pattern | Notes |
 |---|---|
@@ -102,7 +102,7 @@ For each flagged query, provide:
 ### PG 15
 
 - Improved sort (balanced k-way merge replaces polyphase merge; leaner in-memory sorts)
-- `hash_mem_multiplier` default raised 1.0 → 2.0
+- `hash_mem_multiplier` default raised 1.0 -> 2.0
 - `MERGE` command (SQL-standard merge)
 - `pg_stat_statements` tracks JIT stats
 

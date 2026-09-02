@@ -1,4 +1,4 @@
-# AgentCore Runtime — Container Build Procedure
+# AgentCore Runtime -- Container Build Procedure
 
 ## Table of Contents
 
@@ -11,12 +11,12 @@
 
 Deterministic procedure for building an ARM64 container image that meets
 AgentCore Runtime's container contract and pushing it to ECR. Each protocol
-has a different container contract — you MUST select the protocol before
+has a different container contract -- you MUST select the protocol before
 building.
 
 ## Parameters
 
-- **protocol** (required): `http` | `mcp` | `a2a` | `ag-ui` — see [runtime reference](agentcore-runtime.md) for selection guide
+- **protocol** (required): `http` | `mcp` | `a2a` | `ag-ui` -- see [runtime reference](agentcore-runtime.md) for selection guide
 - **framework** (optional): `fastapi` | `express` | `flask` | `custom`
 - **ecr_repo** (required): ECR repository URI
 
@@ -52,13 +52,13 @@ building.
 | A2A | `/.well-known/agent.json` | 8080 | Agent Card discovery, task management |
 | AG-UI | `/ping` | 8080 | SSE event stream via `/invocations`, health via `/ping` |
 
-- You MUST NOT mix protocol contracts — an HTTP health check won't work for MCP
+- You MUST NOT mix protocol contracts -- an HTTP health check won't work for MCP
 
 ### 2. Write Dockerfile
 
 **Constraints:**
 
-- You MUST use ARM64 base image — AgentCore runs on Graviton. x86 images will fail to start.
+- You MUST use ARM64 base image -- AgentCore runs on Graviton. x86 images will fail to start.
 - You MUST use multi-stage build to minimize image size
 - You MUST expose the correct port (default 8080)
 - You SHOULD use Python 3.12+ slim or Node.js 20+ slim as base
@@ -144,7 +144,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-# Agent Card discovery endpoint — REQUIRED for A2A protocol
+# Agent Card discovery endpoint -- REQUIRED for A2A protocol
 @app.get("/.well-known/agent.json")
 async def agent_card():
     return {
@@ -186,7 +186,7 @@ async def invocations(request: dict):
 
 > **Note:** This minimal example omits SIGTERM handling for brevity. You MUST add graceful shutdown handling (see the HTTP example above) before deploying to AgentCore.
 
-Refer to the latest AWS documentation on AgentCore A2A protocol and AG-UI protocol for current full specifications — these protocols are evolving and the full contract may have changed.
+Refer to the latest AWS documentation on AgentCore A2A protocol and AG-UI protocol for current full specifications -- these protocols are evolving and the full contract may have changed.
 
 ### 4. Build and Push to ECR
 
@@ -227,48 +227,48 @@ Refer to the latest AWS documentation on AgentCore A2A protocol and AG-UI protoc
   curl http://localhost:8080/<health-endpoint>
   ```
 
-- If health check fails locally, it will fail on AgentCore — fix before deploying
+- If health check fails locally, it will fail on AgentCore -- fix before deploying
 
 ## Security Considerations
 
 **Authentication and network exposure:**
 
-- AgentCore authenticates requests at the platform layer before they reach your container — the code examples omit auth because AgentCore handles it
+- AgentCore authenticates requests at the platform layer before they reach your container -- the code examples omit auth because AgentCore handles it
 - You MUST NOT expose this container directly to the internet without adding your own authentication layer
 - For local testing, bind to `127.0.0.1` instead of `0.0.0.0` to prevent network exposure: `uvicorn main:app --host 127.0.0.1 --port 8080`
-- The Dockerfile uses `--host 0.0.0.0` because AgentCore routes traffic to the container internally — do NOT expose port 8080 directly
+- The Dockerfile uses `--host 0.0.0.0` because AgentCore routes traffic to the container internally -- do NOT expose port 8080 directly
 
 **Transport security:**
 
-- AgentCore terminates TLS at the load balancer — your container receives plaintext HTTP on port 8080 over the internal network
-- You MUST NOT expose port 8080 directly to the internet — all external traffic must route through AgentCore
+- AgentCore terminates TLS at the load balancer -- your container receives plaintext HTTP on port 8080 over the internal network
+- You MUST NOT expose port 8080 directly to the internet -- all external traffic must route through AgentCore
 - If deploying outside AgentCore, you MUST configure TLS (use ACM for certificate management)
 
 **Input validation:**
 
-- You MUST validate and sanitize all input before processing — use Pydantic models or equivalent schema validation
+- You MUST validate and sanitize all input before processing -- use Pydantic models or equivalent schema validation
 - You MUST set maximum request body size limits to prevent denial-of-service
 - You MUST handle malformed input gracefully with appropriate error responses
 - You SHOULD include security headers in HTTP responses: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Cache-Control: no-store`
 
 **Container image security:**
 
-- You MUST NOT bake secrets, API keys, or credentials into the Docker image — use Secrets Manager at runtime for secrets; use environment variables only for non-sensitive configuration (RUNTIME_ID, AWS_REGION)
-- You MUST run the container as a non-root user (the example Dockerfile uses `USER appuser` — do not remove this)
+- You MUST NOT bake secrets, API keys, or credentials into the Docker image -- use Secrets Manager at runtime for secrets; use environment variables only for non-sensitive configuration (RUNTIME_ID, AWS_REGION)
+- You MUST run the container as a non-root user (the example Dockerfile uses `USER appuser` -- do not remove this)
 - You MUST use multi-stage builds to exclude build-time dependencies (compilers, pip cache, dev packages) from the final image
 - You SHOULD pin base image versions (e.g., `python:3.12.4-slim` not `python:3.12-slim`) to avoid supply chain attacks from tag mutation
 - You SHOULD enable ECR image scanning: `aws ecr put-image-scanning-configuration --repository-name <repo> --image-scanning-configuration scanOnPush=true`
 
 **ECR access control:**
 
-- Scope ECR push permissions to the specific repository ARN — avoid `ecr:*` on `Resource: "*"`
-- The ECR login token from `get-login-password` is ephemeral (12 hours) — do not store or share it
+- Scope ECR push permissions to the specific repository ARN -- avoid `ecr:*` on `Resource: "*"`
+- The ECR login token from `get-login-password` is ephemeral (12 hours) -- do not store or share it
 - You MUST NOT log the ECR login token in agent output
 
 **Runtime security:**
 
-- AgentCore injects credentials via environment variables (AWS_ACCESS_KEY_ID, etc.) — do not override these
-- Log to stdout/stderr only — AgentCore routes to CloudWatch with encryption
+- AgentCore injects credentials via environment variables (AWS_ACCESS_KEY_ID, etc.) -- do not override these
+- Log to stdout/stderr only -- AgentCore routes to CloudWatch with encryption
 - You MUST NOT log request or response bodies that may contain PII or sensitive model inputs/outputs
 - Handle SIGTERM for graceful shutdown to avoid data loss during scaling events
 - Enable CloudTrail logging for ECR API calls to audit image push/pull activity

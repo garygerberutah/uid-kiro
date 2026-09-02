@@ -69,7 +69,7 @@ def validate_skill_frontmatter(skill_md: Path) -> None:
             fm[key.strip()] = value
             current_key = key.strip()
         elif current_key and line.startswith("  "):
-            # Continuation line — append to current key
+            # Continuation line -- append to current key
             fm[current_key] = (fm[current_key] + " " + line.strip()).strip()
 
     name = fm.get("name")

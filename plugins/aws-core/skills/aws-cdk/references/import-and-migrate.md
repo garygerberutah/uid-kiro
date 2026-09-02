@@ -46,7 +46,7 @@ const vpc = ec2.Vpc.fromLookup(this, 'ImportedVpc', { vpcId: '$VPC_ID' });
 
 Constraints:
 
-- `from*` references are **read-only** — CDK MUST NOT attempt to modify or
+- `from*` references are **read-only** -- CDK MUST NOT attempt to modify or
   delete these resources.
 - `fromLookup` methods require the `env` property (account and region) to be
   set on the stack. They perform API calls at synth time and cache results in
@@ -82,7 +82,7 @@ Workflow:
 
 1. Add the construct to your CDK code matching the existing resource's properties
 2. Run `cdk import $STACK_NAME` (interactive) or with `--resource-mapping` (CI)
-3. CloudFormation executes an import change set — no resource is created
+3. CloudFormation executes an import change set -- no resource is created
 
 Constraints:
 
@@ -104,10 +104,10 @@ The CLI matches resources in the synthesized template against existing unmanaged
 
 **Constraints:**
 
-- You MUST set explicit physical names on resources you want to import — auto-generated names cannot be matched
+- You MUST set explicit physical names on resources you want to import -- auto-generated names cannot be matched
 - The resource MUST be unmanaged (not already part of another CloudFormation stack)
 - Not every resource type supports CloudFormation import
-- Supports mixed operations — you can add new resources AND import existing ones in the same deploy
+- Supports mixed operations -- you can add new resources AND import existing ones in the same deploy
 
 **When to prefer over `cdk import`:**
 
@@ -145,13 +145,13 @@ cdk migrate --from-scan --stack-name $STACK_NAME
 - Output is **L1 constructs only** (`Cfn*` classes). Higher-level L2/L3
   constructs are NOT generated.
 - Only a **single stack** can be migrated per invocation.
-- **Assets are not migrated** — inline code, S3 references, and Docker images
+- **Assets are not migrated** -- inline code, S3 references, and Docker images
   MUST be handled manually after migration.
 
 ### First Deploy After Migration
 
 A `migrate.json` file is generated alongside the CDK code. This file is
-REQUIRED for the first deployment after migration — it tells CloudFormation to
+REQUIRED for the first deployment after migration -- it tells CloudFormation to
 import the existing resources rather than creating new ones.
 
 ```bash
@@ -175,10 +175,10 @@ After migration, incrementally refactor L1 constructs to L2/L3 constructs:
 
 After importing or migrating resources, the following steps MUST be performed:
 
-1. **Verify drift** — Run `cdk drift $STACK_NAME` to confirm the imported
+1. **Verify drift** -- Run `cdk drift $STACK_NAME` to confirm the imported
    resource state matches the CDK definition.
-2. **Protect logical IDs** — Logical ID changes after import will cause
+2. **Protect logical IDs** -- Logical ID changes after import will cause
    resource replacement. Lock logical IDs with unit tests or use
    `overrideLogicalId()` where necessary.
-3. **Run `cdk diff`** — Confirm no unexpected changes are pending before the
+3. **Run `cdk diff`** -- Confirm no unexpected changes are pending before the
    next deployment.

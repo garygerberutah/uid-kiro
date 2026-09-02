@@ -83,7 +83,7 @@ Works from both standalone accounts and delegated administrator accounts.
 
    Configured: autoEnable is true.
 
-3. For quick membership signal, `describe-organization-configuration` confirms auto-enable for new accounts. Full member enumeration requires `list-members` pagination — expensive for large organizations.
+3. For quick membership signal, `describe-organization-configuration` confirms auto-enable for new accounts. Full member enumeration requires `list-members` pagination -- expensive for large organizations.
 
 4. (ONLY if user explicitly requests per-account detail):
 
@@ -117,10 +117,10 @@ Works from both standalone accounts and delegated administrator accounts.
 
 | Error | Resolution |
 |-------|------------|
-| AccessDeniedException on list-graphs | Detective not enabled — report as NOT_CONFIGURED |
-| ValidationException on list-members | Invalid graph ARN — re-fetch from list-graphs |
+| AccessDeniedException on list-graphs | Detective not enabled -- report as NOT_CONFIGURED |
+| ValidationException on list-members | Invalid graph ARN -- re-fetch from list-graphs |
 | Empty list-graphs response | Detective not enabled in region |
-| AccessDeniedException on describe-organization-configuration | Not an org admin — switch to Workflow A |
+| AccessDeniedException on describe-organization-configuration | Not an org admin -- switch to Workflow A |
 
 ## Output Sensitivity
 

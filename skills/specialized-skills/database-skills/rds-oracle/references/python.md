@@ -1,19 +1,19 @@
-# RDS for Oracle — Python
+# RDS for Oracle -- Python
 
-Python driver: **python-oracledb** (≥ 6.0). `cx_Oracle` is legacy — migrate.
+Python driver: **python-oracledb** (>= 6.0). `cx_Oracle` is legacy -- migrate.
 
 ```bash
 pip install oracledb
 ```
 
-## Thin mode — default, no Oracle Client needed
+## Thin mode -- default, no Oracle Client needed
 
 ```python
 import oracledb
 
 conn = oracledb.connect(
     user="dbadmin",
-    password="<from-secrets-manager>",  # fetch at runtime; see connection-auth.md section (b) — via AWS Secrets Manager
+    password="<from-secrets-manager>",  # fetch at runtime; see connection-auth.md section (b) -- via AWS Secrets Manager
     dsn="mydb.xxxxxxxxxxxx.us-east-1.rds.amazonaws.com:1521/ORCL"
 )
 cursor = conn.cursor()
@@ -107,7 +107,7 @@ def create_pool_from_secret(secret_name: str, region: str = "us-east-1"):
 | Medium | 2 | 10 | 1 |
 | High | 5 | 20 | 2 |
 
-`max` ≤ RDS `max_connections` / number of app instances.
+`max` <= RDS `max_connections` / number of app instances.
 
 ## SQLAlchemy
 
@@ -147,7 +147,7 @@ def handler(event, context):
         return {"result": str(cur.fetchone())}
 ```
 
-Total Oracle connections = concurrent Lambda instances × `max` (typically 1-2 per instance). Keep `max` small to avoid exhausting RDS `max_connections`.
+Total Oracle connections = concurrent Lambda instances x `max` (typically 1-2 per instance). Keep `max` small to avoid exhausting RDS `max_connections`.
 
 ## SSL/TLS thin mode
 
@@ -175,18 +175,18 @@ try:
 except oracledb.DatabaseError as e:
     error, = e.args
     if error.code == 12170:
-        print("TNS connect timeout — check security groups and network path")
+        print("TNS connect timeout -- check security groups and network path")
     elif error.code == 1017:
-        print("Invalid username/password — check Secrets Manager rotation")
+        print("Invalid username/password -- check Secrets Manager rotation")
     elif error.code == 12541:
-        print("No listener — check RDS endpoint and port")
+        print("No listener -- check RDS endpoint and port")
     elif error.code == 12514:
-        print("Service name mismatch — check SERVICE_NAME in your DSN")
+        print("Service name mismatch -- check SERVICE_NAME in your DSN")
     else:
         print(f"Oracle error {error.code}: {error.message}")
 ```
 
 ## Common driver errors (thick mode only)
 
-- **`DPI-1047`** — "Cannot locate a 64-bit Oracle Client library" → switch to thin mode (default in 6.0+) or fix `lib_dir`.
-- **`DPY-6005`** — thin mode incompatibility → some operation isn't supported in thin mode; switch to thick for just that code path if truly needed, otherwise find the thin-compatible equivalent.
+- **`DPI-1047`** -- "Cannot locate a 64-bit Oracle Client library" -> switch to thin mode (default in 6.0+) or fix `lib_dir`.
+- **`DPY-6005`** -- thin mode incompatibility -> some operation isn't supported in thin mode; switch to thick for just that code path if truly needed, otherwise find the thin-compatible equivalent.

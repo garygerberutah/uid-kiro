@@ -1,4 +1,4 @@
-# RDS for Db2 — Operations Reference
+# RDS for Db2 -- Operations Reference
 
 ---
 
@@ -115,7 +115,7 @@ RDS for Db2 supports loading data directly from S3 using `DB2REMOTE` identifiers
 ### Create storage access alias
 
 ```sql
--- On RDS for Db2 (IAM role handles auth — no credentials needed):
+-- On RDS for Db2 (IAM role handles auth -- no credentials needed):
 db2 "CATALOG STORAGE ACCESS ALIAS myS3 VENDOR S3 
      SERVER https://s3.<region>.amazonaws.com 
      CONTAINER <bucket-name> 
@@ -147,7 +147,7 @@ aws rds modify-db-instance \
   --monitoring-role-arn arn:aws:iam::<account>:role/rds-monitoring-role
 ```
 
-Enhanced monitoring data goes to CloudWatch Logs group `RDSOSMetrics`. Metrics include CPU, memory, disk I/O, network at OS level (1–60 second granularity).
+Enhanced monitoring data goes to CloudWatch Logs group `RDSOSMetrics`. Metrics include CPU, memory, disk I/O, network at OS level (1-60 second granularity).
 
 ### Enable db2diag logs to CloudWatch
 
@@ -193,7 +193,7 @@ fields @timestamp, cpuUtilization.total, memory.free
 | limit 100
 ```
 
-Or use the RDS console → Monitoring tab → Enhanced monitoring for a built-in view.
+Or use the RDS console -> Monitoring tab -> Enhanced monitoring for a built-in view.
 
 ### Run basic monitoring from Db2 client
 

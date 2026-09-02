@@ -49,7 +49,7 @@ Before referring to any listed errors, refer to the complete [DSQL troubleshooti
 
 **Solution**:
 
-- Use psql ≥14 (or a TLS library that supports SNI — required by DSQL's shared endpoint)
+- Use psql >=14 (or a TLS library that supports SNI -- required by DSQL's shared endpoint)
 - Set `sslmode=verify-full` and point `sslrootcert` at a CA bundle that includes Amazon Root CAs (`sslrootcert=system` works on most OSes; libpq otherwise looks at `~/.postgresql/root.crt`)
 - Use native TLS libraries (not OpenSSL 1.0.x)
 
@@ -60,7 +60,7 @@ Before referring to any listed errors, refer to the complete [DSQL troubleshooti
 **Solution**: tell libpq to use the OS trust store instead. Either pass `sslrootcert=system` in the connection string, or set `PGSSLROOTCERT=system` in the environment. The bundled `scripts/psql-connect.sh` does this by default; only override `PGSSLROOTCERT` if you have a corporate CA bundle to point at.
 
 ```bash
-export PGSSLROOTCERT=system            # libpq ≥16 supports `system` directly
+export PGSSLROOTCERT=system            # libpq >=16 supports `system` directly
 psql "host=$ENDPOINT sslmode=verify-full sslrootcert=system" ...
 ```
 
@@ -142,18 +142,18 @@ CREATE INDEX ASYNC idx_name ON table(column);
 ### Error: OCC / serialization failure ("could not serialize access" / "concurrent update")
 
 **Cause:** Two concurrent transactions wrote to overlapping rows. DSQL uses optimistic concurrency
-control — the loser of the race is aborted at COMMIT time and MUST be retried.
+control -- the loser of the race is aborted at COMMIT time and MUST be retried.
 
 **Solution:**
 
-1. **Retry with backoff.** Wrap writes in a retry loop (exponential, jittered, capped at 3–5 attempts). Most OCC errors clear on the first retry once the conflicting transaction commits.
+1. **Retry with backoff.** Wrap writes in a retry loop (exponential, jittered, capped at 3-5 attempts). Most OCC errors clear on the first retry once the conflicting transaction commits.
 2. **Check for hot keys.** If retries persist beyond a couple of attempts, the workload likely concentrates writes on a small set of keys. Diagnostics:
    - Run the query with `EXPLAIN ANALYZE` (Workflow 8) and inspect node-level row counts.
    - Cross-reference against the [scaling-guide.md "Hot Keys"](auth/scaling-guide.md) section.
 3. **Reduce write fan-in.** Common fixes: introduce per-shard counters instead of a global one, batch writes by tenant rather than mixing tenants in one transaction, partition heavy-write tables by a high-cardinality dimension.
 
 If the workload genuinely requires strict serial writes on the same key, accept the OCC retry cost
-or move that subset to a different consistency primitive — DSQL's contract is optimistic.
+or move that subset to a different consistency primitive -- DSQL's contract is optimistic.
 
 ## Protocol Compatibility
 

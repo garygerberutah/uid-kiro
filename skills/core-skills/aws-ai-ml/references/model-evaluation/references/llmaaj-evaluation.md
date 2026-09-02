@@ -27,7 +27,7 @@ If you know this already, skip this step. If not, ask the user:
 For this step, you need: **to understand what the data looks like to inform metric recommendations.**
 If you already know what the data looks like, skip this step. If not, ask the user:
 
-> "Can you tell me a bit about your evaluation dataset — what format is it in, and what do the input/output fields look like?"
+> "Can you tell me a bit about your evaluation dataset -- what format is it in, and what do the input/output fields look like?"
 
 If the user isn't sure, offer to peek at the data:
 
@@ -38,7 +38,7 @@ If you fail to get a sample, move on and rely on the user's description.
 
 ### Step 4: Validate dataset format
 
-If the evaluation dataset was already validated via the **dataset-evaluation** reference — either earlier in this conversation, or in a previous session (as recorded in plan.md) — skip this step.
+If the evaluation dataset was already validated via the **dataset-evaluation** reference -- either earlier in this conversation, or in a previous session (as recorded in plan.md) -- skip this step.
 
 Otherwise, load the **dataset-evaluation** reference to validate it. If it fails, offer to load the **dataset-transformation** reference to convert it. Do not proceed until the dataset is valid.
 
@@ -46,7 +46,7 @@ Otherwise, load the **dataset-evaluation** reference to validate it. If it fails
 
 After dataset validation, warn the user about the Bedrock evaluation dataset size limit:
 
-> "One thing to note — Bedrock LLM-as-Judge evaluation supports a maximum of 1,000 rows per job. If your dataset is larger than that, the job will fail. You may need to trim it before running the evaluation."
+> "One thing to note -- Bedrock LLM-as-Judge evaluation supports a maximum of 1,000 rows per job. If your dataset is larger than that, the job will fail. You may need to trim it before running the evaluation."
 
 ### Step 6: Check for custom metrics
 
@@ -54,12 +54,12 @@ For this step, you need: **whether the user has predefined custom metrics.**
 
 > "Do you have predefined custom metrics you'd like to use? If so, they must follow the Bedrock custom metrics format: https://docs.aws.amazon.com/bedrock/latest/userguide/model-evaluation-custom-metrics-prompt-formats.html
 >
-> If not, no worries — I can recommend built-in metrics for your task."
+> If not, no worries -- I can recommend built-in metrics for your task."
 
-⏸ Wait for user.
+[PAUSE] Wait for user.
 
-- If the user has custom metrics → Read `references/llmaaj-custom-evaluation.md` and follow its instructions to collect and validate the metrics JSON.
-- If the user does not have custom metrics → Move to Step 7.
+- If the user has custom metrics -> Read `references/llmaaj-custom-evaluation.md` and follow its instructions to collect and validate the metrics JSON.
+- If the user does not have custom metrics -> Move to Step 7.
 
 ### Step 7: Select built-in metrics
 
@@ -87,7 +87,7 @@ If you already know from context (e.g., the user said "compare my model to the b
 >
 > Which would you prefer?"
 
-⏸ Wait for user.
+[PAUSE] Wait for user.
 
 ### Step 9: Resolve Model Package ARN
 
@@ -118,7 +118,7 @@ For this step, you need: **the Model Package ARN of the fine-tuned model.**
 
 **This step only applies if the evaluation scope includes the base model (option 2 or 3 from Step 8).** If the user chose fine-tuned only, skip to Step 11.
 
-For **comparison mode** (option 3): the base model is resolved automatically from the fine-tuned model's lineage — no additional input needed.
+For **comparison mode** (option 3): the base model is resolved automatically from the fine-tuned model's lineage -- no additional input needed.
 
 For **base model only** (option 2): you need a JumpStart model ID (e.g., `meta-textgeneration-llama-3-2-1b-instruct`). This is a string identifier, not an ARN. Check if you already know it from conversation context (e.g., the user mentioned which base model they used for fine-tuning). If not, ask:
 
@@ -129,7 +129,7 @@ For **base model only** (option 2): you need a JumpStart model ID (e.g., `meta-t
 ### Step 11: Select judge model
 
 For this step, you need: **which judge model to use for evaluation.**
-This step always runs — both built-in and custom metrics require a judge model.
+This step always runs -- both built-in and custom metrics require a judge model.
 
 Read `references/supported-judge-models.md` for the canonical list, selection guidance, and validation steps.
 
@@ -182,13 +182,13 @@ Perform this step quietly. The user does not need to know about this. This is to
 
 ### Step 16: Confirm configuration
 
-Summarize everything and ask for approval — even if the user has already answered each question individually. This is a final check, not a re-ask. The purpose is to confirm the complete picture before any code is generated.
+Summarize everything and ask for approval -- even if the user has already answered each question individually. This is a final check, not a re-ask. The purpose is to confirm the complete picture before any code is generated.
 
 > "Here's the evaluation setup:
 >
 > - Task: [task]
 > - Dataset: [path]
-> - Custom metrics: [Yes — N metrics / No]
+> - Custom metrics: [Yes -- N metrics / No]
 > - Built-in metrics: [list, or None]
 > - Judge: [model]
 > - Model: [Model Package ARN or JumpStart model ID]
@@ -200,7 +200,7 @@ Summarize everything and ask for approval — even if the user has already answe
 >
 > Does this look right?"
 
-⏸ Wait for user approval.
+[PAUSE] Wait for user approval.
 
 Once the user approves the configuration, continue to Step 17 before generating any code.
 
@@ -218,7 +218,7 @@ Before generating the notebook, present the following agreement language:
 >
 > Do you acknowledge and agree to proceed?
 
-⏸ **Hard stop.** Wait for the user to explicitly confirm. Acceptable responses include "yes", "I agree", "proceed", "ok", or similar affirmative statements. If the user asks questions about the terms, answer them, then re-ask for confirmation. Do NOT generate the notebook until the user has confirmed.
+[PAUSE] **Hard stop.** Wait for the user to explicitly confirm. Acceptable responses include "yes", "I agree", "proceed", "ok", or similar affirmative statements. If the user asks questions about the terms, answer them, then re-ask for confirmation. Do NOT generate the notebook until the user has confirmed.
 
 ### Step 18: Generate code
 
@@ -226,7 +226,7 @@ Read `../references/code_output_guide.md` for output format rules.
 
 If a project directory already exists (from earlier in the workflow), use it. Otherwise, load the **directory-management** reference to set one up.
 
-Read `code_templates/llmaaj_evaluator.py`, substitute the collected values into the placeholders, and write the cells. The template uses `# Cell N: Label` markers — each marker starts a new notebook cell, with everything between one marker and the next becoming that cell's content. `BUILTIN_METRICS` must be a Python list of strings, e.g. `["Faithfulness", "Correctness"]`. `CUSTOM_METRICS` should be read from `custom_metrics.json` if it was created previously, or set to `None` if no custom metrics are needed.
+Read `code_templates/llmaaj_evaluator.py`, substitute the collected values into the placeholders, and write the cells. The template uses `# Cell N: Label` markers -- each marker starts a new notebook cell, with everything between one marker and the next becoming that cell's content. `BUILTIN_METRICS` must be a Python list of strings, e.g. `["Faithfulness", "Correctness"]`. `CUSTOM_METRICS` should be read from `custom_metrics.json` if it was created previously, or set to `None` if no custom metrics are needed.
 
 ### Step 19: Post-generation
 
@@ -234,10 +234,10 @@ Read `code_templates/llmaaj_evaluator.py`, substitute the collected values into 
 
 ```
 To run:
-1. Cell 1 — configuration and SDK install
-2. Cell 2 — start evaluation
-3. Cell 3 — polls status automatically (~25-60 min)
-4. Cell 4 — show results
+1. Cell 1 -- configuration and SDK install
+2. Cell 2 -- start evaluation
+3. Cell 3 -- polls status automatically (~25-60 min)
+4. Cell 4 -- show results
 
 ```
 
@@ -247,9 +247,9 @@ Evaluation can take hours depending on your dataset. Present the user with optio
 
 > "Would you like me to:
 >
-> 1. Leave it to you — run with `python scripts/[script_name]`
+> 1. Leave it to you -- run with `python scripts/[script_name]`
 > 2. Run it and wait until it's done
-> 3. Start it but don't wait — we can check status later"
+> 3. Start it but don't wait -- we can check status later"
 
 - **Option 1:** Done. Wait for user to come back.
 - **Option 2:** Execute the script as-is. `execution.wait()` polls until complete. Report results.
@@ -259,8 +259,8 @@ Note: `evaluate()` does not accept a `wait` parameter. It always returns immedia
 
 **Checking status:**
 
-- `describe-pipeline-execution --pipeline-execution-arn ARN` → `PipelineExecutionStatus`
-- `list-pipeline-execution-steps --pipeline-execution-arn ARN` → per-step `StepStatus`, `FailureReason`
+- `describe-pipeline-execution --pipeline-execution-arn ARN` -> `PipelineExecutionStatus`
+- `list-pipeline-execution-steps --pipeline-execution-arn ARN` -> per-step `StepStatus`, `FailureReason`
 
 **Showing results after completion:**
 

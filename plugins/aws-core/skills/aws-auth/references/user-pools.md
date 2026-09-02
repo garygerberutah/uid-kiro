@@ -18,7 +18,7 @@ aws cognito-idp create-user-pool \
   --username-attributes email \
   --policies '{"PasswordPolicy":{"MinimumLength":12,"RequireUppercase":true,"RequireLowercase":true,"RequireNumbers":true,"RequireSymbols":true}}'
 
-# Require MFA and enable the TOTP (software token) factor — no SMS/SNS needed for TOTP.
+# Require MFA and enable the TOTP (software token) factor -- no SMS/SNS needed for TOTP.
 aws cognito-idp set-user-pool-mfa-config \
   --user-pool-id <pool-id> \
   --mfa-configuration ON \
@@ -27,10 +27,10 @@ aws cognito-idp set-user-pool-mfa-config \
 
 The example uses a strong default (12+ chars, all character classes, mandatory TOTP MFA). A
 shorter/relaxed password policy or a non-mandatory MFA posture is possible but should be
-treated as a **non-production exception** — for example, in a local/dev-only pool:
+treated as a **non-production exception** -- for example, in a local/dev-only pool:
 
 ```
-# Development-only variant, for local testing — do not use in production.
+# Development-only variant, for local testing -- do not use in production.
 # Same rule: don't pass --mfa-configuration to create-user-pool; relax MFA (OPTIONAL/OFF) via
 # set-user-pool-mfa-config afterward if you need it.
 aws cognito-idp create-user-pool \
@@ -55,7 +55,7 @@ An app client represents one application that talks to the pool. Create one per 
 
 ```
 # Public client (SPA / mobile): NO secret; token revocation + refresh rotation enabled.
-# NOTE: with rotation enabled, do NOT include ALLOW_REFRESH_TOKEN_AUTH — that flow is
+# NOTE: with rotation enabled, do NOT include ALLOW_REFRESH_TOKEN_AUTH -- that flow is
 # incompatible with refresh-token rotation. Refresh via GetTokensFromRefreshToken instead.
 aws cognito-idp create-user-pool-client \
   --user-pool-id <pool-id> \
@@ -67,7 +67,7 @@ aws cognito-idp create-user-pool-client \
 
 # Confidential client (server-side): WITH secret; token revocation + refresh rotation enabled.
 # Set --explicit-auth-flows explicitly so the default set (which includes ALLOW_REFRESH_TOKEN_AUTH)
-# is not picked up — again, that flow conflicts with rotation.
+# is not picked up -- again, that flow conflicts with rotation.
 aws cognito-idp create-user-pool-client \
   --user-pool-id <pool-id> \
   --client-name backend \
@@ -83,7 +83,7 @@ only for confidential clients running on a server you control.
 
 **Refresh-token rotation makes the `ALLOW_REFRESH_TOKEN_AUTH` (`REFRESH_TOKEN_AUTH`) flow
 unavailable at runtime**: an app client with rotation enabled cannot use
-`InitiateAuth`/`AdminInitiateAuth` with `AuthFlow=REFRESH_TOKEN_AUTH` — that call is rejected. So
+`InitiateAuth`/`AdminInitiateAuth` with `AuthFlow=REFRESH_TOKEN_AUTH` -- that call is rejected. So
 omit `ALLOW_REFRESH_TOKEN_AUTH` from `--explicit-auth-flows` when rotation is on (and set the flows
 explicitly on the confidential client so it isn't inherited from the default set), and refresh
 tokens with the `GetTokensFromRefreshToken` API instead.
@@ -94,7 +94,7 @@ the client. Enable `ALLOW_USER_PASSWORD_AUTH` only for migration or server-side 
 ## MFA
 
 - `--mfa-configuration` = `OFF` | `OPTIONAL` | `ON`. Default to `ON` (mandatory) for production
-  pools. `OPTIONAL` (opt-in) or `OFF` are non-production exceptions — mark them clearly as such
+  pools. `OPTIONAL` (opt-in) or `OFF` are non-production exceptions -- mark them clearly as such
   when used. **Set MFA with `set-user-pool-mfa-config`, not `create-user-pool`:**
   `create-user-pool --mfa-configuration ON|OPTIONAL` only succeeds if you also pass
   `--sms-configuration` (an `SmsConfiguration` with an `SnsCallerArn`), otherwise it fails with
@@ -102,7 +102,7 @@ the client. Enable `ALLOW_USER_PASSWORD_AUTH` only for migration or server-side 
   configure it afterward with `set-user-pool-mfa-config`.
 - Software TOTP (authenticator apps) is the recommended second factor; SMS incurs cost and is
   weaker. Enable TOTP with `set-user-pool-mfa-config --software-token-mfa-configuration Enabled=true`
-  — note this call alone only makes TOTP *available*; `--mfa-configuration` (above) is what
+  -- note this call alone only makes TOTP *available*; `--mfa-configuration` (above) is what
   actually requires it.
 - Email OTP as a factor requires a supported feature plan.
 
@@ -112,9 +112,9 @@ the client. Enable `ALLOW_USER_PASSWORD_AUTH` only for migration or server-side 
 |--------|-----|
 | Register a user | `sign-up` (public) or `admin-create-user` (admin) |
 | Confirm sign-up | `confirm-sign-up` with the emailed code, or `admin-confirm-sign-up` |
-| Sign in | `initiate-auth` (SRP or `USER_PASSWORD_AUTH`) → returns tokens or a challenge |
+| Sign in | `initiate-auth` (SRP or `USER_PASSWORD_AUTH`) -> returns tokens or a challenge |
 | Respond to MFA/other challenge | `respond-to-auth-challenge` |
-| Forgot password | `forgot-password` → `confirm-forgot-password` |
+| Forgot password | `forgot-password` -> `confirm-forgot-password` |
 
 Most web/mobile apps should use the **hosted UI / managed login** or the Amplify client library
 instead of calling these APIs directly. See [managed-login-oauth.md](managed-login-oauth.md) and
@@ -125,7 +125,7 @@ instead of calling these APIs directly. See [managed-login-oauth.md](managed-log
 Add custom attributes at creation with a `custom:` prefix (e.g. `custom:tenant_id`). You can also
 add them **after the pool exists** with `aws cognito-idp add-custom-attributes` (up to **50**
 custom attributes total). Once defined, a custom attribute cannot be renamed or deleted, and its
-mutability is fixed — mark mutable attributes explicitly at definition time.
+mutability is fixed -- mark mutable attributes explicitly at definition time.
 
 ## User pool groups
 
@@ -164,5 +164,5 @@ aws cognito-idp admin-add-user-to-group \
 
 ## Authoritative sources
 
-- [Amazon Cognito user pools — Developer Guide](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html)
+- [Amazon Cognito user pools -- Developer Guide](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html)
 - [`aws cognito-idp` CLI reference](https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/)

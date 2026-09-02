@@ -20,9 +20,9 @@ metadata:
 
 ## Overview
 
-Domain expertise for AWS observability across metrics, logs, and traces, covering the full lifecycle: **enabling/onboarding** a service to Application Signals using ADOT (AWS Distro for OpenTelemetry) auto-instrumentation SDKs and ServiceEvents — making the service show up in Application Signals — on EC2, ECS, EKS, and Lambda in Python, Node.js, Java, and .NET.
+Domain expertise for AWS observability across metrics, logs, and traces, covering the full lifecycle: **enabling/onboarding** a service to Application Signals using ADOT (AWS Distro for OpenTelemetry) auto-instrumentation SDKs and ServiceEvents -- making the service show up in Application Signals -- on EC2, ECS, EKS, and Lambda in Python, Node.js, Java, and .NET.
 
-**Works best with** the [AWS MCP server](https://docs.aws.amazon.com/aws-mcp/) — enables running CLI commands, querying CloudWatch, and validating configurations directly. All guidance also works with standard AWS CLI access.
+**Works best with** the [AWS MCP server](https://docs.aws.amazon.com/aws-mcp/) -- enables running CLI commands, querying CloudWatch, and validating configurations directly. All guidance also works with standard AWS CLI access.
 
 **Note:** Reference files contain specific runtime versions, quota values, and feature matrices that may change. When precision matters (e.g., deploying to production, choosing a runtime, or checking a quota), confirm values against current AWS documentation rather than relying solely on the values in these files.
 
@@ -38,30 +38,30 @@ Domain expertise for AWS observability across metrics, logs, and traces, coverin
 | Publishing custom metrics or using EMF | Read [metrics.md](references/metrics.md) |
 | Setting up X-Ray tracing or ADOT | Read [tracing.md](references/tracing.md) |
 | Building dashboards | Read [dashboards.md](references/dashboards.md) |
-| Debugging observability issues | Read [troubleshooting.md](references/troubleshooting.md) — starts with the 5 most common fixes |
-| Debugging canary failures | Read [synthetics.md](references/synthetics.md) — see Common failures table |
+| Debugging observability issues | Read [troubleshooting.md](references/troubleshooting.md) -- starts with the 5 most common fixes |
+| Debugging canary failures | Read [synthetics.md](references/synthetics.md) -- see Common failures table |
 | CloudTrail operational auditing | Read [cloudtrail.md](references/cloudtrail.md) |
 | Setting up Lambda monitoring with CDK | Use [alarm-template.ts](assets/alarm-template.ts) as a starting point |
 | Creating synthetic canaries | Read [synthetics.md](references/synthetics.md) |
 | Configuring ADOT collector | Use [otel-config.yaml](assets/otel-config.yaml) as a starting point |
-| Debugging a running service with breakpoints/snapshots — Dynamic Instrumentation (**modifies live services and capture live data**) | Read [dynamic-instrumentation.md](references/dynamic-instrumentation.md) in full before acting. Confirm with the user before any create/delete, and narrate before significant actions: observation → hypothesis → proposed action → expected result. Diagnosing running-service root cause from source/code inspection. Source inspection alone identifies hypotheses, not confirmed root causes. Keep suspected causes tentative until runtime evidence confirms them. |
+| Debugging a running service with breakpoints/snapshots -- Dynamic Instrumentation (**modifies live services and capture live data**) | Read [dynamic-instrumentation.md](references/dynamic-instrumentation.md) in full before acting. Confirm with the user before any create/delete, and narrate before significant actions: observation -> hypothesis -> proposed action -> expected result. Diagnosing running-service root cause from source/code inspection. Source inspection alone identifies hypotheses, not confirmed root causes. Keep suspected causes tentative until runtime evidence confirms them. |
 | Spans multiple areas | Read the most specific reference first, then consult others as needed |
 
 ## Files
 
 | File | Content |
 |------|---------|
-| [application-signals-onboarding.md](references/application-signals-onboarding.md) | Enable Application Signals auto-instrumentation: EKS add-on, CloudWatch Agent IAM, OTLP endpoints, ServiceEvents env vars, Dynamic Instrumentation — two-tier scope by platform/language |
+| [application-signals-onboarding.md](references/application-signals-onboarding.md) | Enable Application Signals auto-instrumentation: EKS add-on, CloudWatch Agent IAM, OTLP endpoints, ServiceEvents env vars, Dynamic Instrumentation -- two-tier scope by platform/language |
 | [application-signals-cicd-metadata.md](references/application-signals-cicd-metadata.md) | ServiceEvents git & deployment metadata propagation through CI/CD (the 5 `OTEL_AWS_SERVICE_EVENTS_*` vars) |
-| `references/appsignals-guides/` (e.g. [eks-python.md](references/appsignals-guides/eks-python.md)) | 16 per-platform × per-language enablement guides (EC2/ECS/EKS/Lambda × Python/Node.js/Java/.NET) |
-| [alarms.md](references/alarms.md) | Metric, composite, anomaly detection alarms — configuration, constraints, recommended defaults |
+| `references/appsignals-guides/` (e.g. [eks-python.md](references/appsignals-guides/eks-python.md)) | 16 per-platform x per-language enablement guides (EC2/ECS/EKS/Lambda x Python/Node.js/Java/.NET) |
+| [alarms.md](references/alarms.md) | Metric, composite, anomaly detection alarms -- configuration, constraints, recommended defaults |
 | [log-insights.md](references/log-insights.md) | Complete query syntax, commands, functions, known issues, reusable query library |
 | [metrics.md](references/metrics.md) | Custom metrics, EMF spec, metric filters, high-resolution, retention |
-| [tracing.md](references/tracing.md) | X-Ray → ADOT migration, sampling rules, annotations vs metadata, collector config |
+| [tracing.md](references/tracing.md) | X-Ray -> ADOT migration, sampling rules, annotations vs metadata, collector config |
 | [dashboards.md](references/dashboards.md) | Widget types, cross-account/region, dynamic labels, sharing |
-| [troubleshooting.md](references/troubleshooting.md) | Error → cause → fix for all observability services |
+| [troubleshooting.md](references/troubleshooting.md) | Error -> cause -> fix for all observability services |
 | [cloudtrail.md](references/cloudtrail.md) | Operational auditing, event types, S3+Athena queries |
 | [synthetics.md](references/synthetics.md) | Canary runtime/blueprint constraints, VPC networking, common failures |
 | [alarm-template.ts](assets/alarm-template.ts) | Best-practice CDK Lambda monitoring (alarms + dashboard) |
 | [otel-config.yaml](assets/otel-config.yaml) | ADOT collector config for X-Ray traces + CloudWatch EMF metrics |
-| [dynamic-instrumentation.md](references/dynamic-instrumentation.md) | Dynamic Instrumentation debugging loop — breakpoints/probes on live code, snapshot capture + correlation analysis, create/delete gating, snapshot PII handling. Runs via `scripts/di_instrumentation.py` + `scripts/di_snapshots.py`. |
+| [dynamic-instrumentation.md](references/dynamic-instrumentation.md) | Dynamic Instrumentation debugging loop -- breakpoints/probes on live code, snapshot capture + correlation analysis, create/delete gating, snapshot PII handling. Runs via `scripts/di_instrumentation.py` + `scripts/di_snapshots.py`. |

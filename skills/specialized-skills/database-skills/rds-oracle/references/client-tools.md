@@ -1,14 +1,14 @@
-# RDS for Oracle — Client Tools
+# RDS for Oracle -- Client Tools
 
 GUI and CLI tools. See `connection-auth.md` for driver choice per tool.
 
 ## SQL Developer
 
-Free Oracle GUI. Uses JDBC Thin driver internally — no Oracle Client needed unless you use advanced features (Oracle Wallet, Kerberos with file-based tickets).
+Free Oracle GUI. Uses JDBC Thin driver internally -- no Oracle Client needed unless you use advanced features (Oracle Wallet, Kerberos with file-based tickets).
 
 ### Basic connection
 
-1. Open SQL Developer → click **+** (new connection).
+1. Open SQL Developer -> click **+** (new connection).
 2. **Connection Type**: Basic
 3. **Name**: any friendly name
 4. **Username**: `admin`
@@ -16,19 +16,19 @@ Free Oracle GUI. Uses JDBC Thin driver internally — no Oracle Client needed un
 6. **Hostname**: `mydb.xxxxxxxxxxxx.us-east-1.rds.amazonaws.com`
 7. **Port**: `1521`
 8. **Service Name**: `ORCL` (select **Service Name** radio, not SID)
-9. Click **Test** → should say "Success"
+9. Click **Test** -> should say "Success"
 10. **Connect**
 
 ### SSL/TLS connection
 
-1. New Connection → **Connection Type**: Advanced
+1. New Connection -> **Connection Type**: Advanced
 2. Custom JDBC URL:
 
    ```
    jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=mydb.xxxxxxxxxxxx.us-east-1.rds.amazonaws.com)(PORT=2484))(CONNECT_DATA=(SERVICE_NAME=ORCL)))
    ```
 
-3. **Advanced** tab → properties:
+3. **Advanced** tab -> properties:
 
    ```
    javax.net.ssl.trustStore=/path/to/truststore.jks
@@ -52,11 +52,11 @@ rm -f /tmp/rds-cert-*.pem
 
 SQL Developer does NOT support Windows in-memory tickets (`OSMSFT:`). Use a file-based cache.
 
-1. `okinit joedoe@AD.MYAWS.COM` — generate ticket file.
-2. Tools → Preferences → Database → **Advanced**:
+1. `okinit joedoe@AD.MYAWS.COM` -- generate ticket file.
+2. Tools -> Preferences -> Database -> **Advanced**:
    - **Kerberos Configuration File**: `/etc/krb5.conf` (or `C:\Oracle_Home\krb5.conf`)
    - **Kerberos Credential Cache**: `/tmp/kerbcache`
-3. New Connection → **Authentication Type: Kerberos**, hostname/port/service as normal, username/password blank.
+3. New Connection -> **Authentication Type: Kerberos**, hostname/port/service as normal, username/password blank.
 
 ### Built-in SSH tunnel
 
@@ -69,23 +69,23 @@ SQL Developer 23+ has native SSH tunnel support. Requires the bastion to accept 
 | "Network Adapter could not establish connection" | Check hostname, port, SGs. `nc -zv <host> 1521` from same network |
 | `ORA-12505` | Switch from SID to Service Name in the connection dialog |
 | `ORA-28040` No matching auth protocol | Update SQL Developer (older versions lack newer protocols) |
-| Kerberos "Unable to obtain Principal Name" | Ticket expired — `okinit` again; verify `krb5.conf` path |
-| SSL "PKIX path building failed" | Truststore missing or wrong path — re-import RDS CA |
+| Kerberos "Unable to obtain Principal Name" | Ticket expired -- `okinit` again; verify `krb5.conf` path |
+| SSL "PKIX path building failed" | Truststore missing or wrong path -- re-import RDS CA |
 
 ## Toad for Oracle
 
-Commercial Oracle GUI. **Always requires Oracle Client (thick mode)** — Toad cannot do thin.
+Commercial Oracle GUI. **Always requires Oracle Client (thick mode)** -- Toad cannot do thin.
 
 Install Oracle Instant Client, set `ORACLE_HOME` and `PATH`/`LD_LIBRARY_PATH`, and Toad auto-detects.
 
 ### Basic connection
 
-1. Session → New Connection
+1. Session -> New Connection
 2. **User**: `admin`, **Password**: your password
 3. **Database** (one of):
    - Direct: `mydb.xxxxxxxxxxxx.us-east-1.rds.amazonaws.com:1521/ORCL`
    - Or TNS alias if `tnsnames.ora` is configured
-4. **Connect As**: **Normal** (never SYSDBA — RDS doesn't allow SYS)
+4. **Connect As**: **Normal** (never SYSDBA -- RDS doesn't allow SYS)
 5. **Connect**
 
 ### `tnsnames.ora` for Toad
@@ -103,7 +103,7 @@ Then select `MYDB_RDS` from the Database dropdown.
 
 ### NNE vs TLS
 
-- **NNE**: no Toad config — transparent once the option group is applied.
+- **NNE**: no Toad config -- transparent once the option group is applied.
 - **TLS (TCPS 2484)**: requires Oracle Wallet.
 
   ```bash
@@ -145,7 +145,7 @@ SQLNET.KERBEROS5_CC_NAME = /tmp/kerbcache
 
 ## SQLcl
 
-Oracle's modern CLI. **Thin mode native** — no Oracle Client needed. Java 11+ required.
+Oracle's modern CLI. **Thin mode native** -- no Oracle Client needed. Java 11+ required.
 
 ```bash
 brew install --cask sqlcl   # macOS
@@ -230,29 +230,29 @@ Free multi-DB GUI. Uses Oracle JDBC Thin (auto-downloads on first Oracle connect
 
 ### Basic connection
 
-1. Database → New Database Connection → Oracle
+1. Database -> New Database Connection -> Oracle
 2. **Host**: `mydb.xxxxxxxxxxxx.us-east-1.rds.amazonaws.com`
 3. **Port**: `1521`
 4. **Database**: `ORCL` (Service Name)
 5. **Authentication**: Database Native
 6. **Username**: `admin`, **Password**: your password
-7. Test Connection (driver downloads on first use) → Finish
+7. Test Connection (driver downloads on first use) -> Finish
 
 ### SSL/TLS
 
-Edit Connection → **SSL** tab → Use SSL → CA Certificate: `global-bundle.pem`. Or set driver properties:
+Edit Connection -> **SSL** tab -> Use SSL -> CA Certificate: `global-bundle.pem`. Or set driver properties:
 
 ```
 javax.net.ssl.trustStore=/path/to/truststore.jks
 javax.net.ssl.trustStorePassword=changeit
 ```
 
-Built-in SSH tunnel: DBeaver → Edit Connection → **SSH** tab.
+Built-in SSH tunnel: DBeaver -> Edit Connection -> **SSH** tab.
 
 ### Troubleshooting
 
 | Issue | Fix |
 |---|---|
 | "Driver download failed" | Check internet; or add `ojdbc11.jar` manually in Driver Manager |
-| `ORA-12505` | Switch SID → Service Name |
+| `ORA-12505` | Switch SID -> Service Name |
 | "Connection reset" on TLS | Set `oracle.net.ssl_version=1.2` in driver properties |

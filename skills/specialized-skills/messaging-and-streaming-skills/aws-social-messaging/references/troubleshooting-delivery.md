@@ -1,6 +1,6 @@
 # Troubleshooting WhatsApp Message Delivery
 
-> **Security:** See [SKILL.md — Security Considerations](../SKILL.md#security-considerations) for encryption, IAM, and audit logging guidance.
+> **Security:** See [SKILL.md -- Security Considerations](../SKILL.md#security-considerations) for encryption, IAM, and audit logging guidance.
 
 ## Diagnostic Flow
 
@@ -12,7 +12,7 @@ aws socialmessaging get-linked-whatsapp-business-account --id "waba-XXXXXXXXXXXX
 ```
 
 - Registration status MUST be `COMPLETE`
-- Check `qualityRating` — LOW restricts sending capacity
+- Check `qualityRating` -- LOW restricts sending capacity
 - If not COMPLETE, finish registration in the AWS Console (cannot be done via CLI)
 
 ### Step 2: Check Phone Number Health
@@ -35,9 +35,9 @@ aws socialmessaging list-whatsapp-message-templates --id "waba-XXXXXXXXXXXXXXXXX
 
 Look for:
 
-- `REJECTED` templates — recreate with compliant content
-- `PENDING` > 24h — create a new template
-- Category mismatch (submitted UTILITY, now shows MARKETING) — reclassified by Meta
+- `REJECTED` templates -- recreate with compliant content
+- `PENDING` > 24h -- create a new template
+- Category mismatch (submitted UTILITY, now shows MARKETING) -- reclassified by Meta
 
 ### Step 4: Verify Event Destinations
 
@@ -71,7 +71,7 @@ aws cloudtrail lookup-events \
 
 ```
 
-CloudTrail records all `social-messaging` API calls. Look for `SendWhatsAppMessage` events with error details not visible in the CLI response. Verify CloudTrail is enabled for the account/region. Ensure CloudTrail logs are encrypted with a KMS CMK (see [SKILL.md — Security Considerations](../SKILL.md#security-considerations)).
+CloudTrail records all `social-messaging` API calls. Look for `SendWhatsAppMessage` events with error details not visible in the CLI response. Verify CloudTrail is enabled for the account/region. Ensure CloudTrail logs are encrypted with a KMS CMK (see [SKILL.md -- Security Considerations](../SKILL.md#security-considerations)).
 
 ## Common Error Patterns
 
@@ -89,23 +89,23 @@ CloudTrail records all `social-messaging` API calls. Look for `SendWhatsAppMessa
 
 ## Meta Error Codes
 
-Common codes — see [Meta's error reference](https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes) for the full list.
+Common codes -- see [Meta's error reference](https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes) for the full list.
 
 | Code | Meaning |
 |------|---------|
 | 131026 | Recipient phone number not on WhatsApp. Verify E.164 format with `+` prefix, confirm number has active WhatsApp, retry after a brief delay for transient failures, and check if your phone number quality rating has degraded |
-| 131049 | Message failed — requires recent user engagement (marketing templates) |
-| 131047 | Re-engagement message — more than 24h since last reply |
+| 131049 | Message failed -- requires recent user engagement (marketing templates) |
+| 131047 | Re-engagement message -- more than 24h since last reply |
 | 131051 | Unsupported message type |
 | 130472 | Number deregistered from WhatsApp |
 
 ## Quick Checklist
 
-1. ✅ WABA registration COMPLETE
-2. ✅ Phone number verified and active
-3. ✅ Template APPROVED (not PENDING/REJECTED)
-4. ✅ Template category matches content (not reclassified)
-5. ✅ Event destinations configured + SNS subscriptions confirmed
-6. ✅ Recipient has WhatsApp on that number
-7. ✅ Within 24h window (freeform only)
-8. ✅ Not exceeding rate limits
+1. [YES] WABA registration COMPLETE
+2. [YES] Phone number verified and active
+3. [YES] Template APPROVED (not PENDING/REJECTED)
+4. [YES] Template category matches content (not reclassified)
+5. [YES] Event destinations configured + SNS subscriptions confirmed
+6. [YES] Recipient has WhatsApp on that number
+7. [YES] Within 24h window (freeform only)
+8. [YES] Not exceeding rate limits

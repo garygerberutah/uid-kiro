@@ -1,4 +1,4 @@
-# Cell 0 [markdown]: Model Deployment — SageMaker
+# Cell 0 [markdown]: Model Deployment -- SageMaker
 
 # Cell 1: Setup
 

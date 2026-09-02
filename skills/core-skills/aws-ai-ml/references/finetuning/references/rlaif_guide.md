@@ -1,6 +1,6 @@
 # RLAIF Fine-Tuning Guide
 
-RLAIF (Reinforcement Learning from AI Feedback) uses a Bedrock LLM as a judge to score model outputs during training. No human-labeled preference pairs are needed — the judge evaluates responses in real time.
+RLAIF (Reinforcement Learning from AI Feedback) uses a Bedrock LLM as a judge to score model outputs during training. No human-labeled preference pairs are needed -- the judge evaluates responses in real time.
 
 ## How RLAIF Differs from RLVR
 
@@ -23,14 +23,14 @@ Present the output to the user as a numbered list showing each model name and it
 
 ## Option 1: Builtin Reward Prompt
 
-The simplest path. Choose one of the four builtin prompts — the SDK maps it to the corresponding Jinja template in the Hub recipe.
+The simplest path. Choose one of the four builtin prompts -- the SDK maps it to the corresponding Jinja template in the Hub recipe.
 
 Pass the builtin name directly as the `reward_prompt` parameter:
 
-- `"Builtin.Summarize"` — evaluates summarization quality
-- `"Builtin.Faithfulness"` — evaluates factual consistency with source
-- `"Builtin.ChainOfThought"` — evaluates step-by-step reasoning quality
-- `"Builtin.Evaluation"` — general response quality evaluation
+- `"Builtin.Summarize"` -- evaluates summarization quality
+- `"Builtin.Faithfulness"` -- evaluates factual consistency with source
+- `"Builtin.ChainOfThought"` -- evaluates step-by-step reasoning quality
+- `"Builtin.Evaluation"` -- general response quality evaluation
 
 **When to use**: When one of the four builtin prompts matches the use case well enough. Ask the user which one fits, or suggest based on the task.
 
@@ -47,14 +47,14 @@ Suitable for: domain-specific quality, structured output validation, or multi-cr
 
 **Key difference from RLVR**:
 
-- RLVR uses `Evaluator.create(type=REWARD_FUNCTION)` → deploys a Lambda function
-- RLAIF uses `Evaluator.create(type=REWARD_PROMPT)` → uploads a text/Jinja file to S3
+- RLVR uses `Evaluator.create(type=REWARD_FUNCTION)` -> deploys a Lambda function
+- RLAIF uses `Evaluator.create(type=REWARD_PROMPT)` -> uploads a text/Jinja file to S3
 
 The Bedrock judge receives the prompt and evaluates the model output. No Lambda is involved.
 
 ### Steps
 
-1. **Write the prompt file** — create a `.jinja` file with a suitable name in the project's scripts directory. The prompt should instruct the judge how to evaluate the model's response. It can reference `{{ prompt }}` and `{{ response }}` template variables.
+1. **Write the prompt file** -- create a `.jinja` file with a suitable name in the project's scripts directory. The prompt should instruct the judge how to evaluate the model's response. It can reference `{{ prompt }}` and `{{ response }}` template variables.
 
    **To help user write the prompt** - think:
 

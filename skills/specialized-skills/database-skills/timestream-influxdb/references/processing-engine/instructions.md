@@ -8,7 +8,7 @@ User asks about data processing plugins, triggers, downsampling, data transforma
 
 ## Overview
 
-The Processing Engine is an embedded Python virtual machine inside InfluxDB 3 that extends database functionality with plugins. **Only InfluxData certified plugins are supported** — custom user-written plugins are not supported.
+The Processing Engine is an embedded Python virtual machine inside InfluxDB 3 that extends database functionality with plugins. **Only InfluxData certified plugins are supported** -- custom user-written plugins are not supported.
 
 ## Available Certified Plugins
 
@@ -34,7 +34,7 @@ Source code and documentation: [InfluxData Plugins Repository](https://github.co
 ## Creating Triggers
 
 ```bash
-# Downsampler — aggregate CPU metrics hourly
+# Downsampler -- aggregate CPU metrics hourly
 influxdb3 create trigger \
   --database metrics \
   --plugin-filename "downsampler/downsampler.py" \
@@ -42,8 +42,8 @@ influxdb3 create trigger \
   --trigger-arguments 'source_measurement=cpu_detailed,target_measurement=cpu_hourly,interval=1h,window=6h,calculations="usage:avg.max_usage:max"' \
   cpu_downsampler
 
-# MAD Anomaly Detection — real-time outlier detection on sensor data
-# Fetch the Slack webhook from Secrets Manager — never hardcode secrets in trigger arguments
+# MAD Anomaly Detection -- real-time outlier detection on sensor data
+# Fetch the Slack webhook from Secrets Manager -- never hardcode secrets in trigger arguments
 SLACK_WEBHOOK=$(aws secretsmanager get-secret-value --secret-id influxdb3/slack-webhook --query SecretString --output text)
 influxdb3 create trigger \
   --database sensors \
@@ -52,7 +52,7 @@ influxdb3 create trigger \
   --trigger-arguments "measurement=temperature_sensors,mad_thresholds=\"temp:2.5:20:5\",senders=slack,slack_webhook_url=\"$SLACK_WEBHOOK\"" \
   temp_anomaly_detector
 
-# Basic transformation — clean field names on incoming data
+# Basic transformation -- clean field names on incoming data
 influxdb3 create trigger \
   --database iot \
   --plugin-filename "basic_transformation/basic_transformation.py" \
@@ -60,7 +60,7 @@ influxdb3 create trigger \
   --trigger-arguments 'measurement=raw_sensors,target_measurement=clean_sensors,names_transformations=.*:"snake alnum_underscore_only"' \
   sensor_cleaner
 
-# State Change Monitor — alert on equipment status changes
+# State Change Monitor -- alert on equipment status changes
 influxdb3 create trigger \
   --database factory \
   --plugin-filename "state_change/state_change_check_plugin.py" \
@@ -68,7 +68,7 @@ influxdb3 create trigger \
   --trigger-arguments 'measurement=equipment,field_change_count="status:3",window=15m,senders=slack' \
   equipment_monitor
 
-# System Metrics Collector — collect host metrics every 30s
+# System Metrics Collector -- collect host metrics every 30s
 influxdb3 create trigger \
   --database monitoring \
   --plugin-filename "system_metrics/system_metrics.py" \
@@ -98,7 +98,7 @@ influxdb3 delete trigger --database <db> --trigger-name <name>
 --trigger-arguments 'threshold=90,notify_email=admin@example.com'
 ```
 
-**Secrets in plugin arguments:** Do not hardcode webhook URLs, API keys, or other credentials directly in scripts or source control. Store them in AWS Secrets Manager and retrieve them at trigger-creation time (e.g., `aws secretsmanager get-secret-value` into an environment variable, as shown in the MAD anomaly-detection example above). **Limitation:** the resolved value is still written into the trigger spec and is visible in plaintext in `system.processing_engine_triggers` — this approach keeps secrets out of source control but does not protect them at rest inside InfluxDB. Restrict access to the database/system tables accordingly, and rotate any secret that is exposed this way.
+**Secrets in plugin arguments:** Do not hardcode webhook URLs, API keys, or other credentials directly in scripts or source control. Store them in AWS Secrets Manager and retrieve them at trigger-creation time (e.g., `aws secretsmanager get-secret-value` into an environment variable, as shown in the MAD anomaly-detection example above). **Limitation:** the resolved value is still written into the trigger spec and is visible in plaintext in `system.processing_engine_triggers` -- this approach keeps secrets out of source control but does not protect them at rest inside InfluxDB. Restrict access to the database/system tables accordingly, and rotate any secret that is exposed this way.
 
 **Error handling:** `--error-behavior log` (default), `retry`, or `disable`
 
@@ -139,6 +139,6 @@ WHERE database = 'your_database';
 
 ## What's NOT Supported
 
-- **Custom user-written plugins** — only InfluxData certified plugins are available. Custom user-written plugins are not supported.
-- **Custom Python package installation** — plugins run with the packages bundled in the certified plugin set
-- **Arbitrary filesystem or network access** — plugins operate within a constrained sandbox
+- **Custom user-written plugins** -- only InfluxData certified plugins are available. Custom user-written plugins are not supported.
+- **Custom Python package installation** -- plugins run with the packages bundled in the certified plugin set
+- **Arbitrary filesystem or network access** -- plugins operate within a constrained sandbox

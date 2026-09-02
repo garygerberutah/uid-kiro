@@ -225,7 +225,7 @@ const appContainer = taskDefinition.addContainer('Application', {
 Once deployed, you can verify Application Signals is working by:
 
 - Opening the AWS CloudWatch Console
-- Navigating to Application Signals → Services
+- Navigating to Application Signals -> Services
 - Looking for your service (named: {{SERVICE_NAME}})
 - Checking that traces and metrics are being collected
 

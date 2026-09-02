@@ -20,7 +20,7 @@ aws lambda-microvms list-microvm-image-builds \
 | `S3_NO_SUCH_BUCKET` | Bucket doesn't exist. | Create the bucket; check spelling. |
 | `S3_INVALID_OBJECT` | Glacier or other non-instant storage class. | Move to Standard. |
 | `S3_CROSS_REGION_ACCESS_DENIED` | Artifact in different region than the image. | Re-upload to a bucket in the image's region. |
-| `ARCHIVE_DOCKERFILE_NOT_FOUND` | No `Dockerfile` at zip root. | Ensure `Dockerfile` is at the **top level** of the zip — `unzip -l my-app.zip` should show `Dockerfile` first, not `my-app/Dockerfile`. |
+| `ARCHIVE_DOCKERFILE_NOT_FOUND` | No `Dockerfile` at zip root. | Ensure `Dockerfile` is at the **top level** of the zip -- `unzip -l my-app.zip` should show `Dockerfile` first, not `my-app/Dockerfile`. |
 | `ARCHIVE_INVALID` | Corrupt or non-zip archive. | Re-create with `zip -r`; verify with `unzip -t`. |
 | `CONTAINER_BUILD_FAILED` | Dockerfile error. | Reproduce locally with `docker build` against the same base image. Check the build logs in `/aws/lambda-microvms/<image-name>` in CloudWatch. |
 | `DISK_STORAGE_FULL` | Build exceeded disk. | Trim layers (multi-stage builds, `--no-install-recommends`, clean caches). |
@@ -28,11 +28,11 @@ aws lambda-microvms list-microvm-image-builds \
 
 ### `/ready` hook caused build failure
 
-The `/ready` and `/validate` hooks are asynchronous — return 503 until the application is ready/validated, and the platform will retry. If the application blocks the request instead of returning 503 promptly, a single hung call can consume the whole hook timeout window before the platform gets a chance to retry. If `/ready` never returns 200 (or the timeout elapses), the build fails. Look at the application's CloudWatch logs (`/aws/lambda-microvms/<image-name>`) for stack traces from your hook server.
+The `/ready` and `/validate` hooks are asynchronous -- return 503 until the application is ready/validated, and the platform will retry. If the application blocks the request instead of returning 503 promptly, a single hung call can consume the whole hook timeout window before the platform gets a chance to retry. If `/ready` never returns 200 (or the timeout elapses), the build fails. Look at the application's CloudWatch logs (`/aws/lambda-microvms/<image-name>`) for stack traces from your hook server.
 
 ### `/validate` hook caused build failure
 
-The validation phase launches a test MicroVM from the snapshot and calls `/validate`. This is an application-level check — use it to verify your app behaves correctly after resume (e.g., that connections are re-established, state is valid).
+The validation phase launches a test MicroVM from the snapshot and calls `/validate`. This is an application-level check -- use it to verify your app behaves correctly after resume (e.g., that connections are re-established, state is valid).
 
 ## Run failures (`RunMicrovm`)
 
@@ -40,7 +40,7 @@ The validation phase launches a test MicroVM from the snapshot and calls `/valid
 |---|---|---|
 | `ResourceNotFoundException` | Image, version, or execution role doesn't exist. | Verify ARNs. For custom images use `imageVersion`; for managed images you can omit it. |
 | `ServiceQuotaExceededException` | Hit account-wide MicroVM concurrency or memory cap. | Wait for terminations, request a quota increase. |
-| `ValidationException` | Bad input (idle policy missing required fields, malformed connector ARN, etc.). | Check the `message` field — it's specific. |
+| `ValidationException` | Bad input (idle policy missing required fields, malformed connector ARN, etc.). | Check the `message` field -- it's specific. |
 | `AccessDenied` | Caller can't `lambda:RunMicrovm`, or `iam:PassRole` for the execution role, or `lambda:PassNetworkConnector` (required on every `RunMicrovm`, even with the default connectors). | Add the missing IAM permission to the caller. |
 | `ConflictException` | `clientToken` reused with different parameters. | Use a fresh `clientToken` or replay the exact same request. |
 
@@ -57,7 +57,7 @@ The validation phase launches a test MicroVM from the snapshot and calls `/valid
 A 502 can be returned during the first few seconds after the MicroVM is run while the snapshot is being restored.
 
 - App not listening on the routed port (default 8080; use `X-aws-proxy-port` to redirect).
-- TLS mismatch — the app is speaking TLS without ALPN advertising HTTP/1.1, or speaking plaintext on a port the proxy thinks is TLS.
+- TLS mismatch -- the app is speaking TLS without ALPN advertising HTTP/1.1, or speaking plaintext on a port the proxy thinks is TLS.
 - App crashed after run. Check CloudWatch logs.
 
 ### `429` from the proxy
@@ -71,7 +71,7 @@ If the proxy receives traffic before `RunMicrovm` finishes, it may 5xx. Retry co
 ## Auto-resume not working
 
 - Confirm `idlePolicy.autoResumeEnabled: true` was set at run time.
-- Confirm the MicroVM's `state` is `SUSPENDED` (not `TERMINATED` — auto-resume doesn't revive terminated VMs).
+- Confirm the MicroVM's `state` is `SUSPENDED` (not `TERMINATED` -- auto-resume doesn't revive terminated VMs).
 - The proxy invokes resume then retries connecting a few times with a delay between attempts. If your `/resume` hook is slow or the app doesn't respond in time, the proxy may return an error to the caller.
 
 ## Hook timeouts at runtime
@@ -96,9 +96,9 @@ Hook server **must bind to `0.0.0.0`** on the configured `port` (commonly 9000).
 
 ## Snapshot / uniqueness symptoms
 
-- All MicroVMs serve the same instance ID / UUID. → Generation happened at build time. Move to `/run` or first-request init. See [`snapshots-and-uniqueness.md`](snapshots-and-uniqueness.md).
-- TLS handshakes intermittently fail across multiple VMs. → Predictable PRNG seeded once at build. Switch to a CSPRNG.
-- "AWS SDK calls fail with credentials errors after a few hours." → SDK client picked up creds at boot and didn't refresh. Most modern SDKs refresh; verify version.
+- All MicroVMs serve the same instance ID / UUID. -> Generation happened at build time. Move to `/run` or first-request init. See [`snapshots-and-uniqueness.md`](snapshots-and-uniqueness.md).
+- TLS handshakes intermittently fail across multiple VMs. -> Predictable PRNG seeded once at build. Switch to a CSPRNG.
+- "AWS SDK calls fail with credentials errors after a few hours." -> SDK client picked up creds at boot and didn't refresh. Most modern SDKs refresh; verify version.
 
 ## Image storage costs growing
 
@@ -124,11 +124,11 @@ Or mark old versions `INACTIVE` first if you want to keep them around for rollba
 | Custom CloudWatch logging | Pass `--logging '{"cloudWatch":{"logGroup":"...","logStream":"..."}}'` to `RunMicrovm` |
 | CloudTrail | Standard `lambda:*` events in your trail |
 
-> Avoid logging secrets, tokens, or PII to stdout/stderr — application output is forwarded to CloudWatch.
+> Avoid logging secrets, tokens, or PII to stdout/stderr -- application output is forwarded to CloudWatch.
 
-Custom CloudWatch metrics are **not** auto-emitted — publish from inside your application (or run the CloudWatch Agent inside the container). Set up CloudWatch Alarms on key metrics to catch operational issues early. Consider enabling CloudTrail data events for Lambda MicroVM API calls in production environments.
+Custom CloudWatch metrics are **not** auto-emitted -- publish from inside your application (or run the CloudWatch Agent inside the container). Set up CloudWatch Alarms on key metrics to catch operational issues early. Consider enabling CloudTrail data events for Lambda MicroVM API calls in production environments.
 
 ## When all else fails
 
 1. Run with the `SHELL_INGRESS` network connector attached, get a shell auth token, connect via the console "Connect" button.
-2. The shell drops into the same container as the running app — same network namespace, same filesystem. You can inspect files, processes, and network state directly.
+2. The shell drops into the same container as the running app -- same network namespace, same filesystem. You can inspect files, processes, and network state directly.

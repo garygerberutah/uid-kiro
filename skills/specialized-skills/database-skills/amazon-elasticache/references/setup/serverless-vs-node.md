@@ -104,7 +104,7 @@ Serverless bills in ElastiCache Processing Units (ECPUs). How commands are charg
 - **Fixed commands** (GET, SET, HGET, INCR, EXISTS, PING, DEL, UNLINK, and other O(1) operations): each request consumes at least 1 ECPU, with 1 ECPU per KB of data transferred. A GET returning 3.2 KB of data consumes 3.2 ECPUs (see [ElastiCache pricing](https://aws.amazon.com/elasticache/pricing/)).
 - **Non-fixed commands** (EVAL, SORT, MGET, HGETALL, and other variable-cost operations): consume ECPUs based on the higher of vCPU time or data transferred. For example, an HMGET that takes 3x the vCPU time of a GET and transfers 3.2 KB consumes 3.2 ECPUs (data wins). If it transfers only 2 KB, it consumes 3 ECPUs (vCPU wins). See the [ElastiCache Serverless pricing blog](https://aws.amazon.com/blogs/database/unlock-on-demand-cost-optimized-performance-with-amazon-elasticache-serverless/).
 - **Pipelined commands** are charged individually (each command in the pipeline costs its own ECPUs), but pipelining still reduces round-trip latency and network overhead.
-- **Non-key commands** (ACL, SELECT, ECHO, TIME, etc.): these consume ECPUs as fixed commands. INFO and PUBLISH are exceptions — they are not metered.
+- **Non-key commands** (ACL, SELECT, ECHO, TIME, etc.): these consume ECPUs as fixed commands. INFO and PUBLISH are exceptions -- they are not metered.
 - **Pub/sub commands** (SUBSCRIBE, PUBLISH, etc.): SUBSCRIBE and UNSUBSCRIBE are not metered. SPUBLISH, SSUBSCRIBE, and SUNSUBSCRIBE are metered.
 - **Metadata commands** (AUTH, MULTI, EXEC, CONFIG): these are not metered.
 - **Replication/cluster commands** (REPLCONF, PSYNC, CLUSTER): these are internal to the serverless infrastructure and are not metered.

@@ -6,7 +6,7 @@
 - **Query language**: openCypher, Apache TinkerPop/Gremlin, SPARQL
 - **Compatibility**: openCypher (Neo4j-compatible), Gremlin (TinkerPop standard), SPARQL (W3C standard)
 - **Serverless**: Yes (both Database and Analytics)
-- **Serverless type**: Capacity — Serverless mode auto-scales compute, but you still manage a cluster (no scale to zero)
+- **Serverless type**: Capacity -- Serverless mode auto-scales compute, but you still manage a cluster (no scale to zero)
 - **Scale to zero**: No (Serverless scales to minimum NCU)
 - **VPC required**: Yes (Database); No (Analytics). Database supports public endpoints but still requires VPC configuration.
 - **Multi-region**: Global Database (disaster recovery, <1 second RPO, up to 5 secondary regions)

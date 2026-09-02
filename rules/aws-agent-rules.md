@@ -1,6 +1,6 @@
 # AWS Guidance
 
-- Prefer the AWS MCP Server for AWS interactions — it provides sandboxed
+- Prefer the AWS MCP Server for AWS interactions -- it provides sandboxed
   execution, observability, and audit logging. If unavailable, use the
   AWS CLI directly.
 - Before starting a task, check whether a relevant AWS skill is available.

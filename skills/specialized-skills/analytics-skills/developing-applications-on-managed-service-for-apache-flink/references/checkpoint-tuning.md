@@ -22,7 +22,7 @@ Checkpoint frequency is configured via the Managed Service for Apache Flink `Che
 - **Increase network bandwidth**: checkpoint data flows from TaskManagers to S3. With large state and frequent checkpoints, this can compete with data processing traffic.
 - **Reduce recovery time**: more frequent checkpoints mean less data to replay from sources after a failure.
 
-**Trade-off guidance per Flink docs:** When checkpoints frequently take longer than the base interval, the system ends up constantly taking checkpoints, tying up resources and reducing operator progress. Use `MinPauseBetweenCheckpoints` to prevent this. The Flink documentation does not prescribe specific interval ranges for state sizes — tune based on observed `lastCheckpointDuration` relative to your interval, and ensure checkpoints complete well within the interval with room to spare.
+**Trade-off guidance per Flink docs:** When checkpoints frequently take longer than the base interval, the system ends up constantly taking checkpoints, tying up resources and reducing operator progress. Use `MinPauseBetweenCheckpoints` to prevent this. The Flink documentation does not prescribe specific interval ranges for state sizes -- tune based on observed `lastCheckpointDuration` relative to your interval, and ensure checkpoints complete well within the interval with room to spare.
 
 ## Checkpoint Duration Exceeding Interval
 
@@ -41,18 +41,18 @@ Checkpoint frequency is configured via the Managed Service for Apache Flink `Che
 
 **Remediation:**
 
-1. **Verify incremental checkpoints are active** (they are enabled by default on Managed Service for Apache Flink). If for some reason they were overridden, re-enable them — incremental checkpoints only upload state changes since the last checkpoint, dramatically reducing upload size for large state.
+1. **Verify incremental checkpoints are active** (they are enabled by default on Managed Service for Apache Flink). If for some reason they were overridden, re-enable them -- incremental checkpoints only upload state changes since the last checkpoint, dramatically reducing upload size for large state.
 2. **Increase checkpoint interval** via the `UpdateApplication` API with `ConfigurationType: CUSTOM` to give more time for completion. Also consider increasing `MinPauseBetweenCheckpoints`.
 3. **Add KPUs** to spread state across more TaskManagers, reducing per-TaskManager checkpoint size.
 4. **Reduce state size**: add or tighten TTL on keyed state, reduce key cardinality, or use more compact serialization (POJO over Kryo).
 5. **Request RocksDB tuning overrides** via AWS support if compaction or read amplification is the bottleneck.
-6. **Consider buffer debloating** — request enablement via AWS support case. This can help applications with backpressure-related checkpoint issues.
+6. **Consider buffer debloating** -- request enablement via AWS support case. This can help applications with backpressure-related checkpoint issues.
 
 ## OOM and GC Diagnostic Steps
 
 If the application throws `OutOfMemoryError` or shows sustained high GC activity:
 
-1. **Check `heapMemoryUtilization` in CloudWatch.** If sustained > 80%, the application needs investigation and likely a scale-up (see [monitoring-and-metrics.md](monitoring-and-metrics.md) for graduated thresholds: healthy ≤ 75%, scale-up signal > 80% sustained, critical alarm > 90%).
+1. **Check `heapMemoryUtilization` in CloudWatch.** If sustained > 80%, the application needs investigation and likely a scale-up (see [monitoring-and-metrics.md](monitoring-and-metrics.md) for graduated thresholds: healthy <= 75%, scale-up signal > 80% sustained, critical alarm > 90%).
 2. **Check `lastCheckpointSize` and `lastCheckpointDuration`.** Large checkpoints consume significant heap during snapshot creation.
 3. **Review state TTL configuration.** Missing or overly long TTL causes state to accumulate indefinitely.
 4. **Check for Kryo serialization fallbacks.** Kryo uses more memory than POJO serialization. Look for log messages: `"Class ... cannot be used as a POJO type"`.

@@ -47,7 +47,7 @@ aws osis create-pipeline --pipeline-name my-log-pipeline \
   --pipeline-configuration-body file://pipeline.yaml
 ```
 
-> **Tip — pipeline logging for debugging.** OSI pipeline logs may carry sensitive data (document content, field values, query parameters), so create the log group **with KMS encryption first**, then attach it:
+> **Tip -- pipeline logging for debugging.** OSI pipeline logs may carry sensitive data (document content, field values, query parameters), so create the log group **with KMS encryption first**, then attach it:
 >
 > ```bash
 > # 1. Create the log group with a customer-managed KMS key
@@ -63,7 +63,7 @@ aws osis create-pipeline --pipeline-name my-log-pipeline \
 >   --log-publishing-options 'CloudWatchLogDestination={LogGroup=/aws/vendedlogs/OpenSearchIngestion/my-log-pipeline},IsLoggingEnabled=true'
 > ```
 
-### Pipeline YAML for CloudWatch Logs → AOS
+### Pipeline YAML for CloudWatch Logs -> AOS
 
 ```yaml
 version: "2"
@@ -87,7 +87,7 @@ cloudwatch-pipeline:
           region: "<region>"
 ```
 
-### Pipeline YAML for CloudWatch Logs → AOSS
+### Pipeline YAML for CloudWatch Logs -> AOSS
 
 ```yaml
 version: "2"

@@ -35,7 +35,7 @@ breaking changes.
 **Resources sharing a Condition form an atomic feature toggle group.**
 
 When multiple resources use the same `Condition`, they are intentionally coupled
-— they must all be created or none created. Removing the Condition from one
+-- they must all be created or none created. Removing the Condition from one
 resource in the group breaks the atomicity.
 
 Before modifying or removing a Condition from a resource:
@@ -67,7 +67,7 @@ Before modifying a security group:
    should only apply to a subset of resources
 
 **Key principle:** Public ingress (0.0.0.0/0) on a shared security group is
-almost always wrong — it exposes databases and internal services, not just the
+almost always wrong -- it exposes databases and internal services, not just the
 intended target.
 
 ## DeletionPolicy Preservation for Stateful Resources
@@ -81,7 +81,7 @@ resource:
 
 1. Check `Metadata."com.aws.cloudformation.Context"` for data criticality
    documentation
-2. Warn about data loss risk — even with Retain, removing from the template
+2. Warn about data loss risk -- even with Retain, removing from the template
    orphans the resource from CloudFormation management
 3. Confirm the user understands: the physical resource survives (Retain), but it
    is no longer managed by the stack
@@ -129,8 +129,8 @@ resources. A template that already carries many resources or rich
 `Metadata."com.aws.cloudformation.Context"` may be close to these limits, so the
 addition you are about to make may not fit.
 
-Service Quotas reports the current values for two of these — `Template Size`
-(1 MB) and `Template Resources` (500), both non-adjustable — and also
+Service Quotas reports the current values for two of these -- `Template Size`
+(1 MB) and `Template Resources` (500), both non-adjustable -- and also
 `Template Description Length` (1,024 bytes), which the persist procedure
 relies on. The 51,200-byte inline `TemplateBody` cap is not published as a
 service quota; take it from the [CloudFormation quotas
@@ -143,7 +143,7 @@ aws service-quotas list-service-quotas --service-code cloudformation \
 
 [cloudformation-quotas]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html
 
-When adding or modifying resources — especially in a large template:
+When adding or modifying resources -- especially in a large template:
 
 1. Measure the current template body size in bytes (e.g., `wc -c <template>` on
    Unix/macOS or Git Bash, or `(Get-Item <template>).Length` in PowerShell) and
@@ -164,11 +164,11 @@ When adding or modifying resources — especially in a large template:
    CloudFormation module, or relocate bulky static content (e.g., large inline
    code) to S3. Preserve `Metadata."com.aws.cloudformation.Context"` on the
    extracted resources.
-5. Never silently drop required context or exceed the limit — a template over
+5. Never silently drop required context or exceed the limit -- a template over
    the limit fails at `CreateStack`/`UpdateStack` (e.g., "Template body is too
    long" / "Template format error: number of resources exceeds maximum").
 
 **Key principle:** Context is mandatory, but so is staying under the size limit.
 When both cannot fit, *intelligently adjust* existing and new context (condense,
-prioritize, or relocate) — never choose between blindly adding and dropping
+prioritize, or relocate) -- never choose between blindly adding and dropping
 context.

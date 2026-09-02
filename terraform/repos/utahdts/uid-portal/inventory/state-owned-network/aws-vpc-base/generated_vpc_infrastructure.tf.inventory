@@ -1,4 +1,4 @@
-# HISTORICAL INVENTORY ONLY — this file intentionally does not end in .tf.
+# HISTORICAL INVENTORY ONLY -- this file intentionally does not end in .tf.
 # It describes organization-owned resources and must never be loaded by Terraform.
 
 # __generated__ by Terraform from "igw-005c82ba48e352e71"

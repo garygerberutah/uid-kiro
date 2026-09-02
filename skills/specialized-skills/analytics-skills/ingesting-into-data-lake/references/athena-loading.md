@@ -104,7 +104,7 @@ DROP TABLE IF EXISTS temp_source_<timestamp>;
 If Athena times out (30-minute limit):
 
 1. **Batch by partition**: Load one month/day at a time
-2. **Switch to Glue ETL**: Better for datasets > 1GB — handles larger data with more workers, provides monitoring and retries
+2. **Switch to Glue ETL**: Better for datasets > 1GB -- handles larger data with more workers, provides monitoring and retries
 
 ## Limitations
 

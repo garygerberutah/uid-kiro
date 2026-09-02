@@ -74,7 +74,7 @@ observability). Fall back to the AWS CLI otherwise.
   CloudFront managed prefix list or the service-managed security group, not a broad CIDR. Missing
   this rule causes silent failures
 - You MUST validate the resource type against the current VPC origins documentation before
-  proceeding, rather than relying on a fixed list — supported and unsupported origin types and
+  proceeding, rather than relying on a fixed list -- supported and unsupported origin types and
   features evolve as the service changes. As examples to verify (not an authoritative list): some
   load-balancer types such as Gateway Load Balancers, dual-stack NLBs, and NLBs with TLS listeners
   have been unsupported, an NLB must have a security group attached, and VPC origins have not

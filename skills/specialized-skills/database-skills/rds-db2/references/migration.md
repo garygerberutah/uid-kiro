@@ -1,4 +1,4 @@
-# RDS for Db2 — Migration Reference
+# RDS for Db2 -- Migration Reference
 
 Source blogs:
 
@@ -16,8 +16,8 @@ Source blogs:
 | Rehost | Linux (LE) | Db2 backup/restore or Db2MT | Offline: full downtime; Online: minimal |
 | Replatform | AIX, Windows, z/OS, zLinux | Db2MT + DMS or Q Replication | Near-zero with replication |
 
-**Rehost** (Linux → Linux): Faster, no data conversion. Use Db2 native backup/restore or Db2MT.
-**Replatform** (AIX/Windows/z/OS → Linux): Requires data conversion. Use Db2MT for metadata + data, then DMS or Q Replication for CDC.
+**Rehost** (Linux -> Linux): Faster, no data conversion. Use Db2 native backup/restore or Db2MT.
+**Replatform** (AIX/Windows/z/OS -> Linux): Requires data conversion. Use Db2MT for metadata + data, then DMS or Q Replication for CDC.
 
 ---
 
@@ -48,24 +48,24 @@ DB2_INSTANCES=db2inst1 ./db2_migration_prereq_check.sh
 
 | Check | Common failure / fix |
 |---|---|
-| `db2updv115` | Must be run on source DB before backup — most common restore failure |
+| `db2updv115` | Must be run on source DB before backup -- most common restore failure |
 | InDoubt transactions | `db2 list indoubt transactions with prompting` |
 | Invalid objects | `db2 "call SYSPROC.ADMIN_REVALIDATE_DB_OBJECTS()"` |
 | Tablespace state | All must be Normal |
-| Non-fenced routines | Convert all to fenced — non-fenced not permitted in RDS |
+| Non-fenced routines | Convert all to fenced -- non-fenced not permitted in RDS |
 | Automatic storage | At least one storage group must exist |
 | Database config | Backup/rollforward/restore/upgrade pending must all be No |
-| Log files | Circular ≤254, archive ≤4096 |
+| Log files | Circular <=254, archive <=4096 |
 
 ### Readiness levels
 
-- **READY FOR MIGRATION** — all checks passed
-- **REVIEW REQUIRED** — warnings found, manual review needed
-- **NOT READY FOR MIGRATION** — critical failures, must fix before proceeding
+- **READY FOR MIGRATION** -- all checks passed
+- **REVIEW REQUIRED** -- warnings found, manual review needed
+- **NOT READY FOR MIGRATION** -- critical failures, must fix before proceeding
 
 ---
 
-## Rehost: one-time migration (Linux → RDS)
+## Rehost: one-time migration (Linux -> RDS)
 
 ### Using Db2 backup + restore stored procedure
 
@@ -79,7 +79,7 @@ db2 backup database <DBNAME> to /backup, /backup, /backup, /backup, /backup
 Copy to S3 (create storage alias first):
 
 ```bash
-# On EC2 with IAM role — no credentials needed:
+# On EC2 with IAM role -- no credentials needed:
 db2 "CATALOG STORAGE ACCESS ALIAS db2S3 VENDOR S3 SERVER https://s3.<region>.amazonaws.com CONTAINER <bucket> DBUSER <masterUser>"
 
 # Self-managed Db2 with long-term credentials:
@@ -108,7 +108,7 @@ call rdsadmin.set_configuration('USE_STREAMING_RESTORE', 'TRUE');
 
 ---
 
-## Rehost: online migration with log replication (Linux → RDS)
+## Rehost: online migration with log replication (Linux -> RDS)
 
 1. Take online backup to S3 (same as above but `backup_type = 'ONLINE'`)
 2. Restore on RDS:
@@ -131,7 +131,7 @@ call rdsadmin.set_configuration('USE_STREAMING_RESTORE', 'TRUE');
 
 ---
 
-## Replatform: AIX/Windows → RDS (near-zero downtime with Q Replication)
+## Replatform: AIX/Windows -> RDS (near-zero downtime with Q Replication)
 
 Source: https://aws.amazon.com/blogs/database/near-zero-downtime-migrations-from-self-managed-db2-on-aix-or-windows-to-amazon-rds-for-db2-using-ibm-q-replication/
 
@@ -157,9 +157,9 @@ Source: https://aws.amazon.com/blogs/database/near-zero-downtime-migrations-from
 5. Create subscriptions with `HAS LOAD PHASE N` (Db2MT handles the load)
 6. Start Capture and Apply to verify subscriptions activate
 7. Record the start time of earliest in-flight transaction
-8. Run Db2MT for initial data load to S3 → RDS
+8. Run Db2MT for initial data load to S3 -> RDS
 9. Restart Q Capture from before the Db2MT start time to catch up changes
-10. Monitor `QASN.IBMQREP_APPLYMON.OLDEST_TRANS` — when it approaches current time, cutover
+10. Monitor `QASN.IBMQREP_APPLYMON.OLDEST_TRANS` -- when it approaches current time, cutover
 
 ### Monitor replication lag
 
@@ -176,7 +176,7 @@ ORDER BY MONITOR_TIME DESC FETCH FIRST 20 ROWS ONLY WITH UR;
 - Supports Db2 as source and RDS for Db2 as target.
 - Supports **full load + CDC** for LUW sources.
 - Does **NOT** support CDC from Db2 for z/OS (full load only from z/OS).
-- No bulk load (uses inserts) — slower than native tools for very large tables.
+- No bulk load (uses inserts) -- slower than native tools for very large tables.
 
 ## Lift and shift (same as rehost)
 
@@ -194,17 +194,17 @@ Online restore + rollforward:
 
 Alternative: Q Replication for continuous sync with a brief cutover window.
 
-## AS/400 (IBM i) → RDS Db2
+## AS/400 (IBM i) -> RDS Db2
 
 Use **AWS Mainframe Modernization Data Replication with Precisely** (from AWS Marketplace): IBM i source, RDS for Db2 target, initial load + CDC. Initial load uses inserts; pre-load large tables via Db2 federation or export/import, then start CDC from a timestamp.
 
-## POWER/AIX → RDS Db2
+## POWER/AIX -> RDS Db2
 
-Db2MT for metadata extraction and data unload to S3, then load into RDS. For near-zero downtime add Q Replication for CDC — see the Q Replication section above.
+Db2MT for metadata extraction and data unload to S3, then load into RDS. For near-zero downtime add Q Replication for CDC -- see the Q Replication section above.
 
 ## Strategy decision tree
 
-1. **Source Linux LE?** Rehost. Acceptable downtime → offline restore. None → online restore + rollforward or Q Replication.
-2. **Source AIX/Windows?** Downtime OK → Db2MT one-time. None → Db2MT + Q Replication.
+1. **Source Linux LE?** Rehost. Acceptable downtime -> offline restore. None -> online restore + rollforward or Q Replication.
+2. **Source AIX/Windows?** Downtime OK -> Db2MT one-time. None -> Db2MT + Q Replication.
 3. **Source z/OS?** See `mainframe-migration.md`. DMS (full load) or Qlik/Precisely/Q Replication (CDC).
 4. **Source AS/400?** Precisely Mainframe Modernization Data Replication.

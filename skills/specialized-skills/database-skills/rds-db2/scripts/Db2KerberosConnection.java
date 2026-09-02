@@ -12,7 +12,7 @@ import com.ibm.db2.jcc.DB2SimpleDataSource;
  *
  * Connects to a Db2 database using Kerberos authentication over either
  * plain TCPIP or SSL (TLS). SSL mode uses a PEM certificate file directly
- * via the IBM JDBC driver's sslCertLocation property — no KeyStore or
+ * via the IBM JDBC driver's sslCertLocation property -- no KeyStore or
  * keytool required.
  *
  * Reference:
@@ -25,7 +25,7 @@ import com.ibm.db2.jcc.DB2SimpleDataSource;
  * Usage (SSL):
  *   java Db2KerberosConnection <HOST> <DATABASE> <PORT> SSL <CERT_PEM_PATH>
  *
- *   CERT_PEM_PATH — region-specific PEM bundle from AWS, e.g.
+ *   CERT_PEM_PATH -- region-specific PEM bundle from AWS, e.g.
  *                   us-east-1-bundle.pem  (do NOT use global-bundle.pem;
  *                   the IBM JDBC driver only supports single-region bundles)
  */
@@ -95,7 +95,7 @@ public class Db2KerberosConnection {
         System.err.println("Usage (SSL):");
         System.err.println("  java Db2KerberosConnection <HOST> <DATABASE> <PORT> SSL <CERT_PEM_PATH>");
         System.err.println();
-        System.err.println("  CERT_PEM_PATH — region-specific PEM bundle, e.g. <region>-bundle.pem");
+        System.err.println("  CERT_PEM_PATH -- region-specific PEM bundle, e.g. <region>-bundle.pem");
         System.err.println("                  Download: curl -sL https://truststore.pki.rds.amazonaws.com/");
         System.err.println("                            <region>/<region>-bundle.pem -o <region>-bundle.pem");
         System.err.println();
@@ -140,7 +140,7 @@ public class Db2KerberosConnection {
     }
 
     // -------------------------------------------------------------------------
-    // DataSource builder — sets connection parameters via dedicated setters
+    // DataSource builder -- sets connection parameters via dedicated setters
     // (no JDBC URL string concatenation, so no connection-string injection)
     // -------------------------------------------------------------------------
 
@@ -151,7 +151,7 @@ public class Db2KerberosConnection {
         ds.setPortNumber(Integer.parseInt(config.port));
         ds.setDatabaseName(config.database);
 
-        // Kerberos — no user/password needed (security mechanism 11 = Kerberos)
+        // Kerberos -- no user/password needed (security mechanism 11 = Kerberos)
         ds.setSecurityMechanism(Integer.parseInt(KERBEROS_SECURITY_MECHANISM));
 
         if (config.useSsl) {

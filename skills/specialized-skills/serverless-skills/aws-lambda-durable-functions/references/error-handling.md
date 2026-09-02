@@ -269,7 +269,7 @@ def handler(event: dict, context: DurableContext) -> dict:
     def fetch_user_step(step_ctx: StepContext):
         user = fetch_user(event['user_id'])
         if not user:
-            # Stop execution immediately — permanent failure, no retry
+            # Stop execution immediately -- permanent failure, no retry
             raise ExecutionError('User not found')
         return user
     
@@ -284,7 +284,7 @@ The SDK provides these exception types for different failure scenarios:
 | `ExecutionError` | No | Permanent business logic failures (returns FAILED status) |
 | `InvocationError` | Yes (by Lambda) | Transient infrastructure issues (Lambda retries invocation) |
 | `CallbackError` | No | Callback handling failures |
-| `DurableExecutionsError` | — | Base class for all SDK exceptions |
+| `DurableExecutionsError` | -- | Base class for all SDK exceptions |
 
 ## Error Determinism
 
@@ -306,7 +306,7 @@ class CustomBusinessError extends Error {
 
 const result = await context.step('validate', async () => {
   if (!isValid(data)) {
-    // ✅ Deterministic error
+    // [YES] Deterministic error
     throw new CustomBusinessError(
       'Validation failed',
       'INVALID_DATA',

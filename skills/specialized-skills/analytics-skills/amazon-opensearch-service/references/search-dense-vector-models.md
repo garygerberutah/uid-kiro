@@ -30,10 +30,10 @@ OpenSearch provides a repository of pre-trained models that can be registered di
 
 | Model Name | Dimensions | Description | Size | Latency (Approx) |
 |------------|------------|-------------|------|------------------|
-| `huggingface/sentence-transformers/all-MiniLM-L6-v2` | 384 | Good speed/quality tradeoff for English. | 22M | Low (5–15ms) |
-| `huggingface/sentence-transformers/all-mpnet-base-v2` | 768 | Often higher quality than MiniLM, slower. | 110M | Medium (20–50ms) |
-| `huggingface/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` | 384 | Multilingual baseline for many languages. | 120M | Medium (10–30ms) |
-| `huggingface/sentence-transformers/multi-qa-MiniLM-L6-cos-v1` | 384 | Tuned for QA-style semantic search. | 22M | Low (5–15ms) |
+| `huggingface/sentence-transformers/all-MiniLM-L6-v2` | 384 | Good speed/quality tradeoff for English. | 22M | Low (5-15ms) |
+| `huggingface/sentence-transformers/all-mpnet-base-v2` | 768 | Often higher quality than MiniLM, slower. | 110M | Medium (20-50ms) |
+| `huggingface/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` | 384 | Multilingual baseline for many languages. | 120M | Medium (10-30ms) |
+| `huggingface/sentence-transformers/multi-qa-MiniLM-L6-cos-v1` | 384 | Tuned for QA-style semantic search. | 22M | Low (5-15ms) |
 
 ### 1.2 Custom Models
 

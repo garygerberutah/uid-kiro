@@ -4,9 +4,9 @@ A "location" is the central domain noun of this package: where in customer
 code (or which endpoint) an instrumentation configuration applies. The
 ``application-signals`` API exposes three flavors:
 
-* ``CodeLocation``    — language + file/class/method/line, used by BREAKPOINT
+* ``CodeLocation``    -- language + file/class/method/line, used by BREAKPOINT
                         and PROBE.
-* ``LocationHash``    — a 16-character hex identifier referring to an
+* ``LocationHash``    -- a 16-character hex identifier referring to an
                         already-created configuration.
 
 This module collapses the seven module-level helpers that used to build,
@@ -46,12 +46,12 @@ class CodeLocation:
 
     Which fields identify the target vs. which are metadata depends on language:
 
-    * Java       — ``code_unit`` (package), ``class_name`` (simple name), and
+    * Java       -- ``code_unit`` (package), ``class_name`` (simple name), and
                    ``method_name`` together identify the target; all required.
-    * Python     — ``code_unit`` (dotted module path) and ``method_name``
+    * Python     -- ``code_unit`` (dotted module path) and ``method_name``
                    identify the target; ``class_name`` is optional (qualifies a
                    method defined in a class).
-    * JavaScript — ``file_path`` + ``line_number`` identify the target;
+    * JavaScript -- ``file_path`` + ``line_number`` identify the target;
                    ``code_unit``/``class_name``/``method_name`` are not used.
 
     ``line_number`` makes any target line-level (fires at that line rather than
@@ -144,7 +144,7 @@ class HashLocation:
     Carries a deliberately narrower interface than its sibling variants:
 
     * ``to_api_payload`` is *unsupported*: a hash cannot describe a *new*
-      configuration — ``create_instrumentation_configuration`` requires
+      configuration -- ``create_instrumentation_configuration`` requires
       a real CodeLocation.
     * ``format_details`` is *unsupported*: a hash has no fields beyond
       itself; ``render_location_block`` prints the hash via its
@@ -152,7 +152,7 @@ class HashLocation:
 
     Both methods exist as stubs that raise ``NotImplementedError`` with a
     descriptive message rather than being absent. The asymmetry is still
-    the design — these are lookup-only — but the explicit raise turns
+    the design -- these are lookup-only -- but the explicit raise turns
     a confusing ``AttributeError`` into a clear "use ``to_identifier()``
     instead" message when a future caller forgets the discipline.
     """
@@ -164,7 +164,7 @@ class HashLocation:
         return f"LocationHash {self.location_hash}"
 
     def level(self) -> Optional[str]:
-        """Return None — a hash carries no breakpoint granularity."""
+        """Return None -- a hash carries no breakpoint granularity."""
         return None
 
     def to_identifier(self) -> Dict[str, Any]:
@@ -172,16 +172,16 @@ class HashLocation:
         return {"LocationHash": self.location_hash}
 
     def to_api_payload(self) -> Dict[str, Any]:
-        """Unsupported — a hash cannot describe a new configuration."""
+        """Unsupported -- a hash cannot describe a new configuration."""
         raise NotImplementedError(
-            "HashLocation cannot be used in create requests — use to_identifier() instead. "
+            "HashLocation cannot be used in create requests -- use to_identifier() instead. "
             "create_instrumentation_configuration requires a CodeLocation."
         )
 
     def format_details(self, location_hash: Optional[str] = None) -> str:
-        """Unsupported — a hash has no fields; describe() gives a one-liner."""
+        """Unsupported -- a hash has no fields; describe() gives a one-liner."""
         raise NotImplementedError(
-            "HashLocation has no fields to format — render_location_block handles it directly. "
+            "HashLocation has no fields to format -- render_location_block handles it directly. "
             "Use describe() for a one-line target string."
         )
 
@@ -192,7 +192,7 @@ class UnknownLocation:
 
     A forward-compat fallback: ``location_from_response`` produces this so
     renderers don't crash on future API additions. Input parsers never
-    produce it. Mirrors ``UnknownCapture`` in shape and naming — both are
+    produce it. Mirrors ``UnknownCapture`` in shape and naming -- both are
     public so callers doing exhaustive ``isinstance`` matching don't need
     to reach into a private name.
 
@@ -208,11 +208,11 @@ class UnknownLocation:
             object.__setattr__(self, "raw", MappingProxyType(dict(self.raw)))
 
     def describe(self) -> str:
-        """Return 'N/A' — an unknown location has no describable target."""
+        """Return 'N/A' -- an unknown location has no describable target."""
         return "N/A"
 
     def level(self) -> Optional[str]:
-        """Return None — an unknown location has no granularity."""
+        """Return None -- an unknown location has no granularity."""
         return None
 
     def format_details(self, location_hash: Optional[str] = None) -> str:
@@ -231,14 +231,14 @@ class UnknownLocation:
 Location = Union[CodeLocation, HashLocation, UnknownLocation]
 
 # A location resolved from *caller* inputs (create/lookup). Unlike ``Location``,
-# this never includes ``UnknownLocation`` — that variant only arises when parsing
+# this never includes ``UnknownLocation`` -- that variant only arises when parsing
 # an API *response* (see ``location_from_response``). Narrowing the parser return
 # types to this union lets callers use ``to_identifier``/``to_api_payload``
 # without a cast, since both members implement them.
 ResolvedLocation = Union[CodeLocation, HashLocation]
 
 
-# ──────────────────────────── input parsers ────────────────────────────
+# ---------------------------- input parsers ----------------------------
 
 
 def parse_create_inputs(
@@ -329,7 +329,7 @@ def parse_lookup_inputs(
     )
 
 
-# ──────────────────────────── response parser ────────────────────────────
+# ---------------------------- response parser ----------------------------
 
 
 _KNOWN_CODE_FIELDS = {"Language", "FilePath", "CodeUnit", "ClassName", "MethodName", "LineNumber"}
@@ -338,7 +338,7 @@ _KNOWN_CODE_FIELDS = {"Language", "FilePath", "CodeUnit", "ClassName", "MethodNa
 def location_from_response(union_dict: Optional[Dict[str, Any]]) -> Location:
     """Parse a ``Location`` union returned by the API into the ADT.
 
-    Returns ``UnknownLocation`` if the dict has no recognized variant — this
+    Returns ``UnknownLocation`` if the dict has no recognized variant -- this
     keeps response rendering forward-compatible with future API additions.
     """
     if not isinstance(union_dict, dict):
@@ -367,7 +367,7 @@ def _code_location_from_dict(payload: Dict[str, Any]) -> CodeLocation:
     )
 
 
-# ──────────────────────────── shared helpers ────────────────────────────
+# ---------------------------- shared helpers ----------------------------
 
 
 def render_location_block(location: Location, location_hash: Optional[str] = None) -> str:

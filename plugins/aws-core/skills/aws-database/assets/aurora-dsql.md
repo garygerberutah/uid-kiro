@@ -6,11 +6,11 @@
 - **Query language**: PostgreSQL SQL (standard SQL)
 - **Compatibility**: PostgreSQL wire-compatible (works with PG drivers and ORMs)
 - **Serverless**: Yes (only mode)
-- **Serverless type**: Operations — no cluster, no instances, no maintenance windows; you interact with a database endpoint only
+- **Serverless type**: Operations -- no cluster, no instances, no maintenance windows; you interact with a database endpoint only
 - **Scale to zero**: Yes, instant (no resume latency)
 - **VPC required**: No
 - **Multi-region**: Active-active, strongly consistent
-- **Free Tier**: Always free — 100,000 DPUs/month + 1 GB storage
+- **Free Tier**: Always free -- 100,000 DPUs/month + 1 GB storage
 - **Min cost**: $0 idle; ~$1-5/month light traffic
 - **Time to first query**: ~30 seconds
 - **Key features**: No VPC setup, IAM auth, distributed, automatic scaling, optimistic concurrency control, up to 99.999% availability (multi-Region)

@@ -1,11 +1,11 @@
 # IF-Bench
 
-Precise instruction-following generalization — 58 novel verifiable output constraints.
+Precise instruction-following generalization -- 58 novel verifiable output constraints.
 
 **Use this for:** Tasks requiring tight control over model output.
 
 **Source:** Artificial Analysis (artificialanalysis.ai).
-"—" = no data — infer from similar models in the same family, but tell the user you're inferring.
+"--" = no data -- infer from similar models in the same family, but tell the user you're inferring.
 
 |   # | Model                                  | Family      | Score |
 |-----|----------------------------------------|-------------|-------|
@@ -38,7 +38,7 @@ Precise instruction-following generalization — 58 novel verifiable output cons
 |  27 | DeepSeek R1 Distill Qwen 14B           | DeepSeek    | 22.1% |
 |  28 | DeepSeek R1 Distill Llama 8B           | DeepSeek    | 17.6% |
 |  29 | DeepSeek R1 Distill Qwen 1.5B          | DeepSeek    | 13.2% |
-|   — | Qwen2.5 32B Instruct                   | Qwen        |     — |
-|   — | Qwen2.5 14B Instruct                   | Qwen        |     — |
-|   — | Qwen2.5 7B Instruct                    | Qwen        |     — |
-|   — | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     — |
+|   -- | Qwen2.5 32B Instruct                   | Qwen        |     -- |
+|   -- | Qwen2.5 14B Instruct                   | Qwen        |     -- |
+|   -- | Qwen2.5 7B Instruct                    | Qwen        |     -- |
+|   -- | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     -- |

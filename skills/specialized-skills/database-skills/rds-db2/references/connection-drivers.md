@@ -1,4 +1,4 @@
-# RDS for Db2 — Drivers, Kerberos, Multi-Instance
+# RDS for Db2 -- Drivers, Kerberos, Multi-Instance
 
 Connecting from Python, Java, and laptop clients; Kerberos/Active Directory auth; managing multiple RDS for Db2 instances from the same shell.
 
@@ -30,7 +30,7 @@ curl -sL https://truststore.pki.rds.amazonaws.com/<region>/<region>-bundle.pem -
 
 Source: <https://aws.amazon.com/blogs/database/create-an-ssl-connection-to-amazon-rds-for-db2-in-java-without-keystore-or-keytool/>
 
-With the IBM Db2 JDBC driver (`db2jcc4.jar`), point `sslTrustStoreLocation` at the PEM file — no keystore or keytool needed:
+With the IBM Db2 JDBC driver (`db2jcc4.jar`), point `sslTrustStoreLocation` at the PEM file -- no keystore or keytool needed:
 
 ```java
 Properties props = new Properties();
@@ -63,7 +63,7 @@ For SSL, download the bundle (same URL as above) and catalog with SSL parameters
 
 ## Kerberos / Active Directory
 
-For self-managed Active Directory join and Kerberos authentication — AD permission delegation, the Secrets Manager secret keys, the `--domain-fqdn/-ou/-auth-secret-arn/-dns-ips` join flags, the AD port matrix, and the JDBC Kerberos connection (`securityMechanism=11`) with the bundled `Db2KerberosConnection.java` / `db2-kerberos-test.sh` test — see `ad-kerberos.md`.
+For self-managed Active Directory join and Kerberos authentication -- AD permission delegation, the Secrets Manager secret keys, the `--domain-fqdn/-ou/-auth-secret-arn/-dns-ips` join flags, the AD port matrix, and the JDBC Kerberos connection (`securityMechanism=11`) with the bundled `Db2KerberosConnection.java` / `db2-kerberos-test.sh` test -- see `ad-kerberos.md`.
 
 ## Multi-instance workflow
 
@@ -98,7 +98,7 @@ How `db2_use` actually works (important for understanding password rotation):
 - Rewrites `~/.db2env` with the active instance's DSN, user, password.
 - Prints the two connect commands to run.
 
-So after a password rotation in Secrets Manager, the only thing you need to do is re-run `db2_use <instance-id>` — the helper picks up the new password automatically. You do not need to re-run `db2client-configure.sh`.
+So after a password rotation in Secrets Manager, the only thing you need to do is re-run `db2_use <instance-id>` -- the helper picks up the new password automatically. You do not need to re-run `db2client-configure.sh`.
 
 ## Files reference (quick)
 
@@ -109,7 +109,7 @@ So after a password rotation in Secrets Manager, the only thing you need to do i
 | `~/CONN_HELP_README.txt` | Last configure's connect commands |
 | `~/.db2env` | Active instance credentials (`chmod 600`) |
 | `~/.db2instances` | Instance registry, no passwords (`chmod 600`) |
-| `~/.need_password` | Passwords when not using Secrets Manager — dev/test only, never production (`chmod 600`) |
+| `~/.need_password` | Passwords when not using Secrets Manager -- dev/test only, never production (`chmod 600`) |
 | `~/<region>-bundle.pem` | RDS SSL certificate bundle |
 | `~/sqllib/cfg/db2dsdriver.cfg` | Db2 DSN config |
 | `~/sqllib/cfg/db2cli.ini` | Db2 CLI config |

@@ -1,13 +1,13 @@
-# RDS for Oracle — Connection Auth
+# RDS for Oracle -- Connection Auth
 
 Authentication patterns and quick cross-language connection overview. Language-specific deep-dives in `python.md`, `java.md`, `nodejs.md`, `dotnet.md`.
 
 ## Two supported auth methods
 
-1. **Username/password** — stored in the DB or fetched from AWS Secrets Manager at runtime.
-2. **Kerberos** — external auth via AWS Managed Microsoft AD, `IDENTIFIED EXTERNALLY`.
+1. **Username/password** -- stored in the DB or fetched from AWS Secrets Manager at runtime.
+2. **Kerberos** -- external auth via AWS Managed Microsoft AD, `IDENTIFIED EXTERNALLY`.
 
-Never log in as **SYS** or **SYSTEM** on RDS Oracle — those are reserved. Use the master user created at DB setup.
+Never log in as **SYS** or **SYSTEM** on RDS Oracle -- those are reserved. Use the master user created at DB setup.
 
 ## a) Username/password direct
 
@@ -71,7 +71,7 @@ IAM policy for the app's role:
 
 `kms:Decrypt` is required when the secret uses a customer-managed KMS key (default `aws/secretsmanager` doesn't need it but add it for best practice).
 
-**Rotation**: enable automatic rotation on the secret. RDS for Oracle supports single-user and multi-user rotation strategies. Always fetch fresh — don't cache long-term.
+**Rotation**: enable automatic rotation on the secret. RDS for Oracle supports single-user and multi-user rotation strategies. Always fetch fresh -- don't cache long-term.
 
 ## c) Kerberos with AWS Managed Microsoft AD
 
@@ -79,12 +79,12 @@ Users connect without passwords, using their Active Directory identity.
 
 ### Prerequisites
 
-- AWS Managed Microsoft AD (AWS Directory Service) — same account or shared via RAM
-- For on-prem AD users: one-way forest trust on-prem → AWS Managed AD
+- AWS Managed Microsoft AD (AWS Directory Service) -- same account or shared via RAM
+- For on-prem AD users: one-way forest trust on-prem -> AWS Managed AD
 - IAM role with `AmazonRDSDirectoryServiceAccess` managed policy
 - RDS Oracle with "Password and Kerberos authentication" enabled
 
-### Step 1 — create the IAM role
+### Step 1 -- create the IAM role
 
 ```bash
 aws iam create-role \
@@ -99,7 +99,7 @@ aws iam attach-role-policy \
   --policy-arn arn:aws:iam::aws:policy/service-role/AmazonRDSDirectoryServiceAccess
 ```
 
-### Step 2 — join RDS to the directory
+### Step 2 -- join RDS to the directory
 
 ```bash
 # New instance
@@ -125,7 +125,7 @@ aws rds modify-db-instance \
   --apply-immediately
 ```
 
-### Step 3 — verify kerberos-enabled
+### Step 3 -- verify kerberos-enabled
 
 ```bash
 aws rds describe-db-instances \
@@ -135,7 +135,7 @@ aws rds describe-db-instances \
 
 Status should show **`kerberos-enabled`**.
 
-### Step 4 — create the DB user (UPPERCASE, IDENTIFIED EXTERNALLY)
+### Step 4 -- create the DB user (UPPERCASE, IDENTIFIED EXTERNALLY)
 
 ```sql
 -- For an on-prem AD user joedoe@onprem.local
@@ -149,7 +149,7 @@ GRANT CREATE SESSION TO "JOEDOE@AD.MYAWS.COM";
 
 Username **must be uppercase** and the realm suffix is required.
 
-### Step 5 — client config
+### Step 5 -- client config
 
 `krb5.conf` (`/etc/krb5.conf` Linux, `C:\Oracle_Home\krb5.conf` Windows):
 
@@ -177,28 +177,28 @@ SQLNET.KERBEROS5_CC_NAME = /tmp/kerbcache
 SQLNET.FALLBACK_AUTHENTICATION = TRUE
 ```
 
-On Windows, use `OSMSFT:` for `KERBEROS5_CC_NAME` to use the Windows in-memory ticket. **SQL Developer does NOT support `OSMSFT:`** — it requires a ticket file from `okinit`.
+On Windows, use `OSMSFT:` for `KERBEROS5_CC_NAME` to use the Windows in-memory ticket. **SQL Developer does NOT support `OSMSFT:`** -- it requires a ticket file from `okinit`.
 
-### Step 6 — connect
+### Step 6 -- connect
 
 ```bash
 # Generate ticket (Linux)
 okinit joedoe@ONPREM.LOCAL
 
-# sqlplus — no password
+# sqlplus -- no password
 sqlplus /@mydb.xxxxxxxxxxxx.us-east-1.rds.amazonaws.com:1521/ORCL
 
 # SQL Developer: Authentication Type = Kerberos, no password, hostname/port/service as usual
 ```
 
-## Quick pick — which driver for my language?
+## Quick pick -- which driver for my language?
 
 | Language | Driver | Mode | Notes |
 |---|---|---|---|
-| Python | `oracledb` ≥ 6.0 | thin (default) | cx_Oracle is legacy — migrate |
+| Python | `oracledb` >= 6.0 | thin (default) | cx_Oracle is legacy -- migrate |
 | Java | `ojdbc11.jar` (23.x) | thin | UCP or HikariCP for pooling |
 | Java Spring Boot | `ojdbc11` + HikariCP | thin | built into Spring Boot defaults |
-| Node.js | `node-oracledb` ≥ 6 | thin (default) | module-level `createPool` for Lambda |
+| Node.js | `node-oracledb` >= 6 | thin (default) | module-level `createPool` for Lambda |
 | .NET | `Oracle.ManagedDataAccess.Core` | thin | built-in pooling, cross-platform |
 | SQL Developer / DBeaver | ojdbc (bundled) | thin | GUI tools |
 | Toad for Oracle | Oracle Instant Client | thick | Toad cannot do thin mode |
@@ -213,7 +213,7 @@ See the language-specific references for code examples and pooling.
 
 Thick mode is only needed for:
 
-- Kerberos with in-memory tickets (on Windows, for sqlplus — not SQL Developer)
+- Kerberos with in-memory tickets (on Windows, for sqlplus -- not SQL Developer)
 - LDAP directory service
 - Oracle Wallet-based (sqlnet.ora) Advanced Security
 - Advanced Queuing (AQ)

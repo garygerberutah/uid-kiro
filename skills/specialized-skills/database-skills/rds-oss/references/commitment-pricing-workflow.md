@@ -1,10 +1,10 @@
 # RDS Commitment Pricing Workflow
 
-Estimate monthly cost savings from RDS Reserved Instances (RI) and Database Savings Plans (DSP) for RDS MySQL, MariaDB, and PostgreSQL. Fetches live RI offerings and DSP rates from AWS Pricing and Savings Plans APIs. Read-only — never purchases commitments.
+Estimate monthly cost savings from RDS Reserved Instances (RI) and Database Savings Plans (DSP) for RDS MySQL, MariaDB, and PostgreSQL. Fetches live RI offerings and DSP rates from AWS Pricing and Savings Plans APIs. Read-only -- never purchases commitments.
 
 ## When This Applies
 
-User mentions: "should I buy a reserved instance / RI", "how much would a savings plan save", "compare 1-year vs 3-year", "RI vs DSP", "commitment pricing for RDS", "No Upfront / Partial Upfront / All Upfront", Multi-AZ pricing. Do NOT use this workflow for Aurora — Aurora has a separate commitment-pricing skill with different rules (Aurora DSP is 1yr-only; Aurora RIs interact with I/O-Optimized).
+User mentions: "should I buy a reserved instance / RI", "how much would a savings plan save", "compare 1-year vs 3-year", "RI vs DSP", "commitment pricing for RDS", "No Upfront / Partial Upfront / All Upfront", Multi-AZ pricing. Do NOT use this workflow for Aurora -- Aurora has a separate commitment-pricing skill with different rules (Aurora DSP is 1yr-only; Aurora RIs interact with I/O-Optimized).
 
 ## Tasks
 
@@ -21,7 +21,7 @@ The analyzer supports two modes.
 - You MUST ask which engine (`mysql`, `mariadb`, or `postgres`) for offline mode
 - You MUST confirm captured parameters before running the analyzer
 - You SHOULD ask about the user's confidence horizon (1 vs 3 years)
-- You MUST NOT default the engine — RDS RIs are engine-specific, and a wrong engine produces wrong numbers
+- You MUST NOT default the engine -- RDS RIs are engine-specific, and a wrong engine produces wrong numbers
 
 ### 2. Run the Analyzer
 
@@ -48,10 +48,10 @@ python3 scripts/rds_commitment_pricing_analyzer.py --region us-east-1 offline \
 
 **Constraints:**
 
-- You MUST surface the script's `notes` array — these cover common misconceptions
+- You MUST surface the script's `notes` array -- these cover common misconceptions
 - You MUST NOT claim DSP savings for instance families the analyzer marks as ineligible (r5, r6g, older). DSP only covers latest-generation families (r7g, r7i, r8g, r8gd, m7g, m7i, c7g, c7i, x8g).
 - You MUST explain Multi-AZ RI pricing: Multi-AZ RIs cost more than Single-AZ, and a Single-AZ RI does NOT cover a Multi-AZ instance. The user must buy the correct deployment type.
-- For RDS, there is NO Serverless option — do NOT mention ACU pricing, scale-to-zero, or any Aurora-specific concepts
+- For RDS, there is NO Serverless option -- do NOT mention ACU pricing, scale-to-zero, or any Aurora-specific concepts
 - You SHOULD cite [commitment-basics.md](commitment-basics.md) for RI vs DSP mechanics and [commitment-scenarios.md](commitment-scenarios.md) for workload-pattern decisions
 
 ### 4. Present Results
@@ -66,10 +66,10 @@ Every comparison MUST include:
 
 **Constraints:**
 
-- You MUST cite both dollar and percentage savings — neither alone is sufficient (dollars alone hide the scale; percentages alone hide the magnitude)
-- You MUST show upfront payment when non-zero — cash-flow impact matters for finance approval
+- You MUST cite both dollar and percentage savings -- neither alone is sufficient (dollars alone hide the scale; percentages alone hide the magnitude)
+- You MUST show upfront payment when non-zero -- cash-flow impact matters for finance approval
 - You MUST NOT run any purchase API (`purchase-reserved-db-instances-offering`, Savings Plans purchase calls) because this workflow is advisory-only
-- You MAY reference the AWS console path (RDS → Reserved Instances, or Billing → Savings Plans) so the user knows where to execute the commitment manually
+- You MAY reference the AWS console path (RDS -> Reserved Instances, or Billing -> Savings Plans) so the user knows where to execute the commitment manually
 
 ### 5. Scenario Guidance
 
@@ -79,7 +79,7 @@ For workload-pattern questions, pull guidance from [commitment-scenarios.md](com
 
 - You SHOULD match the user's workload to a scenario in the scenarios reference and explain why
 - You MUST NOT recommend 3yr terms for workloads the user indicates may be retired within the term, because RIs and DSPs are use-it-or-lose-it
-- You MUST warn that RDS RIs do NOT transfer to Aurora if the user is considering Aurora migration within the term — different engine, different commitment product
+- You MUST warn that RDS RIs do NOT transfer to Aurora if the user is considering Aurora migration within the term -- different engine, different commitment product
 - You MUST warn that RDS RIs are region-locked if the user is considering moving the workload to a different region
 
 ## Troubleshooting
@@ -92,5 +92,5 @@ For workload-pattern questions, pull guidance from [commitment-scenarios.md](com
 
 ## References
 
-- [commitment-basics.md](commitment-basics.md) — RI vs DSP mechanics, payment options, break-even, RDS-vs-Aurora differences
-- [commitment-scenarios.md](commitment-scenarios.md) — workload-pattern decision scenarios and quick decision tree
+- [commitment-basics.md](commitment-basics.md) -- RI vs DSP mechanics, payment options, break-even, RDS-vs-Aurora differences
+- [commitment-scenarios.md](commitment-scenarios.md) -- workload-pattern decision scenarios and quick decision tree

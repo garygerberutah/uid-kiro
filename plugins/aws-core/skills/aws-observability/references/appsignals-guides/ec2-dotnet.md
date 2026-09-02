@@ -33,8 +33,8 @@ After completing this task:
 
 ### Step 1: Determine Deployment Type
 
-- `docker run` or `docker start` → Docker deployment
-- `dotnet run`, `dotnet myapp.dll`, or similar → Non-Docker deployment
+- `docker run` or `docker start` -> Docker deployment
+- `dotnet run`, `dotnet myapp.dll`, or similar -> Non-Docker deployment
 
 ### Step 2: Extract Placeholder Values
 
@@ -50,7 +50,7 @@ After completing this task:
 
 **Windows Server:**
 
-- Supported. Use the **For Windows instances** code blocks in Steps 4–7 (PowerShell). **How to detect:** look for a Windows AMI reference in the IaC (e.g. `Windows_Server`, `windowsLatest`), PowerShell in existing UserData, or ask the user.
+- Supported. Use the **For Windows instances** code blocks in Steps 4-7 (PowerShell). **How to detect:** look for a Windows AMI reference in the IaC (e.g. `Windows_Server`, `windowsLatest`), PowerShell in existing UserData, or ask the user.
 
 ## Instructions
 
@@ -178,13 +178,13 @@ instance.userData.addCommands(
 
 #### Option A: Docker Deployment
 
-**Container networking — match the customer's existing setup (minimal change).** The example below uses `--network host` with `localhost:4316` endpoints. That pairing is one option, not a hard requirement — the right choice depends on how the container already reaches the host-installed CloudWatch Agent. Don't change the customer's networking model just to instrument; instead pick the variant that fits theirs:
+**Container networking -- match the customer's existing setup (minimal change).** The example below uses `--network host` with `localhost:4316` endpoints. That pairing is one option, not a hard requirement -- the right choice depends on how the container already reaches the host-installed CloudWatch Agent. Don't change the customer's networking model just to instrument; instead pick the variant that fits theirs:
 
 - **Already using `--network host`** (or willing to): keep it, and the `localhost:4316` / `localhost:2000` endpoints in the example work as-is. Trade-off: host networking shares the host's network namespace (no container isolation), though the agent's ports can stay bound to loopback, unreachable off-host. For production, it is recommended to restrict the OTLP `4316` / proxy `2000` ports via EC2 security groups / host firewall and to avoid co-locating untrusted containers; this guide does not apply those controls, so assess and configure them for your environment.
-- **Using a bridge/default network:** don't add `--network host`. Point the endpoints at the host instead — `host.docker.internal:4316`/`:2000` (add `--add-host=host.docker.internal:host-gateway` on Linux) or the bridge gateway IP. This requires the CloudWatch Agent to listen on a non-loopback address, so it is recommended to restrict those ports with security groups / host firewall.
-- **Option 2 — CloudWatch Agent as a sidecar container** (most isolated): run the agent as another container on the same user-defined Docker network and target it by name (e.g. `cwagent:4316`). Nothing binds to host interfaces. This is the same model the ECS guides use; choose it if the customer prefers full container isolation over a host-installed agent.
+- **Using a bridge/default network:** don't add `--network host`. Point the endpoints at the host instead -- `host.docker.internal:4316`/`:2000` (add `--add-host=host.docker.internal:host-gateway` on Linux) or the bridge gateway IP. This requires the CloudWatch Agent to listen on a non-loopback address, so it is recommended to restrict those ports with security groups / host firewall.
+- **Option 2 -- CloudWatch Agent as a sidecar container** (most isolated): run the agent as another container on the same user-defined Docker network and target it by name (e.g. `cwagent:4316`). Nothing binds to host interfaces. This is the same model the ECS guides use; choose it if the customer prefers full container isolation over a host-installed agent.
 
-**For Linux-based containers (`--network host` example — adapt per the networking variant you chose above):**
+**For Linux-based containers (`--network host` example -- adapt per the networking variant you chose above):**
 
 ```typescript
 instance.userData.addCommands(
@@ -225,9 +225,9 @@ instance.userData.addCommands(
 );
 ```
 
-> The `export ...` / `. instrument.sh` form above only instruments an app **launched in the same shell session**. If the application runs as a **systemd service** (the app is started by an `ExecStart=` in a `.service` unit), those exports do **not** reach the service process — `ExecStart` is a fresh process that does not inherit the userdata shell's environment, and sourcing `instrument.sh` in `ExecStartPre=` does not propagate either. You must put the variables on the unit itself. The CoreCLR profiler env vars are required because the .NET profiler is loaded by the runtime at process start from these variables.
+> The `export ...` / `. instrument.sh` form above only instruments an app **launched in the same shell session**. If the application runs as a **systemd service** (the app is started by an `ExecStart=` in a `.service` unit), those exports do **not** reach the service process -- `ExecStart` is a fresh process that does not inherit the userdata shell's environment, and sourcing `instrument.sh` in `ExecStartPre=` does not propagate either. You must put the variables on the unit itself. The CoreCLR profiler env vars are required because the .NET profiler is loaded by the runtime at process start from these variables.
 
-**For Linux instances where the app runs as a systemd service:** set the auto-instrumentation env vars in the unit (or an `EnvironmentFile=`) so the `ExecStart` process inherits them. The Linux CoreCLR values below are from the [Application Signals EC2 docs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Application-Signals-Enable-EC2Main.html) — adjust `OTEL_DOTNET_AUTO_HOME` (here `/opt/otel-dotnet-auto`) to your install dir:
+**For Linux instances where the app runs as a systemd service:** set the auto-instrumentation env vars in the unit (or an `EnvironmentFile=`) so the `ExecStart` process inherits them. The Linux CoreCLR values below are from the [Application Signals EC2 docs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Application-Signals-Enable-EC2Main.html) -- adjust `OTEL_DOTNET_AUTO_HOME` (here `/opt/otel-dotnet-auto`) to your install dir:
 
 ```ini
 # /etc/systemd/system/{{SERVICE_NAME}}.service  (add to the [Service] section)
@@ -309,7 +309,7 @@ instance.userData.addCommands(
 Once deployed, you can verify Application Signals is working by:
 
 - Opening the AWS CloudWatch Console
-- Navigating to Application Signals → Services
+- Navigating to Application Signals -> Services
 - Looking for your service (named: {{SERVICE_NAME}})
 
 **Monitor Application Health:**

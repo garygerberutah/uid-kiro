@@ -11,7 +11,7 @@ metadata:
 
 Routes networking requests to the correct service-specific skill. Covers 7 services across DNS and content delivery, hybrid connectivity, and network security (web application firewall and DDoS protection). Other AWS networking services (VPC foundations, load balancing, endpoints, PrivateLink, API Gateway, and more) are out of scope for this router (see step 6).
 
-**Works best with** the [AWS MCP server](https://docs.aws.amazon.com/aws-mcp/) — enables sandboxed execution, audit logging, and enterprise controls. All guidance also works with standard AWS CLI access.
+**Works best with** the [AWS MCP server](https://docs.aws.amazon.com/aws-mcp/) -- enables sandboxed execution, audit logging, and enterprise controls. All guidance also works with standard AWS CLI access.
 
 ## How to use this skill
 
@@ -21,7 +21,7 @@ Routes networking requests to the correct service-specific skill. Covers 7 servi
 4. Load the target skill: if the AWS MCP server is available, use `aws___retrieve_skill(skill_name="<skill>")`; otherwise retrieve the skill document from this repository at `skills/<skill>/SKILL.md`.
 5. **If a request spans multiple of these skills**, route to each in dependency order. When routing to an internet-facing service (`cloudfront`), also route to `shieldadvanced` for DDoS protection and to `waf` for L7 filtering (AWS WAF attaches to CloudFront, Application Load Balancer, API Gateway, and AppSync), if the user has not already addressed L7 filtering and DDoS protection. When routing to a connectivity skill (`directconnect`, `sitetositevpn`, `transitgateway`), confirm encryption in transit is addressed (MACsec for Direct Connect, IPsec for VPN, inter-region peering encryption for Transit Gateway). When the request involves custom domains or TLS on `cloudfront`, note that ACM certificate provisioning is part of the implementation. When routing to `cloudfront` for a web-facing distribution, note that the target skill should address security response headers (CSP, HSTS, X-Frame-Options, X-Content-Type-Options) via a CloudFront Response Headers Policy, including the managed `SecurityHeadersPolicy`. The target skill handles the configuration.
 6. **If the request is an AWS networking task that is not in the Skill Routing Table** (for example VPC subnets or route tables, security groups, load balancers, VPC endpoints, PrivateLink, or API Gateway), tell the user that service is not available in this skill set rather than routing to the closest listed skill. This skill set does not cover every AWS networking service.
-7. This skill triages — it does not implement. Do not answer service-specific configuration questions from this skill alone.
+7. This skill triages -- it does not implement. Do not answer service-specific configuration questions from this skill alone.
 
 ## Connectivity vs Security
 
@@ -29,19 +29,19 @@ Routes networking requests to the correct service-specific skill. Covers 7 servi
 | --- | --- | --- |
 | **Answers** | Can traffic reach its destination? | Should traffic be allowed? |
 | **Failure symptom** | Timeout, unreachable, black hole | Rejected, denied, dropped |
-| **Dependency** | Independent of policy — path exists or it doesn't | Assumes connectivity exists — can only filter reachable traffic |
+| **Dependency** | Independent of policy -- path exists or it doesn't | Assumes connectivity exists -- can only filter reachable traffic |
 | **Granularity** | Affects all flows on a path | Targets specific flows by match criteria |
 
 ## Skill Routing Table
 
-| Skill | Choose when… |
+| Skill | Choose when... |
 | --- | --- |
 | `transitgateway` | Connecting more than two VPCs or on-premises networks in a hub, routing segmentation, cross-account/cross-region connectivity at scale, centralized egress/inspection, multicast |
-| `directconnect` | Dedicated private link to on-premises — consistent latency, high throughput, MACsec encryption, LAGs, Direct Connect Gateway for multi-VPC, SiteLink for site-to-site bypass, production hybrid workloads |
-| `sitetositevpn` | Encrypted IPsec tunnel over internet — quick setup, DX backup, static or BGP routing, accelerated option via Global Accelerator backbone, standard or large tunnel bandwidth |
+| `directconnect` | Dedicated private link to on-premises -- consistent latency, high throughput, MACsec encryption, LAGs, Direct Connect Gateway for multi-VPC, SiteLink for site-to-site bypass, production hybrid workloads |
+| `sitetositevpn` | Encrypted IPsec tunnel over internet -- quick setup, DX backup, static or BGP routing, accelerated option via Global Accelerator backbone, standard or large tunnel bandwidth |
 | `route53` | DNS management (public/private zones, records), health checks, routing policies (weighted, failover, geo, latency), domain registration, Resolver (hybrid DNS forwarding), DNS Firewall, Route 53 Profiles, Global Resolver |
 | `cloudfront` | Caching, TLS termination at edge, origin protection (OAC), custom domains, cache policies/behaviors, signed URLs, CloudFront Functions, viewer mTLS, VPC origins, multi-tenant distributions |
-| `waf` | Web application firewall (L7) — web ACLs on CloudFront/ALB/API Gateway/AppSync, AWS Managed Rules, rate-based rules for HTTP floods, IP/geo match, Bot Control, Fraud Control (account takeover/creation), for protecting web apps and APIs from exploits, bots, and credential stuffing |
+| `waf` | Web application firewall (L7) -- web ACLs on CloudFront/ALB/API Gateway/AppSync, AWS Managed Rules, rate-based rules for HTTP floods, IP/geo match, Bot Control, Fraud Control (account takeover/creation), for protecting web apps and APIs from exploits, bots, and credential stuffing |
 | `shieldadvanced` | L3/L4 DDoS protection for internet-facing resources, automatic application-layer (L7) mitigation via WAF, health-based detection, Shield Response Team access, and DDoS cost-protection credits |
 
 ## Cross-Service Concepts
@@ -50,19 +50,19 @@ Same concept, different service depending on layer. Use these to disambiguate wh
 
 ### Filtering / Blocking
 
-Use when the user says "block", "deny", "filter", or "restrict traffic" — determines which layer the filtering operates at.
+Use when the user says "block", "deny", "filter", or "restrict traffic" -- determines which layer the filtering operates at.
 
 | Layer | Service | What it filters on | Skill |
 | --- | --- | --- | --- |
 | L7 (HTTP/HTTPS, web apps and APIs) | AWS WAF | HTTP request attributes, AWS Managed Rules, rate-based and bot rules, IP/geo match | `waf` |
 | L3/L4 (DDoS volumetric/state-exhaustion) | Shield Advanced | Network/transport-layer DDoS floods on internet-facing resources | `shieldadvanced` |
-| DNS (resolution) | Route 53 DNS Firewall | Domain name patterns — blocks resolution, not traffic | `route53` |
+| DNS (resolution) | Route 53 DNS Firewall | Domain name patterns -- blocks resolution, not traffic | `route53` |
 
-When routing to `waf` or `cloudfront` for an internet-facing API or website, treat WAF rate-based rules as a default protective measure, not only when the user asks: note that the target skill should add WAF rate-based rules to bound request volume per client — the target skill implements it.
+When routing to `waf` or `cloudfront` for an internet-facing API or website, treat WAF rate-based rules as a default protective measure, not only when the user asks: note that the target skill should add WAF rate-based rules to bound request volume per client -- the target skill implements it.
 
 ### Logging / Visibility
 
-Use when the user says "logs", "visibility", "what's being blocked", or "can I see the traffic" — identifies which log source to check.
+Use when the user says "logs", "visibility", "what's being blocked", or "can I see the traffic" -- identifies which log source to check.
 
 | What you need to see | Service | Log type | Skill |
 | --- | --- | --- | --- |
@@ -72,11 +72,11 @@ Use when the user says "logs", "visibility", "what's being blocked", or "can I s
 | Edge/CDN request access | CloudFront | Standard logs (S3), real-time logs (Kinesis Data Streams) | `cloudfront` |
 | Tunnel state and traffic | Site-to-Site VPN | Tunnel telemetry, CloudWatch metrics | `sitetositevpn` |
 
-When routing to any of these services, remind the user to enable the corresponding logging (above) for security visibility and incident response — the target skill implements it. These logs can contain sensitive data (request query strings, internal hostnames in DNS queries), so also remind the user that the log destination (S3, CloudWatch Logs, Kinesis Data Firehose, or Kinesis Data Streams) MUST have encryption at rest enabled and access restricted to authorized personnel — the target skill implements it.
+When routing to any of these services, remind the user to enable the corresponding logging (above) for security visibility and incident response -- the target skill implements it. These logs can contain sensitive data (request query strings, internal hostnames in DNS queries), so also remind the user that the log destination (S3, CloudWatch Logs, Kinesis Data Firehose, or Kinesis Data Streams) MUST have encryption at rest enabled and access restricted to authorized personnel -- the target skill implements it.
 
 ### Traffic Shifting
 
-Use when the user says "shift traffic", "blue/green", "failover", "canary", or "weighted routing" — determines the granularity and which service controls it.
+Use when the user says "shift traffic", "blue/green", "failover", "canary", or "weighted routing" -- determines the granularity and which service controls it.
 
 | Granularity | Service | Mechanism | Skill |
 | --- | --- | --- | --- |
@@ -85,7 +85,7 @@ Use when the user says "shift traffic", "blue/green", "failover", "canary", or "
 
 ## Security Considerations
 
-These services are security-sensitive, so raise the relevant risk and control when routing regardless of which skill you hand off to — the target skill implements the control:
+These services are security-sensitive, so raise the relevant risk and control when routing regardless of which skill you hand off to -- the target skill implements the control:
 
 | Risk | Control the target skill should address | Skills |
 | --- | --- | --- |

@@ -1,4 +1,4 @@
-# Assessment — Sizing
+# Assessment -- Sizing
 
 Sizing is delegated to the managing-amazon-msk Skill's pricing logic. This skill
 implements no sizing math and packages no sizing script of its own. Derive the
@@ -14,7 +14,7 @@ to produce the recommended instance type, broker count, and monthly cost.
 ## Using managing-amazon-msk Skill's pricing logic (agent flow)
 
 1. **Load the managing-amazon-msk Skill.** How you reach its sizing script depends
-   on how skills are available in this environment — the same MCP-vs-local split
+   on how skills are available in this environment -- the same MCP-vs-local split
    described in the guardrail section of
    [assessment-compatibility.md](./assessment-compatibility.md), applied to the
    other skill:
@@ -39,24 +39,24 @@ to produce the recommended instance type, broker count, and monthly cost.
 
 `cluster-config.json` records throughput **per broker** and partitions as **leader
 counts**. `msk_sizing.py` expects **total cluster** throughput and **total partition
-replicas**. Apply these conversions — do not pass the contract values through
+replicas**. Apply these conversions -- do not pass the contract values through
 unchanged.
 
 | `msk_sizing.py` flag | Derivation from `cluster-config.json` |
 |---|---|
-| `--peak-data-in-mbs` | `metrics.peak_bytes_in_per_broker_mbps` **× `topology.num_brokers`** |
-| `--peak-data-out-mbs` | `metrics.peak_bytes_out_per_broker_mbps` **× `topology.num_brokers`** |
-| `--avg-data-in-mbs` | `metrics.avg_bytes_in_per_broker_mbps` **× `topology.num_brokers`**. When the field is `null`, use `peak_in / 2` and say so in `msk_sizing_pricing.md`. |
-| `--avg-data-out-mbs` | `metrics.avg_bytes_out_per_broker_mbps` **× `topology.num_brokers`**. When the field is `null`, use `peak_out / 2` and say so in `msk_sizing_pricing.md`. |
-| `--num-partitions` | `sum(topics[].num_partitions)` **× 3**. The contract stores leader counts; the flag wants total replicas, and Express always uses RF=3. Never use the source cluster's own replication factor here. |
-| `--retention-hours` | `ceil(max(topics[].configs["retention.ms"]) ÷ 3_600_000)` — the flag takes an integer hour count, so round up so retention is never under-estimated. Default to 24 when no topic declares it. |
-| `--primary-retention-hours` | Same value as `--retention-hours` — equal values disable Tiered Storage, which is correct for an Express target. If customer asks to compare Standard, and uses Tiered Storage today, pass the customer's Tiered Storage configuration. Only relevant for when customer asks for Standard comparison. |
+| `--peak-data-in-mbs` | `metrics.peak_bytes_in_per_broker_mbps` **x `topology.num_brokers`** |
+| `--peak-data-out-mbs` | `metrics.peak_bytes_out_per_broker_mbps` **x `topology.num_brokers`** |
+| `--avg-data-in-mbs` | `metrics.avg_bytes_in_per_broker_mbps` **x `topology.num_brokers`**. When the field is `null`, use `peak_in / 2` and say so in `msk_sizing_pricing.md`. |
+| `--avg-data-out-mbs` | `metrics.avg_bytes_out_per_broker_mbps` **x `topology.num_brokers`**. When the field is `null`, use `peak_out / 2` and say so in `msk_sizing_pricing.md`. |
+| `--num-partitions` | `sum(topics[].num_partitions)` **x 3**. The contract stores leader counts; the flag wants total replicas, and Express always uses RF=3. Never use the source cluster's own replication factor here. |
+| `--retention-hours` | `ceil(max(topics[].configs["retention.ms"]) / 3_600_000)` -- the flag takes an integer hour count, so round up so retention is never under-estimated. Default to 24 when no topic declares it. |
+| `--primary-retention-hours` | Same value as `--retention-hours` -- equal values disable Tiered Storage, which is correct for an Express target. If customer asks to compare Standard, and uses Tiered Storage today, pass the customer's Tiered Storage configuration. Only relevant for when customer asks for Standard comparison. |
 | `--replication-factor` | Omit. The default of 3 matches Express. |
 | `--broker-classes` | `express` (see "Present Express only"). |
 | `--discount-pct` | `target.pricing_discount_pct` (see "Negotiated pricing"). |
 | `--no-rack-affined-consumers` | Pass when `target.rack_affined_consumers` is `false` (see "Consumer rack affinity"). |
 
-Record the derived values — not the raw contract values — in
+Record the derived values -- not the raw contract values -- in
 `msk-sizing-inputs.<cluster_name>.json`, so the sizing run is reproducible.
 
 If `metrics` is absent entirely or `topology.num_brokers` is `null`, you cannot
@@ -68,7 +68,7 @@ figures, and do not pivot back into discovery to collect them.
 
 Read `target.pricing_discount_pct` from `cluster-config.json`. A number is the
 percentage the customer stated (`0` means they confirmed no discount). When the field
-is `null` or absent, ask — alongside the rack affinity question if that one is also
+is `null` or absent, ask -- alongside the rack affinity question if that one is also
 missing:
 
 > Does your organization have a Private Pricing Agreement (PPA), Enterprise Discount
@@ -92,20 +92,20 @@ budgeting.
 
 Cross-AZ consumer fetch is often one of the largest line items in the estimate. Read
 `target.rack_affined_consumers` from `cluster-config.json`. When it is `null` or
-absent, ask before you run sizing — this and negotiated pricing are the only inputs
-Assessment may request (see "Assessment scope — forbidden behavior" in
+absent, ask before you run sizing -- this and negotiated pricing are the only inputs
+Assessment may request (see "Assessment scope -- forbidden behavior" in
 [assessment-compatibility.md](./assessment-compatibility.md)):
 
-> Will your consumers fetch from local-AZ replicas on the Express target — rack-aware
+> Will your consumers fetch from local-AZ replicas on the Express target -- rack-aware
 > fetching, with `client.rack` set on each consumer and
-> `replica.selector.class=RackAwareReplicaSelector` on the cluster — or will they fetch
+> `replica.selector.class=RackAwareReplicaSelector` on the cluster -- or will they fetch
 > from partition leaders in any AZ?
 
 Map the contract value (or the answer) to the sizing flags:
 
 | `target.rack_affined_consumers` | Answer | Flag |
 |---|---|---|
-| `true` | Rack-aware / local-AZ fetching | Omit the flag — rack affinity is the script default |
+| `true` | Rack-aware / local-AZ fetching | Omit the flag -- rack affinity is the script default |
 | `false` | Fetch from leaders in any AZ, or no rack configuration planned | `--no-rack-affined-consumers` |
 | `null` | Unknown | Run both ways |
 
@@ -115,7 +115,7 @@ intend to configure rack-aware fetching on the Express cluster.
 
 When the answer is unknown, run sizing both ways, report the rack-affined figure as
 the recommendation, and present the difference as avoidable cost. Recommend enabling
-rack-aware fetching on the target either way — see
+rack-aware fetching on the target either way -- see
 `references/configure-clients.md` in the `managing-amazon-msk` skill for
 the `client.rack` and `replica.selector.class` settings.
 
@@ -134,7 +134,7 @@ If the workload exceeds the broker quota at every Express size, recommend a quot
 
 ## Compare the recommendation against the source footprint
 
-Source clusters are frequently over-provisioned — sized for peak plus a safety margin, then never scaled back. Recommend the smaller, lower-cost target when the workload supports it, and show the delta.
+Source clusters are frequently over-provisioned -- sized for peak plus a safety margin, then never scaled back. Recommend the smaller, lower-cost target when the workload supports it, and show the delta.
 
 1. Pull the source footprint from `cluster-config.json`: `topology.num_brokers`, `topology.num_azs`, `topology.broker_instance_type`.
 2. Compare it against the Express recommendation. Recommend the Express pick even when it is materially smaller than the source. The script already models peak throughput, 1-AZ-down headroom, and partition limits, so a smaller broker count is not a reduction in resilience.
@@ -158,11 +158,11 @@ Do not inflate the recommendation to match the source footprint. If the customer
    table above) if the source has a small set of low-retention topics dominating
    the storage picture, and say so in `msk_sizing_pricing.md`. Express storage is billed
    per GB-hour on retained data, so right-sizing per-topic retention is the
-   storage cost lever — not a change of broker class.
+   storage cost lever -- not a change of broker class.
 
 3. **Pricing is us-east-1 and public on-demand by default.** Cost figures do not
    reflect other AWS Regions. Apply a customer-stated Private Pricing Agreement
-   (PPA) or Enterprise Discount Program (EDP) discount with `--discount-pct` — see
+   (PPA) or Enterprise Discount Program (EDP) discount with `--discount-pct` -- see
    "Negotiated pricing" above.
 
 ## Key recommendations
@@ -187,7 +187,7 @@ When new skill updates are released, pricing logic can be re-run with the managi
 - **Sizing inputs reveal capacity and topology details.** The
   `msk-sizing-inputs.<cluster_name>.json` and `msk_sizing_pricing.md` artifacts
   contain peak throughput, partition count, retention, and the recommended
-  broker count and instance type for the workload. Treat them as sensitive —
+  broker count and instance type for the workload. Treat them as sensitive --
   these details are useful inputs for targeted attacks. Do not share via
   unencrypted email, public channels, or public ticketing systems without
   redaction.

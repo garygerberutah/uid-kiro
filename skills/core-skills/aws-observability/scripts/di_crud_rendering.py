@@ -144,7 +144,7 @@ INSTRUMENTATION CREATED:
         expected_ready = "~1-2 min"
     success_message += (
         f"\nNOTE: Allow {expected_ready} before this configuration reports READY. "
-        "Status checks immediately after creation may return no events yet — "
+        "Status checks immediately after creation may return no events yet -- "
         "wait and re-check rather than recreating.\n"
     )
 

@@ -95,7 +95,7 @@ source_df = spark.read.format("jdbc").options(
 Best practices:
 
 - Use a numeric column with even distribution for `partitionColumn`
-- Set `numPartitions` = number of Glue workers × 2
+- Set `numPartitions` = number of Glue workers x 2
 - Ensure `lowerBound`/`upperBound` cover actual data range
 - Source database must handle concurrent connections
 

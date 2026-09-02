@@ -119,7 +119,7 @@ proves domain ownership through one of three options:
 - You MUST use self-hosted validation (redirect or token) when the domain still serves live traffic
   from another provider, because managed validation requires DNS to already point at CloudFront
 - You MUST note that for HTTP-validated managed certificates, CloudFront associates the certificate
-  automatically once validated — no explicit customer action needed
+  automatically once validated -- no explicit customer action needed
 - You MUST note that for DNS validation and imported certificates, the customer must explicitly
   associate the certificate with the tenant AND activate the tenant to serve traffic
 - You MUST remind customers that tenants must be explicitly activated after certificate association
@@ -189,7 +189,7 @@ and surfacing the console link.
 - You MUST set the distribution's minimum protocol version to a current strong security policy (a
   TLS 1.2-or-higher `MinimumProtocolVersion`) rather than relying on the default, which may allow
   older TLS versions, to ensure strong encryption in transit. Do not hardcode a policy string that
-  ages — select the newest TLS 1.2+ security policy CloudFront offers, confirming the current options
+  ages -- select the newest TLS 1.2+ security policy CloudFront offers, confirming the current options
   against the CloudFront Developer Guide "supported protocols and ciphers" page
 - You MUST enable standard logging on the distribution as part of this change if it is not already
   enabled, so configuring the custom domain does not leave an audit-trail gap on a production

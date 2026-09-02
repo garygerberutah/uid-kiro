@@ -12,17 +12,17 @@ This is the log level configured through the Managed Service for Apache Flink AP
 - Also configurable in the console under the "Monitoring log level" section of the application configuration page.
 - Valid values: `ERROR`, `WARN`, `INFO`, `DEBUG`.
 - AWS recommends `INFO` because Apache Flink logs some errors at the INFO level rather than ERROR. Using ERROR alone may cause you to miss important failure information.
-- `DEBUG` should only be used temporarily for troubleshooting — it significantly impacts application performance.
+- `DEBUG` should only be used temporarily for troubleshooting -- it significantly impacts application performance.
 
 ### 2. Application-Level Log4j2 Configuration
 
-This is the Log4j2 configuration bundled inside your application JAR at `src/main/resources/log4j2.properties` (or `log4j2.xml`). **In Managed Service for Apache Flink, the service-level `MonitoringConfiguration.LogLevel` is the only log level control — it sets the application-wide log level. MSF does not support per-package or per-logger log level configuration through bundled Log4j2 config files.** Your bundled Log4j2 configuration is only used for local development. For per-package verbosity control in MSF, you can programmatically adjust log levels in your code using Log4j2's `Configurator.setLevel()` API, or use a separate DataStream with a sink (e.g., S3 or CloudWatch) for detailed debug output.
+This is the Log4j2 configuration bundled inside your application JAR at `src/main/resources/log4j2.properties` (or `log4j2.xml`). **In Managed Service for Apache Flink, the service-level `MonitoringConfiguration.LogLevel` is the only log level control -- it sets the application-wide log level. MSF does not support per-package or per-logger log level configuration through bundled Log4j2 config files.** Your bundled Log4j2 configuration is only used for local development. For per-package verbosity control in MSF, you can programmatically adjust log levels in your code using Log4j2's `Configurator.setLevel()` API, or use a separate DataStream with a sink (e.g., S3 or CloudWatch) for detailed debug output.
 
 ## Enabling CloudWatch Logging for an Managed Service for Apache Flink Application
 
 To configure logging, you need:
 
-1. **Create the CloudWatch log group AND a log stream inside it.** MSF does not auto-create either resource. If the log group exists but the log stream does not, MSF silently drops application logs — this is the most common cause of "logs configured but nothing shows up." Verify both with explicit CLI calls before changing log levels or redeploying:
+1. **Create the CloudWatch log group AND a log stream inside it.** MSF does not auto-create either resource. If the log group exists but the log stream does not, MSF silently drops application logs -- this is the most common cause of "logs configured but nothing shows up." Verify both with explicit CLI calls before changing log levels or redeploying:
 
    ```bash
    # Required: create the log group
@@ -56,12 +56,12 @@ To configure logging, you need:
 
 ### Diagnosing "App is RUNNING but no logs in CloudWatch"
 
-When an application is processing records but no logs appear, work this checklist in order — do **not** start by changing log level or redeploying, since the most common cause is a missing resource, not a verbosity issue.
+When an application is processing records but no logs appear, work this checklist in order -- do **not** start by changing log level or redeploying, since the most common cause is a missing resource, not a verbosity issue.
 
-1. **Confirm the logging option is attached.** Run `describe-application` and check `CloudWatchLoggingOptionDescriptions`. If empty or missing, that is the problem — re-run step 2 above.
+1. **Confirm the logging option is attached.** Run `describe-application` and check `CloudWatchLoggingOptionDescriptions`. If empty or missing, that is the problem -- re-run step 2 above.
 2. **Confirm the log stream exists** (not just the log group). Run the `describe-log-streams` call above. A log group alone is not enough; without an existing stream, logs are silently dropped.
 3. **Confirm IAM permissions on the execution role** include the three `logs:*` actions listed above. Missing permissions also cause silent log loss.
-4. Only after the resource and permission checks pass should you investigate `MonitoringConfiguration.LogLevel` — and only then to confirm it is `INFO` (the AWS-recommended level), not as a fix for missing logs.
+4. Only after the resource and permission checks pass should you investigate `MonitoringConfiguration.LogLevel` -- and only then to confirm it is `INFO` (the AWS-recommended level), not as a fix for missing logs.
 
 ## Local Development Logging vs Managed Service for Apache Flink Logging
 
@@ -76,8 +76,8 @@ When running locally, logging behaves differently from Managed Service for Apach
 ### Managed Service for Apache Flink (Production / Staging)
 
 - All stdout/stderr output from TaskManagers and JobManager is captured and forwarded to CloudWatch Logs automatically.
-- The service-level monitoring log level is the only log level control. MSF does not apply bundled Log4j2 log level configurations — per-package or per-logger levels set in `log4j2.properties` are ignored.
-- CloudWatch Logs charges $0.50/GB ingested and $0.03/GB stored per month — verbose logging has direct cost impact.
+- The service-level monitoring log level is the only log level control. MSF does not apply bundled Log4j2 log level configurations -- per-package or per-logger levels set in `log4j2.properties` are ignored.
+- CloudWatch Logs charges $0.50/GB ingested and $0.03/GB stored per month -- verbose logging has direct cost impact.
 - The Managed Service for Apache Flink service-level log level can be changed via `UpdateApplication` without redeploying the JAR.
 - For per-package verbosity control, programmatically adjust log levels in your code (e.g., `Configurator.setLevel("com.mypackage", Level.DEBUG)`), or use a separate DataStream with a sink for detailed debug output.
 
@@ -104,7 +104,7 @@ public class MyFlinkJob {
 }
 ```
 
-No additional Maven dependencies are needed — SLF4J and the Log4j2 binding are included in the Flink runtime.
+No additional Maven dependencies are needed -- SLF4J and the Log4j2 binding are included in the Flink runtime.
 
 ### Using Log4j2 Directly
 
@@ -138,7 +138,7 @@ public class MyFlinkJob {
 
 In Managed Service for Apache Flink, custom log messages appear in CloudWatch Logs as structured JSON entries containing fields like `locationInformation`, `logger`, `message`, `threadName`, `applicationARN`, `applicationVersionId`, and `messageType`.
 
-AWS recommends using the `INFO` level for custom messages because the application log contains a large volume of entries — INFO-level messages are easier to filter.
+AWS recommends using the `INFO` level for custom messages because the application log contains a large volume of entries -- INFO-level messages are easier to filter.
 
 ## Managed Service for Apache Flink-Specific CloudWatch Logs Insights Queries
 
@@ -176,7 +176,7 @@ fields @timestamp, @message
 | filter @message like /ResourceNotFoundException/
 | sort @timestamp desc
 
-# Task failures — application switching from RUNNING to RESTARTING
+# Task failures -- application switching from RUNNING to RESTARTING
 fields @timestamp, @message
 | filter @message like /switched from RUNNING to RESTARTING/
 | sort @timestamp desc

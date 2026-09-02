@@ -238,7 +238,7 @@ negotiate, so it is the most security-sensitive artifact the customer handles.
 - You MUST treat tunnel pre-shared keys (PSKs) as secrets: never pass them on the command line or store them in plaintext, store them in AWS Secrets Manager, and rotate them periodically; where the device supports it, recommend certificate-based authentication with AWS Private Certificate Authority instead of a static PSK
 - You SHOULD remind the customer that the downloaded sample contains live tunnel secrets and should
   be deleted from any temporary or download location once applied
-- You SHOULD enable Amazon CloudWatch tunnel-state alarms and Site-to-Site VPN logs, and confirm AWS CloudTrail is enabled so the API calls that create, modify, or delete the connection are audited (see the monitoring-and-troubleshooting-tunnels reference). You MUST enable encryption at rest on every log destination — KMS on the CloudWatch Logs log group holding the VPN/tunnel logs and SSE-S3 or SSE-KMS on the S3 bucket holding the CloudTrail logs — since these logs can carry tunnel and connection detail
+- You SHOULD enable Amazon CloudWatch tunnel-state alarms and Site-to-Site VPN logs, and confirm AWS CloudTrail is enabled so the API calls that create, modify, or delete the connection are audited (see the monitoring-and-troubleshooting-tunnels reference). You MUST enable encryption at rest on every log destination -- KMS on the CloudWatch Logs log group holding the VPN/tunnel logs and SSE-S3 or SSE-KMS on the S3 bucket holding the CloudTrail logs -- since these logs can carry tunnel and connection detail
 
 ## Additional Resources
 

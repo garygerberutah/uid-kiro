@@ -38,7 +38,7 @@ Use when building conditions or when an operation has no `Operations` entry.
 { "service": "s3", "condition_key": "aws:TagKeys" }
 ```
 
-Essential before using `ForAnyValue`/`ForAllValues` — these operators MUST only be used with array-typed keys (`ArrayOfString`, `ArrayOfARN`, etc.).
+Essential before using `ForAnyValue`/`ForAllValues` -- these operators MUST only be used with array-typed keys (`ArrayOfString`, `ArrayOfARN`, etc.).
 
 ### Pattern 5: List all operations or actions for a service
 
@@ -52,15 +52,15 @@ If the operation name is not found, the tool returns the list of available opera
 
 Each service reference JSON contains four top-level arrays:
 
-- **Actions** — IAM actions with resource types and condition keys
-- **Operations** — API operations mapped to authorized actions (available for most services; absent for a few)
-- **Resources** — Resource type definitions with ARN formats
-- **ConditionKeys** — Condition key definitions with types (String, ArrayOfString, Bool, etc.)
+- **Actions** -- IAM actions with resource types and condition keys
+- **Operations** -- API operations mapped to authorized actions (available for most services; absent for a few)
+- **Resources** -- Resource type definitions with ARN formats
+- **ConditionKeys** -- Condition key definitions with types (String, ArrayOfString, Bool, etc.)
 
 Each Operation entry contains:
 
-- **Name** — The API operation name (e.g., `CreateFunction`)
-- **AuthorizedActions** — IAM actions required, each with `Name`, `Service` (may differ from the queried service for cross-service actions), and optional `Context`
+- **Name** -- The API operation name (e.g., `CreateFunction`)
+- **AuthorizedActions** -- IAM actions required, each with `Name`, `Service` (may differ from the queried service for cross-service actions), and optional `Context`
 
 ## CLI Fallback
 

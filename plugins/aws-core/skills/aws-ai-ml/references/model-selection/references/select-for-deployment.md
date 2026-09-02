@@ -30,14 +30,14 @@ For each constraint in the spec, compare the user's words against the available 
 
 | Spec Field | Filter Key | Mapping Approach |
 |---|---|---|
-| Task | `task` | Match user's description to closest value(s) in `tasks` list. E.g., "chatbot" → "text generation" |
+| Task | `task` | Match user's description to closest value(s) in `tasks` list. E.g., "chatbot" -> "text generation" |
 | Data type | `data_type` | Match to closest value in `data_types` list |
-| Size preference | `size` | Map descriptive language to size bucket(s). E.g., "small" → "1b" and "1b-10b"; "large" → "10b-70b" and "70b-100b" |
-| Deployment target | `bedrock` | If "Bedrock" → `bedrock:true`. If "SageMaker" or "either" → no filter needed |
+| Size preference | `size` | Map descriptive language to size bucket(s). E.g., "small" -> "1b" and "1b-10b"; "large" -> "10b-70b" and "70b-100b" |
+| Deployment target | `bedrock` | If "Bedrock" -> `bedrock:true`. If "SageMaker" or "either" -> no filter needed |
 | License | `license` | Match to closest value in `licenses` list. Use substring matching. |
-| Context window | `context_window` | Map to closest bucket. E.g., "long documents" → "32k-128k" or ">128k" |
+| Context window | `context_window` | Map to closest bucket. E.g., "long documents" -> "32k-128k" or ">128k" |
 | Languages | `language` | Match to value in `languages` list |
-| Model type | `model_type` | "open source" / "open weights" → "open_weights"; "proprietary" → "proprietary" |
+| Model type | `model_type` | "open source" / "open weights" -> "open_weights"; "proprietary" -> "proprietary" |
 | Recency | *(not a filter)* | If user wants "latest" or "newest", sort filtered results by `original_creation_time` descending and present the most recent models first |
 
 **Rules:**
@@ -50,7 +50,7 @@ Present your mapping to the user for confirmation before filtering:
 
 > "Based on your preferences, I'll filter with these criteria: [list each mapping]. Does this look right?"
 
-⏸ Wait for user confirmation. If they disagree, adjust.
+[PAUSE] Wait for user confirmation. If they disagree, adjust.
 
 ## Step 3: List Models and Apply Filters
 
@@ -69,22 +69,22 @@ After filtering, report:
 
 ## Step 4: Handle Results
 
-### If results are non-empty (≤20 models)
+### If results are non-empty (<=20 models)
 
 Present all matching models. Cross-reference with `references/model-licenses.md` for license links where available. Display each model on its own line:
 
 ```
-<model name> — <size> | <license> | Bedrock: ✓/✗
+<model name> -- <size> | <license> | Bedrock: [OK]/[FAIL]
 
 ```
 
-Omit fields that are unknown rather than showing blanks. **Display every matching model — completeness is required.**
+Omit fields that are unknown rather than showing blanks. **Display every matching model -- completeness is required.**
 
 Ask the user to select:
 
 > "Which model would you like to deploy?"
 
-⏸ Wait for user selection. Once the user selects a model, **proceed immediately to Step 5** (do not confirm or hand off yet).
+[PAUSE] Wait for user selection. Once the user selects a model, **proceed immediately to Step 5** (do not confirm or hand off yet).
 
 ### If results are non-empty but large (>20 models)
 
@@ -114,10 +114,10 @@ From the response, parse the `HubContentDocument` JSON and determine the instanc
 
 The model has pre-configured hosting profiles optimized for different use cases. Each config name follows the pattern `<use-case>_<optimization>`, e.g.:
 
-- `generate_best_price_performance` — balanced cost/speed for text generation
-- `summarize_lowest_latency` — fastest for summarization tasks
-- `interact_lowest_cost` — cheapest for interactive/chatbot use
-- `max_context_best_price_performance` — best value for long-context inputs
+- `generate_best_price_performance` -- balanced cost/speed for text generation
+- `summarize_lowest_latency` -- fastest for summarization tasks
+- `interact_lowest_cost` -- cheapest for interactive/chatbot use
+- `max_context_best_price_performance` -- best value for long-context inputs
 
 Each config includes `BenchmarkMetrics` with latency and throughput per instance type.
 
@@ -130,41 +130,41 @@ Each config includes `BenchmarkMetrics` with latency and throughput per instance
 
 > "For your use case ([task]), I recommend the **[config_name]** hosting configuration on **[instance_type]** ([latency] latency, [throughput] throughput). There are [N] other configurations available if you'd like to optimize differently. Would you like to proceed with this, or see other options?"
 
-⏸ Wait for user confirmation or selection.
+[PAUSE] Wait for user confirmation or selection.
 
 ### If `InferenceConfigs` does NOT exist (no labeled configs):
 
 The model has basic hosting info only. Collect ALL available instance types from both sources:
 
-1. `SupportedInferenceInstanceTypes` — the top-level list
-2. `HostingInstanceTypeVariants.Variants` — keys in this object are instance families or specific instance types (e.g., `g5`, `ml.g5.2xlarge`) that also support the model
+1. `SupportedInferenceInstanceTypes` -- the top-level list
+2. `HostingInstanceTypeVariants.Variants` -- keys in this object are instance families or specific instance types (e.g., `g5`, `ml.g5.2xlarge`) that also support the model
 
 Merge both into a single candidate set (union, deduplicated). The `HostingInstanceTypeVariants` often contains smaller/cheaper instances not listed in `SupportedInferenceInstanceTypes`.
 
 From the merged set, select the **cheapest** instance type as the default recommendation. Consider both:
 
-1. **Instance family** (cost tier): `g4dn` < `g5` ≈ `g6` < `g6e` < `p4d` < `p5`
+1. **Instance family** (cost tier): `g4dn` < `g5` ~ `g6` < `g6e` < `p4d` < `p5`
 2. **Instance size** (suffix): `xlarge` < `2xlarge` < `4xlarge` < `12xlarge` < `24xlarge` < `48xlarge`
 
 Pick the cheapest family available, then the smallest size within that family.
 
-**Important:** A hosting config entry (with `ResourceRequirements`, `ImageUri`, etc.) is NOT required to recommend an instance. If an instance family appears in `HostingInstanceTypeVariants` with just an `ImageUri`, that is sufficient — the model can run on it. Do not bias toward instances that have a more detailed config. Always recommend the cheapest option regardless of whether it has a full config or just an image URI.
+**Important:** A hosting config entry (with `ResourceRequirements`, `ImageUri`, etc.) is NOT required to recommend an instance. If an instance family appears in `HostingInstanceTypeVariants` with just an `ImageUri`, that is sufficient -- the model can run on it. Do not bias toward instances that have a more detailed config. Always recommend the cheapest option regardless of whether it has a full config or just an image URI.
 
 Present:
 
 > "For this model, I recommend starting with **[cheapest_instance]** (the most cost-effective supported instance). Other supported options from smallest to largest: [list]. Would you like to proceed with this, or choose a different instance?"
 
-⏸ Wait for user confirmation.
+[PAUSE] Wait for user confirmation.
 
 ---
 
 ## Step 5B: Resolve Hosting Configuration
 
-> ⚠️ Do NOT proceed to Step 6 until you have completed this step. The user confirming an instance type does NOT mean the step is done.
+> [WARNING] Do NOT proceed to Step 6 until you have completed this step. The user confirming an instance type does NOT mean the step is done.
 
 Now that the instance type is confirmed, resolve the hosting configuration:
 
-1. Check `RecipeCollection` entries in the `HubContentDocument`. Within each recipe, look at `HostingConfigs` — an array of objects keyed by `InstanceType`.
+1. Check `RecipeCollection` entries in the `HubContentDocument`. Within each recipe, look at `HostingConfigs` -- an array of objects keyed by `InstanceType`.
 2. Find an entry where `InstanceType` matches the confirmed instance (e.g., `ml.g5.2xlarge`).
 3. If a match exists, it contains deployment-specific settings (`EcrAddress`, `Environment`, `ComputeResourceRequirements`, `Profile`). Record this as the hosting config.
 4. If no match in `RecipeCollection`, check `HostingInstanceTypeVariants.Variants` for the instance family (e.g., `g5`). This may contain `ImageUri` or environment variable overrides.
@@ -176,9 +176,9 @@ Now that the instance type is confirmed, resolve the hosting configuration:
 
 Emit a flat deployment config with exactly these three fields:
 
-- [ ] `model_id` — the selected Hub model ID.
-- [ ] `instance_type` — the user-confirmed instance type.
-- [ ] `inference_config_name` — the config name the user **confirmed** in Step 5A (the one you
+- [ ] `model_id` -- the selected Hub model ID.
+- [ ] `instance_type` -- the user-confirmed instance type.
+- [ ] `inference_config_name` -- the config name the user **confirmed** in Step 5A (the one you
       recommended, or a different one they chose), e.g. `generate_best_price_performance`, so
       deployment deploys THAT config instead of the SDK's top-ranked default. This is required
       whenever the model has labeled `InferenceConfigs`: because the instance type was derived from
@@ -188,10 +188,10 @@ Emit a flat deployment config with exactly these three fields:
       it), so the pair stays consistent. Set it to `null` ONLY on the Step 5A "no labeled configs"
       path.
 
-Do NOT hand off the image URI / environment / `ComputeResourceRequirements` resolved in Step 5B —
+Do NOT hand off the image URI / environment / `ComputeResourceRequirements` resolved in Step 5B --
 the serving container and environment are re-resolved from `inference_config_name`, so Step 5B stays
 a validation step (confirm a hosting config exists for the chosen instance) and its output is not
-part of the hand-off. Do not emit the role ARN, region, or endpoint/model naming either — those are
+part of the hand-off. Do not emit the role ARN, region, or endpoint/model naming either -- those are
 set at deployment time, not here.
 
 If any of the three fields is missing, go back and resolve it before proceeding.

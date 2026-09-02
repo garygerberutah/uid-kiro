@@ -127,27 +127,27 @@ handles the zone apex constraint and long TXT values, and surfaces the console l
   exclusive parameter groups below applies. Inferred as `true` when the target is a supported
   AWS resource (at any level, including the apex), or when the record is at the zone apex AND a
   CNAME was requested (a CNAME is prohibited at the apex, so an alias is the substitute). A plain
-  A or AAAA record at the apex pointing to a non-AWS IP address is NOT an alias — leave `is_alias`
+  A or AAAA record at the apex pointing to a non-AWS IP address is NOT an alias -- leave `is_alias`
   `false` in that case.
 
 Provide exactly one of the following groups, based on `is_alias`:
 
-**Alias record (`is_alias = true`) — provide an alias target:**
+**Alias record (`is_alias = true`) -- provide an alias target:**
 
 - **alias_target_dns_name** (required): DNS name of the AWS resource or the in-zone record to
   point at (e.g., `my-alb-123456789.us-east-1.elb.amazonaws.com`).
 - **alias_target_zone_id** (required): The hosted zone ID of the alias *target*. This is NOT the
   record's own `hosted_zone_id`. Resolve it by target type:
-  - CloudFront → always `Z2FDTNDATAQYW2`
-  - ELB (ALB/NLB) → the target's `CanonicalHostedZoneId` (`aws elbv2 describe-load-balancers`)
-  - CLB → the target's `CanonicalHostedZoneNameID` (`aws elb describe-load-balancers`)
-  - S3 website endpoint, API Gateway, and other AWS resources → the region-specific zone ID from
+  - CloudFront -> always `Z2FDTNDATAQYW2`
+  - ELB (ALB/NLB) -> the target's `CanonicalHostedZoneId` (`aws elbv2 describe-load-balancers`)
+  - CLB -> the target's `CanonicalHostedZoneNameID` (`aws elb describe-load-balancers`)
+  - S3 website endpoint, API Gateway, and other AWS resources -> the region-specific zone ID from
     the service's documentation or the console alias target picker
-  - Another record in the same hosted zone → reuse `hosted_zone_id`
+  - Another record in the same hosted zone -> reuse `hosted_zone_id`
 - **evaluate_target_health** (optional, default `false`): The ETH toggle. Leave `false` for a
   plain single-target record (see the ETH decision section).
 
-**Standard record (`is_alias = false`) — provide records and a TTL:**
+**Standard record (`is_alias = false`) -- provide records and a TTL:**
 
 - **records** (required): One or more resource record values (an IP, a hostname, or quoted TXT
   strings).
@@ -288,9 +288,9 @@ Alias records inherit the target's TTL. Remove the TTL.
 - You SHOULD use least-privilege IAM credentials provisioned through ephemeral mechanisms (IAM
   roles, SSO/IAM Identity Center session credentials, or `aws sts assume-role`) rather than
   long-lived IAM user access keys, and prefer read-only credentials for inspection steps. Grant
-  only the specific actions this procedure needs — `route53:ChangeResourceRecordSets` and
+  only the specific actions this procedure needs -- `route53:ChangeResourceRecordSets` and
   `route53:GetChange` to create the record and confirm propagation, plus
-  `route53:ListResourceRecordSets` and `route53:GetHostedZone` for inspection — rather than
+  `route53:ListResourceRecordSets` and `route53:GetHostedZone` for inspection -- rather than
   `route53:*` or broader `service:*` wildcards.
 - You MUST enable Route 53 query logging to an encrypted destination (KMS on CloudWatch Logs,
   SSE-S3/SSE-KMS on S3, or server-side encryption on a Data Firehose stream) and ensure CloudTrail

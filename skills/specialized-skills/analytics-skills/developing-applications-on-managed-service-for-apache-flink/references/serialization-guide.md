@@ -98,13 +98,13 @@ DataStream<MyEvent> events = protobufSource
         proto.getEventId(),
         proto.getTimestamp(),
         proto.getUserId()));
-// MyEvent is a Flink POJO (public fields + no-arg constructor) — fast serialization, schema evolution, no Kryo
+// MyEvent is a Flink POJO (public fields + no-arg constructor) -- fast serialization, schema evolution, no Kryo
 ```
 
-> **Legacy note — not recommended for new applications:** If you must use Protobuf objects directly in state, you can register them with Kryo via `env.getConfig()`. However, Kryo has a 50%+ performance penalty and Kryo-serialized state does not migrate from Flink 1.x to 2.x. Convenience registration methods on `StreamExecutionEnvironment` are removed in Flink 2.x.
+> **Legacy note -- not recommended for new applications:** If you must use Protobuf objects directly in state, you can register them with Kryo via `env.getConfig()`. However, Kryo has a 50%+ performance penalty and Kryo-serialized state does not migrate from Flink 1.x to 2.x. Convenience registration methods on `StreamExecutionEnvironment` are removed in Flink 2.x.
 >
 > ```java
-> // Not recommended — use POJO conversion instead:
+> // Not recommended -- use POJO conversion instead:
 > env.getConfig().registerTypeWithKryoSerializer(
 >     MyProtobufMessage.class,
 >     ProtobufSerializer.class
@@ -119,7 +119,7 @@ If Flink can't recognize a type as a POJO/Tuple/Avro/Protobuf, it silently falls
 
 - **~50% performance penalty** vs. POJO serialization, plus larger serialized objects on the wire and in state. On a high-throughput keyed pipeline this dominates per-record cost.
 - **Larger checkpoint and shuffle bytes.** Inflated checkpoint size lengthens the checkpoint window and pushes more data across cross-AZ network paths inside MSF.
-- **Kryo-serialized state does not migrate from Flink 1.x to 2.x.** This is a hard blocker for in-place version upgrades — see [flink-2x-migration.md](flink-2x-migration.md) for the migration path. Plan to eliminate Kryo *before* the 1→2 upgrade, not after.
+- **Kryo-serialized state does not migrate from Flink 1.x to 2.x.** This is a hard blocker for in-place version upgrades -- see [flink-2x-migration.md](flink-2x-migration.md) for the migration path. Plan to eliminate Kryo *before* the 1->2 upgrade, not after.
 
 ### Fail Fast in Development
 
@@ -137,10 +137,10 @@ Run with `disableGenericTypes()` enabled locally as part of every PR build so Kr
 
 ## Last Resort: Kryo Type Registration
 
-> **Warning:** Prefer converting to Flink POJOs or Tuples instead of registering Kryo serializers. Kryo-serialized state does not migrate across Flink major versions. Convenience registration methods on `StreamExecutionEnvironment` are removed in Flink 2.x — use `env.getConfig()` methods instead. Use this only when migrating away from Kryo is not yet feasible.
+> **Warning:** Prefer converting to Flink POJOs or Tuples instead of registering Kryo serializers. Kryo-serialized state does not migrate across Flink major versions. Convenience registration methods on `StreamExecutionEnvironment` are removed in Flink 2.x -- use `env.getConfig()` methods instead. Use this only when migrating away from Kryo is not yet feasible.
 
 ```java
-// Last resort — register frequently used types to avoid class name serialization overhead IF you use Kryo
+// Last resort -- register frequently used types to avoid class name serialization overhead IF you use Kryo
 // In Flink 2.x, use env.getConfig() methods (env-level convenience methods are removed)
 StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 

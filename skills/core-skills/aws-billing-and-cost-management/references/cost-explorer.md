@@ -15,7 +15,7 @@
 
 **RECORD_TYPE not CHARGE_TYPE:** The dimension for charge type filtering is `RECORD_TYPE`. Using `CHARGE_TYPE` throws `ValidationException`.
 
-**Empty Total with GroupBy:** By design — `Total` is empty when `GroupBy` is used. Sum grouped results using a script (see `references/deterministic-calculations.md`), or make a separate call without GroupBy.
+**Empty Total with GroupBy:** By design -- `Total` is empty when `GroupBy` is used. Sum grouped results using a script (see `references/deterministic-calculations.md`), or make a separate call without GroupBy.
 
 **Filter validation:** Cost Explorer does not distinguish between valid filters with no data and invalid filters. If a filter returns no results, call `GetDimensionValues` to verify the filter value exists.
 
@@ -23,7 +23,7 @@
 
 **Hourly granularity:** Requires opt-in in Cost Explorer preferences. Only available for past 14 days. Hourly + resource-level only works for EC2 Compute.
 
-**Tags take 24 hours** to appear after activation, and only for resources that incurred costs after activation — not retroactive.
+**Tags take 24 hours** to appear after activation, and only for resources that incurred costs after activation -- not retroactive.
 
 ## Usage Quantity Analysis
 
@@ -31,42 +31,42 @@ When using `USAGE_QUANTITY` metric:
 
 - MUST group by usage type OR filter for usage types with the same unit (e.g., GB-month)
 - NEVER aggregate different usage units (GB-months + instance-hours)
-- If API returns usage units of `"NA"`, multiple units were aggregated — discard these results
+- If API returns usage units of `"NA"`, multiple units were aggregated -- discard these results
 
 ## Data Transfer Analysis
 
-Data transfer costs in Cost Explorer are spread across multiple usage type patterns. Use a script with regex for accurate filtering — do NOT rely on broad keyword matching (`Bytes`, `Transfer`) as it produces many false positives.
+Data transfer costs in Cost Explorer are spread across multiple usage type patterns. Use a script with regex for accurate filtering -- do NOT rely on broad keyword matching (`Bytes`, `Transfer`) as it produces many false positives.
 
 **Core data transfer** (product family "Data Transfer" in CUR):
 
-- `DataTransfer-*-Bytes` — Internet ingress/egress, intra-region cross-AZ
-- `*-AWS-Out-Bytes`, `*-AWS-In-Bytes` — inter-region transfer
-- `*-Bytes-Internet`, `*-Bytes-AWS` — Global Accelerator
-- `CloudFront-*-Bytes` — CloudFront to/from origin
-- `*-DataXfer-*` — Direct Connect
-- `*-ABytes-*` — S3 Transfer Acceleration
+- `DataTransfer-*-Bytes` -- Internet ingress/egress, intra-region cross-AZ
+- `*-AWS-Out-Bytes`, `*-AWS-In-Bytes` -- inter-region transfer
+- `*-Bytes-Internet`, `*-Bytes-AWS` -- Global Accelerator
+- `CloudFront-*-Bytes` -- CloudFront to/from origin
+- `*-DataXfer-*` -- Direct Connect
+- `*-ABytes-*` -- S3 Transfer Acceleration
 
 **Networking data processing** (billed under respective services, not under "Data Transfer"):
 
-- `*-NatGateway-Bytes` — per-byte NAT Gateway processing (service: `EC2 - Other`)
-- `*-VpcEndpoint-Bytes` — per-byte VPC Endpoint / PrivateLink processing (service: `Amazon Virtual Private Cloud`)
-- `*-TransitGateway-Bytes` — per-byte Transit Gateway processing (service: `Amazon Virtual Private Cloud`)
-- `*-DataProcessing-Bytes` — per-byte processing, but source varies by service:
-  - `Elastic Load Balancing` → NLB/GLB data processing (networking, include)
-  - `AmazonCloudWatch` → VPC Flow Logs processing (observability, exclude)
-  - Other services → check context before including
+- `*-NatGateway-Bytes` -- per-byte NAT Gateway processing (service: `EC2 - Other`)
+- `*-VpcEndpoint-Bytes` -- per-byte VPC Endpoint / PrivateLink processing (service: `Amazon Virtual Private Cloud`)
+- `*-TransitGateway-Bytes` -- per-byte Transit Gateway processing (service: `Amazon Virtual Private Cloud`)
+- `*-DataProcessing-Bytes` -- per-byte processing, but source varies by service:
+  - `Elastic Load Balancing` -> NLB/GLB data processing (networking, include)
+  - `AmazonCloudWatch` -> VPC Flow Logs processing (observability, exclude)
+  - Other services -> check context before including
 
 Group by both `SERVICE` and `USAGE_TYPE` to disambiguate `DataProcessing-Bytes`. Only include it when the service is `Elastic Load Balancing`.
 
 **Networking infrastructure** (hourly charges for networking resources that facilitate data movement):
 
-- `*-NatGateway-Hours` — NAT Gateway hourly charge
-- `*-VpcEndpoint-Hours` — VPC Endpoint hourly charge
-- `*-TransitGateway-Hours` — Transit Gateway attachment hourly charge
-- `GlobalAccelerator*` — Global Accelerator hourly + data transfer
-- `*-LCUUsage` — ALB capacity units
+- `*-NatGateway-Hours` -- NAT Gateway hourly charge
+- `*-VpcEndpoint-Hours` -- VPC Endpoint hourly charge
+- `*-TransitGateway-Hours` -- Transit Gateway attachment hourly charge
+- `GlobalAccelerator*` -- Global Accelerator hourly + data transfer
+- `*-LCUUsage` -- ALB capacity units
 
-Include both networking categories in your analysis as separate sections — customers asking about "data transfer costs" often want to see the full networking picture, not just per-byte charges.
+Include both networking categories in your analysis as separate sections -- customers asking about "data transfer costs" often want to see the full networking picture, not just per-byte charges.
 
 **NOT data transfer** (common false positives):
 `Ingestion-Bytes` (CloudWatch Logs), `PaidEventsAnalyzed-Bytes` (CloudTrail), `QueryScanned-Bytes` (Logs Insights), `VendedLog-Bytes`, `LambdaNetworkLogsAnalyzed-Bytes`, `Select-Scanned-Bytes`/`Select-Returned-Bytes` (S3 Select).
@@ -86,7 +86,7 @@ for service, usage_type, cost in results:
     elif NETWORKING_PROCESSING_RE.search(usage_type):
         pass  # Networking data processing
     elif 'DataProcessing-Bytes' in usage_type and service == 'Elastic Load Balancing':
-        pass  # ELB data processing (networking) — exclude CloudWatch/other services
+        pass  # ELB data processing (networking) -- exclude CloudWatch/other services
     elif NETWORKING_INFRA_RE.search(usage_type):
         pass  # Networking infrastructure (hourly)
     # Everything else: not data transfer
@@ -108,9 +108,9 @@ Use `GetCostAndUsageWithResources` (not `GetCostAndUsage`) for individual resour
 ## Date Handling
 
 - If user says "last month" without a year, use the most recent completed month
-- **ALWAYS check the current date before querying.** Use `date` or equivalent to confirm the current year and month. Models frequently default to dates from training data. An analysis of "last month" using the wrong year will return real data that looks plausible but is entirely stale — the most dangerous kind of error.
+- **ALWAYS check the current date before querying.** Use `date` or equivalent to confirm the current year and month. Models frequently default to dates from training data. An analysis of "last month" using the wrong year will return real data that looks plausible but is entirely stale -- the most dangerous kind of error.
 - NEVER compare a complete month to a partial current month without calculating daily averages
-- Cost data has ~24-hour delay — current day data is estimated
+- Cost data has ~24-hour delay -- current day data is estimated
 
 ## Common CLI Commands
 

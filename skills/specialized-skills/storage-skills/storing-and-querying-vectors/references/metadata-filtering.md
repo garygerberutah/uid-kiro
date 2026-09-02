@@ -9,7 +9,7 @@ For full docs: search AWS docs for `"S3 Vectors metadata filtering"`
 - **Non-filterable**: Declared at index creation via `--metadata-configuration`. Search AWS docs for `"S3 Vectors non-filterable metadata"` for JSON syntax.
   Cannot be used in filters but can store larger data. Total metadata per vector
   (filterable + non-filterable combined) is limited to 40 KB. Ideal for text
-  chunks, descriptions, raw content. Immutable — cannot change after index
+  chunks, descriptions, raw content. Immutable -- cannot change after index
   creation. Max 10 non-filterable keys per index.
 
 ## Filter Operators
@@ -62,7 +62,7 @@ Existence check:
 
 ## Key Rules
 
-- `$eq` is implicit — `{"genre": "drama"}` equals `{"genre": {"$eq": "drama"}}`
+- `$eq` is implicit -- `{"genre": "drama"}` equals `{"genre": {"$eq": "drama"}}`
 - `$eq` on array metadata matches if input matches ANY element in the array
 - Filtering is applied during search (not post-filter). All returned results satisfy the filter, but fewer than top-K may be returned when few vectors match
 - Query with filter requires both `s3vectors:QueryVectors` AND `s3vectors:GetVectors`

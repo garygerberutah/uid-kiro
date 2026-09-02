@@ -3,7 +3,7 @@
 - **Docs**: https://docs.aws.amazon.com/detective/latest/userguide/
 - **Docs (llms.txt)**: https://docs.aws.amazon.com/detective/latest/userguide/llms.txt
 
-Amazon Detective helps investigate security findings by building behavior graphs from CloudTrail management events, VPC Flow Logs, GuardDuty findings, EKS audit logs, and Security Hub CSPM findings. It does not generate findings — it provides investigation context through entity profiles, finding groups, and automated investigations. Detective does NOT support S3 data events. Detective uses AWS Security Finding Format (ASFF) for ingestion. It does not produce findings — it produces investigations.
+Amazon Detective helps investigate security findings by building behavior graphs from CloudTrail management events, VPC Flow Logs, GuardDuty findings, EKS audit logs, and Security Hub CSPM findings. It does not generate findings -- it provides investigation context through entity profiles, finding groups, and automated investigations. Detective does NOT support S3 data events. Detective uses AWS Security Finding Format (ASFF) for ingestion. It does not produce findings -- it produces investigations.
 
 ## Data Sources
 
@@ -47,7 +47,7 @@ Detective investigations use a severity score:
 
 - Investigation severity is based on the combination and weight of indicators found
 - Indicator types: TTP_OBSERVED, IMPOSSIBLE_TRAVEL, FLAGGED_IP_ADDRESS, NEW_GEOLOCATION, NEW_ASO, NEW_USER_AGENT, RELATED_FINDING, RELATED_FINDING_GROUP
-- Detective does not generate findings — it produces investigations and finding groups from ingested data
+- Detective does not generate findings -- it produces investigations and finding groups from ingested data
 
 **Documentation:** https://docs.aws.amazon.com/detective/latest/userguide/investigations-report.html
 

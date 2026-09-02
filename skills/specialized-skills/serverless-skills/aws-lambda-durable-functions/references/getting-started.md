@@ -17,7 +17,7 @@ Before using AWS Lambda durable functions, verify:
 
 2. **Runtime environment** is ready:
    - For TypeScript/JavaScript: Node.js 22+ (`node --version`)
-   - For Python: Python 3.11+ (`python --version`. Note that only Lambda runtime environments 3.13+ come with the Durable Execution SDK pre-installed. 3.11 is the minimum supported Python version by the Durable Execution SDK itself — use OCI to bring your own container image with an older Python runtime + Durable Execution SDK.)
+   - For Python: Python 3.11+ (`python --version`. Note that only Lambda runtime environments 3.13+ come with the Durable Execution SDK pre-installed. 3.11 is the minimum supported Python version by the Durable Execution SDK itself -- use OCI to bring your own container image with an older Python runtime + Durable Execution SDK.)
 
 3. **Deployment capability** exists (one of):
    - AWS SAM CLI (`sam --version`) 1.153.1 or higher
@@ -32,8 +32,8 @@ Default: TypeScript
 
 Override syntax:
 
-- "use Python" → Generate Python code
-- "use JavaScript" → Generate JavaScript code
+- "use Python" -> Generate Python code
+- "use JavaScript" -> Generate JavaScript code
 
 When not specified, ALWAYS use TypeScript
 
@@ -43,8 +43,8 @@ Default: CDK
 
 Override syntax:
 
-- "use CloudFormation" → Generate YAML templates
-- "use SAM" → Generate YAML templates
+- "use CloudFormation" -> Generate YAML templates
+- "use SAM" -> Generate YAML templates
 
 When not specified, ALWAYS use CDK
 
@@ -283,40 +283,40 @@ export const handler = withDurableExecution(async (event, context: DurableContex
 
 ```
 my-durable-function/
-├── src/
-│   ├── handler.ts              # Main handler
-│   ├── steps/                  # Step functions
-│   │   ├── validate.ts
-│   │   └── process.ts
-│   └── utils/                  # Utilities
-│       └── retry-strategies.ts
-├── tests/
-│   └── handler.test.ts         # Tests with LocalDurableTestRunner
-├── infrastructure/
-│   └── template.yaml           # SAM/CloudFormation
-├── eslint.config.js            # ESLint configuration
-├── jest.config.js              # Jest configuration
-├── tsconfig.json               # TypeScript configuration
-└── package.json
++-- src/
+|   +-- handler.ts              # Main handler
+|   +-- steps/                  # Step functions
+|   |   +-- validate.ts
+|   |   +-- process.ts
+|   +-- utils/                  # Utilities
+|       +-- retry-strategies.ts
++-- tests/
+|   +-- handler.test.ts         # Tests with LocalDurableTestRunner
++-- infrastructure/
+|   +-- template.yaml           # SAM/CloudFormation
++-- eslint.config.js            # ESLint configuration
++-- jest.config.js              # Jest configuration
++-- tsconfig.json               # TypeScript configuration
++-- package.json
 ```
 
 ### Python
 
 ```
 my-durable-function/
-├── src/
-│   ├── handler.py              # Main handler
-│   ├── steps/                  # Step functions
-│   │   ├── __init__.py
-│   │   ├── validate.py
-│   │   └── process.py
-│   └── utils/
-│       └── retry_strategies.py
-├── tests/
-│   └── test_handler.py         # Tests with DurableFunctionTestRunner
-├── infrastructure/
-│   └── template.yaml           # SAM/CloudFormation
-└── pyproject.toml              # Project configuration
++-- src/
+|   +-- handler.py              # Main handler
+|   +-- steps/                  # Step functions
+|   |   +-- __init__.py
+|   |   +-- validate.py
+|   |   +-- process.py
+|   +-- utils/
+|       +-- retry_strategies.py
++-- tests/
+|   +-- test_handler.py         # Tests with DurableFunctionTestRunner
++-- infrastructure/
+|   +-- template.yaml           # SAM/CloudFormation
++-- pyproject.toml              # Project configuration
 ```
 
 ## ESLint Plugin Setup

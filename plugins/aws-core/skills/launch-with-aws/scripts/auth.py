@@ -83,7 +83,7 @@ def _generate_state() -> str:
     return secrets.token_hex(16)
 
 
-# ── Session persistence ──────────────────────────────────────────────────
+# -- Session persistence --------------------------------------------------
 
 
 def load_session() -> Optional[StoredSession]:
@@ -115,7 +115,7 @@ def has_valid_session() -> bool:
     return bool(session and session.token_expires_at > int(time.time()) + TOKEN_EXPIRY_BUFFER_SECS)
 
 
-# ── Client registration ──────────────────────────────────────────────────
+# -- Client registration --------------------------------------------------
 
 
 def _resolve_scopes() -> list[str]:
@@ -163,7 +163,7 @@ def _register_client() -> ClientCredentials:
     )
 
 
-# ── Token exchange ────────────────────────────────────────────────────────
+# -- Token exchange --------------------------------------------------------
 
 
 def _exchange_code(
@@ -209,7 +209,7 @@ def _refresh_token(session: StoredSession) -> Tuple[str, str, int]:
     return access_token, refresh_token, int(time.time()) + expires_in
 
 
-# ── Loopback callback server ─────────────────────────────────────────────
+# -- Loopback callback server ---------------------------------------------
 
 
 class _OAuthState:
@@ -266,7 +266,7 @@ class _CallbackHandler(BaseHTTPRequestHandler):
         pass
 
 
-# ── Public API ────────────────────────────────────────────────────────────
+# -- Public API ------------------------------------------------------------
 
 
 def get_access_token() -> str:
@@ -357,7 +357,7 @@ def sign_out() -> dict:
     return {"signedOut": True, "sessionRemoved": removed}
 
 
-# ── Non-blocking auth (auth-start / auth-wait) ──────────────────────────
+# -- Non-blocking auth (auth-start / auth-wait) --------------------------
 
 
 def start_auth() -> dict:

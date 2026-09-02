@@ -20,13 +20,13 @@ activation. The fastest path is to ask your agent to walk you through it:
 
 > Ask OpenClaw: "help me set up the agents-pay skill"
 
-This drives the bundled skill's interactive setup wizard end-to-end — it
+This drives the bundled skill's interactive setup wizard end-to-end -- it
 prompts for AWS credentials, network, recipients, and spend limits, then
 provisions the payment instrument and session for you.
 
 If you'd rather run it yourself, or want to see the raw steps first, open
 [`skills/agents-pay/SKILL.md`](skills/agents-pay/SKILL.md) directly (there is
-no `openclaw skills read` command — use `openclaw skills info agents-pay`
+no `openclaw skills read` command -- use `openclaw skills info agents-pay`
 once the skill is installed/staged, or just open the file). For
 OpenClaw-specific configuration, see
 [`skills/agents-pay/references/openclaw-setup.md`](skills/agents-pay/references/openclaw-setup.md).
@@ -57,7 +57,7 @@ Required configuration:
   `allowAnyRecipient: true`
 - Optional `allowedOrigins` and `networkPreferences`
 - `allowedAssetsByNetwork` for exact network-to-asset policy
-- `maxPaymentAmountAtomic` — **required**, no default. Set this to the maximum
+- `maxPaymentAmountAtomic` -- **required**, no default. Set this to the maximum
   amount the agent may spend in a single payment, in the asset's smallest unit
   (e.g. `"100000"` = 0.10 USDC at 6 decimals). This is the PER-PAYMENT ceiling;
   it is not a substitute for the session budget, which caps cumulative spend.
@@ -68,7 +68,7 @@ Required configuration:
   may contain prompt injection aimed at the agent. See "Content isolation" in
   [`references/security-model.md`](../../references/security-model.md) for the
   full tradeoff. This is a separate, TypeScript-runtime-only setting from the
-  Python `x402_fetch.py` path's `return_body` policy field — set both if you
+  Python `x402_fetch.py` path's `return_body` policy field -- set both if you
   run both runtimes and want consistent behavior.
 
 The manifest accepts either an unconfigured installation or the complete
@@ -83,7 +83,7 @@ asset, per-payment, or cumulative session limits.
 ## Hard boundary: sessions are human-only
 
 Payment sessions are created **outside the agent loop** by a human operator
-using the AWS CLI or console — never inside an OpenClaw conversation. The
+using the AWS CLI or console -- never inside an OpenClaw conversation. The
 plugin exposes no tool to create, extend, or replace a session. If a session
 expires or drains, the operator must create a new one and update the config;
 the agent cannot self-authorize continued spending.

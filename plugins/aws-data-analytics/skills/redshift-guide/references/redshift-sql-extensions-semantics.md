@@ -2,7 +2,7 @@
 
 ## Extensions LLMs under-use
 
-### QUALIFY — filter on window functions (no subquery)
+### QUALIFY -- filter on window functions (no subquery)
 
 ```sql
 -- Preferred: single scan
@@ -44,16 +44,16 @@ CREATE TABLE events (event_id INT IDENTITY(1,1), payload SUPER) DISTSTYLE AUTO;
 INSERT INTO events (payload) VALUES (JSON_PARSE('{"user":"alice","meta":{"page":"/home"},"tags":["a","b"]}'));
 SELECT payload.user, payload.meta.page FROM events;         -- dot-notation
 SELECT e.event_id, t AS tag_value FROM events e, e.payload.tags AS t;  -- UNNEST array
--- (TAG is a reserved word — alias as tag_value or quote it as "tag")
+-- (TAG is a reserved word -- alias as tag_value or quote it as "tag")
 ```
 
-`JSON_PARSE(str)` → SUPER, `JSON_SERIALIZE(super)` → string. Dot-notation returns a
+`JSON_PARSE(str)` -> SUPER, `JSON_SERIALIZE(super)` -> string. Dot-notation returns a
 JSON-quoted value; `::VARCHAR` gives the bare string. `CAN_JSON_PARSE(str)` tests
 parseability before ingest.
 
 **Prefer SUPER over the text-based JSON functions** (`JSON_EXTRACT_PATH_TEXT`,
-`JSON_EXTRACT_ARRAY_ELEMENT_TEXT`) — parse to SUPER via `JSON_PARSE` during ingestion
-instead. They take a JSON string, not a SUPER column — pass `JSON_SERIALIZE(col)` to
+`JSON_EXTRACT_ARRAY_ELEMENT_TEXT`) -- parse to SUPER via `JSON_PARSE` during ingestion
+instead. They take a JSON string, not a SUPER column -- pass `JSON_SERIALIZE(col)` to
 use them on SUPER.
 
 ### APPROXIMATE COUNT(DISTINCT)
@@ -67,7 +67,7 @@ SELECT APPROXIMATE COUNT(DISTINCT user_id) FROM pageviews;
 ### TOP N (SQL Server compat)
 
 `SELECT TOP n <column_list> FROM <table>` works; `LIMIT n` also works.
-`TOP N PERCENT` does **not** (SQL Server–only).
+`TOP N PERCENT` does **not** (SQL Server-only).
 
 ## Semantic traps (wrong results, no error)
 
@@ -80,15 +80,15 @@ SELECT APPROXIMATE COUNT(DISTINCT user_id) FROM pageviews;
   `= 'abc'` (two bare literals do not), and `GROUP BY`/`DISTINCT` treat both as one value.
   `LIKE` compares blanks literally on character data types.
 - **`ALTER TABLE`** adds one column per statement; `ALTER COLUMN TYPE` only supports resizing VARCHAR columns.
-- **No `VALUES` as a constant table** in FROM — use `SELECT ... UNION ALL SELECT ...`.
-- **No sequences** — use `IDENTITY(seed, step)`.
+- **No `VALUES` as a constant table** in FROM -- use `SELECT ... UNION ALL SELECT ...`.
+- **No sequences** -- use `IDENTITY(seed, step)`.
 
 ## VACUUM (not like PostgreSQL)
 
-`VACUUM FULL` is valid — the **default** mode: reclaim space **and** fully resort rows
-(expensive on large tables). **For large tables, recommend `VACUUM RECLUSTER`** — it sorts
+`VACUUM FULL` is valid -- the **default** mode: reclaim space **and** fully resort rows
+(expensive on large tables). **For large tables, recommend `VACUUM RECLUSTER`** -- it sorts
 only the unsorted portions, leaving already-sorted portions intact; doesn't merge into
 the sorted region or reclaim all deleted space. Other modes:
 `VACUUM DELETE ONLY` (reclaim, no resort), `VACUUM SORT ONLY` (resort, no reclaim),
-`VACUUM REINDEX` (interleaved keys). Redshift VACUUM has no ANALYZE option — unlike
+`VACUUM REINDEX` (interleaved keys). Redshift VACUUM has no ANALYZE option -- unlike
 PostgreSQL's combined `VACUUM ANALYZE`, run `ANALYZE` as its own statement.

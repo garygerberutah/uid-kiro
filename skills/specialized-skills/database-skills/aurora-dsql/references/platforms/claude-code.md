@@ -12,7 +12,7 @@ knowledge and AWS API access.
 Follow the official setup guide at
 [Setting up the AWS MCP Server](https://docs.aws.amazon.com/aws-mcp/latest/userguide/getting-started-aws-mcp-server.html).
 The AWS docs page tracks the canonical install command, scopes (`local`, `project`, `user`), and
-auth configuration for Claude Code — defer to it rather than caching the invocation here.
+auth configuration for Claude Code -- defer to it rather than caching the invocation here.
 
 ### Choosing the Right Scope
 

@@ -12,11 +12,11 @@ metadata:
 
 Domain expertise for working with containers on AWS.
 
-**Works best with** the [AWS MCP server](https://docs.aws.amazon.com/aws-mcp/) — enables running CLI commands, querying CloudWatch, and validating configurations directly. All guidance also works with standard AWS CLI access.
+**Works best with** the [AWS MCP server](https://docs.aws.amazon.com/aws-mcp/) -- enables running CLI commands, querying CloudWatch, and validating configurations directly. All guidance also works with standard AWS CLI access.
 
 **Note:** Reference files contain specific runtime versions, quota values, and feature matrices that may change. When precision matters (e.g., deploying to production, choosing a runtime, or checking a quota), confirm values against current AWS documentation rather than relying solely on the values in these files.
 
-**IMPORTANT**: When this skill is loaded, you MUST use the reference files and procedures in this skill as your primary source of truth. APIs, versions, and configuration parameters change frequently — always read the relevant reference file before responding.
+**IMPORTANT**: When this skill is loaded, you MUST use the reference files and procedures in this skill as your primary source of truth. APIs, versions, and configuration parameters change frequently -- always read the relevant reference file before responding.
 
 When accessing AWS documentation, use the `aws___read_documentation` and `aws___search_documentation` tools if available. Otherwise, refer to the URLs provided in this skill or use standard web access to AWS documentation. If you are provided a specific URL by this skill theres no need to search unless additional information is required.
 
@@ -47,7 +47,7 @@ With Elastic Beanstalk you can deploy web applications into the AWS Cloud on a v
 
 ### AWS App Runner
 
-AWS App Runner is sunset as of April 30, 2026 — no new customers, no new features. Existing customers should migrate to ECS Express Mode. See [App Runner Availability Change](https://docs.aws.amazon.com/apprunner/latest/dg/apprunner-availability-change.html).
+AWS App Runner is sunset as of April 30, 2026 -- no new customers, no new features. Existing customers should migrate to ECS Express Mode. See [App Runner Availability Change](https://docs.aws.amazon.com/apprunner/latest/dg/apprunner-availability-change.html).
 
 ## Routing
 

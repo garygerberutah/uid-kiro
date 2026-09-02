@@ -1,16 +1,16 @@
 # Agent Skills for AWS
 
-This directory contains agent skills — curated packages of instructions and reference materials that help AI coding agents complete AWS tasks effectively. We plan to release new and updated skills on a regular cadence.
+This directory contains agent skills -- curated packages of instructions and reference materials that help AI coding agents complete AWS tasks effectively. We plan to release new and updated skills on a regular cadence.
 
 ## Using skills
 
 There are three ways to get skills:
 
-- **Install a plugin** — If you installed a plugin (aws-core, aws-agents, or aws-data-analytics), the skills bundled with that plugin are already available to your agent.
+- **Install a plugin** -- If you installed a plugin (aws-core, aws-agents, or aws-data-analytics), the skills bundled with that plugin are already available to your agent.
 
-- **Install locally** — Copy skill directories from this repository to your agent's skills location, or use `npx skills add aws/agent-toolkit-for-aws/skills`.
+- **Install locally** -- Copy skill directories from this repository to your agent's skills location, or use `npx skills add aws/agent-toolkit-for-aws/skills`.
 
-- **Discover at runtime** — Agents can search for and load skills on demand through the AWS MCP Server, without any local installation. Ask your agent: "Search for AWS skills related to databases."
+- **Discover at runtime** -- Agents can search for and load skills on demand through the AWS MCP Server, without any local installation. Ask your agent: "Search for AWS skills related to databases."
 
 To install skills locally, copy the skill directory to your agent's skills location:
 
@@ -50,7 +50,7 @@ Core skills cover:
 ### Specialized skills
 
 Specialized skills offer service-specific guidance and detailed workflows for common
-tasks that agents struggle with. These go deeper than core skills — providing
+tasks that agents struggle with. These go deeper than core skills -- providing
 step-by-step procedures for specific operations like creating a data lake table,
 launching an EC2 instance with best practices, or troubleshooting EFS connectivity.
 

@@ -4,9 +4,9 @@
 
 Code reaches CodeBuild via:
 
-- **Pipeline action** — CodePipeline passes artifacts (most common in CI/CD)
-- **Direct source** — CodeBuild pulls from CodeCommit, S3, GitHub, GitLab, or Bitbucket
-- **No source** — buildspec commands handle everything (e.g., `git clone` in install phase)
+- **Pipeline action** -- CodePipeline passes artifacts (most common in CI/CD)
+- **Direct source** -- CodeBuild pulls from CodeCommit, S3, GitHub, GitLab, or Bitbucket
+- **No source** -- buildspec commands handle everything (e.g., `git clone` in install phase)
 
 When using CodePipeline, the source is passed as an input artifact. When using CodeBuild standalone, configure source in the project:
 
@@ -69,14 +69,14 @@ aws codebuild create-project --name my-project \
 
 | Requirement | Consequence if Missing |
 |-------------|----------------------|
-| NAT gateway on private subnets | Build hangs indefinitely — no timeout error, just silence |
+| NAT gateway on private subnets | Build hangs indefinitely -- no timeout error, just silence |
 | Private subnets only | Public subnets not supported for CodeBuild VPC |
 | S3 VPC endpoint | Artifact operations route through NAT (slow, costly) |
 | CloudWatch Logs VPC endpoint | Logs missing or delayed |
 
 Service role needs: `ec2:CreateNetworkInterface`, `ec2:DescribeNetworkInterfaces`, `ec2:DeleteNetworkInterface`, `ec2:CreateNetworkInterfacePermission`.
 
-**Security group**: Restrict egress to required destinations only (VPC endpoints, NAT gateway). Avoid `0.0.0.0/0` egress — scope to S3 prefix lists and specific internal CIDRs. Ingress should be empty unless builds require inbound connections.
+**Security group**: Restrict egress to required destinations only (VPC endpoints, NAT gateway). Avoid `0.0.0.0/0` egress -- scope to S3 prefix lists and specific internal CIDRs. Ingress should be empty unless builds require inbound connections.
 
 ## Caching
 
@@ -96,11 +96,11 @@ cache:
     - '/root/.m2/**/*'
 ```
 
-Project config: `--cache type=S3,location=BUCKET/cache` (MUST enable SSE-KMS or SSE-S3 on the cache bucket — cached artifacts may contain dependency metadata)
+Project config: `--cache type=S3,location=BUCKET/cache` (MUST enable SSE-KMS or SSE-S3 on the cache bucket -- cached artifacts may contain dependency metadata)
 
 Local caching (reliable on fleet, best-effort on on-demand): `--cache type=LOCAL,modes=[LOCAL_DOCKER_LAYER_CACHE,LOCAL_SOURCE_CACHE]`
 
-**Key distinction:** S3 cache survives across any build host but costs network transfer. Local cache is instant (no transfer) but only works when consecutive builds land on the same host — guaranteed with fleet, probabilistic with on-demand.
+**Key distinction:** S3 cache survives across any build host but costs network transfer. Local cache is instant (no transfer) but only works when consecutive builds land on the same host -- guaranteed with fleet, probabilistic with on-demand.
 
 ## Docker Image Builds
 
@@ -171,7 +171,7 @@ Encrypt the log group: `aws logs associate-kms-key --log-group-name /aws/codebui
 
 - MUST scope service role to specific S3 buckets and ECR repos; avoid `*` resource
 - Enable SSE-KMS or SSE-S3 on cache buckets (cached artifacts may reveal application internals)
-- MUST NOT use `type: PLAINTEXT` environment variables for secrets — use `PARAMETER_STORE` or `SECRETS_MANAGER`
+- MUST NOT use `type: PLAINTEXT` environment variables for secrets -- use `PARAMETER_STORE` or `SECRETS_MANAGER`
 - Use VPC endpoints to keep artifact and log traffic off the public internet
 - Enable CloudTrail for `codebuild:*` API auditing
 - See [CodeBuild security best practices](https://docs.aws.amazon.com/codebuild/latest/userguide/security-best-practices.html)

@@ -181,7 +181,7 @@ mainContainer.addContainerDependencies({
 Once deployed, you can verify Application Signals is working by:
 
 - Opening the AWS CloudWatch Console
-- Navigating to Application Signals → Services
+- Navigating to Application Signals -> Services
 - Looking for your service (named: {{SERVICE_NAME}})
 
 **Monitor Application Health:**

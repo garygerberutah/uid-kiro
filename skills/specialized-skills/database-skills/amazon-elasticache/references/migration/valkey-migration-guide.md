@@ -6,29 +6,29 @@ Complete guide for planning and executing a Redis OSS to Valkey migration on Ela
 
 ```
 Is your cluster running Redis OSS on ElastiCache?
-├── No (self-managed Redis) --> See "Self-Hosted Redis to ElastiCache" in instructions.md
-└── Yes
-    ├── Running Redis OSS 4.x or 5.x?
-    │   └── Yes --> URGENT: These versions are past EOL. You are paying Extended Support fees.
-    │       └── Direct upgrade to Valkey is supported (e.g., --engine valkey --engine-version 7.2).
-    │           Optionally upgrade to Valkey 8.0, 8.1, or 8.2 for new features (Valkey 9.0 is the recommended target).
-    ├── Running Redis OSS 6.x?
-    │   └── Yes --> Extended Support fees begin after EOL (check lifecycle calendar).
-    │       └── Direct upgrade to Valkey is supported (e.g., --engine valkey --engine-version 7.2).
-    │           Optionally upgrade to Valkey 8.0, 8.1, or 8.2 for new features (Valkey 9.0 is the recommended target).
-    └── Running Redis OSS 7.x?
-        └── Yes --> Direct switch to Valkey 7.2 available (in-place, zero downtime).
-            └── After switch: optionally upgrade to Valkey 8.0, 8.1, or 8.2 for new features (Valkey 9.0 is the recommended target).
++-- No (self-managed Redis) --> See "Self-Hosted Redis to ElastiCache" in instructions.md
++-- Yes
+    +-- Running Redis OSS 4.x or 5.x?
+    |   +-- Yes --> URGENT: These versions are past EOL. You are paying Extended Support fees.
+    |       +-- Direct upgrade to Valkey is supported (e.g., --engine valkey --engine-version 7.2).
+    |           Optionally upgrade to Valkey 8.0, 8.1, or 8.2 for new features (Valkey 9.0 is the recommended target).
+    +-- Running Redis OSS 6.x?
+    |   +-- Yes --> Extended Support fees begin after EOL (check lifecycle calendar).
+    |       +-- Direct upgrade to Valkey is supported (e.g., --engine valkey --engine-version 7.2).
+    |           Optionally upgrade to Valkey 8.0, 8.1, or 8.2 for new features (Valkey 9.0 is the recommended target).
+    +-- Running Redis OSS 7.x?
+        +-- Yes --> Direct switch to Valkey 7.2 available (in-place, zero downtime).
+            +-- After switch: optionally upgrade to Valkey 8.0, 8.1, or 8.2 for new features (Valkey 9.0 is the recommended target).
 ```
 
 After reaching Valkey 7.2, further upgrades are available:
 
 ```
 Valkey 7.2
-├── Valkey 8.0 (in-place upgrade, adds performance improvements)
-├── Valkey 8.1 (in-place upgrade, hash table memory improvements: up to 20% less overhead for common key/value patterns; suitable bridge between 8.0 and 8.2)
-├── Valkey 8.2 (in-place upgrade, adds vector search)
-└── Valkey 9.0 (in-place upgrade, recommended target version)
++-- Valkey 8.0 (in-place upgrade, adds performance improvements)
++-- Valkey 8.1 (in-place upgrade, hash table memory improvements: up to 20% less overhead for common key/value patterns; suitable bridge between 8.0 and 8.2)
++-- Valkey 8.2 (in-place upgrade, adds vector search)
++-- Valkey 9.0 (in-place upgrade, recommended target version)
 ```
 
 ## Multi-Step Upgrade Paths
@@ -48,7 +48,7 @@ In-place engine version downgrades are not supported, except for Valkey 7.2 to R
 | Valkey 8.0 | Valkey 8.2 | Valkey 8.0 -> 8.2 (direct) | 1 operation (minutes) |
 | Valkey 8.1 | Valkey 8.2 | Valkey 8.1 -> 8.2 (direct) | 1 operation (minutes) |
 
-> **Note:** Cross-engine upgrades support jumping directly from any Redis OSS version to any available Valkey version (7.2, 8.0, 8.2, etc.) in a single operation. Verify the target version is available in your region. AWS documentation may not explicitly list every supported source→target combination.
+> **Note:** Cross-engine upgrades support jumping directly from any Redis OSS version to any available Valkey version (7.2, 8.0, 8.2, etc.) in a single operation. Verify the target version is available in your region. AWS documentation may not explicitly list every supported source->target combination.
 
 Valkey 8.1 features (verify availability in your region): 20% less memory via new hash table (efficiency improvement), native Bloom filters, COMMANDLOG, SET IFEQ, ZRANK 45% lower latency, PFMERGE/PFCOUNT 12x faster. Note: Valkey 8.0 introduced 20% more data per node (capacity improvement); these are two distinct features.
 

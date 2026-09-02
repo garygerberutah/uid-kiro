@@ -2,8 +2,8 @@
 """Command-line entry point for the agent: pay for a URL and print the result.
 
 This is how a harness invokes the skill. Claude Code, Codex, Cursor, Kiro and
-OpenClaw run shell commands and read files — they do not import Python and build an
-agent object — so the contract is argv in, JSON on stdout. Same behaviour in every
+OpenClaw run shell commands and read files -- they do not import Python and build an
+agent object -- so the contract is argv in, JSON on stdout. Same behaviour in every
 harness, nothing to register, no framework binding.
 
     python3 x402_fetch_cli.py https://merchant.example/paid
@@ -13,7 +13,7 @@ harness, nothing to register, no framework binding.
 Exit codes let a harness branch without parsing:
 
     0  paid, or fetched without payment being required
-    2  refused by policy, or missing configuration — NOT an error to retry
+    2  refused by policy, or missing configuration -- NOT an error to retry
     1  unexpected failure
 
 A refusal is exit 2 and not 1 on purpose: it is a decision, not a fault. Retrying it
@@ -47,7 +47,7 @@ def main() -> int:
                     help="Pay for URL and return an opaque single-use handle for a browser "
                          "navigation, instead of fetching the content here")
     ap.add_argument("--method", default="GET", choices=["GET", "HEAD"],
-                    help="HTTP method (GET or HEAD only — a request body would let the "
+                    help="HTTP method (GET or HEAD only -- a request body would let the "
                          "agent send data to an arbitrary origin)")
     ap.add_argument("--purchase-id", default=None,
                     help="Distinguish a deliberate repeat purchase of the same resource")

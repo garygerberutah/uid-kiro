@@ -4,15 +4,15 @@
 
 ### Standard brokers
 
-During patching and version upgrades, MSK performs **rolling broker restarts** — one broker at a time. The cluster enters `MAINTENANCE` state. You can still produce and consume data, but you cannot perform MSK API update operations until the cluster returns to `ACTIVE`. These operations appear as `SECURITY_PATCHING` in the `DescribeClusterOperation` API.
+During patching and version upgrades, MSK performs **rolling broker restarts** -- one broker at a time. The cluster enters `MAINTENANCE` state. You can still produce and consume data, but you cannot perform MSK API update operations until the cluster returns to `ACTIVE`. These operations appear as `SECURITY_PATCHING` in the `DescribeClusterOperation` API.
 
-**Expected client impact**: Transient disconnect errors and brief p99 latency spikes (high milliseconds, up to ~2 seconds) lasting up to 2 minutes per broker restart as clients reconnect to new leaders. With the default RF=3 and proper client configuration (retries, `delivery.timeout.ms >= 60000`, `acks=all`), this does NOT cause data loss or prolonged unavailability — retries transparently reconnect to the new leader within seconds. **Topics with RF=1 become completely unavailable while their broker restarts** — there is no replica to fail over to, so producers receive errors and consumers stall for the full restart duration (5-15 min). See [configure-clients.md](configure-clients.md) and the "Consumer Resilience During Maintenance" section below.
+**Expected client impact**: Transient disconnect errors and brief p99 latency spikes (high milliseconds, up to ~2 seconds) lasting up to 2 minutes per broker restart as clients reconnect to new leaders. With the default RF=3 and proper client configuration (retries, `delivery.timeout.ms >= 60000`, `acks=all`), this does NOT cause data loss or prolonged unavailability -- retries transparently reconnect to the new leader within seconds. **Topics with RF=1 become completely unavailable while their broker restarts** -- there is no replica to fail over to, so producers receive errors and consumers stall for the full restart duration (5-15 min). See [configure-clients.md](configure-clients.md) and the "Consumer Resilience During Maintenance" section below.
 
-**Expected metric impact**: `UnderReplicatedPartitions` increases temporarily (partitions on the offline broker stop replicating). After restart, the broker catches up on missed messages — you may see increased volume throughput and CPU usage during catch-up.
+**Expected metric impact**: `UnderReplicatedPartitions` increases temporarily (partitions on the offline broker stop replicating). After restart, the broker catches up on missed messages -- you may see increased volume throughput and CPU usage during catch-up.
 
 ### Express brokers
 
-Express brokers have **no maintenance windows**. MSK updates Express broker software on an ongoing basis in a **time-distributed manner** — occasional singular broker reboots spread across the month. The cluster stays `ACTIVE` during all maintenance. These operations appear as `BROKER_UPDATE` in the `DescribeClusterOperation` API.
+Express brokers have **no maintenance windows**. MSK updates Express broker software on an ongoing basis in a **time-distributed manner** -- occasional singular broker reboots spread across the month. The cluster stays `ACTIVE` during all maintenance. These operations appear as `BROKER_UPDATE` in the `DescribeClusterOperation` API.
 
 **Why Express patching is less disruptive**:
 
@@ -26,9 +26,9 @@ Express brokers have **no maintenance windows**. MSK updates Express broker soft
 
 ## Can You Reschedule or Opt Out of Patching?
 
-Patching cannot be opted out of on either broker type — it is mandatory for the health and security of the cluster.
+Patching cannot be opted out of on either broker type -- it is mandatory for the health and security of the cluster.
 
-- **Standard**: the maintenance window **is** configurable, but only by opening an **AWS Support case** — there is no self-service control (no MSK API, SDK, CLI, or console setting) to change it yourself. Use a Support case to shift the window or reschedule/postpone a specific pending patch. Do not rely on repeatedly postponing: MSK force-applies patching to clusters whose maintenance is continually delayed.
+- **Standard**: the maintenance window **is** configurable, but only by opening an **AWS Support case** -- there is no self-service control (no MSK API, SDK, CLI, or console setting) to change it yourself. Use a Support case to shift the window or reschedule/postpone a specific pending patch. Do not rely on repeatedly postponing: MSK force-applies patching to clusters whose maintenance is continually delayed.
 - **Express**: patching is continuous and time-distributed with no maintenance window, so there is nothing to schedule or reschedule.
 
 ## What Happens During a Rolling Restart
@@ -37,7 +37,7 @@ When a broker restarts during maintenance:
 
 1. **Broker goes offline**: The broker's metrics disappear from CloudWatch for several minutes.
 2. **Leadership transfer**: Partition leadership moves from the restarting broker to other in-sync replicas. `LeaderCount` shifts across brokers.
-3. **UnderReplicatedPartitions (URP) spikes** (Standard only — Express does not emit URP): While the broker is down, its partitions are under-replicated. This is expected and temporary.
+3. **UnderReplicatedPartitions (URP) spikes** (Standard only -- Express does not emit URP): While the broker is down, its partitions are under-replicated. This is expected and temporary.
 4. **ActiveControllerCount may change**: If the controller broker is restarted, a new controller is elected.
 5. **Consumer group rebalances**: If consumers were connected to the restarting broker, the session timeout triggers a rebalance.
 6. **Broker restarts and catches up**: The broker comes back online, loads logs, replicates missed data, and rejoins ISR. URP decreases as replicas catch up.
@@ -45,13 +45,13 @@ When a broker restarts during maintenance:
 
 **Typical timeline per broker**: 5-15 minutes depending on data volume and partition count. Log loading progress can be tracked via the JMX metrics `remainingLogsToRecover` and `remainingSegmentsToRecover` (available through Prometheus/JMX monitoring, not via CloudWatch).
 
-**Speeding up log recovery**: By default, Kafka uses a single thread per log directory for log recovery after an unclean shutdown. With thousands of partitions, recovery can take hours. Set `num.recovery.threads.per.data.dir` to the number of CPU cores to parallelize recovery. This is a broker-side configuration — update via `aws kafka update-cluster-configuration`.
+**Speeding up log recovery**: By default, Kafka uses a single thread per log directory for log recovery after an unclean shutdown. With thousands of partitions, recovery can take hours. Set `num.recovery.threads.per.data.dir` to the number of CPU cores to parallelize recovery. This is a broker-side configuration -- update via `aws kafka update-cluster-configuration`.
 
 ## What NOT To Do During Maintenance
 
-- **NEVER restart additional brokers** — MSK is already performing a rolling restart. Manual restarts compound the problem.
-- **NEVER reassign partitions during URP** — Reassignment adds replication load on already-stressed brokers.
-- **NEVER lower `min.insync.replicas`** — This weakens durability guarantees. The `NotEnoughReplicasException` during maintenance is transient.
+- **NEVER restart additional brokers** -- MSK is already performing a rolling restart. Manual restarts compound the problem.
+- **NEVER reassign partitions during URP** -- Reassignment adds replication load on already-stressed brokers.
+- **NEVER lower `min.insync.replicas`** -- This weakens durability guarantees. The `NotEnoughReplicasException` during maintenance is transient.
 - **NEVER escalate as a cluster-level issue** if URP is decreasing and only one broker has a metrics gap.
 
 ## Impact of Scaling Operations (Standard)
@@ -60,7 +60,7 @@ Scaling operations on Standard clusters trigger rolling restarts or add replicat
 
 ### Broker size updates
 
-Updating the broker size (e.g., kafka.m5.large → kafka.m5.xlarge) triggers a **rolling restart** — MSK takes brokers offline one at a time and temporarily reassigns partition leadership to other brokers. This is the same process as a maintenance rolling restart. A size update typically takes **10-15 minutes per broker**. During this time:
+Updating the broker size (e.g., kafka.m5.large -> kafka.m5.xlarge) triggers a **rolling restart** -- MSK takes brokers offline one at a time and temporarily reassigns partition leadership to other brokers. This is the same process as a maintenance rolling restart. A size update typically takes **10-15 minutes per broker**. During this time:
 
 - `UnderReplicatedPartitions` will spike per broker, same as during patching
 - Remaining brokers absorb extra leadership and replication load
@@ -73,13 +73,13 @@ After adding brokers to expand a Standard cluster, existing partitions are NOT a
 **Constraints:**
 
 - Limit to **10 partitions per reassignment call** for safe operations on Standard clusters
-- Do NOT reassign partitions when CPU utilization is above **70%** — replication adds significant CPU and network load that can cascade
+- Do NOT reassign partitions when CPU utilization is above **70%** -- replication adds significant CPU and network load that can cascade
 - Do NOT reassign partitions while `UnderReplicatedPartitions` > 0
 - Consider using [Cruise Control](https://docs.aws.amazon.com/msk/latest/developerguide/cruise-control.html) for continuous, automated partition rebalancing
 
 ### Storage expansion
 
-Expanding EBS storage does NOT trigger a rolling restart — it happens online. However, the volume enters an **optimizing** state that can take up to 24 hours, and a second expansion cannot be performed for at least 6 hours. See [manage-storage.md](manage-storage.md) for details.
+Expanding EBS storage does NOT trigger a rolling restart -- it happens online. However, the volume enters an **optimizing** state that can take up to 24 hours, and a second expansion cannot be performed for at least 6 hours. See [manage-storage.md](manage-storage.md) for details.
 
 ## Impact of Scaling Operations (Express)
 
@@ -89,7 +89,7 @@ Express scaling is simpler than Standard, but broker size changes still involve 
 
 Updating the Express broker size also triggers a **rolling restart**, same as Standard. MSK takes brokers offline one at a time. However, the cluster stays **ACTIVE** (not MAINTENANCE) throughout. Key differences from Standard:
 
-- Express does **not** emit `UnderReplicatedPartitions` — you cannot use URP to track restart progress. Monitor `ProduceThrottleTime`, `FetchThrottleTime`, and consumer lag instead.
+- Express does **not** emit `UnderReplicatedPartitions` -- you cannot use URP to track restart progress. Monitor `ProduceThrottleTime`, `FetchThrottleTime`, and consumer lag instead.
 - Ensure CPU (CpuUser + CpuSystem) is under 60% before initiating a size change, same as Standard.
 
 ### Adding brokers and partition redistribution
@@ -101,7 +101,7 @@ When you add brokers to an Express cluster:
 
 ### Storage
 
-Express storage is fully managed — there is no expansion operation, no cooldown period, and no provisioning required. Storage scales automatically with data retained. However, you should still monitor `StorageUsed` and per-topic ingress to catch runaway growth that impacts cost. See [manage-storage.md](manage-storage.md) for investigation steps.
+Express storage is fully managed -- there is no expansion operation, no cooldown period, and no provisioning required. Storage scales automatically with data retained. However, you should still monitor `StorageUsed` and per-topic ingress to catch runaway growth that impacts cost. See [manage-storage.md](manage-storage.md) for investigation steps.
 
 ## Consumer Resilience During Maintenance
 
@@ -122,7 +122,7 @@ Configure consumers to survive broker restarts gracefully. See [configure-client
 | Setting | Recommended | Why |
 |---|---|---|
 | `retries` | Integer.MAX_VALUE | Allows retrying through broker restart. |
-| `delivery.timeout.ms` | 60000 minimum; 120000 (2 minutes) or higher | Bounds total retry time. AWS recommends a minimum of 60 seconds. Must be ≥ `request.timeout.ms` + `linger.ms`. With RF=3 and `min.insync.replicas=2`, producers only stall during leader election (seconds, not minutes). The 2-min default covers this. Increase if you observe `TimeoutException` during maintenance. |
+| `delivery.timeout.ms` | 60000 minimum; 120000 (2 minutes) or higher | Bounds total retry time. AWS recommends a minimum of 60 seconds. Must be >= `request.timeout.ms` + `linger.ms`. With RF=3 and `min.insync.replicas=2`, producers only stall during leader election (seconds, not minutes). The 2-min default covers this. Increase if you observe `TimeoutException` during maintenance. |
 | `acks` | `all` | With `min.insync.replicas=2` (MSK default), writes succeed as long as 2 of 3 replicas are available. One broker offline is tolerated. |
 
 ## Preparing for Maintenance Windows (Standard)
@@ -144,9 +144,9 @@ Version upgrades trigger rolling restarts. The process:
 **Constraints:**
 
 - You MUST check that partition counts per broker are within the limits for the target version before upgrading (see [size-and-choose-cluster.md](size-and-choose-cluster.md)).
-- Upgrades are forward-only — you cannot downgrade Kafka versions.
-- The supported version list and end-of-support dates change over time — check [Supported Apache Kafka versions](https://docs.aws.amazon.com/msk/latest/developerguide/supported-kafka-versions.html) rather than relying on memory, and query a specific cluster's valid upgrade targets with `aws kafka get-compatible-kafka-versions --cluster-arn <arn>`. Express supports a narrower set than Standard.
-- KRaft metadata mode (no ZooKeeper) is available from Kafka 3.7.x — see [Metadata management](https://docs.aws.amazon.com/msk/latest/developerguide/metadata-management.html).
+- Upgrades are forward-only -- you cannot downgrade Kafka versions.
+- The supported version list and end-of-support dates change over time -- check [Supported Apache Kafka versions](https://docs.aws.amazon.com/msk/latest/developerguide/supported-kafka-versions.html) rather than relying on memory, and query a specific cluster's valid upgrade targets with `aws kafka get-compatible-kafka-versions --cluster-arn <arn>`. Express supports a narrower set than Standard.
+- KRaft metadata mode (no ZooKeeper) is available from Kafka 3.7.x -- see [Metadata management](https://docs.aws.amazon.com/msk/latest/developerguide/metadata-management.html).
 
 ## Monitoring During Maintenance
 

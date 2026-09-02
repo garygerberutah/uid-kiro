@@ -2,12 +2,12 @@
 """Host command for the dynamic-instrumentation instrumentation-config operations.
 
 Creates/lists/gets/deletes breakpoints and checks their status against the
-`application-signals` instrumentation API, using only `python3` + `boto3` — self-contained,
+`application-signals` instrumentation API, using only `python3` + `boto3` -- self-contained,
 no external service required. If no interpreter is available the calling skill treats the
 commands as display-only.
 
 The instrumentation operations ship in the public AWS SDK as of **boto3/botocore 1.43.35**, so
-this command builds an ordinary `application-signals` client from the ambient boto3 install — no
+this command builds an ordinary `application-signals` client from the ambient boto3 install -- no
 bundled service model and no data-loader manipulation. Older SDKs lack these operations; the
 client builder fails fast with an upgrade message rather than falling through to a confusing
 ``AttributeError`` deep inside an operation.
@@ -16,7 +16,7 @@ ARCHITECTURE
   - The 8 operation implementations (create/list/get/delete/batch-delete-by-scope/
     batch-delete-by-arns/get-status/check-status) live in the flat `di_*.py` sibling
     modules. They carry the validation, location/capture parsing, and token-efficient
-    rendering the agent relies on — this is the "ergonomic surface", not a thin boto3
+    rendering the agent relies on -- this is the "ergonomic surface", not a thin boto3
     passthrough.
   - The application-signals client seam lives in the leaf module `di_app_signals_client`
     (`get_application_signals_client()`), which `di_gateway` imports directly. Keeping it out
@@ -26,7 +26,7 @@ ARCHITECTURE
     import keeps a bare `import di_instrumentation` free of a hard boto3 dependency (the build
     env omits boto3 and must still be able to import this module). `--print-contract` itself is
     NOT boto3-free: it resolves the op functions to inspect their signatures, which triggers
-    the lazy import of the op modules — and hence `botocore` — via `_resolve_tool`.
+    the lazy import of the op modules -- and hence `botocore` -- via `_resolve_tool`.
 
 LOAD-BEARING DETAILS (keep exactly)
   - Region resolves from --region > AWS_REGION > AWS_DEFAULT_REGION > us-east-1, at CALL
@@ -39,7 +39,7 @@ SECURITY
     (stdin) so caller-supplied values never transit the shell command line; `--json '<text>'`
     is also accepted for short, trusted payloads.
   - Prefer IAM roles (instance profile, ECS task role, or SSO/STS session credentials) over
-    long-lived IAM user access keys — these operations modify live services.
+    long-lived IAM user access keys -- these operations modify live services.
 
 USAGE
     python3 scripts/di_instrumentation.py --print-contract
@@ -71,7 +71,7 @@ if str(_HERE) not in sys.path:
 # pull botocore into a bare `import di_instrumentation`.
 from di_app_signals_client import APPLICATION_SIGNALS_API_VERSION  # noqa: E402
 
-# ── the 8-op contract: op name -> (vendored module, function) ────────────────────────────
+# -- the 8-op contract: op name -> (vendored module, function) ----------------------------
 # Op names mirror the agent-facing TOOL names (crud_tools/status_tools), not the boto3
 # method names. Re-verified against registration.py.
 _OPS = {
@@ -97,7 +97,7 @@ def _dispatch_table() -> Dict[str, Any]:
     dependency (the build env omits boto3 and must still import this module). Note this does
     NOT make ``--print-contract`` boto3-free: calling ``_resolve_tool`` runs this function and
     triggers the lazy ``botocore`` import. (The old import cycle that also required this is
-    gone — the client seam moved to ``di_app_signals_client``.)
+    gone -- the client seam moved to ``di_app_signals_client``.)
 
     ``_resolve_tool`` and the ``test_dispatch_table_keys_match_ops`` sync guard both key off
     this table, so an op added to ``_OPS`` without a matching binding here fails loudly rather
@@ -129,7 +129,7 @@ def _resolve_tool(op: str):
 
 # Semantic hints layered onto the inspected signature in the emitted contract. The signature
 # gives the arg SHAPE (name/required/default); these add the meaning the agent cannot infer
-# from a bare name — notably that `instrumentation_type` is required on EVERY op (not just
+# from a bare name -- notably that `instrumentation_type` is required on EVERY op (not just
 # create) and must match how the breakpoint was created.
 _ARG_HINTS = {
     "instrumentation_type": {
@@ -217,7 +217,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--json-file",
         dest="json_file",
-        help="read the op's JSON arguments from PATH (or '-' for stdin) — keeps values off "
+        help="read the op's JSON arguments from PATH (or '-' for stdin) -- keeps values off "
         "the shell command line",
     )
     ap.add_argument(
@@ -258,13 +258,13 @@ def main(argv: list[str] | None = None) -> int:
     try:
         result = fn(**payload)
     except TypeError as exc:
-        # Bad/unknown argument names for the op — deterministic input error.
+        # Bad/unknown argument names for the op -- deterministic input error.
         print(f"ERROR: invalid arguments for op '{args.op}': {exc}", file=sys.stderr)
         return 2
     except RuntimeError as exc:
         # The only deliberate RuntimeError in the op path is the SDK-too-old guard in
         # get_application_signals_client(); surface its clean upgrade message instead of a
-        # bare traceback (the di_* op modules never raise — they return strings).
+        # bare traceback (the di_* op modules never raise -- they return strings).
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
     print(result.text)

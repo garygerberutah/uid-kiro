@@ -2,11 +2,11 @@
 
 Complete conversion guide for migrating existing JSONPath state machines to JSONata. Covers fields, states, intrinsic functions, common pitfalls, and the end-to-end conversion workflow.
 
-## JSONPath → JSONata Quick Reference
+## JSONPath -> JSONata Quick Reference
 
 | JSONPath | JSONata |
 |---|---|
-| `InputPath` | Not needed — use `$states.input` directly in `Arguments` |
+| `InputPath` | Not needed -- use `$states.input` directly in `Arguments` |
 | `Parameters` | `Arguments` |
 | `ResultSelector` | `Output` (reference `$states.result`) |
 | `ResultPath` | `Assign` (preferred) or `Output` |
@@ -226,7 +226,7 @@ JSONPath Catch uses `ResultPath`. JSONata Catch uses `Assign` and `Output` with 
 }]
 ```
 
-Retry syntax is identical between JSONPath and JSONata — no conversion needed.
+Retry syntax is identical between JSONPath and JSONata -- no conversion needed.
 
 ---
 
@@ -238,15 +238,15 @@ Invalid combinations: `Arguments` + `InputPath`, `Output` + `ResultSelector`, `C
 ### 2. You must remove `.$` suffixes
 
 ```json
-❌  "orderId.$": "{% $states.input.orderId %}"
-✓  "orderId": "{% $states.input.orderId %}"
+[NO]  "orderId.$": "{% $states.input.orderId %}"
+[OK]  "orderId": "{% $states.input.orderId %}"
 ```
 
 ### 3. Use `$states` instead of `$` or `$$`.
 
 ```json
-❌  "{% $.orderId %}"        ❌  "{% $$.Task.Token %}"
-✓  "{% $states.input.orderId %}"   ✓  "{% $states.context.Task.Token %}"
+[NO]  "{% $.orderId %}"        [NO]  "{% $$.Task.Token %}"
+[OK]  "{% $states.input.orderId %}"   [OK]  "{% $states.context.Task.Token %}"
 ```
 
 Note: `$` is valid inside nested filter expressions (e.g., `$states.input.items[$.price > 10]`).
@@ -254,17 +254,17 @@ Note: `$` is valid inside nested filter expressions (e.g., `$states.input.items[
 ### 4. Do not use double quotes inside JSONata expressions
 
 ```json
-❌  "{% $states.input.status = "active" %}"
-✓  "{% $states.input.status = 'active' %}"
+[NO]  "{% $states.input.status = "active" %}"
+[OK]  "{% $states.input.status = 'active' %}"
 ```
 
 ### 5. Do not attempt to access the output of `Assign` or `Output` in the same state where they are assigned.
-`Assign` and `Output` evaluate in parallel — new variable values are not available until the next state.
+`Assign` and `Output` evaluate in parallel -- new variable values are not available until the next state.
 
 ```json
-❌  "Assign": { "total": "{% $states.result.Payload.total %}" },
+[NO]  "Assign": { "total": "{% $states.result.Payload.total %}" },
     "Output": { "total": "{% $total %}" }
-✓  "Assign": { "total": "{% $states.result.Payload.total %}" },
+[OK]  "Assign": { "total": "{% $states.result.Payload.total %}" },
     "Output": { "total": "{% $states.result.Payload.total %}" }
 ```
 
@@ -272,24 +272,24 @@ Note: `$` is valid inside nested filter expressions (e.g., `$states.input.items[
 JSONPath silently returns null. JSONata throws `States.QueryEvaluationError`:
 
 ```json
-❌  "{% $states.input.customer.middleName %}"
-✓  "{% $exists($states.input.customer.middleName) ? $states.input.customer.middleName : '' %}"
+[NO]  "{% $states.input.customer.middleName %}"
+[OK]  "{% $exists($states.input.customer.middleName) ? $states.input.customer.middleName : '' %}"
 ```
 
 ### 7. Use defensive coding to prevent invalid filter results
 JSONata returns a single object (not a 1-element array) when exactly one item matches a filter, and undefined when nothing matches. Both break Map state `Items` and functions like `$count`:
 
 ```json
-❌  "Items": "{% $states.input.orders[status = 'pending'] %}"
-✓  "Items": "{% ( $f := $states.input.orders[status = 'pending']; $type($f) = 'array' ? $f : $exists($f) ? [$f] : [] ) %}"
+[NO]  "Items": "{% $states.input.orders[status = 'pending'] %}"
+[OK]  "Items": "{% ( $f := $states.input.orders[status = 'pending']; $type($f) = 'array' ? $f : $exists($f) ? [$f] : [] ) %}"
 ```
 
-### 8. Iterator → ItemProcessor rename
+### 8. Iterator -> ItemProcessor rename
 `Iterator` was renamed to `ItemProcessor` and requires `ProcessorConfig`:
 
 ```json
-❌  "Iterator": { "StartAt": "...", "States": {...} }
-✓  "ItemProcessor": { "ProcessorConfig": { "Mode": "INLINE" }, "StartAt": "...", "States": {...} }
+[NO]  "Iterator": { "StartAt": "...", "States": {...} }
+[OK]  "ItemProcessor": { "ProcessorConfig": { "Mode": "INLINE" }, "StartAt": "...", "States": {...} }
 ```
 
 ---
@@ -299,21 +299,21 @@ JSONata returns a single object (not a 1-element array) when exactly one item ma
 For each state being converted, apply these steps in order:
 
 1. Add `"QueryLanguage": "JSONata"` to the state
-2. `Parameters` → `Arguments`: remove `.$` suffixes from all keys, wrap values in `{% %}`, replace `$` with `$states.input` and `$$` with `$states.context`
+2. `Parameters` -> `Arguments`: remove `.$` suffixes from all keys, wrap values in `{% %}`, replace `$` with `$states.input` and `$$` with `$states.context`
 3. Convert `ResultPath` based on its value:
-   - Absent or `"$"` → no action needed (default behavior is replaced by `Output`)
-   - `null` → add `"Output": "{% $states.input %}"`
-   - `"$.field"` → add `"Assign": { "field": "{% $states.result %}" }` and `"Output": "{% $states.input %}"`
-4. `ResultSelector` → fold selection logic into `Output` (reference `$states.result`)
-5. `OutputPath` → fold into `Output` (return only what you need)
+   - Absent or `"$"` -> no action needed (default behavior is replaced by `Output`)
+   - `null` -> add `"Output": "{% $states.input %}"`
+   - `"$.field"` -> add `"Assign": { "field": "{% $states.result %}" }` and `"Output": "{% $states.input %}"`
+4. `ResultSelector` -> fold selection logic into `Output` (reference `$states.result`)
+5. `OutputPath` -> fold into `Output` (return only what you need)
 6. Reminder: If the state has `ResultSelector` + `ResultPath` + `OutputPath`, collapse all three into a single `Output` field
 7. Remove all five JSONPath I/O fields: `InputPath`, `Parameters`, `ResultSelector`, `ResultPath`, `OutputPath`
-8. Convert `*Path` fields to base field + `{% %}` expression (`TimeoutSecondsPath` → `TimeoutSeconds`, `HeartbeatSecondsPath` → `HeartbeatSeconds`, `ItemsPath` → `Items`)
+8. Convert `*Path` fields to base field + `{% %}` expression (`TimeoutSecondsPath` -> `TimeoutSeconds`, `HeartbeatSecondsPath` -> `HeartbeatSeconds`, `ItemsPath` -> `Items`)
 9. Replace `States.*` intrinsic functions with JSONata equivalents (see Converting Intrinsic Functions table)
 10. Choice states: replace `Variable` + comparison operators with a single `Condition` expression
-11. Map states: `Iterator` → `ItemProcessor` with `ProcessorConfig`, `ItemsPath` → `Items`, `Parameters` with `$$.Map.*` → `ItemSelector` with `$states.context.Map.*`
+11. Map states: `Iterator` -> `ItemProcessor` with `ProcessorConfig`, `ItemsPath` -> `Items`, `Parameters` with `$$.Map.*` -> `ItemSelector` with `$states.context.Map.*`
 12. Catch blocks: replace `ResultPath` with `Assign` + `Output` using `$states.errorOutput`
 13. Pass states: replace `Result` with `Output` or `Assign`
-14. Where multiple consecutive states used `ResultPath` to thread data through the payload, refactor to use `Assign` variables instead — downstream states reference `$variableName` directly
+14. Where multiple consecutive states used `ResultPath` to thread data through the payload, refactor to use `Assign` variables instead -- downstream states reference `$variableName` directly
 15. Validate the converted state using the TestState API
 16. Repeat for all states, then promote `"QueryLanguage": "JSONata"` to the top level and remove per-state declarations

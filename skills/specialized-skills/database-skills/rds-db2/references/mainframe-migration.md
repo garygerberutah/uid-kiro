@@ -1,4 +1,4 @@
-# RDS for Db2 — Mainframe Migration Reference
+# RDS for Db2 -- Mainframe Migration Reference
 
 Source blogs:
 
@@ -7,7 +7,7 @@ Source blogs:
 
 ---
 
-## z/OS to RDS Db2 — Overview
+## z/OS to RDS Db2 -- Overview
 
 Migrating from Db2 for z/OS is a **replatform** (different OS/endianness). You cannot restore a z/OS backup image to RDS for Db2. The process requires:
 
@@ -68,9 +68,9 @@ Code page, collation, and territory are **immutable** after database creation, s
 | 930 / 939 (Japanese) | UTF-8 or IBM-943 | EBCDIC_932_5026 / _5035 |
 | 1390, 1399 (Japanese + Euro) | UTF-8 | SYSTEM |
 
-Watch-outs: UTF-8 expands accented characters from 1 to 2 bytes (truncation risk — consider `CODEUNITS32`), and ISO-8859-1 silently substitutes out-of-range characters with `0x1A`.
+Watch-outs: UTF-8 expands accented characters from 1 to 2 bytes (truncation risk -- consider `CODEUNITS32`), and ISO-8859-1 silently substitutes out-of-range characters with `0x1A`.
 
-**For full code page and collation guidance, see code-page-collation.md** — the CCSID inventory, the complete decision matrix, `rdsadmin.create_database` examples, CODEUNITS32 vs OCTETS trade-offs, and source-CCSID checks.
+**For full code page and collation guidance, see code-page-collation.md** -- the CCSID inventory, the complete decision matrix, `rdsadmin.create_database` examples, CODEUNITS32 vs OCTETS trade-offs, and source-CCSID checks.
 
 ---
 
@@ -80,13 +80,13 @@ Watch-outs: UTF-8 expands accented characters from 1 to 2 bytes (truncation risk
 |---|---|---|---|
 | AWS DMS | Yes | No | Full load only from z/OS |
 | Precisely Mainframe Replication | Yes | Yes | Initial load uses inserts |
-| Mainframe tools (HPU, File-AID, UNLOAD) | Yes | No | Extract to DEL/IXF, convert EBCDIC→ASCII, load via S3 |
+| Mainframe tools (HPU, File-AID, UNLOAD) | Yes | No | Extract to DEL/IXF, convert EBCDIC->ASCII, load via S3 |
 | Db2 Export | Yes | No | Best for small/medium tables; use IXF format |
 | Db2 Federation | Yes | No | RDS connects to z/OS; LOAD with CURSOR |
 | Qlik Replicate | Yes | Yes | ODBC endpoint for Db2 LUW; no bulk load |
 | IBM Q Replication (IIDR) | Yes | Yes | SQL or Q Replication; Q Replication requires IBM MQ |
 
-### Db2 Federation (RDS → z/OS)
+### Db2 Federation (RDS -> z/OS)
 
 RDS for Db2 supports homogeneous federation. Catalog the z/OS database from within RDS, then load data directly:
 
@@ -102,7 +102,7 @@ LOAD FROM (SELECT * FROM ZOSDB.<schema>.<table>) OF CURSOR INSERT INTO <rds-sche
 ### Mainframe tools workflow
 
 1. Extract data using HPU/File-AID/UNLOAD in DEL or IXF format
-2. Convert EBCDIC → ASCII (mainframe tools or `iconv`)
+2. Convert EBCDIC -> ASCII (mainframe tools or `iconv`)
 3. Copy to S3 using AWS CLI on mainframe (Go SDK for AIX where CLI unavailable)
 4. Load into RDS from S3:
 
@@ -115,10 +115,10 @@ LOAD FROM (SELECT * FROM ZOSDB.<schema>.<table>) OF CURSOR INSERT INTO <rds-sche
 ## Best practices for mainframe migration
 
 1. **Run precheck** on source before the final backup (see `migration.md`).
-2. **Choose code page early** — immutable after database creation.
-3. **Use IXF format** — avoids delimiter conflicts, preserves types.
-4. **ADB2GEN** for DDL extraction — highest fidelity for z/OS.
-5. **Test character round-trips** — insert international chars, export, import, verify display.
+2. **Choose code page early** -- immutable after database creation.
+3. **Use IXF format** -- avoids delimiter conflicts, preserves types.
+4. **ADB2GEN** for DDL extraction -- highest fidelity for z/OS.
+5. **Test character round-trips** -- insert international chars, export, import, verify display.
 6. **Large tables**: Db2 federation or S3 load for bulk, then CDC via Qlik/Precisely/Q Replication.
 7. **Cold data** early; **hot data** near cutover.
 8. **Validate with DBeaver / DataGrip / IBM Data Studio** for character display consistency.

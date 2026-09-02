@@ -19,7 +19,7 @@ inline them into the manifest under each action group's `apiSchema._inlinedPaylo
 
 Requires: boto3 with read-only credentials. Prefer ephemeral, role-based
 credentials (an assumed IAM role, SSO session, or instance profile) over
-long-lived IAM user access keys — `--profile` may otherwise resolve to static
+long-lived IAM user access keys -- `--profile` may otherwise resolve to static
 keys in ~/.aws/credentials.
 
 Minimum IAM permissions (all read-only; scope Resource as noted):
@@ -229,7 +229,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Fetch a complete Bedrock Agent manifest for migration."
     )
-    # id only — Phase 1 resolves name/ARN to a confirmed agentId before this runs
+    # id only -- Phase 1 resolves name/ARN to a confirmed agentId before this runs
     parser.add_argument("--agent-id", required=True)
     parser.add_argument(
         "--agent-version",
@@ -268,7 +268,7 @@ def main() -> int:
         return 2
 
     agent_id = args.agent_id
-    # get_agent is fundamental to discovery — a tolerated error here (e.g.
+    # get_agent is fundamental to discovery -- a tolerated error here (e.g.
     # ResourceNotFoundException) would write a broken manifest whose downstream
     # field lookups silently produce wrong defaults. So fail hard, not via _safe.
     try:
@@ -329,7 +329,7 @@ def main() -> int:
         print(
             f"WARNING: could not restrict permissions on {args.out} ({e}). It holds "
             "sensitive data (account ids, role ARNs, IAM policies) and may be readable "
-            "by others — secure or delete it manually.",
+            "by others -- secure or delete it manually.",
             file=sys.stderr,
         )
 

@@ -14,7 +14,7 @@ boto3 resolves credentials in this order:
 8. Credential process (`credential_process` in profile)
 9. `~/.aws/config` file (static keys in profile)
 10. Legacy boto config (`BOTO_CONFIG`, `~/.boto`, `/etc/boto.cfg`)
-11. Container credentials — ECS task role / EKS Pod Identity (`AWS_CONTAINER_CREDENTIALS_RELATIVE_URI` or `AWS_CONTAINER_CREDENTIALS_FULL_URI`)
+11. Container credentials -- ECS task role / EKS Pod Identity (`AWS_CONTAINER_CREDENTIALS_RELATIVE_URI` or `AWS_CONTAINER_CREDENTIALS_FULL_URI`)
 12. EC2 instance metadata (IMDS)
 
 In most cases, let the default chain handle credential resolution rather than hardcoding credentials.

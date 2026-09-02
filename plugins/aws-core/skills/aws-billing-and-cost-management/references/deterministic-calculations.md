@@ -35,7 +35,7 @@ for service, cost in current_month:
 # Example: Count exceeded budgets from Budgets API response
 budgets = [("Monthly-Total", "EXCEEDED"), ("Dev-Budget", "OK"), ("Prod-Budget", "EXCEEDED")]
 exceeded = [name for name, status in budgets if status == "EXCEEDED"]
-print(f"Exceeded budgets: {len(exceeded)} — {', '.join(exceeded)}")
+print(f"Exceeded budgets: {len(exceeded)} -- {', '.join(exceeded)}")
 ```
 
 ## Pattern: Savings calculation
@@ -57,6 +57,6 @@ print(f"Annual savings: ${total_savings * 12:,.2f}")
 ## Why this matters
 
 - LLMs frequently make arithmetic errors on multi-digit numbers, especially with percentages and aggregations
-- Cost data involves currency — wrong numbers erode customer trust immediately
+- Cost data involves currency -- wrong numbers erode customer trust immediately
 - Scripts produce verifiable, reproducible results
-- The AWS MCP server's `run_script` tool runs Python in a sandbox — use it when available
+- The AWS MCP server's `run_script` tool runs Python in a sandbox -- use it when available

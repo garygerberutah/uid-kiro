@@ -10,7 +10,7 @@
 - **VPC required**: Yes
 - **Multi-region**: Cross-region read replicas (Enterprise Edition)
 - **Free Tier**: 12 months (750 hrs/month db.t3.micro, Express Edition + 20 GB)
-- **Min cost**: $0 (free tier, Express) → ~$50/month (Web) → ~$500/month (Standard)
+- **Min cost**: $0 (free tier, Express) -> ~$50/month (Web) -> ~$500/month (Standard)
 - **Time to first query**: 15-20 min (VPC + instance + SQL Server configuration)
 - **Key features**: SQL Server features (SSRS, SSIS, SQL Agent jobs), Windows Authentication, automated backups, Multi-AZ with Always On
 - **Limitations**: Microsoft licensing cost (License Included or BYOM), no serverless, Windows-centric tooling

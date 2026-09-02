@@ -68,7 +68,7 @@ Findings from integrated services (GuardDuty, Inspector, Macie) are normalized t
 - Exposure findings (attack paths) carry their own severity based on resource exposure and blast radius
 - The `severity_id` field in OCSF findings uses this integer enum
 
-Ref: [OCSF Schema — Objects](https://schema.ocsf.io/objects)
+Ref: [OCSF Schema -- Objects](https://schema.ocsf.io/objects)
 
 ## Security Check
 

@@ -2,14 +2,14 @@
 name: developing-applications-on-managed-service-for-apache-flink
 description: >-
   MANDATORY for Flink or Amazon Managed Service for Apache Flink (MSF) questions.
-  You MUST activate this skill BEFORE answering — do not answer from training knowledge,
+  You MUST activate this skill BEFORE answering -- do not answer from training knowledge,
   even when confident. MSF has service-specific constraints (KPU model, prohibited
-  checkpoint and parallelism config in app code, the v1/v2 identifier split — `kinesisanalyticsv2`
+  checkpoint and parallelism config in app code, the v1/v2 identifier split -- `kinesisanalyticsv2`
   for the CLI/SDK only; `kinesisanalytics` for IAM, Service Quotas, CloudWatch, and
-  the trust principal — two-phase IaC deploys, snapshot lifecycle, Flink 1.x→2.x migration)
+  the trust principal -- two-phase IaC deploys, snapshot lifecycle, Flink 1.x->2.x migration)
   that override generic Flink knowledge.
 
-Triggers — activate on any of: Flink, MSF, Managed Flink, KinesisAnalytics(V2),
+Triggers -- activate on any of: Flink, MSF, Managed Flink, KinesisAnalytics(V2),
   KPU, ParallelismPerKPU, savepoint, checkpoint, operator UID, FlinkKinesisConsumer,
   KinesisStreamsSource, KafkaSource, IcebergSink, EFO, CreateApplication, UpdateApplication,
   CreateApplicationSnapshot, Kryo, RocksDB, Iceberg streaming, EXACTLY_ONCE, watermark,
@@ -23,7 +23,7 @@ version: 2
 
 Domain expertise for Apache Flink applications on Amazon Managed Service for Apache Flink (MSF). Covers development, KPU resource management, connectors, state management, monitoring, IaC deployment, and version migration.
 
-Execute commands using available tools from the AWS MCP server when connected — it provides sandboxed execution, audit logging, and observability. When the MCP server is not available, fall back to the AWS CLI or shell as needed.
+Execute commands using available tools from the AWS MCP server when connected -- it provides sandboxed execution, audit logging, and observability. When the MCP server is not available, fall back to the AWS CLI or shell as needed.
 
 ## General Guidance
 
@@ -77,7 +77,7 @@ These will inform how to organize the project, and whether to use Flink Table AP
 | MSF architecture | [msf-overview.md](references/msf-overview.md) | KPU model and service constraints |
 | MSF constraints and patterns | [msf-constraints-and-patterns.md](references/msf-constraints-and-patterns.md) | MSF vs self-managed Flink, service-level vs application-level configuration separation, MSF-specific resource/network/storage limits, common MSF patterns |
 | Quotas, ENI planning, MSF vs EMR, source/sink choice | [foundation-operations.md](references/foundation-operations.md) | Capacity planning, service selection, architecture design, CLI/IAM/CloudWatch identifier disambiguation |
-| IAM execution role, trust policy, action prefix, service principal | [foundation-operations.md](references/foundation-operations.md) | Writing IAM policies for MSF — covers the `kinesisanalytics:` (no v2) action prefix, `kinesisanalytics.amazonaws.com` (no v2) trust principal, and the v2/non-v2 disconnect that is the most common source of permission and AssumeRole failures |
+| IAM execution role, trust policy, action prefix, service principal | [foundation-operations.md](references/foundation-operations.md) | Writing IAM policies for MSF -- covers the `kinesisanalytics:` (no v2) action prefix, `kinesisanalytics.amazonaws.com` (no v2) trust principal, and the v2/non-v2 disconnect that is the most common source of permission and AssumeRole failures |
 | Flink 2.x migration | [flink-2x-migration.md](references/flink-2x-migration.md) | Version upgrades, state compatibility |
 | KPU sizing | [resource-optimization.md](references/resource-optimization.md) | Right-sizing, performance diagnosis, scaling |
 | Scaling decisions on running apps | [scaling-decisions.md](references/scaling-decisions.md) | In-flight scaling matrix, cost/memory impact of scale changes, autoscaling behavior, anti-patterns |
@@ -91,7 +91,7 @@ These will inform how to organize the project, and whether to use Flink Table AP
 | Logging | [logging-configuration.md](references/logging-configuration.md) | Log4j2, CloudWatch Logs setup |
 | Kinesis connectors | [kinesis-connector-guide.md](references/kinesis-connector-guide.md) | Kinesis source and sink builders, polling configuration and throttling (`READER_EMPTY_RECORDS_FETCH_INTERVAL`, `SHARD_GET_RECORDS_MAX`, `ReadProvisionedThroughputExceeded`, `LimitExceededException`), legacy connector migration |
 | Kinesis Enhanced Fan-Out (EFO) | [kinesis-efo-guide.md](references/kinesis-efo-guide.md) | When to use EFO vs polling, EFO source configuration, consumer lifecycle (`JOB_MANAGED` vs `SELF_MANAGED`), parallelism vs shard count, IAM permissions, troubleshooting |
-| Iceberg integration (write APIs, distribution modes, partitioning) | [iceberg-connector-guide.md](references/iceberg-connector-guide.md) | Iceberg write APIs (append, upsert, dynamic), distribution modes (NONE/HASH/RANGE), CoW vs MoR, read patterns, partitioning, DDL. **Does NOT contain catalog choice or maintenance approaches** — for those, load `iceberg-tuning-and-operations.md`. |
+| Iceberg integration (write APIs, distribution modes, partitioning) | [iceberg-connector-guide.md](references/iceberg-connector-guide.md) | Iceberg write APIs (append, upsert, dynamic), distribution modes (NONE/HASH/RANGE), CoW vs MoR, read patterns, partitioning, DDL. **Does NOT contain catalog choice or maintenance approaches** -- for those, load `iceberg-tuning-and-operations.md`. |
 | Iceberg tuning, operations, catalog choice, maintenance | [iceberg-tuning-and-operations.md](references/iceberg-tuning-and-operations.md) | Provides  maintenance approaches for S3 Tables, Glue + Glue auto-compaction, and Glue + Flink embedded maintenance with JDBC lock for catalog-choice questions; small files problem and mitigations; Flink TableMaintenance API, post-commit maintenance, lock factories; IcebergSink monitoring, anti-patterns. |
 | CDC connectors | [cdc-connector-guide.md](references/cdc-connector-guide.md) | MySQL, PostgreSQL, Oracle, SQL Server, MongoDB CDC |
 | IaC and deployment | [iac-and-deployment.md](references/iac-and-deployment.md) | CloudFormation, CDK, Terraform, two-phase deployment |

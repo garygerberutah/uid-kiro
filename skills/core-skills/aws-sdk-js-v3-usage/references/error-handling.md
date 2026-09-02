@@ -9,10 +9,10 @@ try {
   await client.send(new CreateFunctionCommand({ ... }));
 } catch (e) {
   if (e?.$metadata) {
-    // e.name          — error code string (e.g. "ResourceNotFoundException")
-    // e.$metadata.httpStatusCode — HTTP status
-    // e.$response     — raw HTTP response object
-    // e.$responseBodyText — set when SDK fails to parse the error body (unexpected format)
+    // e.name          -- error code string (e.g. "ResourceNotFoundException")
+    // e.$metadata.httpStatusCode -- HTTP status
+    // e.$response     -- raw HTTP response object
+    // e.$responseBodyText -- set when SDK fails to parse the error body (unexpected format)
     console.error(e.name, e.$metadata.httpStatusCode);
   }
 }
@@ -20,7 +20,7 @@ try {
 
 ## Checking Specific Error Types
 
-By name or `instanceof` (both safe — SDK overrides `Symbol.hasInstance`):
+By name or `instanceof` (both safe -- SDK overrides `Symbol.hasInstance`):
 
 ```js
 import { NoSuchKeyException } from "@aws-sdk/client-s3";

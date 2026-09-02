@@ -4,8 +4,8 @@ Thank you for using the Agent Toolkit for AWS. Here's how to get help.
 
 ## Documentation
 
-- [User guide](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/) — Setup, configuration, and reference documentation.
-- [AWS MCP Server tools](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/understanding-mcp-server-tools.html) — Reference for all available MCP tools.
+- [User guide](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/) -- Setup, configuration, and reference documentation.
+- [AWS MCP Server tools](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/understanding-mcp-server-tools.html) -- Reference for all available MCP tools.
 
 ## Bug reports
 

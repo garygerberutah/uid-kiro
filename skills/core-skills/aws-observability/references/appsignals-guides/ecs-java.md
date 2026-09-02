@@ -171,7 +171,7 @@ mainContainer.addContainerDependencies({
 
 **Verification:**
 
-- Open AWS CloudWatch Console → Application Signals → Services
+- Open AWS CloudWatch Console -> Application Signals -> Services
 - Look for your service (named: {{SERVICE_NAME}})
 
 **Troubleshooting**

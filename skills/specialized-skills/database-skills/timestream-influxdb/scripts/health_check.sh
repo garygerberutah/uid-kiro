@@ -63,7 +63,7 @@ RESP=$(curl -s $CURL_TLS_OPTS -w "\n%{http_code}" "${BASE}/health" 2>/dev/null) 
 HTTP_CODE=$(echo "$RESP" | tail -1)
 BODY=$(echo "$RESP" | head -1)
 if [ "$HTTP_CODE" = "200" ]; then
-  echo "OK — $BODY"
+  echo "OK -- $BODY"
 else
   echo "FAILED ($HTTP_CODE)"
 fi
@@ -72,20 +72,20 @@ fi
 if [ -n "$TOKEN" ]; then
   echo -n "  Auth test: "
   if [ "$PORT" = "8086" ]; then
-    # V2 — check /api/v2/buckets
+    # V2 -- check /api/v2/buckets
     HTTP_CODE=$(curl -s $CURL_TLS_OPTS -o /dev/null -w "%{http_code}" -H "Authorization: Token ${TOKEN}" "${BASE}/api/v2/buckets?limit=1" 2>/dev/null) || HTTP_CODE="FAIL"
   elif [ -n "$DB" ]; then
-    # V3 — check /api/v3/query_sql with a real database
+    # V3 -- check /api/v3/query_sql with a real database
     HTTP_CODE=$(curl -s $CURL_TLS_OPTS -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/json" -d "{\"db\":\"${DB}\",\"q\":\"SELECT 1\"}" "${BASE}/api/v3/query_sql" 2>/dev/null) || HTTP_CODE="FAIL"
   else
-    echo "SKIPPED — provide a database name as 4th arg for V3 auth test"
+    echo "SKIPPED -- provide a database name as 4th arg for V3 auth test"
     HTTP_CODE=""
   fi
   if [ -n "$HTTP_CODE" ]; then
     if [ "$HTTP_CODE" = "200" ]; then
-      echo "OK — authenticated"
+      echo "OK -- authenticated"
     else
-      echo "FAILED ($HTTP_CODE) — check token"
+      echo "FAILED ($HTTP_CODE) -- check token"
     fi
   fi
 fi

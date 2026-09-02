@@ -9,9 +9,9 @@ metadata:
 
 Domain expertise for building serverless applications on AWS: Lambda, API Gateway, Step Functions, EventBridge, event source mappings, concurrency, cold starts, deployment, and troubleshooting.
 
-**Works best with** the [AWS MCP server](https://docs.aws.amazon.com/aws-mcp/) — run CLI commands, query CloudWatch, validate configs directly. All guidance also works with standard AWS CLI access.
+**Works best with** the [AWS MCP server](https://docs.aws.amazon.com/aws-mcp/) -- run CLI commands, query CloudWatch, validate configs directly. All guidance also works with standard AWS CLI access.
 
-## Specialized skills — check these first
+## Specialized skills -- check these first
 
 These cover capabilities and procedures the general references below do **not**. Several are specialized features or step-by-step tested procedures you would otherwise miss. Route to the matching skill before falling back to the references.
 
@@ -27,16 +27,16 @@ These cover capabilities and procedures the general references below do **not**.
 
 Route here when the user wants to coordinate multiple steps, services, or functions. Triggers include "orchestration", "workflow", "state machine", "multi-step coordination", "coordinate Lambda functions", "durable execution", "pipeline with retries", or intent to build saga/compensation, human-in-the-loop approval, fan-out, or long-running async coordination.
 
-When starting a new orchestration or multi-step workflow, you MUST surface the choice between AWS Step Functions and AWS Lambda Durable Functions before implementing — do not silently pick one. Route on the signals below. When the request names only a generic pattern (saga/compensation, human-in-the-loop, fan-out, or "workflow orchestration") with no technology, present both options and the one-line tradeoff, then let the user decide. Do not lead with the tradeoff caveats when the signals already point to one service.
+When starting a new orchestration or multi-step workflow, you MUST surface the choice between AWS Step Functions and AWS Lambda Durable Functions before implementing -- do not silently pick one. Route on the signals below. When the request names only a generic pattern (saga/compensation, human-in-the-loop, fan-out, or "workflow orchestration") with no technology, present both options and the one-line tradeoff, then let the user decide. Do not lead with the tradeoff caveats when the signals already point to one service.
 
 | Use this skill | When the workload involves |
 |---|---|
-| **aws-step-functions** | Orchestration whose primary work is calling AWS services directly; coordinating non-Lambda compute (ECS/Fargate, Glue, SageMaker, Batch) through native managed integrations; a visual, auditable workflow definition required for compliance, cross-team operational observability, or as a shared contract between teams that do not share a codebase (ASL is the specification, not application code); authoring or editing state machines and Amazon States Language (ASL) — state types, JSONata data transformation, Retry/Catch error handling, `.sync`/`waitForTaskToken` service integrations, Distributed Map, TestState unit testing, JSONPath-to-JSONata migration |
-| **aws-lambda-durable-functions** | Code-first orchestration in-process when already building on Lambda (`context.step`/`context.wait`/`context.invoke`, `withDurableExecution`); many fine-grained steps per execution where cumulative Step Functions Standard state-transition cost may be significant — compare Step Functions pricing (Standard vs Express) against Lambda invocation cost at the expected volume before choosing; orchestration steps written in a general-purpose language within the same application codebase (share modules, data types, and test suites with application code); teams applying standard software-engineering practices (unit tests, code review, type checking) to orchestration logic without learning a declarative workflow language |
+| **aws-step-functions** | Orchestration whose primary work is calling AWS services directly; coordinating non-Lambda compute (ECS/Fargate, Glue, SageMaker, Batch) through native managed integrations; a visual, auditable workflow definition required for compliance, cross-team operational observability, or as a shared contract between teams that do not share a codebase (ASL is the specification, not application code); authoring or editing state machines and Amazon States Language (ASL) -- state types, JSONata data transformation, Retry/Catch error handling, `.sync`/`waitForTaskToken` service integrations, Distributed Map, TestState unit testing, JSONPath-to-JSONata migration |
+| **aws-lambda-durable-functions** | Code-first orchestration in-process when already building on Lambda (`context.step`/`context.wait`/`context.invoke`, `withDurableExecution`); many fine-grained steps per execution where cumulative Step Functions Standard state-transition cost may be significant -- compare Step Functions pricing (Standard vs Express) against Lambda invocation cost at the expected volume before choosing; orchestration steps written in a general-purpose language within the same application codebase (share modules, data types, and test suites with application code); teams applying standard software-engineering practices (unit tests, code review, type checking) to orchestration logic without learning a declarative workflow language |
 
 **Tradeoff (use when either fits):** Durable Functions keeps orchestration in your Lambda codebase; Step Functions externalizes it into a managed, visual state machine with built-in service integrations.
 
-**Security:** Both services persist workflow state and payloads — Step Functions records full input/output in execution history (viewable in the console and, if logging is enabled, CloudWatch Logs). As a baseline, enable execution logging (CloudTrail) and CloudWatch alarms on execution failures, and use least-privilege per-workflow execution roles. Do not pass secrets, tokens, or PII through workflow state; reference them by Secrets Manager/ARN pointer, and apply a customer-managed KMS key to encrypt state when the data is sensitive.
+**Security:** Both services persist workflow state and payloads -- Step Functions records full input/output in execution history (viewable in the console and, if logging is enabled, CloudWatch Logs). As a baseline, enable execution logging (CloudTrail) and CloudWatch alarms on execution failures, and use least-privilege per-workflow execution roles. Do not pass secrets, tokens, or PII through workflow state; reference them by Secrets Manager/ARN pointer, and apply a customer-managed KMS key to encrypt state when the data is sensitive.
 
 ### Step-by-step task procedures (tested CLI SOPs)
 
@@ -47,13 +47,13 @@ When starting a new orchestration or multi-step workflow, you MUST surface the c
 | **creating-api-gateway-stage** | Create an API Gateway stage with CloudWatch logging, X-Ray tracing, throttling, WAF association, and authorization |
 | **deploying-custom-domain-rest-api** | Deploy a Regional REST API with custom domain: ACM cert, Lambda backend, request authorizer, base path mapping, Route 53 DNS |
 | **debugging-lambda-timeouts** | Systematically diagnose a timing-out Lambda: config, CloudWatch logs/metrics, VPC, cold starts, memory, downstream calls |
-| **processing-s3-uploads-with-step-functions** | Deploy an event-driven workflow: S3 upload → EventBridge → Step Functions → Lambda (small files) or Fargate (large files), with VPC/ECR/ECS/IAM |
+| **processing-s3-uploads-with-step-functions** | Deploy an event-driven workflow: S3 upload -> EventBridge -> Step Functions -> Lambda (small files) or Fargate (large files), with VPC/ECR/ECS/IAM |
 
 ## Routing (general references in this skill)
 
 | User need | Read |
 |-----------|------|
-| Building a new serverless app — pattern selection | [architecture.md](references/architecture.md) |
+| Building a new serverless app -- pattern selection | [architecture.md](references/architecture.md) |
 | Lambda config, cold starts, SnapStart, memory, VPC, layers, Function URLs | [lambda.md](references/lambda.md) |
 | Concurrency (reserved, provisioned, ESM controls) | [concurrency.md](references/concurrency.md) |
 | Event sources (SQS, DynamoDB Streams, SNS, Kinesis), filtering, batch failures | [event-sources.md](references/event-sources.md) |
@@ -61,7 +61,7 @@ When starting a new orchestration or multi-step workflow, you MUST surface the c
 | API Gateway quotas, authorizers, WebSocket | [api-gateway.md](references/api-gateway.md) |
 | SAM/CDK resource types and fast iteration | [deployment.md](references/deployment.md) |
 | Production readiness, observability, anti-patterns | [production.md](references/production.md) |
-| Debugging an error (exact string → cause → fix) | [troubleshooting.md](references/troubleshooting.md) |
+| Debugging an error (exact string -> cause -> fix) | [troubleshooting.md](references/troubleshooting.md) |
 | Powertools handler template | [powertools-handler.py](assets/powertools-handler.py) |
 
-**Note:** Reference files contain specific runtime versions, quotas, and feature matrices that change. When precision matters (production, runtime choice, quotas), confirm against current AWS documentation. The references focus on values and gotchas that are easy to get wrong — not on basics.
+**Note:** Reference files contain specific runtime versions, quotas, and feature matrices that change. When precision matters (production, runtime choice, quotas), confirm against current AWS documentation. The references focus on values and gotchas that are easy to get wrong -- not on basics.

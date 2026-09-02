@@ -111,13 +111,13 @@ RLAIF uses the same base schema as RLVR. The `ability` and `reward_model.style` 
 | `faithfulness` | `llmj-faithfulness` | Check if response stays grounded in provided context |
 | `summarization` | `llmj-summarization` | Evaluate quality of a generated summary |
 
-**`pairwise-judging` — prompt must include both responses to compare; `ground_truth` is the preferred response index + reasoning.**
+**`pairwise-judging` -- prompt must include both responses to compare; `ground_truth` is the preferred response index + reasoning.**
 
-**`chain-of-thought` / `faithfulness` / `summarization` — prompt contains the task; `ground_truth` is the reference answer or source text.**
+**`chain-of-thought` / `faithfulness` / `summarization` -- prompt contains the task; `ground_truth` is the reference answer or source text.**
 
 #### Custom Evaluator
 
-Set `reward_model.style` to `llmj-custom` and supply a Jinja2 prompt template. The template receives `{{ prompt }}`, `{{ response }}`, and optional `{{ ground_truth }}` as variables. The LLM judge must return a JSON object with a `score` field (0.0–1.0).
+Set `reward_model.style` to `llmj-custom` and supply a Jinja2 prompt template. The template receives `{{ prompt }}`, `{{ response }}`, and optional `{{ ground_truth }}` as variables. The LLM judge must return a JSON object with a `score` field (0.0-1.0).
 
 ```jsonl
 {

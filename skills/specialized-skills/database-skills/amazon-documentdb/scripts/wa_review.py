@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DocumentDB Well-Architected Review — standalone CLI.
+"""DocumentDB Well-Architected Review -- standalone CLI.
 
 Runs 41 automated checks across 6 pillars against a DocumentDB cluster.
 Infrastructure checks use boto3 (AWS APIs). Database-level checks use
@@ -9,8 +9,8 @@ Usage:
     python3 wa_review.py --cluster-id <id> --region <region> [--analysis-data <path>]
 
 Output:
-    wa_review_results.json  — structured check results
-    wa_review_report.md     — human-readable summary
+    wa_review_results.json  -- structured check results
+    wa_review_report.md     -- human-readable summary
 
 Requires: boto3, AWS credentials with docdb/cloudwatch/ec2/secretsmanager read access.
 """
@@ -192,7 +192,7 @@ def run_infra_checks(cluster_id, region):
     else:
         _add(results, "Reliability", "REL6", f"Engine version {engine_ver}", "pass")
 
-    # Recent failover events (14 days) — paginated
+    # Recent failover events (14 days) -- paginated
     try:
         evt_end = datetime.now(timezone.utc)
         evt_start = evt_end - timedelta(days=13)
@@ -471,7 +471,7 @@ def run_infra_checks(cluster_id, region):
         is_writer = inst.get("IsClusterWriter", False)
         family = itype.replace("db.", "").split(".")[0] if itype.startswith("db.") else ""
 
-        # CPU — use hourly Maximum for P95 to capture peak usage within each hour
+        # CPU -- use hourly Maximum for P95 to capture peak usage within each hour
         try:
             raw_dps = cw.get_metric_statistics(
                 Namespace="AWS/DocDB",

@@ -1,7 +1,7 @@
 ---
 name: agents-optimize
 description: >
-  Use when measuring or improving agent quality and performance — set up
+  Use when measuring or improving agent quality and performance -- set up
   evaluators, online monitoring, CI/CD quality gates, observability, or
   cost optimization. Triggers on: "evaluate my agent", "add evaluator",
   "measure quality", "quality gate", "run evals", "agent too slow",
@@ -10,7 +10,7 @@ description: >
   not showing up", "logs missing", "spans not found", "eval failing",
   "eval error", "dev traces", "local traces", "agentcore dev traces",
   "traces to CloudWatch".
-  Not for debugging errors or crashes — use agents-debug. Slow but
+  Not for debugging errors or crashes -- use agents-debug. Slow but
   correct routes here; broken routes to debug.
 allowed-tools: Read Grep Glob Bash
 metadata:
@@ -34,8 +34,8 @@ Measure and improve your AgentCore agent's quality through evaluation, monitorin
 
 Do NOT use for:
 
-- Debugging a specific broken agent (wrong answers, errors) → use `agents-debug`
-- Production security hardening (IAM, auth) → use `agents-harden`
+- Debugging a specific broken agent (wrong answers, errors) -> use `agents-debug`
+- Production security hardening (IAM, auth) -> use `agents-harden`
 
 ## Input
 
@@ -44,7 +44,7 @@ Do NOT use for:
 - An eval goal: "add a quality gate", "set up monitoring"
 - An observability goal: "set up CloudWatch dashboard", "understand my traces"
 - A specific evaluator: "llm-as-a-judge", "code-based"
-- Empty — the skill will guide based on project context
+- Empty -- the skill will guide based on project context
 
 ## Process
 
@@ -66,7 +66,7 @@ If `agentcore/agentcore.json` is not found:
 | Measure quality, add evaluator, run eval, CI/CD gate, online monitoring | Load [`references/evals.md`](references/evals.md) and follow its workflow |
 | Set up observability, CloudWatch, X-Ray, logs, metrics, dashboards | Load [`references/observability.md`](references/observability.md) and follow its workflow |
 | Understand or reduce AgentCore costs | Load [`references/cost.md`](references/cost.md) |
-| Both — "I want to understand and improve my agent" | Start with observability setup, then add evals |
+| Both -- "I want to understand and improve my agent" | Start with observability setup, then add evals |
 
 ### Step 3: Follow the loaded reference
 
@@ -80,7 +80,7 @@ The reference file contains the full procedure. Follow it step by step.
 
 ## Output
 
-Depends on the workflow — see the loaded reference for specific outputs.
+Depends on the workflow -- see the loaded reference for specific outputs.
 
 ## Quality criteria
 
@@ -88,4 +88,4 @@ Depends on the workflow — see the loaded reference for specific outputs.
 - Online eval sampling rate is appropriate (not 100% in production without discussion)
 - CI/CD quality gate has a clear pass/fail threshold
 - Observability setup includes both tracing and logging
-- The developer understands the eval data delay: **~10 seconds put-to-get, end-to-end** — one ingestion step covers both trace reads and eval queries; there is no separate indexing wait
+- The developer understands the eval data delay: **~10 seconds put-to-get, end-to-end** -- one ingestion step covers both trace reads and eval queries; there is no separate indexing wait

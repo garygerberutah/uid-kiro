@@ -26,9 +26,9 @@
 
 **Recommendation**: Hybrid approach.
 
-- RI for r6g instances (DSP doesn't cover r6g) — engine-specific RIs
+- RI for r6g instances (DSP doesn't cover r6g) -- engine-specific RIs
 - DSP covers r7g instances across both MySQL and PostgreSQL
-- Migrate r6g → r7g over time, shift more to DSP
+- Migrate r6g -> r7g over time, shift more to DSP
 
 ## Scenario E: Multi-AZ with Read Replicas
 
@@ -50,20 +50,20 @@
 
 ```
 Is utilization < 40%?
-├── YES → Stay on-demand
-└── NO
-    ├── Is the instance family r6g / older?
-    │   ├── YES → RI only (DSP doesn't cover). Engine-specific.
-    │   └── NO → Compare RI vs DSP
-    ├── Planning to migrate to Aurora?
-    │   ├── YES → No commitment (RI doesn't transfer cross-engine)
-    │   └── NO → Continue
-    ├── Want flexibility across families?
-    │   ├── YES → DSP (1yr or 3yr)
-    │   └── NO → 3yr RI for max savings
-    └── Multi-AZ?
-        ├── YES → Must buy Multi-AZ RI offering (not Single-AZ)
-        └── NO → Single-AZ RI
++-- YES -> Stay on-demand
++-- NO
+    +-- Is the instance family r6g / older?
+    |   +-- YES -> RI only (DSP doesn't cover). Engine-specific.
+    |   +-- NO -> Compare RI vs DSP
+    +-- Planning to migrate to Aurora?
+    |   +-- YES -> No commitment (RI doesn't transfer cross-engine)
+    |   +-- NO -> Continue
+    +-- Want flexibility across families?
+    |   +-- YES -> DSP (1yr or 3yr)
+    |   +-- NO -> 3yr RI for max savings
+    +-- Multi-AZ?
+        +-- YES -> Must buy Multi-AZ RI offering (not Single-AZ)
+        +-- NO -> Single-AZ RI
 ```
 
 ## Sizing the Commitment

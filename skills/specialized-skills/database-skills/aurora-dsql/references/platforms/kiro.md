@@ -27,15 +27,15 @@ When both files define the same server name, **workspace settings take precedenc
 
 ### Kiro-Specific Fields
 
-- `disabled` (bool) — set `true` to suspend a server without deleting its entry
-- `autoApprove` (string array) — tool names that skip the per-call approval prompt.
+- `disabled` (bool) -- set `true` to suspend a server without deleting its entry
+- `autoApprove` (string array) -- tool names that skip the per-call approval prompt.
   Leave empty to require approval for every call. For tools that can mutate state
   (cluster lifecycle APIs, write SQL paths), keep this empty so the user approves each call.
-- `disabledTools` (string array) — hide specific tools from this server
+- `disabledTools` (string array) -- hide specific tools from this server
 - `env` supports `${VAR}` expansion from the shell environment,
   e.g. `"AWS_PROFILE": "${DSQL_PROFILE}"`
 
 ### Verification
 
-Open the command palette (`Cmd/Ctrl+Shift+P`) → search `MCP` → open the MCP view in the Kiro
+Open the command palette (`Cmd/Ctrl+Shift+P`) -> search `MCP` -> open the MCP view in the Kiro
 panel. The AWS MCP Server should appear in the server list with an active status.

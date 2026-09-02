@@ -39,9 +39,9 @@ Read ONLY the single reference file that matches the user's task. Do not preload
 
 **Troubleshooting quick facts** (always mention when diagnosing issues):
 
-- Capacity provider stuck in CREATING → most common cause is **private subnets missing a NAT gateway route** (instances need outbound internet for image pull and Lambda service communication)
-- Function not scaling → check that a **version is published** (PublishToLatestPublished: true)
-- Memory errors → LMI minimum is **2048 MB**
+- Capacity provider stuck in CREATING -> most common cause is **private subnets missing a NAT gateway route** (instances need outbound internet for image pull and Lambda service communication)
+- Function not scaling -> check that a **version is published** (PublishToLatestPublished: true)
+- Memory errors -> LMI minimum is **2048 MB**
 
 ## Workflow
 
@@ -70,18 +70,18 @@ Rule of thumb: LMI becomes cost-competitive at 50-100M+ req/month with steady tr
 - **Instance families** (400+ types, .large and up): C-series (compute), M-series (general), R-series (memory). ARM (Graviton) for best price-performance.
 - **When using Graviton instances, MUST set `Architectures: [arm64]`** in the function configuration to match.
 - **Memory-to-vCPU ratios**: 2:1 (compute), 4:1 (general, default), 8:1 (memory). Min 2 GB, max 32 GB.
-- **Multi-concurrency per-vCPU maximums**: Node.js 64, Java 32, .NET 32, Python 16. These are system caps — the actual setting is PerExecutionEnvironmentMaxConcurrency (per execution environment, not per vCPU).
+- **Multi-concurrency per-vCPU maximums**: Node.js 64, Java 32, .NET 32, Python 16. These are system caps -- the actual setting is PerExecutionEnvironmentMaxConcurrency (per execution environment, not per vCPU).
 - **For I/O-bound workloads**: use the runtime default or higher PerExecutionEnvironmentMaxConcurrency (e.g., 10 for Node.js) since each request uses minimal CPU while waiting on network.
 - **For CPU-bound workloads**: set PerExecutionEnvironmentMaxConcurrency to 1-2 per vCPU since each request saturates CPU.
-- **Scaling**: MinExecutionEnvironments (default 3), MaxVCpuCount (optional, default 400 — set explicitly as best practice), TargetResourceUtilization.
+- **Scaling**: MinExecutionEnvironments (default 3), MaxVCpuCount (optional, default 400 -- set explicitly as best practice), TargetResourceUtilization.
 
 ### Step 4: Migrate the Code
 
 Review code for concurrency safety. LMI runs multiple invocations concurrently per execution environment:
 
-- **Python**: Process-based isolation — globals are NOT shared. No thread-safety changes needed. Focus on `/tmp` conflicts and memory sizing.
-- **Node.js**: Worker threads — globals shared within a worker. Requires async safety.
-- **Java/.NET**: OS threads/Tasks — handler shared across threads. Requires full thread safety.
+- **Python**: Process-based isolation -- globals are NOT shared. No thread-safety changes needed. Focus on `/tmp` conflicts and memory sizing.
+- **Node.js**: Worker threads -- globals shared within a worker. Requires async safety.
+- **Java/.NET**: OS threads/Tasks -- handler shared across threads. Requires full thread safety.
 
 ### Step 5: Set Up Infrastructure
 
@@ -95,7 +95,7 @@ Review code for concurrency safety. LMI runs multiple invocations concurrently p
 
 1. Deploy to a non-production environment first
 2. Monitor CloudWatch: CPU utilization, memory, concurrency, throttle rate
-3. Gradual traffic shift with weighted aliases (10% → 50% → 100%)
+3. Gradual traffic shift with weighted aliases (10% -> 50% -> 100%)
 4. Compare costs after 1-2 weeks of production data
 5. Decommission standard Lambda once stable
 
@@ -109,10 +109,10 @@ Review code for concurrency safety. LMI runs multiple invocations concurrently p
 
 ### Scaling (always mention when discussing scaling or traffic)
 
-- LMI absorbs a 50% traffic spike immediately and **doubles capacity within 5 minutes** — if traffic more than doubles faster, requests throttle
-- Standard Lambda bursts to 3000 instantly — LMI cannot match this
+- LMI absorbs a 50% traffic spike immediately and **doubles capacity within 5 minutes** -- if traffic more than doubles faster, requests throttle
+- Standard Lambda bursts to 3000 instantly -- LMI cannot match this
 - **Pre-warm** with MinExecutionEnvironments before known spikes
-- **MaxVCpuCount** (default 400) — set explicitly as a cost ceiling
+- **MaxVCpuCount** (default 400) -- set explicitly as a cost ceiling
 - **Shape**: Reduce MinExecutionEnvironments to lower capacity during off-hours (minimum 3 for AZ resiliency)
 
 ### Instance Sizing
@@ -141,7 +141,7 @@ Review code for concurrency safety. LMI runs multiple invocations concurrently p
 - Set CloudWatch alarms on throttle rate > 1% and CPU > 80%
 - Plan for 14-day instance rotation (automatic)
 - Never manually terminate LMI EC2 instances (delete the capacity provider instead)
-- Always publish a version — unpublished functions cannot run on LMI
+- Always publish a version -- unpublished functions cannot run on LMI
 
 ## Limits Quick Reference
 
@@ -159,7 +159,7 @@ Review code for concurrency safety. LMI runs multiple invocations concurrently p
 
 - **Operator role scoping**: Add `aws:SourceAccount` and `aws:SourceArn` conditions to trust policies to prevent confused deputy attacks.
 - **VPC egress**: Scope security group egress to VPC endpoint security groups or AWS prefix lists rather than 0.0.0.0/0.
-- **Credentials**: Use AWS Secrets Manager or Parameter Store for database credentials — never environment variables for secrets.
+- **Credentials**: Use AWS Secrets Manager or Parameter Store for database credentials -- never environment variables for secrets.
 - **Encryption**: Enable SQS SSE, CloudWatch Logs encryption (KMS), and S3 default encryption for any data at rest.
 - **Logging**: Set CloudWatch Log group retention policies. Avoid logging PII or credentials. Enable CloudTrail data events for Lambda.
 - **Instance rotation**: The 14-day automatic rotation ensures security patches are applied without manual intervention.

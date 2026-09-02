@@ -1,4 +1,4 @@
-# Amazon OpenSearch Service Domain — Deploy Search Configuration
+# Amazon OpenSearch Service Domain -- Deploy Search Configuration
 
 Deploy index configuration, ML models, and pipelines to a provisioned domain.
 

@@ -4,11 +4,11 @@ Guide for diagnosing and resolving performance issues, incremental loading probl
 
 ## Table of Contents
 
-- [Performance Issues](#performance-issues) — Slow queries, job timeouts
-- [Incremental Loading Issues](#incremental-loading-issues) — Watermark not advancing, duplicates
-- [IAM and Permissions Errors](#iam-and-permissions-errors) — S3 access denied, Glue catalog access
-- [Monitoring and Alerting](#monitoring-and-alerting) — CloudWatch alarms, key metrics
-- [Troubleshooting Checklist](#troubleshooting-checklist) — Systematic diagnosis steps
+- [Performance Issues](#performance-issues) -- Slow queries, job timeouts
+- [Incremental Loading Issues](#incremental-loading-issues) -- Watermark not advancing, duplicates
+- [IAM and Permissions Errors](#iam-and-permissions-errors) -- S3 access denied, Glue catalog access
+- [Monitoring and Alerting](#monitoring-and-alerting) -- CloudWatch alarms, key metrics
+- [Troubleshooting Checklist](#troubleshooting-checklist) -- Systematic diagnosis steps
 
 ## Performance Issues
 

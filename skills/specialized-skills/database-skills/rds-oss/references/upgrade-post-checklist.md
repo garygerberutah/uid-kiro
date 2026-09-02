@@ -1,4 +1,4 @@
-# RDS Post-Upgrade Checklist — MySQL, MariaDB, PostgreSQL
+# RDS Post-Upgrade Checklist -- MySQL, MariaDB, PostgreSQL
 
 ## Step 1: Verify the Upgrade Completed Successfully
 
@@ -37,7 +37,7 @@ SELECT 1;
 
 Check that:
 
-- Connection succeeds (for MySQL 8.0: auth plugin may have changed to `caching_sha2_password` — older clients may need `--default-auth=mysql_native_password`)
+- Connection succeeds (for MySQL 8.0: auth plugin may have changed to `caching_sha2_password` -- older clients may need `--default-auth=mysql_native_password`)
 - All expected databases are present
 - Key application queries return expected results
 
@@ -62,7 +62,7 @@ Note: `ANALYZE TABLE` and `OPTIMIZE TABLE` are expensive operations. Do NOT run 
 Beyond basic database connectivity, verify that your actual application connects and operates correctly against the upgraded instance:
 
 - Point your application (or a staging/canary instance) at the upgraded database
-- Confirm the application driver is compatible with the new engine version — auth plugin changes (MySQL 8.0: `caching_sha2_password`), TLS negotiation, and connection pooling behavior may differ
+- Confirm the application driver is compatible with the new engine version -- auth plugin changes (MySQL 8.0: `caching_sha2_password`), TLS negotiation, and connection pooling behavior may differ
 - Run key application workflows end-to-end (reads, writes, transactions)
 - Check application logs for connection errors, query failures, or unexpected behavior
 - If using connection pooling (HikariCP, PgBouncer, ProxySQL), verify pools reconnected and are healthy
@@ -71,7 +71,7 @@ Beyond basic database connectivity, verify that your actual application connects
 
 If you created a custom parameter group to preserve previous behavior, confirm the key settings took effect:
 
-**MySQL (5.7 → 8.0):**
+**MySQL (5.7 -> 8.0):**
 
 ```sql
 SELECT @@character_set_server, @@collation_server, @@sql_mode, @@innodb_strict_mode;
@@ -86,7 +86,7 @@ SHOW work_mem;
 SHOW shared_buffers;
 ```
 
-If you used the default parameter group for the target family, these will be the new version's defaults — verify your application handles them correctly.
+If you used the default parameter group for the target family, these will be the new version's defaults -- verify your application handles them correctly.
 
 ## Step 5: Check for Query Plan Changes
 
@@ -100,8 +100,8 @@ EXPLAIN FORMAT=JSON SELECT ... ;
 
 Watch for (MySQL 8.0):
 
-- Hash joins replacing nested loop joins (new in 8.0 — usually faster, but verify)
-- GROUP BY results no longer implicitly sorted — add explicit ORDER BY if your app relied on this
+- Hash joins replacing nested loop joins (new in 8.0 -- usually faster, but verify)
+- GROUP BY results no longer implicitly sorted -- add explicit ORDER BY if your app relied on this
 - Index choices may differ due to updated cost model
 
 **PostgreSQL:**
@@ -128,12 +128,12 @@ Parameter group changes during an upgrade can reset logging settings. After the 
 
 Monitor these CloudWatch metrics for the first 24-48 hours post-upgrade. These apply to all RDS engines (MySQL, MariaDB, PostgreSQL):
 
-- `CPUUtilization` — should be comparable to pre-upgrade baseline
-- `DatabaseConnections` — confirm apps reconnected successfully
-- `ReadIOPS` — watch for unexpected spikes indicating plan regressions
-- `WriteIOPS` — watch for unexpected spikes
-- `FreeableMemory` — the new version may use memory differently
-- `FreeStorageSpace` — upgrade process may temporarily consume extra storage
+- `CPUUtilization` -- should be comparable to pre-upgrade baseline
+- `DatabaseConnections` -- confirm apps reconnected successfully
+- `ReadIOPS` -- watch for unexpected spikes indicating plan regressions
+- `WriteIOPS` -- watch for unexpected spikes
+- `FreeableMemory` -- the new version may use memory differently
+- `FreeStorageSpace` -- upgrade process may temporarily consume extra storage
 
 ```bash
 aws cloudwatch get-metric-statistics \

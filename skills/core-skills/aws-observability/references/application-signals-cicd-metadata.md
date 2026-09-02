@@ -1,19 +1,19 @@
 # Application Signals: Git & Deployment Metadata Propagation
 
-Propagate git and deployment metadata to an Application Signals service so ServiceEvents can correlate deployments with telemetry. This is **Tier 2** of onboarding (see [application-signals-onboarding.md](application-signals-onboarding.md)) — it applies only to **EC2/ECS/EKS** services in **Python, Node.js, or Java**. It does NOT apply to Lambda or .NET.
+Propagate git and deployment metadata to an Application Signals service so ServiceEvents can correlate deployments with telemetry. This is **Tier 2** of onboarding (see [application-signals-onboarding.md](application-signals-onboarding.md)) -- it applies only to **EC2/ECS/EKS** services in **Python, Node.js, or Java**. It does NOT apply to Lambda or .NET.
 
 Never modify application source code. Only edit the CI/CD workflow, Dockerfiles, and deployment manifests. Make minimum changes and present them for review.
 
 ## The 5 environment variables
 
-### Category 1 — Git metadata (BUILD time, bake into the Docker image)
+### Category 1 -- Git metadata (BUILD time, bake into the Docker image)
 
 | Variable | Description | Git fallback |
 |----------|-------------|--------------|
 | `OTEL_AWS_SERVICE_EVENTS_GIT_REPO_URL` | HTTPS URL of the **app** repo | `git remote get-url origin` |
 | `OTEL_AWS_SERVICE_EVENTS_GIT_COMMIT_SHA` | Full SHA of the **app** commit | `git rev-parse HEAD` |
 
-**Note:** use a plain repo URL for `GIT_REPO_URL` — not one with embedded credentials (e.g. `https://<token>@github.com/...`). This value is propagated into telemetry, so an embedded token would leak. `git remote get-url origin` returns a credential-free URL in the normal case; strip any userinfo if your remote includes it.
+**Note:** use a plain repo URL for `GIT_REPO_URL` -- not one with embedded credentials (e.g. `https://<token>@github.com/...`). This value is propagated into telemetry, so an embedded token would leak. `git remote get-url origin` returns a credential-free URL in the normal case; strip any userinfo if your remote includes it.
 
 CI/CD provider mappings (use only when the app IS the workflow repo):
 
@@ -22,7 +22,7 @@ CI/CD provider mappings (use only when the app IS the workflow repo):
 | GitHub Actions | `${{ github.server_url }}/${{ github.repository }}` | `${{ github.sha }}` |
 | Jenkins | `$GIT_URL` | `$GIT_COMMIT` |
 
-### Category 2 — Deployment metadata (DEPLOY time, runtime env vars only)
+### Category 2 -- Deployment metadata (DEPLOY time, runtime env vars only)
 
 | Variable | Description |
 |----------|-------------|
@@ -30,9 +30,9 @@ CI/CD provider mappings (use only when the app IS the workflow repo):
 | `OTEL_AWS_SERVICE_EVENTS_DEPLOYMENT_ID` | Unique identifier of the CI/CD run (run ID / build number) |
 | `OTEL_AWS_SERVICE_EVENTS_DEPLOYMENT_TIMESTAMP` | ISO 8601 UTC timestamp: `date -u +%Y-%m-%dT%H:%M:%SZ` |
 
-Deployment URL by provider — GitHub Actions: `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`; Jenkins: `$BUILD_URL`. Deployment ID — GitHub Actions: `${{ github.run_id }}`; Jenkins: `$BUILD_NUMBER`.
+Deployment URL by provider -- GitHub Actions: `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`; Jenkins: `$BUILD_URL`. Deployment ID -- GitHub Actions: `${{ github.run_id }}`; Jenkins: `$BUILD_NUMBER`.
 
-**NEVER bake Category 2 (deployment metadata) into Docker images** — it must be set at deploy time. **NEVER set Category 1 using the deploy repo's git metadata if the app comes from a different repo.**
+**NEVER bake Category 2 (deployment metadata) into Docker images** -- it must be set at deploy time. **NEVER set Category 1 using the deploy repo's git metadata if the app comes from a different repo.**
 
 ## Procedure
 
@@ -49,8 +49,8 @@ Read the deploy workflow YAML, the `Dockerfile*` and `docker-compose*.yml` in th
 
 Trace how env vars flow from CI/CD to the running container. Every intermediate layer must explicitly forward each var or it is silently dropped:
 
-- Category 1: workflow step env → shell → docker build args → Dockerfile `ARG`/`ENV`.
-- Category 2: workflow step env → shell → template engine / Terraform vars → deployment manifest → container env.
+- Category 1: workflow step env -> shell -> docker build args -> Dockerfile `ARG`/`ENV`.
+- Category 2: workflow step env -> shell -> template engine / Terraform vars -> deployment manifest -> container env.
 
 ### 4. Apply changes
 
@@ -64,7 +64,7 @@ Summarize changes, stating which vars are build-time vs deploy-time. Present for
 
 ## Pattern examples
 
-### GitHub Actions — app IS the workflow repo
+### GitHub Actions -- app IS the workflow repo
 
 ```yaml
 - name: Set git metadata
@@ -74,7 +74,7 @@ Summarize changes, stating which vars are build-time vs deploy-time. Present for
     echo "git_commit_sha=${{ github.sha }}" >> $GITHUB_OUTPUT
 ```
 
-### GitHub Actions — app is a DIFFERENT repo (multi-checkout)
+### GitHub Actions -- app is a DIFFERENT repo (multi-checkout)
 
 ```yaml
 - name: Set git metadata from app repo
@@ -85,7 +85,7 @@ Summarize changes, stating which vars are build-time vs deploy-time. Present for
     echo "git_commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 ```
 
-### Dockerfile ARG/ENV (build-side — 2 git vars only)
+### Dockerfile ARG/ENV (build-side -- 2 git vars only)
 
 ```dockerfile
 ARG OTEL_AWS_SERVICE_EVENTS_GIT_REPO_URL
@@ -94,7 +94,7 @@ ENV OTEL_AWS_SERVICE_EVENTS_GIT_REPO_URL=${OTEL_AWS_SERVICE_EVENTS_GIT_REPO_URL}
 ENV OTEL_AWS_SERVICE_EVENTS_GIT_COMMIT_SHA=${OTEL_AWS_SERVICE_EVENTS_GIT_COMMIT_SHA}
 ```
 
-### Kubernetes deployment YAML with envsubst (deploy-side — 3 deployment vars only)
+### Kubernetes deployment YAML with envsubst (deploy-side -- 3 deployment vars only)
 
 ```yaml
         - name: OTEL_AWS_SERVICE_EVENTS_DEPLOYMENT_URL
@@ -105,9 +105,9 @@ ENV OTEL_AWS_SERVICE_EVENTS_GIT_COMMIT_SHA=${OTEL_AWS_SERVICE_EVENTS_GIT_COMMIT_
           value: "${OTEL_AWS_SERVICE_EVENTS_DEPLOYMENT_TIMESTAMP}"
 ```
 
-Quotes around `value` are required — `DEPLOYMENT_ID` is numeric and YAML rejects it without quotes.
+Quotes around `value` are required -- `DEPLOYMENT_ID` is numeric and YAML rejects it without quotes.
 
-### Terraform ECS (deploy-side — 3 deployment vars only)
+### Terraform ECS (deploy-side -- 3 deployment vars only)
 
 ```hcl
 variable "deployment_url" { type = string; default = "" }

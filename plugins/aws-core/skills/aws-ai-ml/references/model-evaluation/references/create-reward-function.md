@@ -18,8 +18,8 @@ The caller must know the base model being used (needed for template selection).
 
 Select the reward function template based on the base model:
 
-- **Nova 2.0 Lite** → `scripts/nova_reward_function_source_template.py`
-- **All other models** → `scripts/reward_function_source_template.py`
+- **Nova 2.0 Lite** -> `scripts/nova_reward_function_source_template.py`
+- **All other models** -> `scripts/reward_function_source_template.py`
 
 Copy the selected template as `lambda_function.py` into the project's scripts directory.
 
@@ -54,7 +54,7 @@ After copying the template and generating the notebook cell, inform the user tha
 
 > "The reward function template has placeholder scoring logic that needs to be customized for your task. Would you like me to fill in the TODOs based on what I know about your use case, or would you prefer to do it yourself?"
 
-- If the user wants you to do it: customize the helper functions, reward logic, input parsing, score computation, and return statement based on the task context. Then present the result and warn: "Please review the Lambda code before running — especially the scoring logic. I may have made incorrect assumptions about your requirements."
+- If the user wants you to do it: customize the helper functions, reward logic, input parsing, score computation, and return statement based on the task context. Then present the result and warn: "Please review the Lambda code before running -- especially the scoring logic. I may have made incorrect assumptions about your requirements."
 - If the user wants to do it: direct them to edit `lambda_function.py` directly and wait for their acknowledgment before proceeding.
 
 ## Output
@@ -63,5 +63,5 @@ The output of this workflow is a reference to `evaluator.arn`. Embed the `Evalua
 
 ## References
 
-- `scripts/reward_function_source_template.py` — Lambda source template for open-weights models
-- `scripts/nova_reward_function_source_template.py` — Lambda source template for Nova 2.0 Lite
+- `scripts/reward_function_source_template.py` -- Lambda source template for open-weights models
+- `scripts/nova_reward_function_source_template.py` -- Lambda source template for Nova 2.0 Lite

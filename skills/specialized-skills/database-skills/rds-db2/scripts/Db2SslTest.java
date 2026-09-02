@@ -6,13 +6,13 @@ import java.security.cert.*;
 import java.util.*;
 
 /**
- * Db2SslTest.java — Test SSL connection to RDS DB2 bypassing GSKit entirely.
+ * Db2SslTest.java -- Test SSL connection to RDS DB2 bypassing GSKit entirely.
  *
  * Compile:  javac Db2SslTest.java
  * Run:      java Db2SslTest <host> <port> <pemFile>
  * Example:  java Db2SslTest mydb2.abc123def456.us-west-1.rds.amazonaws.com 50443 /tmp/us-west-1-bundle.pem
  *
- * No JDBC driver needed — tests the raw SSL handshake the same way the blog
+ * No JDBC driver needed -- tests the raw SSL handshake the same way the blog
  * approach works (Java TrustManager loaded from PEM, no keystore/keytool).
  */
 public class Db2SslTest {
@@ -100,7 +100,7 @@ public class Db2SslTest {
         System.out.println();
     }
 
-    // Build SSLContext from PEM certs — same approach as the blog (no keystore/keytool)
+    // Build SSLContext from PEM certs -- same approach as the blog (no keystore/keytool)
     static SSLContext buildSslContext(List<X509Certificate> certs, boolean tlsv12Only)
             throws Exception {
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());

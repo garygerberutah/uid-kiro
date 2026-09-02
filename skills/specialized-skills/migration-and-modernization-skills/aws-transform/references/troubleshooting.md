@@ -6,16 +6,16 @@
 |-------|------------|
 | `atx` not found | Install: `curl -fsSL https://transform-cli.awsstatic.com/install.sh` piped to `bash` |
 | AWS credentials error or expiry | Run `aws sts get-caller-identity`. Check `AWS_PROFILE` or access key env vars |
-| Permission denied | Local mode: need `transform-custom:*` — see Prerequisites → IAM Permissions in SKILL.md. Remote mode: generate and attach policies via `npx ts-node generate-caller-policy.ts` — see remote-execution.md |
+| Permission denied | Local mode: need `transform-custom:*` -- see Prerequisites -> IAM Permissions in SKILL.md. Remote mode: generate and attach policies via `npx ts-node generate-caller-policy.ts` -- see remote-execution.md |
 | Network error | Resolve region: `REGION=${AWS_REGION:-${AWS_DEFAULT_REGION:-$(aws configure get region 2>/dev/null)}}; REGION=${REGION:-us-east-1}`. Check access to `transform-custom.${REGION}.api.aws` |
 | Build fails during transform | Verify build command works locally first. Try interactive mode for debugging |
 | Transform not found | Run `atx custom def list --json` to check available TDs |
-| Configuration fails with commas | Do not use commas inside `additionalPlanContext` values — they break the CLI parser. Rephrase to avoid commas |
+| Configuration fails with commas | Do not use commas inside `additionalPlanContext` values -- they break the CLI parser. Rephrase to avoid commas |
 | Conversation expired | Conversations expire after 30 days. Start a new one |
 | Windows not supported | Tell user to use Windows Subsystem for Linux (WSL) |
 | Git clone fails in remote container | See "Private Repo Credential Issues" section below |
 | Timeout | Set `export ATX_SHELL_TIMEOUT=1800` (default: 900s) |
-| Stale .exit file | The `.exit` file in `atx-agent-session/` may be left over from a previous run. Always use `kill -0 <pid>` to check if the process is still running — do not rely solely on the `.exit` file |
+| Stale .exit file | The `.exit` file in `atx-agent-session/` may be left over from a previous run. Always use `kill -0 <pid>` to check if the process is still running -- do not rely solely on the `.exit` file |
 | Poor quality results | See Improving Quality section below |
 
 ## Private Repo Credential Issues
@@ -30,7 +30,7 @@ aws secretsmanager describe-secret --secret-id "atx/github-token" --region "$REG
 aws secretsmanager describe-secret --secret-id "atx/ssh-key" --region "$REGION" 2>/dev/null && echo "EXISTS" || echo "MISSING"
 ```
 
-If missing, guide the user through setup — see Step 1 in SKILL.md.
+If missing, guide the user through setup -- see Step 1 in SKILL.md.
 
 **2. Does the PAT have the right scope?**
 GitHub fine-grained PATs can be scoped to specific repos. If the user created a
@@ -117,7 +117,7 @@ This is configured via `prebuiltImageUri` in `cdk.json`.
 
 If `git pull`, `git commit`, or any other step on the remote-infra repo fails
 (merge conflicts, corrupted state, detached HEAD, permission errors, etc.), rename
-the existing directory and re-clone from scratch. This is safe — the repo is just
+the existing directory and re-clone from scratch. This is safe -- the repo is just
 a working copy of the infrastructure scripts, and all deployed AWS resources are
 unaffected.
 

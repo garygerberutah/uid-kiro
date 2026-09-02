@@ -1,6 +1,6 @@
 # Configuring Event Destinations
 
-> **Security:** Encrypt SNS topics with KMS; callbacks may contain recipient metadata. See [SKILL.md — Security Considerations](../SKILL.md#security-considerations).
+> **Security:** Encrypt SNS topics with KMS; callbacks may contain recipient metadata. See [SKILL.md -- Security Considerations](../SKILL.md#security-considerations).
 
 ## Contents
 
@@ -16,7 +16,7 @@ Event destinations deliver real-time notifications for:
 
 - Message delivery status (sent, delivered, read, failed)
 - Template status changes (approved, rejected)
-- Template reclassification (UTILITY → MARKETING)
+- Template reclassification (UTILITY -> MARKETING)
 
 Without event destinations, delivery failures and reclassifications are invisible.
 
@@ -132,7 +132,7 @@ aws sns list-subscriptions-by-topic \
 
 Subscriptions must show `"SubscriptionArn"` (not `"PendingConfirmation"`).
 
-Verify SNS subscription endpoints are authorized personnel/systems — use access policies to restrict who can subscribe. Use HTTPS-only endpoints for encryption in transit.
+Verify SNS subscription endpoints are authorized personnel/systems -- use access policies to restrict who can subscribe. Use HTTPS-only endpoints for encryption in transit.
 
 ## Event Payload Examples
 

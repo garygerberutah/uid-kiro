@@ -10,7 +10,7 @@
 | `compression.type` | `lz4` or `zstd` | Reduces network bandwidth and storage. `lz4` for low latency; `zstd` for best compression ratio. |
 | `acks` | `all` | Required for durability with MSK default `min.insync.replicas=2` and `RF=3`. Ensures all in-sync replicas acknowledge. Combined with `min.insync.replicas=2`, writes succeed as long as at least 2 of 3 replicas are in the ISR. |
 | `retries` | 2147483647 (Integer.MAX_VALUE) | Allow unlimited retries. Use `delivery.timeout.ms` to bound total time. Failure to retry breaks Kafka's high availability during broker failover. |
-| `delivery.timeout.ms` | 60000 minimum; 120000 (default) or higher | Upper bound for total send time including retries. Must be ≥ `request.timeout.ms` + `linger.ms`. AWS recommends a minimum of 60 seconds. With RF=3 and `min.insync.replicas=2`, producers only stall during leader election (seconds), so the 2-min default covers most cases. Increase if you observe `TimeoutException` during maintenance. |
+| `delivery.timeout.ms` | 60000 minimum; 120000 (default) or higher | Upper bound for total send time including retries. Must be >= `request.timeout.ms` + `linger.ms`. AWS recommends a minimum of 60 seconds. With RF=3 and `min.insync.replicas=2`, producers only stall during leader election (seconds), so the 2-min default covers most cases. Increase if you observe `TimeoutException` during maintenance. |
 | `request.timeout.ms` | 10000 (10 seconds) or higher | Max wait time for a single request before retry. |
 | `retry.backoff.ms` | 200 minimum | Prevents retry storms during broker failover. |
 | `send.buffer.bytes` | -1 (OS default) | Let the OS manage TCP buffers, especially on high-latency networks. |
@@ -30,18 +30,18 @@
 | `fetch.min.bytes` | 1024-131072 (1 KB-128 KB) | Reduces number of fetch requests. 1 KB for low-latency use cases; 32-128 KB for throughput-oriented workloads. |
 | `fetch.max.wait.ms` | 1000 | How long to wait if `fetch.min.bytes` is not met. |
 | `client.rack` | AZ ID (e.g., `use1-az1`) | Consumer side. Enables nearest-replica reads to eliminate cross-AZ consumer fetch cost. Must be paired with the broker-side selector in the row below. |
-| `replica.selector.class` (cluster configuration) | `org.apache.kafka.common.replica.RackAwareReplicaSelector` | Broker-side. Default on MSK is `null` — must be set explicitly by attaching a custom MSK cluster configuration that includes this line, then applying it to the cluster. Without it, `client.rack` has no effect and consumers still fetch from the partition leader regardless of AZ. `broker.rack` itself is set automatically by MSK to the broker's AZ ID (e.g., `use1-az1`) so no manual config is needed there. See [Reduce network traffic costs of your Amazon MSK consumers with rack awareness](https://aws.amazon.com/blogs/big-data/reduce-network-traffic-costs-of-your-amazon-msk-consumers-with-rack-awareness/) for the full setup. |
+| `replica.selector.class` (cluster configuration) | `org.apache.kafka.common.replica.RackAwareReplicaSelector` | Broker-side. Default on MSK is `null` -- must be set explicitly by attaching a custom MSK cluster configuration that includes this line, then applying it to the cluster. Without it, `client.rack` has no effect and consumers still fetch from the partition leader regardless of AZ. `broker.rack` itself is set automatically by MSK to the broker's AZ ID (e.g., `use1-az1`) so no manual config is needed there. See [Reduce network traffic costs of your Amazon MSK consumers with rack awareness](https://aws.amazon.com/blogs/big-data/reduce-network-traffic-costs-of-your-amazon-msk-consumers-with-rack-awareness/) for the full setup. |
 | `isolation.level` | `read_uncommitted` (default) | SHOULD NOT use `read_committed` when reading from tiered storage unless actively using transactions. |
 | `receive.buffer.bytes` | -1 (OS default) | Let OS manage TCP buffers on high-latency networks. |
 
 ## Connection Management
 
-- Create Kafka clients (producer, consumer, admin) once per application lifecycle — use singleton pattern. For AWS Lambda, create the client in global/init scope, NOT inside the handler function.
+- Create Kafka clients (producer, consumer, admin) once per application lifecycle -- use singleton pattern. For AWS Lambda, create the client in global/init scope, NOT inside the handler function.
 - Add random jitter (random sleep) before creating clients to avoid connection storms during deployments
-- Add a shutdown hook with a random sleep before closing clients on SIGTERM — this prevents all clients from disconnecting simultaneously during rolling deployments. The random sleep should fit within the window before SIGKILL occurs.
-- Ensure your deployment mechanism does not restart all producers/consumers at once — deploy in smaller batches
+- Add a shutdown hook with a random sleep before closing clients on SIGTERM -- this prevents all clients from disconnecting simultaneously during rolling deployments. The random sleep should fit within the window before SIGKILL occurs.
+- Ensure your deployment mechanism does not restart all producers/consumers at once -- deploy in smaller batches
 - Set `reconnect.backoff.ms = 1000` to handle connection retries gracefully
-- Monitor `connection-count`, `connection-creation-rate`, `connection-close-rate` client metrics — these should be stable. High connection creation/termination rates cause unnecessary broker load.
+- Monitor `connection-count`, `connection-creation-rate`, `connection-close-rate` client metrics -- these should be stable. High connection creation/termination rates cause unnecessary broker load.
 
 ## IAM Authentication
 
@@ -68,7 +68,7 @@ sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule require
   username="<username>" password="<password>";
 ```
 
-Store credentials in AWS Secrets Manager. Associate the secret with the MSK cluster. This config format is required for the Kafka CLI (`kafka-console-producer.sh`, etc.). In application code, retrieve credentials from Secrets Manager at runtime and inject into the JAAS config programmatically — do not store passwords in source-controlled config files.
+Store credentials in AWS Secrets Manager. Associate the secret with the MSK cluster. This config format is required for the Kafka CLI (`kafka-console-producer.sh`, etc.). In application code, retrieve credentials from Secrets Manager at runtime and inject into the JAAS config programmatically -- do not store passwords in source-controlled config files.
 
 ## TLS (mTLS) Authentication
 
@@ -81,7 +81,7 @@ ssl.keystore.password=<password>
 ssl.key.password=<password>
 ```
 
-This config format is required for the Kafka CLI. In application code, load keystore/truststore passwords from Secrets Manager or SSM Parameter Store (SecureString) at startup — do not commit passwords to source-controlled config files.
+This config format is required for the Kafka CLI. In application code, load keystore/truststore passwords from Secrets Manager or SSM Parameter Store (SecureString) at startup -- do not commit passwords to source-controlled config files.
 
 If you don't have an existing CA, [AWS Private CA](https://docs.aws.amazon.com/msk/latest/developerguide/msk-authentication.html) can issue and rotate client certificates for MSK mTLS.
 

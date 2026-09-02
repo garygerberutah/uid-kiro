@@ -4,7 +4,7 @@ WHY THIS EXISTS (import-cycle removal)
   This module is the LEAF that owns the lazily-built CloudWatch Logs client, exposed as the
   module attribute ``logs_client``. Previously the seam lived in ``di_snapshots`` (the CLI entry
   point), so the snapshot query layer reached it via ``di_snapshot_tools -> di_snapshot_queries
-  -> di_snapshots`` — an import cycle back into the entry script. A client seam is a leaf concern
+  -> di_snapshots`` -- an import cycle back into the entry script. A client seam is a leaf concern
   (it depends only on ``di_session``/``di_region``), so it belongs in its own leaf module. With
   it here, ``di_snapshot_queries`` imports DOWN into this module (as ``aws_clients``) and nothing
   imports back into ``di_snapshots``: the cycle is gone. Mirrors ``di_app_signals_client``.
@@ -15,7 +15,7 @@ WHY THIS EXISTS (import-cycle removal)
 SECURITY
   Attribute access on ``logs_client`` is restricted to the allowlisted CloudWatch Logs
   operations (``_ALLOWED_LOGS_OPERATIONS``) and each is returned by LITERAL attribute access on
-  the boto3 client — never ``getattr(client, name)`` — so the proxy cannot be turned into an
+  the boto3 client -- never ``getattr(client, name)`` -- so the proxy cannot be turned into an
   arbitrary-Logs-API dispatcher (ExecutableCodeSecurityReview Guideline 1). Mirrors the
   allowlist + literal-dispatch pattern in ``di_gateway``.
 """
@@ -65,7 +65,7 @@ class _LazyLogsClient:
         global _logs_client
         if _logs_client is None:
             _logs_client = _build_logs_client()
-        # Literal attribute access per allowlisted op — no getattr(client, name) dispatch.
+        # Literal attribute access per allowlisted op -- no getattr(client, name) dispatch.
         # _ALLOWED_LOGS_OPERATIONS above already rejected anything outside these two, so the
         # final branch is unreachable; it keeps the allowlist and this dispatch in lockstep.
         if name == "start_query":

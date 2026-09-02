@@ -1,10 +1,10 @@
-# Storage — Mobile
+# Storage -- Mobile
 
 ## Prerequisites
 
 Initialize Amplify with Auth and Storage plugins before using this feature:
 
-**Flutter** — `lib/main.dart`:
+**Flutter** -- `lib/main.dart`:
 
 ```dart
 await Amplify.addPlugins([AmplifyAuthCognito(), AmplifyStorageS3()]);
@@ -34,7 +34,7 @@ Amplify.configure(AmplifyOutputs(R.raw.amplify_outputs), applicationContext)
 > Place `amplify_outputs.json` in `app/src/main/res/raw/`. Enable core library desugaring for API level < 26.
 >
 > **Backend required:** Storage must be defined in `amplify/storage/resource.ts`
-> using `defineStorage` — see [storage-backend.md](storage-backend.md).
+> using `defineStorage` -- see [storage-backend.md](storage-backend.md).
 
 ## Flutter
 
@@ -44,13 +44,13 @@ Imports: `amplify_flutter` + `amplify_storage_s3`. All paths wrapped with `Stora
 | ------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | Upload file   | `Amplify.Storage.uploadFile(localFile: AWSFile.fromPath(path), path: const StoragePath.fromString('public/photo.jpg'))` |
 | Download file | `Amplify.Storage.downloadFile(path: const StoragePath.fromString('public/photo.jpg'), localFile: localFile)`            |
-| List          | `Amplify.Storage.list(path: const StoragePath.fromString('public/'))` → `.result.items`                                 |
+| List          | `Amplify.Storage.list(path: const StoragePath.fromString('public/'))` -> `.result.items`                                 |
 | Presigned URL | `Amplify.Storage.getUrl(path: const StoragePath.fromString('public/file.jpg'))`                                         |
 | Remove        | `Amplify.Storage.remove(path: const StoragePath.fromString('public/file.jpg'))`                                         |
 
 > **Security:** Amplify Gen2 enables S3 server-side encryption (SSE-S3) by default. All transfers use HTTPS (TLS in transit). For sensitive data, configure SSE-KMS with a customer-managed key via CDK overrides.
 
-Upload progress — use the `onProgress` callback parameter:
+Upload progress -- use the `onProgress` callback parameter:
 
 ```dart
 final op = Amplify.Storage.uploadFile(
@@ -71,11 +71,11 @@ Uses `Amplify.Storage` with async/await. Import: `Amplify`.
 
 | Operation     | Call                                                                                                        |
 | ------------- | ----------------------------------------------------------------------------------------------------------- |
-| Upload data   | `Amplify.Storage.uploadData(path: .fromString("public/file.txt"), data: data)` → `try await task.value`     |
-| Upload file   | `Amplify.Storage.uploadFile(path: .fromString("public/file.txt"), local: fileUrl)` → `try await task.value` |
-| Download data | `Amplify.Storage.downloadData(path: .fromString("public/file.txt"))` → `.value` returns `Data`              |
-| Download file | `Amplify.Storage.downloadFile(path: .fromString("public/path"), local: fileUrl)` → `try await task.value`   |
-| List          | `try await Amplify.Storage.list(path: .fromString("public/"))` → `.items`                                   |
+| Upload data   | `Amplify.Storage.uploadData(path: .fromString("public/file.txt"), data: data)` -> `try await task.value`     |
+| Upload file   | `Amplify.Storage.uploadFile(path: .fromString("public/file.txt"), local: fileUrl)` -> `try await task.value` |
+| Download data | `Amplify.Storage.downloadData(path: .fromString("public/file.txt"))` -> `.value` returns `Data`              |
+| Download file | `Amplify.Storage.downloadFile(path: .fromString("public/path"), local: fileUrl)` -> `try await task.value`   |
+| List          | `try await Amplify.Storage.list(path: .fromString("public/"))` -> `.items`                                   |
 | Presigned URL | `try await Amplify.Storage.getURL(path: .fromString("public/file.jpg"))`                                    |
 | Remove        | `try await Amplify.Storage.remove(path: .fromString("public/file.jpg"))`                                    |
 
@@ -150,23 +150,23 @@ private suspend fun downloadFile() {
 
 | Operation (coroutine) | Call                                                                                                |
 | --------------------- | --------------------------------------------------------------------------------------------------- |
-| Upload file           | `Amplify.Storage.uploadFile(StoragePath.fromString("public/photo.jpg"), file)` → `.result()`        |
-| Upload stream         | `Amplify.Storage.uploadInputStream(StoragePath.fromString("public/example"), stream)` → `.result()` |
-| Download file         | `Amplify.Storage.downloadFile(StoragePath.fromString("public/photo.jpg"), localFile)` → `.result()` |
-| List                  | `Amplify.Storage.list(StoragePath.fromString("public/"))` → `.items`                                |
-| Presigned URL         | `Amplify.Storage.getUrl(StoragePath.fromString("public/file.jpg"))` → `.url`                        |
+| Upload file           | `Amplify.Storage.uploadFile(StoragePath.fromString("public/photo.jpg"), file)` -> `.result()`        |
+| Upload stream         | `Amplify.Storage.uploadInputStream(StoragePath.fromString("public/example"), stream)` -> `.result()` |
+| Download file         | `Amplify.Storage.downloadFile(StoragePath.fromString("public/photo.jpg"), localFile)` -> `.result()` |
+| List                  | `Amplify.Storage.list(StoragePath.fromString("public/"))` -> `.items`                                |
+| Presigned URL         | `Amplify.Storage.getUrl(StoragePath.fromString("public/file.jpg"))` -> `.url`                        |
 | Remove                | `Amplify.Storage.remove(StoragePath.fromString("public/file.jpg"))`                                 |
 
-**Callback alternative:** all operations also accept `onSuccess`/`onError` lambdas — e.g.
+**Callback alternative:** all operations also accept `onSuccess`/`onError` lambdas -- e.g.
 `Amplify.Storage.uploadFile(StoragePath.fromString("public/photo.jpg"), file, { result -> ... }, { error -> ... })`.
 
 ## Permissions
 
-For authenticated user paths, use `protected/{entity_id}/` or `private/{entity_id}/` — the `{entity_id}` resolves to the user's Cognito identity ID at runtime.
+For authenticated user paths, use `protected/{entity_id}/` or `private/{entity_id}/` -- the `{entity_id}` resolves to the user's Cognito identity ID at runtime.
 
 - **Android:** Verify `INTERNET` permission is declared in `AndroidManifest.xml` (usually present by default). If the app accesses the camera, add `CAMERA`; for gallery access, add `READ_MEDIA_IMAGES` (API 33+) or `READ_EXTERNAL_STORAGE` (older).
 - **Apple (iOS/macOS):** No special permissions for S3 storage operations. If the app accesses the camera, add `NSCameraUsageDescription` in `Info.plist`. If the app accesses the photo library, add `NSPhotoLibraryUsageDescription`.
-- **Flutter:** Follows Android/iOS rules above — add permissions in `AndroidManifest.xml` and `Info.plist` respectively.
+- **Flutter:** Follows Android/iOS rules above -- add permissions in `AndroidManifest.xml` and `Info.plist` respectively.
 
 ## Pitfalls
 
@@ -176,7 +176,7 @@ For authenticated user paths, use `protected/{entity_id}/` or `private/{entity_i
 - **Wrong file wrapper per platform:** Flutter requires
   `AWSFile.fromPath()`, Swift uses `Data` (for `uploadData`) or a file
   URL (for `uploadFile`), Android uses `File`. Using the wrong type
-  causes compile errors — check the platform's expected input.
+  causes compile errors -- check the platform's expected input.
 - **Missing `StoragePath.fromString()`:** Flutter and Android require
   `StoragePath.fromString('path')` to wrap path strings. Passing a raw
   string literal does not compile.

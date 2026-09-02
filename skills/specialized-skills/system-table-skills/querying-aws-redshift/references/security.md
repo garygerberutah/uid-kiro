@@ -1,6 +1,6 @@
 # Security: Least Privilege, KMS, Data Sensitivity, and Audit Trail
 
-Loaded on demand from `querying-aws-redshift` SKILL.md. Read this before granting anyone access to published system tables — `query_text` can carry credentials, and the KMS key policy needs two service principals, not one.
+Loaded on demand from `querying-aws-redshift` SKILL.md. Read this before granting anyone access to published system tables -- `query_text` can carry credentials, and the KMS key policy needs two service principals, not one.
 
 ## Least-Privilege IAM Policy
 
@@ -81,13 +81,13 @@ When using `--s3-table-kms-key-id` (both Provisioned and Serverless), the KMS ke
 
 `SYS_*` system-table data may contain sensitive fields:
 
-- `query_text` — may reveal schema, data values, or business logic
-- `username` / `user_id` — the principal that ran the query
-- `remote_host` (in `sys_connection_log`) — client IP address
+- `query_text` -- may reveal schema, data values, or business logic
+- `username` / `user_id` -- the principal that ran the query
+- `remote_host` (in `sys_connection_log`) -- client IP address
 
 Store query results in encrypted, access-controlled locations. Avoid logging or sharing raw output that contains query text, principal identifiers, or IP addresses.
 
-**`query_text` can contain credentials, not just schema.** Applications that build SQL by string interpolation rather than parameterized queries embed literal values directly in the statement text — including passwords in `CREATE USER` / `ALTER USER`, connection strings, API keys passed to UDFs, and PII in `WHERE` clauses. All of that is captured verbatim in `sys_query_history` and published to the S3 table. Audit your applications for interpolated SQL **before** making `sys_query_history` broadly readable; a query-history grant is effectively a secrets grant if that anti-pattern is present. Restrict the column via Lake Formation column-level permissions where readers only need timing and identity data.
+**`query_text` can contain credentials, not just schema.** Applications that build SQL by string interpolation rather than parameterized queries embed literal values directly in the statement text -- including passwords in `CREATE USER` / `ALTER USER`, connection strings, API keys passed to UDFs, and PII in `WHERE` clauses. All of that is captured verbatim in `sys_query_history` and published to the S3 table. Audit your applications for interpolated SQL **before** making `sys_query_history` broadly readable; a query-history grant is effectively a secrets grant if that anti-pattern is present. Restrict the column via Lake Formation column-level permissions where readers only need timing and identity data.
 
 Athena is a second copy of the same text: `StartQueryExecution` records the full SQL in CloudTrail. If those events are delivered to CloudWatch Logs, encrypt the receiving log group with a customer-managed key (`aws logs associate-kms-key --log-group-name <NAME> --kms-key-id <KEY_ARN>`), since the default log-group encryption is not customer-managed.
 
@@ -97,7 +97,7 @@ Enable CloudTrail logging for Athena (`StartQueryExecution`, `GetQueryResults`) 
 
 Collecting logs is passive; add active detection so misuse surfaces without someone reading them. Two alarms worth having:
 
-- **Access-denied spikes on the published tables** — a burst of `AccessDenied` on `s3tables:GetTableData` is the signature of enumeration or a broken least-privilege change. With CloudTrail delivering to CloudWatch Logs, create a metric filter and alarm on it:
+- **Access-denied spikes on the published tables** -- a burst of `AccessDenied` on `s3tables:GetTableData` is the signature of enumeration or a broken least-privilege change. With CloudTrail delivering to CloudWatch Logs, create a metric filter and alarm on it:
 
   ```bash
   aws logs put-metric-filter \
@@ -114,7 +114,7 @@ Collecting logs is passive; add active detection so misuse surfaces without some
     --alarm-actions <SNS_TOPIC_ARN>
   ```
 
-- **Failed authentications against the cluster** — `sys_connection_log` records these, so once it is published you can detect credential-stuffing from the S3 table on a schedule rather than by ad-hoc query. Alert on a rising count of failed connections grouped by `remote_host`.
+- **Failed authentications against the cluster** -- `sys_connection_log` records these, so once it is published you can detect credential-stuffing from the S3 table on a schedule rather than by ad-hoc query. Alert on a rising count of failed connections grouped by `remote_host`.
 
 Tune both thresholds to your own baseline; the values above are starting points, not recommendations.
 
@@ -128,4 +128,4 @@ aws sns set-topic-attributes \
 aws sns list-subscriptions-by-topic --topic-arn <SNS_TOPIC_ARN>
 ```
 
-The default `alias/aws/sns` key cannot be restricted by policy or revoked; a customer-managed key can. Review the subscription list on a schedule — an email or HTTP subscriber added later inherits every future alert, and confirm the key policy lets `cloudwatch.amazonaws.com` call `kms:GenerateDataKey*`/`kms:Decrypt`, or alarms will fail to publish silently.
+The default `alias/aws/sns` key cannot be restricted by policy or revoked; a customer-managed key can. Review the subscription list on a schedule -- an email or HTTP subscriber added later inherits every future alert, and confirm the key policy lets `cloudwatch.amazonaws.com` call `kms:GenerateDataKey*`/`kms:Decrypt`, or alarms will fail to publish silently.

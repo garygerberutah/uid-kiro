@@ -56,7 +56,7 @@ The following ALTER TABLE operations MUST use the **Table Recreation Pattern**:
 | Split/Merge Columns            | Use SPLIT_PART, SUBSTRING, or CONCAT in SELECT |
 
 **Note:** The following operations ARE supported directly. Each is still subject to the
-one-DDL-per-transaction rule — issue each as its own `psql -c` invocation (or its own
+one-DDL-per-transaction rule -- issue each as its own `psql -c` invocation (or its own
 `BEGIN`/`COMMIT` block when scripted):
 
 - `ALTER TABLE ... RENAME COLUMN` - Rename a column
@@ -76,15 +76,15 @@ DSQL cluster):
 | `IF NOT EXISTS`                       | Accepted                                                                                      |
 | `INCLUDE (<columns>)`                 | Accepted (covering indexes)                                                                   |
 | `UNIQUE` (`CREATE UNIQUE INDEX ASYNC`)| Accepted                                                                                      |
-| `USING <method>` (btree/hash/gin/...) | **Rejected**: `ERROR: USING not supported for CREATE INDEX` — DSQL is btree-only              |
-| `WHERE <predicate>`                   | **Rejected**: `ERROR: WHERE not supported for CREATE INDEX` — partial indexes are unavailable |
-| `CONCURRENTLY`                        | **Rejected**: `ERROR: CONCURRENTLY not supported for CREATE INDEX` — use `ASYNC` instead (non-blocking by design) |
+| `USING <method>` (btree/hash/gin/...) | **Rejected**: `ERROR: USING not supported for CREATE INDEX` -- DSQL is btree-only              |
+| `WHERE <predicate>`                   | **Rejected**: `ERROR: WHERE not supported for CREATE INDEX` -- partial indexes are unavailable |
+| `CONCURRENTLY`                        | **Rejected**: `ERROR: CONCURRENTLY not supported for CREATE INDEX` -- use `ASYNC` instead (non-blocking by design) |
 
-Without `ASYNC`, DSQL rejects with `ERROR: unsupported mode. please use CREATE INDEX ASYNC.` —
+Without `ASYNC`, DSQL rejects with `ERROR: unsupported mode. please use CREATE INDEX ASYNC.` --
 useful to grep for in failure logs.
 
 If the migration source (e.g., a vanilla PostgreSQL dump) relies on partial indexes or non-btree
-access methods, the pattern MUST be rewritten — denormalize via a filter column, or add a CHECK
+access methods, the pattern MUST be rewritten -- denormalize via a filter column, or add a CHECK
 constraint and a covering composite index. Document the workaround in the migration plan.
 
 ---
@@ -141,16 +141,16 @@ ALTER TABLE target_table_new RENAME TO target_table;
 CREATE INDEX ASYNC idx_target_tenant ON target_table(tenant_id);
 ```
 
-### Recovery — Row Counts Do Not Match
+### Recovery -- Row Counts Do Not Match
 
 When `target_table_new` has fewer rows than `target_table`, treat the migration as incomplete.
-The original table still holds the authoritative data, so recovery is always possible — **MUST NOT**
+The original table still holds the authoritative data, so recovery is always possible -- **MUST NOT**
 proceed with `DROP TABLE` until the counts agree.
 
-1. **Diagnose** — find the missing rows by comparing ranges (for cursor-based migrations, query
+1. **Diagnose** -- find the missing rows by comparing ranges (for cursor-based migrations, query
    `target_table` for IDs greater than `MAX(id)` in `target_table_new`; for OFFSET-based, check
    which batch dropped rows by re-running the SELECT portion of each batch and comparing counts).
-2. **Retry the missing batches** — insert only the gap rows into `target_table_new`. Filter out
+2. **Retry the missing batches** -- insert only the gap rows into `target_table_new`. Filter out
    already-migrated rows to avoid PK collisions (which would roll back the entire batch):
 
    ```sql
@@ -169,10 +169,10 @@ proceed with `DROP TABLE` until the counts agree.
    ORDER BY id LIMIT 1000;
    ```
 
-3. **If a type cast or constraint rejected rows** — migration cannot complete until the data is
+3. **If a type cast or constraint rejected rows** -- migration cannot complete until the data is
    reconciled. Fix the source data in `target_table` (or adjust the new table's constraint),
    then re-run the missing batches.
-4. **Escape hatch** — if diagnosis stalls, drop `target_table_new` and restart the migration
+4. **Escape hatch** -- if diagnosis stalls, drop `target_table_new` and restart the migration
    from a clean slate. The original table is untouched, so no data is at risk.
 
 Re-run the count comparison after each retry. Only proceed to `DROP TABLE` once

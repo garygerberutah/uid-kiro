@@ -34,7 +34,7 @@ You answer questions about product policies, shipping, and returns.
 
 Guidelines:
 - Be concise and friendly
-- If you don't know the answer, say so — don't make up policies
+- If you don't know the answer, say so -- don't make up policies
 - For order-specific questions, ask for the order number
 - Escalate to a human agent if the customer expresses frustration"""
 
@@ -195,6 +195,6 @@ The CLI supports four model providers:
 | `OpenAI` | GPT-4 / GPT-5 models | Requires `OPENAI_API_KEY`; typically paired with OpenAI Agents SDK |
 | `Gemini` | Google Gemini models | Requires `GEMINI_API_KEY`; typically paired with Google ADK |
 
-For cost-sensitive use cases, consider Bedrock Nova models (e.g., `amazon.nova-micro-v1:0`, `amazon.nova-lite-v1:0`) — significantly cheaper than Claude for simpler extractive tasks. See [`agents-optimize/references/cost.md`](../../agents-optimize/references/cost.md) for model selection guidance.
+For cost-sensitive use cases, consider Bedrock Nova models (e.g., `amazon.nova-micro-v1:0`, `amazon.nova-lite-v1:0`) -- significantly cheaper than Claude for simpler extractive tasks. See [`agents-optimize/references/cost.md`](../../agents-optimize/references/cost.md) for model selection guidance.
 
-For a chatbot that remembers conversations, add `--memory longAndShortTerm` during scaffolding. Memory can also be added later — see [`agents-build/references/memory.md`](../../agents-build/references/memory.md).
+For a chatbot that remembers conversations, add `--memory longAndShortTerm` during scaffolding. Memory can also be added later -- see [`agents-build/references/memory.md`](../../agents-build/references/memory.md).

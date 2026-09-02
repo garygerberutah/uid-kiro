@@ -72,7 +72,7 @@ _STATIC_INSTANCE_SPECS = {
 # ---------------------------------------------------------------------------
 # Constants (non-pricing, do not vary by region)
 # ---------------------------------------------------------------------------
-# Aurora bills storage on actual usage per GiB-month with dynamic resizing —
+# Aurora bills storage on actual usage per GiB-month with dynamic resizing --
 # there is no fixed minimum billed storage. (No MIN_STORAGE_GIB floor.)
 HOURS_PER_MONTH = 730
 ACU_MIN = 0.5
@@ -104,7 +104,7 @@ _REGION_NAMES = {
 }
 
 # ---------------------------------------------------------------------------
-# Active pricing & catalog (mutable — overwritten by refresh_pricing())
+# Active pricing & catalog (mutable -- overwritten by refresh_pricing())
 # ---------------------------------------------------------------------------
 ACU_PRICE_STANDARD = _STATIC_ACU_PRICE_STANDARD
 ACU_PRICE_IO_OPTIMIZED = _STATIC_ACU_PRICE_IO_OPTIMIZED
@@ -178,7 +178,7 @@ def _fetch_instance_pricing(region: str) -> dict[str, float]:
 def _fetch_instance_pricing_bulk(region: str) -> dict[str, float]:
     """Fetch on-demand Aurora MySQL pricing from the public AWS Bulk Pricing CSV.
 
-    No IAM credentials required — this is a publicly accessible HTTPS endpoint.
+    No IAM credentials required -- this is a publicly accessible HTTPS endpoint.
     Used as a fallback when the Pricing API is not accessible (AccessDeniedException).
 
     Returns dict: instance_type -> price_per_hour (Aurora Standard only).
@@ -570,7 +570,7 @@ def recommend_min_max(
     conn_mem_gib = connections * 10 / 1024  # ~10 MB per connection average
     conn_acu = round_up_to_half(conn_mem_gib / GIB_PER_ACU)
 
-    # Memory floor (advisory — working set)
+    # Memory floor (advisory -- working set)
     mem_acu = round_up_to_half(working_set_gib / GIB_PER_ACU) if working_set_gib > 0 else 0
 
     # Min: based on avg CPU + connection floor (uncapped first, so we can detect
@@ -583,7 +583,7 @@ def recommend_min_max(
     recommended_max = min(recommended_max, ACU_MAX)
 
     # The workload's baseline doesn't fit a single serverless instance when the
-    # uncapped min exceeds the ACU ceiling or the (capped) max — flag it, mirroring
+    # uncapped min exceeds the ACU ceiling or the (capped) max -- flag it, mirroring
     # estimate_acu's exceeds_capacity.
     exceeds_capacity = raw_min > ACU_MAX or raw_min > recommended_max
 
@@ -651,7 +651,7 @@ def calculate_costs(
         recommendation = "recommended"
         reason = (
             f"Serverless saves ${savings:.0f}/mo ({savings_pct:.0f}%) vs provisioned. "
-            f"Cost range: ${sv_low:.0f}–${sv_high:.0f}/mo."
+            f"Cost range: ${sv_low:.0f}-${sv_high:.0f}/mo."
         )
     elif savings_pct > 10:
         recommendation = "consider"
@@ -712,7 +712,7 @@ def format_table(result: dict) -> str:
     source = result.get("pricing_source", _pricing_source)
     tag = source.get("source", "static_fallback").replace("_", " ").title()
     lines.append("=" * 65)
-    lines.append("  Aurora Serverless v2 — ACU Estimate & Cost Comparison")
+    lines.append("  Aurora Serverless v2 -- ACU Estimate & Cost Comparison")
     lines.append(f"  Pricing: {tag} ({source.get('region', '?')})")
     lines.append("=" * 65)
 
@@ -751,7 +751,7 @@ def format_table(result: dict) -> str:
     )
     lines.append("")
     lines.append(
-        f"  Serverless cost range: ${sv['cost_range']['low']:.0f} – ${sv['cost_range']['high']:.0f}/mo"
+        f"  Serverless cost range: ${sv['cost_range']['low']:.0f} - ${sv['cost_range']['high']:.0f}/mo"
     )
     lines.append(f"  Savings: ${costs['savings_monthly']:.0f}/mo ({costs['savings_pct']:.0f}%)")
 
@@ -908,7 +908,7 @@ def main():
                 else ("PARTIAL" if source["source"] == "partial_live" else "STATIC")
             )
             print(
-                f"[Pricing: {tag} — {source['region']}, "
+                f"[Pricing: {tag} -- {source['region']}, "
                 f"{source['instance_count']} instances, "
                 f"ACU=${source['acu_price_standard']}/hr]",
                 file=sys.stderr,

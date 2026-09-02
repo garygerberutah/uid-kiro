@@ -22,7 +22,7 @@
 
 ### Incomplete Trace Trees
 
-1. Some spans may arrive late — add 1-2 minute buffer before querying
+1. Some spans may arrive late -- add 1-2 minute buffer before querying
 2. If cross-service: verify all services export to the same pipeline
 3. Check `parentSpanId` field is populated in child spans
 

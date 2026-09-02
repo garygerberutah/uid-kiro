@@ -10,11 +10,11 @@ description: >-
 
 # Release Testing
 
-> **AgentSpace routing (SigV4 only):** If `list_agent_spaces` is available in your tool list and the multi-space orchestration skill has NOT been invoked yet this session, invoke it first to determine which `agent_space_id` to use. Then pass `agent_space_id` on all tool calls below. For bearer token auth this is unnecessary — the token is already scoped to one space.
+> **AgentSpace routing (SigV4 only):** If `list_agent_spaces` is available in your tool list and the multi-space orchestration skill has NOT been invoked yet this session, invoke it first to determine which `agent_space_id` to use. Then pass `agent_space_id` on all tool calls below. For bearer token auth this is unnecessary -- the token is already scoped to one space.
 
 Run automated release testing in the cloud via the AWS DevOps Agent's Release Testing Agent. Supports UI testing (browser-based) and API testing (OpenAPI spec-based). Uses pre-existing test profiles that define target URL, agent type, personas, and credentials.
 
-**Input is a test profile** — the test profile already contains the target URL, agent type (UI or API), test personas, and credentials. Do NOT ask the user for a URL directly; the URL is defined in the test profile.
+**Input is a test profile** -- the test profile already contains the target URL, agent type (UI or API), test personas, and credentials. Do NOT ask the user for a URL directly; the URL is defined in the test profile.
 
 ## Prerequisites
 
@@ -24,13 +24,13 @@ Run automated release testing in the cloud via the AWS DevOps Agent's Release Te
 
 Before starting any workflow, you MUST gather the following parameters. Do NOT proceed to job creation until answered.
 
-### Step 1 — Test profile (required)
+### Step 1 -- Test profile (required)
 
-Ask the user which test profile to use. The test profile already contains the target URL, agent type (UI or API), test personas, and credentials configuration — these do NOT need to be gathered separately.
+Ask the user which test profile to use. The test profile already contains the target URL, agent type (UI or API), test personas, and credentials configuration -- these do NOT need to be gathered separately.
 
 **Note:** A pre-existing test profile is a prerequisite. Test profiles are created using the AWS DevOps Agent console or API, not through this tool. If the user asks whether one can be created here, inform them it must already exist.
 
-### Step 2 — Test requirement (optional)
+### Step 2 -- Test requirement (optional)
 
 If the user has not already mentioned a test focus, ask:
 > "Do you have a specific test requirement or focus area? If not, I'll run a full exploratory test."
@@ -53,7 +53,7 @@ Present the list to the user and ask which agent space they'd like to use. **Do 
 
 ### 2. Check tool availability
 
-Verify that the following tools are available: `aws_devops_agent__create_release_testing_job`, `aws_devops_agent__get_task`, `aws_devops_agent__list_journal_records`, `aws_devops_agent__get_release_ui_testing_report`, `aws_devops_agent__get_release_api_testing_report`. These tools are NOT deferred/lazy-loaded — if they do not appear in your tool list, they are unavailable. Do NOT search for them via ToolSearch. If any are missing, skip the remaining steps in this section and use the "Fallback (aws-mcp)" path below instead.
+Verify that the following tools are available: `aws_devops_agent__create_release_testing_job`, `aws_devops_agent__get_task`, `aws_devops_agent__list_journal_records`, `aws_devops_agent__get_release_ui_testing_report`, `aws_devops_agent__get_release_api_testing_report`. These tools are NOT deferred/lazy-loaded -- if they do not appear in your tool list, they are unavailable. Do NOT search for them via ToolSearch. If any are missing, skip the remaining steps in this section and use the "Fallback (aws-mcp)" path below instead.
 
 ### 3. Start the Job
 
@@ -62,7 +62,7 @@ aws_devops_agent__create_release_testing_job(
     test_profile_id="ki-12345",
     webhook_event_message="<optional test requirement>"
 )
-→ {"taskId": "...", "executionId": "...", "status": "started"}
+-> {"taskId": "...", "executionId": "...", "status": "started"}
 ```
 
 Record the **taskId** and **executionId** from the response.
@@ -79,7 +79,7 @@ Once `IN_PROGRESS`, poll for progress in a loop:
 2. Present each record to the user with a friendly progress update.
 3. Use `next_token` from the response to fetch only new records on subsequent polls.
 4. **Wait 20 seconds** between each poll iteration.
-5. Check `aws_devops_agent__get_task(task_id=TASK_ID)` periodically — stop when terminal status (`COMPLETED`, `FAILED`, `CANCELED`, `TIMED_OUT`).
+5. Check `aws_devops_agent__get_task(task_id=TASK_ID)` periodically -- stop when terminal status (`COMPLETED`, `FAILED`, `CANCELED`, `TIMED_OUT`).
 
 ### 6. Present Results
 
@@ -114,7 +114,7 @@ aws_devops_agent__cancel_release_testing_job(task_id=TASK_ID)
 
 If the `aws-devops-agent` remote server is unavailable, use the AWS CLI directly:
 
-Tell the user: "Remote server unavailable — using direct AWS API fallback."
+Tell the user: "Remote server unavailable -- using direct AWS API fallback."
 
 ### 1. Select Agent Space
 
@@ -166,7 +166,7 @@ aws devops-agent list-journal-records \
 1. Present each record to the user with a friendly progress update.
 2. Use `next_token` from the response to fetch only new records on subsequent polls.
 3. **Wait 20 seconds** between each poll iteration.
-4. Check `get-backlog-task` periodically — stop when terminal status (`COMPLETED`, `FAILED`, `CANCELED`, `TIMED_OUT`).
+4. Check `get-backlog-task` periodically -- stop when terminal status (`COMPLETED`, `FAILED`, `CANCELED`, `TIMED_OUT`).
 
 ### 5. Present Results
 

@@ -1,4 +1,4 @@
-# RDS Pre-Upgrade Checklist — MySQL, MariaDB, PostgreSQL
+# RDS Pre-Upgrade Checklist -- MySQL, MariaDB, PostgreSQL
 
 ## Step 1: Take a Manual Snapshot
 
@@ -99,7 +99,7 @@ Key parameters to preserve (MySQL 5.7 to 8.0):
 | innodb_strict_mode | OFF | ON | Set OFF if needed |
 | log_error_verbosity | N/A (was log_warnings) | 2 | Set to match old log_warnings value |
 
-Note: `query_cache_type` and `query_cache_size` are removed in 8.0 — no parameter to set. If your app relied on query cache, handle at the application layer.
+Note: `query_cache_type` and `query_cache_size` are removed in 8.0 -- no parameter to set. If your app relied on query cache, handle at the application layer.
 
 ## Step 7: Test on a Snapshot-Restored Instance
 
@@ -126,8 +126,8 @@ aws rds modify-db-instance \
 
 After the test instance is upgraded and available:
 
-1. Validate database operations — connect, run key queries, check schema integrity
-2. Verify application connectivity — point your application (or a test instance of it) at the upgraded test database and confirm the application driver works correctly with the new engine version. Auth plugin changes (e.g., `caching_sha2_password` in MySQL 8.0), TLS requirements, and connection string parameters may behave differently.
+1. Validate database operations -- connect, run key queries, check schema integrity
+2. Verify application connectivity -- point your application (or a test instance of it) at the upgraded test database and confirm the application driver works correctly with the new engine version. Auth plugin changes (e.g., `caching_sha2_password` in MySQL 8.0), TLS requirements, and connection string parameters may behave differently.
 
 ## Step 8: Consider Blue/Green Deployment
 
@@ -143,7 +143,7 @@ Requirements: automated backups enabled, binlog_format=ROW (MySQL/MariaDB), engi
 
 Before upgrading, review the release notes for the target version to understand behavioral changes, new features, and deprecations. Key changes to watch for are called out below by engine.
 
-**MySQL** (e.g., 5.7 → 8.0):
+**MySQL** (e.g., 5.7 -> 8.0):
 
 - New data dictionary (no more `.frm` files)
 - New TempTable engine replaces MEMORY for internal temp tables
@@ -152,13 +152,13 @@ Before upgrading, review the release notes for the target version to understand 
 - Default auth plugin changed to `caching_sha2_password`
 - Release notes: https://dev.mysql.com/doc/relnotes/mysql/8.0/en/
 
-**MariaDB** (e.g., 10.6 → 10.11 or 11.4):
+**MariaDB** (e.g., 10.6 -> 10.11 or 11.4):
 
 - Each major version introduces new SQL features, optimizer changes, and storage engine updates
 - Check for deprecated features being removed in the target version
 - Release notes: https://mariadb.com/kb/en/release-notes/
 
-**PostgreSQL** (e.g., 14 → 15 or 16):
+**PostgreSQL** (e.g., 14 -> 15 or 16):
 
 - Each major version refines the planner cost model, which can change query plans
 - New features like Memoize (PG 14), work_mem changes (PG 15), subquery decorrelation (PG 16)

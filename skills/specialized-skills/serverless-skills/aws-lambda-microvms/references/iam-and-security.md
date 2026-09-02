@@ -34,7 +34,7 @@ The two **must be separate** ARNs in production. The build role usually needs S3
 
 The `Condition` block prevents the confused deputy problem by restricting which Lambda resources can assume these roles.
 
-## Build role — minimum permissions
+## Build role -- minimum permissions
 
 ```json
 {
@@ -64,7 +64,7 @@ Add as needed:
 
 - `ecr:GetAuthorizationToken`, `ecr:BatchGetImage`, `ecr:GetDownloadUrlForLayer` if your `Dockerfile`'s `FROM` references private ECR.
 
-## Execution role — minimum permissions
+## Execution role -- minimum permissions
 
 The execution role is **optional**, but without it, application stdout is *not* forwarded to CloudWatch.
 
@@ -101,7 +101,7 @@ Lambda issues short-lived, opaque auth tokens for ingress traffic.
 
 | Field | Detail |
 |---|---|
-| TTL | `expirationInMinutes` ≤ 60 |
+| TTL | `expirationInMinutes` <= 60 |
 | Header | `X-aws-proxy-auth: <token>` (or WebSocket subprotocol `lambda-microvms.authentication.<token>`) |
 | Scope | Restricted to a list of ports/ranges via `allowedPorts` on `CreateMicrovmAuthToken` (required) |
 
@@ -127,7 +127,7 @@ Then `create-microvm-shell-auth-token` and connect via the AWS console (Connect 
 
 ## SCP enforcement and IAM scoping
 
-Every `RunMicrovm` caller needs `lambda:PassNetworkConnector` — not just when attaching a custom VPC connector. MicroVMs default to the `HTTP_INGRESS` and `INTERNET_EGRESS` connectors, which are themselves passed at run time, so the permission is required even when you specify no connectors. Scope the `Resource` to the connector ARN(s) you actually pass.
+Every `RunMicrovm` caller needs `lambda:PassNetworkConnector` -- not just when attaching a custom VPC connector. MicroVMs default to the `HTTP_INGRESS` and `INTERNET_EGRESS` connectors, which are themselves passed at run time, so the permission is required even when you specify no connectors. Scope the `Resource` to the connector ARN(s) you actually pass.
 
 ### Example: allow passing connectors
 
@@ -149,7 +149,7 @@ The first ARN covers the AWS-managed default connectors; the second scopes to yo
 
 ## PrivateLink
 
-VPC endpoints are supported for the `*.lambda-microvm.on.aws` domain (endpoint service: `com.amazonaws.<region>.lambda-microvm`) — clients in your VPC can reach MicroVM endpoints without traversing the public internet. Standard VPCE policy condition keys apply (`aws:SourceVpce`, `aws:SourceVpc`, `aws:ResourceAccount`, `aws:ResourceOrgID`). See the [AWS PrivateLink security best practices](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-access.html) for guidance on scoping VPCE policies.
+VPC endpoints are supported for the `*.lambda-microvm.on.aws` domain (endpoint service: `com.amazonaws.<region>.lambda-microvm`) -- clients in your VPC can reach MicroVM endpoints without traversing the public internet. Standard VPCE policy condition keys apply (`aws:SourceVpce`, `aws:SourceVpc`, `aws:ResourceAccount`, `aws:ResourceOrgID`). See the [AWS PrivateLink security best practices](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-access.html) for guidance on scoping VPCE policies.
 
 ## CloudTrail
 

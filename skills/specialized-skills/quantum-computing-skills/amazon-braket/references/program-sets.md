@@ -2,7 +2,7 @@
 
 ## Device support
 
-Program sets run on the local simulator and on all gate-based QPUs. Support is one entry in the device's action map — read it, never guess:
+Program sets run on the local simulator and on all gate-based QPUs. Support is one entry in the device's action map -- read it, never guess:
 
 ```python
 from braket.aws import AwsDevice
@@ -33,7 +33,7 @@ program_set = ProgramSet([bell, sweep])
 # https://amazon-braket-sdk-python.readthedocs.io/en/latest/_apidoc/braket.program_sets.program_set.html#braket.program_sets.program_set.ProgramSet.product
 ProgramSet.product([bell, bell, bell], [Observable.Z() @ Observable.I(), Observable.I() @ Observable.X()])
 
-# zip — the nth circuit in circuits list is bound by the nth input_set and the nth observable
+# zip -- the nth circuit in circuits list is bound by the nth input_set and the nth observable
 # https://amazon-braket-sdk-python.readthedocs.io/en/latest/_apidoc/braket.program_sets.program_set.html#braket.program_sets.program_set.ProgramSet.zip
 ProgramSet.zip([rotation, entangler], input_sets=[{"a": 0.1}, {"phi": 0.5}],
                observables=[Observable.Z() @ Observable.I(), Observable.I() @ Observable.X()])
@@ -46,14 +46,14 @@ counts = [[r.counts for r in entry] for entry in task.result()]  # indexed resul
 ## Contrast with `AwsQuantumTaskBatch`
 
 - Program sets bundle many programs in **one service-side task**, so the per-task fee is only billed once. Supported on all gate-based QPUs.
-- [`AwsQuantumTaskBatch`](https://amazon-braket-sdk-python.readthedocs.io/en/latest/_apidoc/braket.aws.aws_quantum_task_batch.html) (`device.run_batch([...], shots=...)`) — many **independent** tasks dispatched in parallel by the SDK, each billed its own per-task fee. Does not require device support.
+- [`AwsQuantumTaskBatch`](https://amazon-braket-sdk-python.readthedocs.io/en/latest/_apidoc/braket.aws.aws_quantum_task_batch.html) (`device.run_batch([...], shots=...)`) -- many **independent** tasks dispatched in parallel by the SDK, each billed its own per-task fee. Does not require device support.
 
 Always prefer a program set when the device supports it; fall back to `run_batch` if and only if the device doesn't support program sets, as program sets supersede batches in most cases.
 
 ## Related references
 
-- [devices.md](devices.md) — device discovery and capabilities
-- [pricing.md](pricing.md) — billing models for quantum tasks
+- [devices.md](devices.md) -- device discovery and capabilities
+- [pricing.md](pricing.md) -- billing models for quantum tasks
 
 ## References
 
@@ -63,7 +63,7 @@ Always prefer a program set when the device supports it; fall back to `run_batch
   - [ProgramSetQuantumTaskResult](https://amazon-braket-sdk-python.readthedocs.io/en/latest/_apidoc/braket.tasks.program_set_quantum_task_result.html)
   - [Observables](https://amazon-braket-sdk-python.readthedocs.io/en/latest/_apidoc/braket.circuits.observables.html)
 - Notebooks:
-  - [Getting started with program sets](https://github.com/amazon-braket/amazon-braket-examples/blob/main/examples/braket_features/program_sets/01_Getting_started_with_program_sets.ipynb) ·
+  - [Getting started with program sets](https://github.com/amazon-braket/amazon-braket-examples/blob/main/examples/braket_features/program_sets/01_Getting_started_with_program_sets.ipynb)
   - [Expectation value calculations with program sets](https://github.com/amazon-braket/amazon-braket-examples/blob/main/examples/braket_features/program_sets/02_Expectation_value_calculations_with_program_sets.ipynb)
 - [Running multiple programs](https://docs.aws.amazon.com/braket/latest/developerguide/braket-batching-tasks.html)
 - [GetQuantumTask API](https://docs.aws.amazon.com/braket/latest/APIReference/API_GetQuantumTask.html)

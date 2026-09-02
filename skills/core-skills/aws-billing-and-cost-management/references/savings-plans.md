@@ -19,18 +19,18 @@ Default payment: **No Upfront** for first-time buyers to minimize risk.
 
 The recommendation engine analyzes usage over a lookback period (7, 30, or 60 days), considering every usage hour including nights and weekends. It selects a commitment ($/hr) that maximizes savings while maintaining high utilization.
 
-**Utilization** = committed dollars used ÷ committed dollars purchased. Target >95%.
+**Utilization** = committed dollars used / committed dollars purchased. Target >95%.
 
-**Savings** = On-Demand cost − (SP cost + remaining On-Demand cost).
+**Savings** = On-Demand cost - (SP cost + remaining On-Demand cost).
 
-Savings compare to On-Demand prices only. The `estimatedMonthlyCost` and `estimatedMonthlySavings` in Cost Optimization Hub are monthly figures. The `EstimatedOnDemandCostWithCurrentCommitment` in additional details covers the lookback period — do NOT conflate lookback-period costs with monthly costs.
+Savings compare to On-Demand prices only. The `estimatedMonthlyCost` and `estimatedMonthlySavings` in Cost Optimization Hub are monthly figures. The `EstimatedOnDemandCostWithCurrentCommitment` in additional details covers the lookback period -- do NOT conflate lookback-period costs with monthly costs.
 
 ## SP vs Reserved Instances
 
 | Feature | Savings Plans | Reserved Instances |
 |---------|--------------|-------------------|
 | Flexibility | High (Compute SP covers EC2+Fargate+Lambda) | Low (service-specific) |
-| Capacity reservation | No | Yes (AZ-scoped RI — Standard or Convertible) |
+| Capacity reservation | No | Yes (AZ-scoped RI -- Standard or Convertible) |
 | Marketplace resale | No | Yes (Standard RI only) |
 | AWS recommendation | Preferred | Legacy, still supported |
 
@@ -40,12 +40,12 @@ Use RIs only when: capacity reservation needed in specific AZ, want to sell on M
 
 ## Gotchas
 
-- **7-day return window (conditional):** SPs with hourly commitment ≤$100, purchased in the past 7 days AND in the same calendar month, can be returned for a full refund. Usage covered by the returned plan is re-rated to On-Demand. Outside this window, commitment is binding for the full term.
-- Compute SP does NOT cover RDS — use Database SP
-- SP doesn't provide capacity reservation — use ODCR separately
+- **7-day return window (conditional):** SPs with hourly commitment <=$100, purchased in the past 7 days AND in the same calendar month, can be returned for a full refund. Usage covered by the returned plan is re-rated to On-Demand. Outside this window, commitment is binding for the full term.
+- Compute SP does NOT cover RDS -- use Database SP
+- SP doesn't provide capacity reservation -- use ODCR separately
 - EKS control plane ($0.10/hr) is NOT covered by any SP
 - DynamoDB Reserved Capacity is deprecated in favor of Database SP
-- Start with Cost Explorer recommendations — they analyze actual usage patterns
+- Start with Cost Explorer recommendations -- they analyze actual usage patterns
 
 ## CLI Commands
 

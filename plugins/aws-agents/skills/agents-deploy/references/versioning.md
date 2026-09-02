@@ -7,11 +7,11 @@ Every `agentcore deploy` creates a new version of your agent runtime. This refer
 - Each `agentcore deploy` produces a new runtime version
 - The alias (usually `DEFAULT`) points to the currently-live version
 - Old versions remain accessible by ARN for rollback
-- Local dev (`agentcore dev`) always runs the current code — no version concept
+- Local dev (`agentcore dev`) always runs the current code -- no version concept
 
 ## Inspecting versions
 
-The AgentCore CLI currently manages the project config (`agentcore.json` → `agentcore deploy`) but doesn't expose version/alias operations directly. For those, use the AWS CLI against the `bedrock-agentcore-control` data plane.
+The AgentCore CLI currently manages the project config (`agentcore.json` -> `agentcore deploy`) but doesn't expose version/alias operations directly. For those, use the AWS CLI against the `bedrock-agentcore-control` data plane.
 
 ```bash
 # List all versions of your agent
@@ -41,9 +41,9 @@ response = client.invoke_agent_runtime(
 
 This is useful for:
 
-- Canary testing — send a small percentage of traffic to a new version before cutting over
-- A/B comparison — run two versions in parallel and compare outputs
-- Debugging — reproduce an issue against a specific version
+- Canary testing -- send a small percentage of traffic to a new version before cutting over
+- A/B comparison -- run two versions in parallel and compare outputs
+- Debugging -- reproduce an issue against a specific version
 
 ## Rolling back
 
@@ -61,7 +61,7 @@ aws bedrock-agentcore-control update-agent-runtime-alias \
   --routing-configuration agentRuntimeVersion=<OLDER_VERSION>
 ```
 
-Option 2 is faster — no rebuild or redeploy, just a pointer swap. Option 1 is cleaner because your code matches what's running.
+Option 2 is faster -- no rebuild or redeploy, just a pointer swap. Option 1 is cleaner because your code matches what's running.
 
 ## Canary deployment
 
@@ -80,7 +80,7 @@ This routes 10% of traffic to the new version. Monitor `agents-optimize` eval sc
 
 ## Version cleanup
 
-AgentCore retains versions indefinitely — they don't auto-delete. If you've deployed hundreds of times, consider periodically deleting old versions:
+AgentCore retains versions indefinitely -- they don't auto-delete. If you've deployed hundreds of times, consider periodically deleting old versions:
 
 ```bash
 aws bedrock-agentcore-control delete-agent-runtime-version \
@@ -108,7 +108,7 @@ agentcore deploy --target staging -y
 agentcore deploy --target production -y
 ```
 
-Each target gets its own runtime — versions are separate per target.
+Each target gets its own runtime -- versions are separate per target.
 
 ## Cross-references
 

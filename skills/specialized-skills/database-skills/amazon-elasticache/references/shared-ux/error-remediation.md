@@ -115,7 +115,7 @@ ElastiCache-specific errors that require non-obvious remediation. Generic errors
 1. Check the user's access string: `aws elasticache describe-users --user-id <user-id>`.
 2. Update the access string to include the required command categories and key patterns.
 3. Common fix: change `on ~app:* +@read` to `on ~app:* +@read +@write` if writes are needed.
-4. Access string changes (via `aws elasticache modify-user`) take effect immediately on **all** existing connections authenticated as that user — not just new ones. However, setting a user to `off` only prevents new `AUTH` attempts (it does not disconnect existing connections). To delete a user, use `aws elasticache delete-user`; ElastiCache does not support the `ACL DELUSER` command. Deleting a user via the API removes them from all associated user groups.
+4. Access string changes (via `aws elasticache modify-user`) take effect immediately on **all** existing connections authenticated as that user -- not just new ones. However, setting a user to `off` only prevents new `AUTH` attempts (it does not disconnect existing connections). To delete a user, use `aws elasticache delete-user`; ElastiCache does not support the `ACL DELUSER` command. Deleting a user via the API removes them from all associated user groups.
 
 ## 8. READONLY Error
 

@@ -1,4 +1,4 @@
-# Search capability — entry point and methods guide
+# Search capability -- entry point and methods guide
 
 This file is the **entry point** for the `search` capability. It covers vector / semantic / hybrid / sparse / dense / RAG retrieval on Amazon OpenSearch Service or Serverless. Supports Bedrock connectors (Titan, Cohere), self-hosted embedding models, FAISS HNSW vs Lucene, ELSER alternatives, and hybrid scoring.
 
@@ -29,7 +29,7 @@ Cross-cutting refs you may also load: [`vector-knn.md`](vector-knn.md) (vector s
 
 ## Vector / k-NN target shape
 
-- **Serverless NextGen Vector Search collections** use a simplified API — no `engine`/`mode` selection (system auto-picks); supports custom document IDs and 32x compression by default.
+- **Serverless NextGen Vector Search collections** use a simplified API -- no `engine`/`mode` selection (system auto-picks); supports custom document IDs and 32x compression by default.
 - **Serverless Classic Vector Search collections** require explicit `engine: faiss`; Lucene/IVF/PQ are NOT supported on Classic Serverless.
 - **Managed Domain** supports all engines: Lucene, FAISS HNSW, FAISS IVF, FAISS PQ.
 - NMSLIB is removed in OS 3.x. For the engine-by-engine breakdown, see [vector-knn.md](vector-knn.md).
@@ -37,7 +37,7 @@ Cross-cutting refs you may also load: [`vector-knn.md`](vector-knn.md) (vector s
 ## Sizing-related universal rules (apply when this capability sizes a vector index)
 
 - **Current-generation instances.** Default to Graviton (`r7g`/`r8g` for memory-optimized; `m7g`/`m8g` for cluster managers). `r6g`/`r6gd` only with explicit justification.
-- **Input honesty.** When sizing on UNKNOWN inputs, lead with `[BLOCKER — need input]` OR present 2–3 tiered bands. Never present a single point estimate built on invented numbers.
+- **Input honesty.** When sizing on UNKNOWN inputs, lead with `[BLOCKER -- need input]` OR present 2-3 tiered bands. Never present a single point estimate built on invented numbers.
 
 ## Cross-capability handoff
 
@@ -87,8 +87,8 @@ BM25 is the default ranking algorithm in OpenSearch. It calculates relevance bas
 **Storage Estimation:**
 
 ```
-Index Size ≈ Raw Text Size × 0.1 to 0.3
-Example: 1GB text → 100-300MB index
+Index Size ~ Raw Text Size x 0.1 to 0.3
+Example: 1GB text -> 100-300MB index
 ```
 
 **Scaling Behavior:**
@@ -188,9 +188,9 @@ Dense vector search uses neural network embeddings to represent text as dense fl
 **Memory Estimation (Raw):**
 
 ```
-Memory = num_vectors × (dimensions × 4 bytes + m × 8 bytes + overhead)
-Example: 10M vectors × 768 dims, m=16
-Memory ≈ 10M × (768 × 4 + 16 × 8) ≈ 32GB
+Memory = num_vectors x (dimensions x 4 bytes + m x 8 bytes + overhead)
+Example: 10M vectors x 768 dims, m=16
+Memory ~ 10M x (768 x 4 + 16 x 8) ~ 32GB
 ```
 
 **Best For:**
@@ -232,9 +232,9 @@ Memory ≈ 10M × (768 × 4 + 16 × 8) ≈ 32GB
 **Memory Estimation:**
 
 ```
-Memory = num_vectors × dimensions / 8 (bits to bytes) + HNSW graph overhead
-Example: 1B vectors × 768 dims (using BQ)
-Memory ≈ 1B × 96 bytes ≈ 96 GB (manageable on a cluster)
+Memory = num_vectors x dimensions / 8 (bits to bytes) + HNSW graph overhead
+Example: 1B vectors x 768 dims (using BQ)
+Memory ~ 1B x 96 bytes ~ 96 GB (manageable on a cluster)
 vs. ~3TB for float32 vectors
 ```
 

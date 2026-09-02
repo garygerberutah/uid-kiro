@@ -14,9 +14,9 @@ Track, allocate, and manage Bedrock inference costs across teams, products, and 
 
 | Approach | Best For | Setup Effort |
 |----------|----------|-------------|
-| Application inference profiles + cost allocation tags | Per-product or per-team cost tracking in Cost Explorer | Medium — create profiles, tag, activate in Billing |
-| IAM principal-based (CUR 2.0) | Per-developer or per-role attribution | Low — automatic in CUR 2.0, no Bedrock config needed |
-| Model invocation logging + custom analytics | Fine-grained per-request analysis (token counts, latency, model) | High — enable logging, build queries |
+| Application inference profiles + cost allocation tags | Per-product or per-team cost tracking in Cost Explorer | Medium -- create profiles, tag, activate in Billing |
+| IAM principal-based (CUR 2.0) | Per-developer or per-role attribution | Low -- automatic in CUR 2.0, no Bedrock config needed |
+| Model invocation logging + custom analytics | Fine-grained per-request analysis (token counts, latency, model) | High -- enable logging, build queries |
 
 For most teams, **application inference profiles with cost allocation tags** is the recommended approach. It provides clean cost breakdowns in Cost Explorer without custom analytics.
 
@@ -62,7 +62,7 @@ response = bedrock_runtime.converse(
 
 #### 5. Verify in Cost Explorer
 
-After 24–48 hours, filter Cost Explorer by the tag keys. Bedrock costs appear under `Amazon Bedrock` service, grouped by tag values.
+After 24-48 hours, filter Cost Explorer by the tag keys. Bedrock costs appear under `Amazon Bedrock` service, grouped by tag values.
 
 ## IAM Principal-Based Attribution
 

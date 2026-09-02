@@ -74,9 +74,9 @@ aws athena start-query-execution \
 
 If source is missing columns that exist in the target table, two approaches:
 
-**Option 1: Use NULL for missing columns** (recommended) — New rows will have NULL in these columns. Existing rows keep their values.
+**Option 1: Use NULL for missing columns** (recommended) -- New rows will have NULL in these columns. Existing rows keep their values.
 
-**Option 2: Fail the import** — Ensures data completeness. Requires source to have all columns.
+**Option 2: Fail the import** -- Ensures data completeness. Requires source to have all columns.
 
 ## Nested JSON Handling
 

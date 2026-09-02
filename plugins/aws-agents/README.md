@@ -4,7 +4,7 @@ Build, deploy, and operate AI agents on AWS with guided workflows for every stag
 
 ## Overview
 
-This plugin provides 8 skills covering the full agent lifecycle — from scaffolding a new project to production hardening. Skills use progressive disclosure to load detailed reference material on demand, keeping context lean while providing deep expertise when needed.
+This plugin provides 8 skills covering the full agent lifecycle -- from scaffolding a new project to production hardening. Skills use progressive disclosure to load detailed reference material on demand, keeping context lean while providing deep expertise when needed.
 
 ## Skills
 
@@ -17,22 +17,22 @@ This plugin provides 8 skills covering the full agent lifecycle — from scaffol
 | `agents-debug` | "agent not working", "check logs", "command not found", "check my setup" | doctor |
 | `agents-optimize` | "evaluate my agent", "measure quality", "quality gate", "observability", "traces", "cost" | evals, observability, cost |
 | `agents-harden` | "production checklist", "go to production", "secure agent", "before launch", "cold start" | limits |
-| `agents-pay` | "this agent needs to pay", "x402", "402 Payment Required", "spend limit for agent" — the agent paying for itself at run time | operator-guide, security-model, setup, troubleshooting |
+| `agents-pay` | "this agent needs to pay", "x402", "402 Payment Required", "spend limit for agent" -- the agent paying for itself at run time | operator-guide, security-model, setup, troubleshooting |
 
 ## Routing guide
 
 When in doubt about which skill to reach for:
 
-- **Starting from nothing?** → `agents-get-started`
-- **Environment/CLI broken?** → `agents-debug` (loads `references/doctor.md`)
-- **Adding new capabilities to a working project?** → `agents-build`
-- **Connecting to external tools/APIs or restricting access?** → `agents-connect`
-- **Ready to ship?** → `agents-deploy`
-- **Agent is broken?** → `agents-debug`
-- **Measuring quality, observability, or cost?** → `agents-optimize`
-- **Going to production?** → `agents-harden`
-- **The agent you're running needs to pay for something?** → `agents-pay`
-- **Building payment capability into an agent you ship?** → `agents-build`
+- **Starting from nothing?** -> `agents-get-started`
+- **Environment/CLI broken?** -> `agents-debug` (loads `references/doctor.md`)
+- **Adding new capabilities to a working project?** -> `agents-build`
+- **Connecting to external tools/APIs or restricting access?** -> `agents-connect`
+- **Ready to ship?** -> `agents-deploy`
+- **Agent is broken?** -> `agents-debug`
+- **Measuring quality, observability, or cost?** -> `agents-optimize`
+- **Going to production?** -> `agents-harden`
+- **The agent you're running needs to pay for something?** -> `agents-pay`
+- **Building payment capability into an agent you ship?** -> `agents-build`
 
 ## MCP Servers
 

@@ -125,7 +125,7 @@ ROW_NUMBER() OVER (PARTITION BY category ORDER BY revenue DESC) as rank_in_categ
 
 ## Period Comparison / Growth
 
-When the user asks for "growth", "change", or "comparison" between periods, compute the delta — not raw totals.
+When the user asks for "growth", "change", or "comparison" between periods, compute the delta -- not raw totals.
 
 ```sql
 WITH quarterly AS (

@@ -37,15 +37,15 @@ Use `CostFilters` with `TagKeyValue` key and `tag-key$tag-value` format:
 
 ## Budget Actions
 
-Automatically apply IAM deny policies or SCPs when threshold is breached. Use for hard spending limits. Budget Actions cannot directly stop EC2 instances — use SNS → Lambda for custom actions.
+Automatically apply IAM deny policies or SCPs when threshold is breached. Use for hard spending limits. Budget Actions cannot directly stop EC2 instances -- use SNS -> Lambda for custom actions.
 
 ## Gotchas
 
 - **Budgets API requires `us-east-1` region** for global billing data
-- Monitoring-only budgets (no actions) are free — unlimited
+- Monitoring-only budgets (no actions) are free -- unlimited
 - First 2 action-enabled budgets are free; additional action-enabled budgets cost $0.10/day each
 - Budget Reports cost $0.01 per report delivered
-- Budget alerts evaluate once per day — up to 24-hour delay, not real-time
-- `FORECASTED` alerts use ML-based forecasting — useful for catching runaway costs early
-- Budget Actions are powerful but dangerous — test in non-prod first
-- RI/SP utilization budgets default to 100% — set to 80% for practical alerting
+- Budget alerts evaluate once per day -- up to 24-hour delay, not real-time
+- `FORECASTED` alerts use ML-based forecasting -- useful for catching runaway costs early
+- Budget Actions are powerful but dangerous -- test in non-prod first
+- RI/SP utilization budgets default to 100% -- set to 80% for practical alerting

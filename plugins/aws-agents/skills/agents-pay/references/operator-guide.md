@@ -72,7 +72,7 @@ and on why the split exists at all:
 | Step | Command | Role |
 |---|---|---|
 | 1 | `agentcore add payment-manager` / `payment-connector` / `deploy` | ControlPlaneRole |
-| 2 | `agents_pay_admin.py init-config` | none — writes a local file |
+| 2 | `agents_pay_admin.py init-config` | none -- writes a local file |
 | 3 | `agents_pay_admin.py create-instrument` | **ManagementRole** |
 | 4 | `agents_pay_admin.py new-session` | **ManagementRole** |
 | 5 | agent calls `x402_fetch` | **ProcessPaymentRole** |
@@ -89,8 +89,8 @@ python -m pip install -r requirements.txt
 npm install -g @aws/agentcore
 
 # 1. Provision (ControlPlaneRole; only step that touches provider secrets)
-agentcore add payment-manager                     # NO FLAGS — interactive wizard
-agentcore add payment-connector                   # NO FLAGS — interactive wizard
+agentcore add payment-manager                     # NO FLAGS -- interactive wizard
+agentcore add payment-connector                   # NO FLAGS -- interactive wizard
 agentcore deploy
 
 # 2. Write the config with at least one approved payee
@@ -98,15 +98,15 @@ python scripts/agents_pay_admin.py init-config \
   --max-per-payment-usd 0.05 \
   --recipient 0xMerchantWalletAddress
 
-# 3. Create the wallet (ManagementRole) — payer identity comes from the config
+# 3. Create the wallet (ManagementRole) -- payer identity comes from the config
 python scripts/agents_pay_admin.py create-instrument --email you@example.com
 
 # 3a/3b. THE END USER now delegates in a browser and funds the wallet with USDC.
-#        Both belong to the wallet, and both must happen BEFORE step 4 —
+#        Both belong to the wallet, and both must happen BEFORE step 4 --
 #        sessions are time-bounded, so minting one first just burns the clock.
 #        Step 3 prints the delegation URL and the wallet address.
 
-# 4. Authorize a budget (ManagementRole; interactive — you type "approve")
+# 4. Authorize a budget (ManagementRole; interactive -- you type "approve")
 python scripts/agents_pay_admin.py new-session --budget 1.00
 
 # 5. Verify, then register the tool in your agent
@@ -115,7 +115,7 @@ python scripts/agents_pay_admin.py preflight
 
 ### The interactive approval, concretely
 
-Step 4 is an ordinary command that prompts. It is not a web console or a callback —
+Step 4 is an ordinary command that prompts. It is not a web console or a callback --
 you run it in your shell and type one word:
 
 ```text
@@ -133,7 +133,7 @@ Recorded in            : ~/.agents-pay/config.json  (nothing to copy by hand)
 ```
 
 Anything other than `approve` aborts and no session is created. If stdin is not a
-terminal — an agent shelling out, CI, or a pipe — the command refuses outright
+terminal -- an agent shelling out, CI, or a pipe -- the command refuses outright
 rather than prompting:
 
 ```text
@@ -162,7 +162,7 @@ Two things to confirm before you trust the OpenClaw runtime:
 
 1. **No tool takes a wallet secret or provider key as a parameter.** Credentials
    belong in the environment or the `agentcore` wizard, never in a model-visible
-   schema — otherwise they land in transcripts, traces, and logs.
+   schema -- otherwise they land in transcripts, traces, and logs.
 2. **No model-callable tool creates a payment session.** If the model can mint
    budget, the per-session cap bounds nothing.
 
@@ -172,13 +172,13 @@ If either is wrong, disable the plugin before switching to the Python
 ### If you use the Strands plugin or LangGraph middleware instead
 
 Those integrations settle payments inside the framework, so **none of this skill's
-controls apply** — no per-payment ceiling, no origin vetting, no derived idempotency
+controls apply** -- no per-payment ceiling, no origin vetting, no derived idempotency
 token, and `auto_session=True` requires `CreatePaymentSession` on the runtime role,
 which is the arrangement the IAM guide warns against.
 
 They are a reasonable choice for a prototype or an agent whose whole tool surface you
 own. For an agent spending your money against the open web, register `x402_fetch`
-instead. Either way, **do not enable both** — the model would choose which one settles
+instead. Either way, **do not enable both** -- the model would choose which one settles
 a given `402`, and the gate becomes advisory.
 
 See "The gate only covers what routes through it" in
@@ -199,7 +199,7 @@ agent = Agent(model=..., tools=[tool(x402_fetch), tool(payment_session_status)])
 | Capability | Function | Causes spending? | Can raise a limit? |
 |---|---|---|---|
 | Pay and fetch | `x402_fetch(url)` | Yes, within both ceilings | **No** |
-| Check remaining budget | `payment_session_status()` | No — read-only | **No** |
+| Check remaining budget | `payment_session_status()` | No -- read-only | **No** |
 | Pay for a browser navigation | `prepare_browser_payment(url)` | Yes, within both ceilings | **No** |
 
 Out of reach entirely: session creation, infrastructure provisioning, provider
@@ -209,7 +209,7 @@ credentials, and signed payment proofs.
 
 ## Configuration
 
-One file, `~/.agents-pay/config.json` — mode `0600`, in a `0700` directory, written
+One file, `~/.agents-pay/config.json` -- mode `0600`, in a `0700` directory, written
 atomically. It holds **no secrets**: only resource identifiers and limits.
 
 ```json
@@ -236,7 +236,7 @@ operation.
 
 **Single tenant.** One installation is one payer. `init-config` generates the
 `user_id` once and every later step reads it from the config, so you never retype it
-— and cannot accidentally mismatch it between `create-instrument` and `new-session`,
+-- and cannot accidentally mismatch it between `create-instrument` and `new-session`,
 which would produce a session unable to spend the instrument. It is random rather
 than derived from your login or hostname, since it reaches the payments API and the
 wallet's linked accounts. Pass `--user-id` to override if you really need to. For
@@ -276,7 +276,7 @@ ambiguous policy.
 
 | Bound | Scope | Set by |
 |---|---|---|
-| Session budget | **Cumulative** — total before a human re-approves | `new-session` |
+| Session budget | **Cumulative** -- total before a human re-approves | `new-session` |
 | `max_per_payment_usd` | **Per transaction** | the policy section |
 
 Both are needed. With only the session budget, one hostile challenge for the entire
@@ -288,7 +288,7 @@ the skill enforces it locally.)*
 
 ## Security model
 
-The model is treated as **inside** the threat model — the design must hold when
+The model is treated as **inside** the threat model -- the design must hold when
 prompt injection succeeds. In summary:
 
 - **Payment decisions are made in code**, from the config file, before signing:
@@ -306,7 +306,7 @@ prompt injection succeeds. In summary:
 - **Retries are idempotent.** The token is derived, not random, and excludes the
   publisher's nonce, so a retry after a lost response replays one authorization
   instead of paying twice.
-- **Paid content is untrusted input** — by default, only content type, byte
+- **Paid content is untrusted input** -- by default, only content type, byte
   count, and SHA-256 hash are returned. When the operator sets `return_body: true`
   in the config file, body content is returned bounded (10 KiB cap) and marked
   `"untrusted": true`. Instructions inside it are data, never commands.
@@ -323,7 +323,7 @@ Full threat model and enforcement table:
 | `SKILL.md` | The skill the agent loads |
 | `scripts/x402_policy.py` | The trusted decision point |
 | `scripts/x402_fetch.py` | Hardened fetch, settle, session status, browser handles |
-| `scripts/agents_pay_admin.py` | **Human-run** admin CLI — keep away from the agent |
+| `scripts/agents_pay_admin.py` | **Human-run** admin CLI -- keep away from the agent |
 | `scripts/test_x402_policy.py` | Security regression tests |
 | `scripts/test_portability.py` | Cross-runtime portability check |
 | [`security-model.md`](security-model.md) | Threat model and enforcement table |
@@ -340,10 +340,10 @@ python3 scripts/test_portability.py      # cross-runtime checks
 ## Operational notes
 
 - **Start on testnet.** Defaults target Base Sepolia. Moving to mainnet means real
-  money — re-check the ceiling and the recipient mode first.
+  money -- re-check the ceiling and the recipient mode first.
 - **Fund the wallet with only what the agent may plausibly spend.** Wallet balance
   is the final backstop if every other control fails.
-- **Keep sessions short** (≤60 minutes) and budgets small.
+- **Keep sessions short** (<=60 minutes) and budgets small.
 - **Alarm on `CreatePaymentSession` by the runtime principal.** It should be
   impossible, so any occurrence means the IAM split has regressed.
 - Confirm CloudTrail is recording `bedrock-agentcore` calls, especially

@@ -37,6 +37,6 @@ The skill does not attempt to be exhaustive on edge cases, tuning parameters, or
 * **Pricing changes.** The skill uses `scripts/price_calculator.py` for estimation but defers to the official AWS ElastiCache Pricing page for authoritative, current pricing.
 * **API Reference details.** Full API request/response schemas, error codes, and throttling behavior are in the ElastiCache API Reference.
 
-## AI-Generated Output Disclaimer
+## Output Review Requirement
 
-All code, configurations, CLI commands, and recommendations produced by this skill are AI-generated. Review all outputs before deploying to production environments.
+Review all code, configurations, CLI commands, and recommendations before deploying to production environments.

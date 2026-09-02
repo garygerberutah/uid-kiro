@@ -10,7 +10,7 @@ services MUST connect using scoped-down database roles with `dsql:DbConnect`.
 
 - **ALWAYS** use scoped database roles for application connections and routine operations
 - **MUST** create purpose-specific database roles for each application component
-- **MUST** place user-sensitive data (PII, credentials) in a dedicated schema — NOT `public`
+- **MUST** place user-sensitive data (PII, credentials) in a dedicated schema -- NOT `public`
 - **MUST** grant only the minimum permissions each role requires
 - **MUST** create an IAM role with `dsql:DbConnect` for each database role
 - **SHOULD** audit role mappings regularly: `SELECT * FROM sys.iam_pg_role_mappings;`
@@ -52,7 +52,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA users_schema
   GRANT SELECT, INSERT, UPDATE ON TABLES TO user_service;
 ```
 
-> **Tip:** `GRANT … ON ALL TABLES IN SCHEMA` only covers tables that exist *at GRANT time*.
+> **Tip:** `GRANT ... ON ALL TABLES IN SCHEMA` only covers tables that exist *at GRANT time*.
 > `ALTER DEFAULT PRIVILEGES` is required for any role that will read/write tables created later.
 > Skip the `ALTER DEFAULT PRIVILEGES` step only when the same role that has `CREATE` is also the
 > sole writer (it owns its tables and can use them without explicit grants).
@@ -138,7 +138,7 @@ CREATE TABLE public.products (
 Applications generate tokens with `generate-db-connect-auth-token` (NOT the admin variant):
 
 ```bash
-# Application connection — uses DbConnect
+# Application connection -- uses DbConnect
 PGPASSWORD="$(aws dsql generate-db-connect-auth-token \
   --hostname ${CLUSTER_ENDPOINT} \
   --region ${REGION})" \

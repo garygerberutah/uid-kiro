@@ -15,7 +15,7 @@ This guide covers migrating Flink applications from 1.x to 2.x. Key changes: Jav
 | Sink API | `SinkFunction`, `SinkV1` removed | Must migrate to Sink V2 API |
 | Config | `flink-conf.yaml` removed | Must use `config.yaml` (standard YAML) |
 | Time API | `Time` class deprecated | Use `java.time.Duration` |
-| Serialization | Kryo 2.x → 5.x, new collection serializers | State incompatibility (see below) |
+| Serialization | Kryo 2.x -> 5.x, new collection serializers | State incompatibility (see below) |
 | DataSet API | Entire DataSet API removed | Migrate to DataStream or Table API/SQL |
 | Scala API | Scala API removed entirely | Use Java API (callable from Scala) |
 | Python | Python 3.8 removed, Python 3.12 default | Update Python runtime |
@@ -167,13 +167,13 @@ public void open(org.apache.flink.api.common.functions.OpenContext openContext) 
 }
 ```
 
-This change applies to every `RichFunction` subclass — `RichMapFunction`, `RichFlatMapFunction`, `RichFilterFunction`, `KeyedProcessFunction`, `BroadcastProcessFunction`, `KeyedBroadcastProcessFunction`, `ProcessWindowFunction`, async I/O `RichAsyncFunction`, etc. Any code that overrides `open(Configuration)` will fail to compile against Flink 2.2. `OpenContext` does not carry the legacy `Configuration` key/value bag — read runtime properties via the `KinesisAnalyticsRuntime.getApplicationProperties()` flow or pass them through your function's constructor.
+This change applies to every `RichFunction` subclass -- `RichMapFunction`, `RichFlatMapFunction`, `RichFilterFunction`, `KeyedProcessFunction`, `BroadcastProcessFunction`, `KeyedBroadcastProcessFunction`, `ProcessWindowFunction`, async I/O `RichAsyncFunction`, etc. Any code that overrides `open(Configuration)` will fail to compile against Flink 2.2. `OpenContext` does not carry the legacy `Configuration` key/value bag -- read runtime properties via the `KinesisAnalyticsRuntime.getApplicationProperties()` flow or pass them through your function's constructor.
 
 The `open()` change is one of several Flink 2.x breaking API changes you'll likely hit during the same migration. See [Removed APIs and Migration Paths](#removed-apis-and-migration-paths) for the full table; the headline removals are:
 
-- `SourceFunction` and `SinkFunction` are removed in favor of `Source` (FLIP-27) and `Sink` (FLIP-143) — `env.addSource()` / `stream.addSink()` no longer compile.
+- `SourceFunction` and `SinkFunction` are removed in favor of `Source` (FLIP-27) and `Sink` (FLIP-143) -- `env.addSource()` / `stream.addSink()` no longer compile.
 - `org.apache.flink.api.common.time.Time` is deprecated in favor of `java.time.Duration`. Anything that took `Time` (TTL, idleness, async I/O timeout) now takes `Duration`.
-- `TimeCharacteristic` is removed — event-time is the only mode and `setStreamTimeCharacteristic()` is gone.
+- `TimeCharacteristic` is removed -- event-time is the only mode and `setStreamTimeCharacteristic()` is gone.
 - `enableForceAvro()` and the convenience Kryo registration methods on `StreamExecutionEnvironment` are removed; use `env.getConfig()` equivalents.
 
 ### CEP Pattern Type Information
@@ -237,7 +237,7 @@ Three serialization incompatibilities prevent state migration from 1.x to 2.x:
 
 | Issue | Root Cause | Affected Patterns | Error Signature |
 |-------|-----------|-------------------|-----------------|
-| Kryo reference tracking | Kryo 2.x → 5.x upgrade | `registerTypeWithKryoSerializer()` | `IndexOutOfBoundsException: Index 116 out of bounds for length 1` |
+| Kryo reference tracking | Kryo 2.x -> 5.x upgrade | `registerTypeWithKryoSerializer()` | `IndexOutOfBoundsException: Index 116 out of bounds for length 1` |
 | Kryo CollectionSerializer | Kryo's internal collection format changed | Generic collections: `List<T>`, `Map<K,V>`, `Set<T>` in state | `ClassNotFoundException: value2` (data misinterpreted as class names) |
 | PojoSerializer collection handling | TypeExtractor selects different serializers (FLINK-34037) | POJO fields: List, Map, Set, Collection, Queue, Deque | `StateMigrationException: PojoSerializer@8bf85b5d incompatible with @3282ee3` |
 
@@ -262,10 +262,10 @@ Three serialization incompatibilities prevent state migration from 1.x to 2.x:
 
 **Connectors:**
 
-- Kinesis connector state (v5.0+ only — see note below; default polling and Enhanced Fan-Out)
+- Kinesis connector state (v5.0+ only -- see note below; default polling and Enhanced Fan-Out)
 - Kafka connector state (offsets, partition tracking)
 
-**CRITICAL — Kinesis Connector Version Prerequisite:** KDS connector versions below 5.0 maintain state that is incompatible with the Flink 2.2 Kinesis connector (v6.0.0-2.0). You must migrate to connector v5.0+ on Flink 1.x before upgrading to Flink 2.x. See `kinesis-connector-guide.md` for migration paths and the [AWS blog post](https://aws.amazon.com/blogs/big-data/introducing-the-new-amazon-kinesis-source-connector-for-apache-flink/) for details.
+**CRITICAL -- Kinesis Connector Version Prerequisite:** KDS connector versions below 5.0 maintain state that is incompatible with the Flink 2.2 Kinesis connector (v6.0.0-2.0). You must migrate to connector v5.0+ on Flink 1.x before upgrading to Flink 2.x. See `kinesis-connector-guide.md` for migration paths and the [AWS blog post](https://aws.amazon.com/blogs/big-data/introducing-the-new-amazon-kinesis-source-connector-for-apache-flink/) for details.
 
 **Table API/SQL (with caveat):**
 
@@ -280,7 +280,7 @@ Three serialization incompatibilities prevent state migration from 1.x to 2.x:
 **Direct Kryo Usage:**
 
 ```java
-// INCOMPATIBLE - Kryo 2.x → 5.x reference tracking changed
+// INCOMPATIBLE - Kryo 2.x -> 5.x reference tracking changed
 env.getConfig().registerTypeWithKryoSerializer(MyType.class, MyKryoSerializer.class);
 ```
 
@@ -309,7 +309,7 @@ public class UserSession {
 **Scala Case Classes:**
 
 ```scala
-// INCOMPATIBLE - Serialized via Kryo in Flink 1.x, Kryo v2→v5 binary format change breaks state
+// INCOMPATIBLE - Serialized via Kryo in Flink 1.x, Kryo v2->v5 binary format change breaks state
 case class UserEvent(userId: String, eventType: String, timestamp: Long)
 ```
 
@@ -325,7 +325,7 @@ public record UserEvent(String userId, String eventType, long timestamp) {}
 
 ```java
 // INCOMPATIBLE - Types without a registered custom serializer fall back to Kryo
-// The Kryo v2→v5 binary format change breaks all Kryo-serialized state
+// The Kryo v2->v5 binary format change breaks all Kryo-serialized state
 ValueState<ThirdPartyType> state; // Any type from external libraries using Kryo fallback
 ```
 
@@ -491,11 +491,11 @@ env.getConfig().disableGenericTypes(); // Throws exception if Kryo would be used
 
 Your upgrade experience depends on your application's compatibility with Flink 2.2:
 
-**Path 1: Compatible binary and state** — Invoke the Upgrade operation. Application transitions RUNNING → UPDATING → RUNNING with full state preservation. Same experience as minor version migrations. Best for stateless applications or those using compatible serialization (Avro, Protobuf, simple POJOs without collections).
+**Path 1: Compatible binary and state** -- Invoke the Upgrade operation. Application transitions RUNNING -> UPDATING -> RUNNING with full state preservation. Same experience as minor version migrations. Best for stateless applications or those using compatible serialization (Avro, Protobuf, simple POJOs without collections).
 
-**Path 2: Binary incompatibilities** — Upgrade operation fails and surfaces the incompatibility through Operations API and logs. With auto-rollback enabled, the application automatically rolls back within minutes. With auto-rollback disabled, the application remains running without processing data until you manually roll back. Fix the binary issues, then re-attempt for a Path 1 experience.
+**Path 2: Binary incompatibilities** -- Upgrade operation fails and surfaces the incompatibility through Operations API and logs. With auto-rollback enabled, the application automatically rolls back within minutes. With auto-rollback disabled, the application remains running without processing data until you manually roll back. Fix the binary issues, then re-attempt for a Path 1 experience.
 
-**Path 3: Incompatible application state** — Upgrade appears to succeed initially, but the application enters restart loops within seconds as state restoration fails. Detect via CloudWatch metrics (`numRestarts` increasing, `runningTime` not increasing). Manually invoke the Rollback operation, then review the State Compatibility section above.
+**Path 3: Incompatible application state** -- Upgrade appears to succeed initially, but the application enters restart loops within seconds as state restoration fails. Detect via CloudWatch metrics (`numRestarts` increasing, `runningTime` not increasing). Manually invoke the Rollback operation, then review the State Compatibility section above.
 
 ### Upgrade Phases
 
@@ -560,12 +560,12 @@ aws kinesisanalyticsv2 update-application \
     }'
 ```
 
-CloudFormation also supports in-place upgrades — update the `RuntimeEnvironment` field and CloudFormation will update in place without deleting and recreating the application (preserving snapshots and history).
+CloudFormation also supports in-place upgrades -- update the `RuntimeEnvironment` field and CloudFormation will update in place without deleting and recreating the application (preserving snapshots and history).
 
 #### Phase 5: Monitor upgrade
 
 - Use the Operations API to check upgrade status and surface binary incompatibilities
-- If the application is RUNNING but still on the older runtime, auto-rollback kicked in — check Operations API for the failure reason
+- If the application is RUNNING but still on the older runtime, auto-rollback kicked in -- check Operations API for the failure reason
 - Monitor CloudWatch metrics:
   - `numRestarts`: should be zero after upgrade
   - `runningTime`: should be steadily increasing (replaces deprecated `uptime`)

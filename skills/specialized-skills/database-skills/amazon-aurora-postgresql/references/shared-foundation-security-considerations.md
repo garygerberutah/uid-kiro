@@ -31,9 +31,9 @@ Do NOT use `AdministratorAccess` or `*:FullAccess` managed policies. Scope write
 
 - Prefer short-lived credentials (IAM roles, `ada credentials update`, SSO) over long-lived IAM user keys.
 - Do NOT create or store long-lived DB passwords from within the skill. If the user's Isengard credentials are expired, prompt them to refresh outside the skill.
-- **IAM auth tokens are approved.** Calling `aws rds generate-db-auth-token` or `rds_client.generate_db_auth_token()` is explicitly safe — these produce short-lived (15-minute) tokens derived from the caller's IAM identity. They are not stored credentials. This is the required connection method for express clusters.
+- **IAM auth tokens are approved.** Calling `aws rds generate-db-auth-token` or `rds_client.generate_db_auth_token()` is explicitly safe -- these produce short-lived (15-minute) tokens derived from the caller's IAM identity. They are not stored credentials. This is the required connection method for express clusters.
 - Do NOT log or echo DB passwords or raw secret values. For RDS Data API precheck runs, reference secrets by their `secretArn` and let the service resolve them.
-- For SSM Run Command prechecks, pass DB credentials via inline JSON parameters attached to the Run Command invocation — never via positional filesystem arguments.
+- For SSM Run Command prechecks, pass DB credentials via inline JSON parameters attached to the Run Command invocation -- never via positional filesystem arguments.
 
 ## RDS Data API Warning
 
@@ -49,11 +49,11 @@ Any CloudFormation, CDK, or AWS CLI snippet produced by this skill MUST use secu
 
 - Cluster configuration: `StorageEncrypted: true` (and `KmsKeyId` if the user has a customer-managed key)
 - TLS: cluster parameter group enables `rds.force_ssl=1`
-- Security groups: scoped CIDR ranges or security-group references — NEVER `0.0.0.0/0` or `::/0`
+- Security groups: scoped CIDR ranges or security-group references -- NEVER `0.0.0.0/0` or `::/0`
 - Public accessibility: NEVER use `--publicly-accessible`. If the user needs connectivity from outside the VPC, use express configuration (internet-accessible via IAM), RDS Data API, or an EC2 bastion with SSH tunnel.
 - Parameter groups: do NOT disable `log_statement`, `log_min_duration_statement`, or audit logging parameters "for convenience"
-- Logging & monitoring: recommend enabling **CloudTrail** so Aurora control-plane API activity (create / modify / delete / failover) is recorded, and **CloudWatch alarms** on security-relevant metrics such as `LoginFailures` and `DatabaseConnections`. CloudWatch log exports (`postgresql`) give query-level visibility but do not cover API-level activity — CloudTrail does.
-- Resource names: no `prod`, `production`, or `PROD` as example/default values — those get copy-pasted into production accidentally
+- Logging & monitoring: recommend enabling **CloudTrail** so Aurora control-plane API activity (create / modify / delete / failover) is recorded, and **CloudWatch alarms** on security-relevant metrics such as `LoginFailures` and `DatabaseConnections`. CloudWatch log exports (`postgresql`) give query-level visibility but do not cover API-level activity -- CloudTrail does.
+- Resource names: no `prod`, `production`, or `PROD` as example/default values -- those get copy-pasted into production accidentally
 
 ## Output Handling
 
@@ -64,6 +64,6 @@ Any CloudFormation, CDK, or AWS CLI snippet produced by this skill MUST use secu
 ## References
 
 - [Security in Amazon Aurora](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/UsingWithRDS.html)
-- [AWS Well-Architected Framework — Security Pillar](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html)
+- [AWS Well-Architected Framework -- Security Pillar](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html)
 - [IAM database authentication for Aurora](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/UsingWithRDS.IAMDBAuth.html)
 - [Using SSL/TLS with Aurora PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Security.html)

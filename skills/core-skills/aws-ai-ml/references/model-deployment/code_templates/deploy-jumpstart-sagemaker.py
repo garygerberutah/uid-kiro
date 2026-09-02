@@ -11,10 +11,10 @@ import os
 from pathlib import Path
 
 # CONFIG is the deployment config emitted by the model-selection skill. Do NOT re-derive any of
-# these fields from the model spec here — model-selection already resolved them. This skill is a
+# these fields from the model spec here -- model-selection already resolved them. This skill is a
 # thin passthrough onto the v3 SDK's from_jumpstart_config API.
 CONFIG = {
-    "model_id": "[MODEL_ID]",  # REQUIRED — JumpStart model id, e.g. "huggingface-reasoning-qwen3-06b"
+    "model_id": "[MODEL_ID]",  # REQUIRED -- JumpStart model id, e.g. "huggingface-reasoning-qwen3-06b"
     "model_version": None,  # None -> "*" (latest)
     "instance_type": "[INSTANCE_TYPE]",  # REQUIRED for a real-time endpoint
     "instance_count": 1,
@@ -35,7 +35,7 @@ os.environ["AWS_DEFAULT_REGION"] = REGION
 
 def validate_deployment_config(cfg):
     """Fail fast with a clear, actionable message if the model-selection config is missing or
-    malformed. This guards the deployment against a broken hand-off — a bad config should stop
+    malformed. This guards the deployment against a broken hand-off -- a bad config should stop
     here with a readable error, not fail deep inside the SDK or (worse) silently misbehave.
     """
     if not isinstance(cfg, dict):
@@ -52,7 +52,7 @@ def validate_deployment_config(cfg):
                 f"Deployment config is missing a valid '{key}' (got {val!r}). "
                 "model-selection must emit it before deployment can proceed."
             )
-    # instance_count must be a positive integer (bool is a subclass of int — reject it explicitly).
+    # instance_count must be a positive integer (bool is a subclass of int -- reject it explicitly).
     ic = cfg.get("instance_count", 1)
     if isinstance(ic, bool) or not isinstance(ic, int) or ic < 1:
         raise ValueError(
@@ -75,7 +75,7 @@ def validate_deployment_config(cfg):
             "(use None for the SDK's top-ranked config)."
         )
     # accept_eula MUST be a real bool. A non-bool such as the string "false" is truthy in Python
-    # and could silently auto-accept a gated model's license — a safety issue, so reject it.
+    # and could silently auto-accept a gated model's license -- a safety issue, so reject it.
     eula = cfg.get("accept_eula", False)
     if not isinstance(eula, bool):
         raise ValueError(

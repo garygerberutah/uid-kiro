@@ -2,7 +2,7 @@
 
 - **Docs**: https://docs.aws.amazon.com/timestream/
 - **Docs (llms.txt)**: https://docs.aws.amazon.com/timestream/latest/developerguide/llms.txt
-- **Data model**: Time-series (measurements, tags, fields, timestamps — line protocol)
+- **Data model**: Time-series (measurements, tags, fields, timestamps -- line protocol)
 - **Query language**: SQL + InfluxQL (v3); Flux + InfluxQL (v2)
 - **Compatibility**: InfluxDB wire protocol (Telegraf, Grafana, Flight SQL)
 - **Serverless**: No (instance/cluster-based)

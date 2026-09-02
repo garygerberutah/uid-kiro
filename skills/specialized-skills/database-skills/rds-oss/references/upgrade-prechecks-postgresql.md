@@ -12,9 +12,9 @@ aws ssm send-command --instance-ids {instance_id} --document-name "AWS-RunShellS
   --region {region} --output json --query "Command.CommandId"
 ```
 
-**Preferred: IAM database authentication** — where supported, use `aws rds generate-db-auth-token` to produce a short-lived token and connect with `--no-password`. This avoids any password in the environment or command history.
+**Preferred: IAM database authentication** -- where supported, use `aws rds generate-db-auth-token` to produce a short-lived token and connect with `--no-password`. This avoids any password in the environment or command history.
 
-**Fallback: Secrets Manager retrieval** (shown above) — never pass plaintext passwords in SSM command parameters, as they are visible in SSM command history, CloudTrail logs, and process listings. Note that `export PGPASSWORD=...` still exposes the value in the shell process environment (`/proc/<pid>/environ`) for its lifetime; where IAM auth is unavailable, prefer a `.pgpass` file (chmod 600) over environment variables. If query results may contain sensitive data, enable KMS encryption on the SSM Run Command output. Use minimal-privilege credentials (a read-only user scoped to the precheck schemas) rather than the master user.
+**Fallback: Secrets Manager retrieval** (shown above) -- never pass plaintext passwords in SSM command parameters, as they are visible in SSM command history, CloudTrail logs, and process listings. Note that `export PGPASSWORD=...` still exposes the value in the shell process environment (`/proc/<pid>/environ`) for its lifetime; where IAM auth is unavailable, prefer a `.pgpass` file (chmod 600) over environment variables. If query results may contain sensitive data, enable KMS encryption on the SSM Run Command output. Use minimal-privilege credentials (a read-only user scoped to the precheck schemas) rather than the master user.
 
 Note: RDS Data API is NOT available for standalone RDS instances.
 
@@ -34,7 +34,7 @@ Flag: Check target version supports each extension.
 SELECT schemaname, tablename, indexname, indexdef FROM pg_indexes WHERE indexdef LIKE '%USING hash%';
 ```
 
-Flag: 🟡 Must REINDEX after upgrade.
+Flag: [YELLOW] Must REINDEX after upgrade.
 
 ### 3. Unknown/Invalid Data Types
 
@@ -47,7 +47,7 @@ WHERE n.nspname NOT IN ('pg_catalog','information_schema','pg_toast')
 AND t.typname IN ('unknown');
 ```
 
-Flag: 🔴 Unknown types block upgrade.
+Flag: [RED] Unknown types block upgrade.
 
 ### 4. Logical Replication Slots
 
@@ -55,7 +55,7 @@ Flag: 🔴 Unknown types block upgrade.
 SELECT slot_name, plugin, slot_type, active FROM pg_replication_slots;
 ```
 
-Flag: 🔴 Active logical replication slots BLOCK major upgrades.
+Flag: [RED] Active logical replication slots BLOCK major upgrades.
 
 ### 5. Prepared Transactions
 
@@ -63,7 +63,7 @@ Flag: 🔴 Active logical replication slots BLOCK major upgrades.
 SELECT * FROM pg_prepared_xacts;
 ```
 
-Flag: 🔴 Prepared transactions BLOCK the upgrade.
+Flag: [RED] Prepared transactions BLOCK the upgrade.
 
 ### 6. Objects Owned by System Roles
 
@@ -75,7 +75,7 @@ WHERE r.rolname IN ('rdsadmin','rds_superuser')
 AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast');
 ```
 
-Flag: 🟡 May block upgrades.
+Flag: [YELLOW] May block upgrades.
 
 ### 7. Database Encoding and Locale
 
@@ -123,7 +123,7 @@ WHERE t.typname IN ('regproc','regprocedure','regoper','regoperator','regclass',
 AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast');
 ```
 
-Flag: 🟡 reg* types store OIDs that may change after upgrade.
+Flag: [YELLOW] reg* types store OIDs that may change after upgrade.
 
 ### 12. Stale Table Statistics
 
@@ -138,13 +138,13 @@ WHERE (last_analyze IS NULL AND last_autoanalyze IS NULL)
 ORDER BY n_live_tup DESC;
 ```
 
-Flag: 🟡 Use this to record which tables have stale statistics as a pre-upgrade baseline — it helps you spot post-upgrade plan regressions. A major version upgrade does not carry statistics across, so statistics are recalculated **after** the upgrade — see the post-upgrade checklist, which scopes `ANALYZE` to the affected tables in a low-traffic window.
+Flag: [YELLOW] Use this to record which tables have stale statistics as a pre-upgrade baseline -- it helps you spot post-upgrade plan regressions. A major version upgrade does not carry statistics across, so statistics are recalculated **after** the upgrade -- see the post-upgrade checklist, which scopes `ANALYZE` to the affected tables in a low-traffic window.
 
 ## Result Analysis
 
 Generate:
 
-1. Categorized findings (🔴/🟡/🟢)
+1. Categorized findings ([RED]/[YELLOW]/[GREEN])
 2. For each finding: what was found, why it matters, action to take
 3. Extension compatibility matrix for target version
 4. Recommended post-upgrade REINDEX/ANALYZE plan

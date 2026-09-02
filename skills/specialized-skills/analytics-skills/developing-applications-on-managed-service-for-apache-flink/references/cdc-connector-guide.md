@@ -1,13 +1,13 @@
 # Flink CDC Connector Guide
 
-This guide covers Change Data Capture (CDC) connector configuration for Apache Flink applications on Amazon Managed Service for Apache Flink. Flink CDC enables reading snapshot and incremental change data from databases without requiring Kafka or Kafka Connect — Debezium runs embedded within the Flink application.
+This guide covers Change Data Capture (CDC) connector configuration for Apache Flink applications on Amazon Managed Service for Apache Flink. Flink CDC enables reading snapshot and incremental change data from databases without requiring Kafka or Kafka Connect -- Debezium runs embedded within the Flink application.
 
 ## Overview
 
 Flink CDC is a streaming data integration tool built on Apache Flink that captures database changes in real time. It supports two usage modes:
 
 1. **Source Connectors** (DataStream API / Table API / SQL): Individual CDC source connectors for reading changes from a single database table or set of tables into a Flink job for custom processing. **This is the supported approach for MSF.**
-2. **Pipeline API** (YAML-based, Flink CDC 3.x): End-to-end data integration pipelines defined in YAML for whole-database synchronization with schema evolution, routing, and transforms. **This does NOT run on MSF** — it requires the `flink-cdc.sh` CLI which is only available on self-managed Flink clusters.
+2. **Pipeline API** (YAML-based, Flink CDC 3.x): End-to-end data integration pipelines defined in YAML for whole-database synchronization with schema evolution, routing, and transforms. **This does NOT run on MSF** -- it requires the `flink-cdc.sh` CLI which is only available on self-managed Flink clusters.
 
 For MSF deployments, use the Source Connector approach via DataStream API or Table API/SQL.
 
@@ -18,22 +18,22 @@ For MSF deployments, use the Source Connector approach via DataStream API or Tab
 | Flink CDC Release | Flink 1.20 coordinate | Flink 2.2 coordinate | Notes |
 |---|---|---|---|
 | `3.6.x` | `3.6.0-1.20` | `3.6.0-2.2` | Recommended for new projects. Per-Flink-version artifacts. |
-| `3.5.x` | `3.5.0` | ❌ | Flink 1.20 only. Single unsuffixed artifact. |
-| `3.4.x` | `3.4.0` | ❌ | Flink 1.20 only. Single unsuffixed artifact. |
-| `3.3.x` | `3.3.0` | ❌ | Flink 1.20 only (also supports 1.18, 1.19). Single unsuffixed artifact. |
+| `3.5.x` | `3.5.0` | [NO] | Flink 1.20 only. Single unsuffixed artifact. |
+| `3.4.x` | `3.4.0` | [NO] | Flink 1.20 only. Single unsuffixed artifact. |
+| `3.3.x` | `3.3.0` | [NO] | Flink 1.20 only (also supports 1.18, 1.19). Single unsuffixed artifact. |
 
 For Flink 2.2 on MSF, you must use Flink CDC 3.6.x.
 
-**IMPORTANT — version coordinate change in 3.6.x:** Starting with the 3.6.x line, Flink CDC publishes **per-Flink-version artifacts** on Maven Central. The plain `3.6.0` GAV does NOT exist — only `3.6.0-1.20` and `3.6.0-2.2`. Earlier versions (3.5.x and below) used a single artifact compatible with multiple Flink minors. Always copy the coordinate from the table above; do not assume an unsuffixed `3.6.0` will resolve.
+**IMPORTANT -- version coordinate change in 3.6.x:** Starting with the 3.6.x line, Flink CDC publishes **per-Flink-version artifacts** on Maven Central. The plain `3.6.0` GAV does NOT exist -- only `3.6.0-1.20` and `3.6.0-2.2`. Earlier versions (3.5.x and below) used a single artifact compatible with multiple Flink minors. Always copy the coordinate from the table above; do not assume an unsuffixed `3.6.0` will resolve.
 
 ## Supported Database Sources
 
 | Connector | Databases | Key Mechanism |
 |---|---|---|
-| `mysql-cdc` | MySQL 5.6–8.0.x, Aurora MySQL, RDS MySQL, MariaDB 10.x | Binlog |
-| `postgres-cdc` | PostgreSQL 9.6–14, Aurora PostgreSQL, RDS PostgreSQL | WAL / Logical Replication |
+| `mysql-cdc` | MySQL 5.6-8.0.x, Aurora MySQL, RDS MySQL, MariaDB 10.x | Binlog |
+| `postgres-cdc` | PostgreSQL 9.6-14, Aurora PostgreSQL, RDS PostgreSQL | WAL / Logical Replication |
 | `oracle-cdc` | Oracle 11, 12, 19, 21 | LogMiner or XStream |
-| `sqlserver-cdc` | SQL Server 2012–2019 | CT (Change Tracking) |
+| `sqlserver-cdc` | SQL Server 2012-2019 | CT (Change Tracking) |
 | `mongodb-cdc` | MongoDB 3.6+ (replica set or sharded) | Change Streams |
 | `db2-cdc` | Db2 11.5 | ASN Capture |
 
@@ -168,7 +168,7 @@ MSF runtime properties only carry the non-sensitive values plus the secret ID:
 }]
 ```
 
-The secret itself can still be created via CloudFormation/CDK/Terraform — only the *consumption* of the resolved value has to stay out of MSF properties:
+The secret itself can still be created via CloudFormation/CDK/Terraform -- only the *consumption* of the resolved value has to stay out of MSF properties:
 
 ### IAM permissions for the MSF execution role
 
@@ -186,7 +186,7 @@ The trailing `-*` covers the random 6-character suffix Secrets Manager appends t
 
 ### TLS / SSL to the database
 
-Enable TLS for every CDC connection so traffic between the MSF application and the database is encrypted in transit. The default mode for CDC on MSF is **encryption without certificate verification** (`require` for Postgres, `REQUIRED` for MySQL). MSF does not give you a stable filesystem path to drop a CA bundle on — `${user.dir}` resolves to a runtime working directory that is not the JAR location, and there is no host filesystem you can pre-populate at deploy time. The conventional Postgres/MySQL "extract the bundle to a known path and point `sslrootcert`/`trustCertificateKeyStoreUrl` at it" pattern does not work: even when the file is extracted from the JAR to `/tmp` at startup, the Debezium connectors run their internal JDBC connections from a different JVM context inside the connector, so the file lookup fails (verified: `Could not open SSL root certificate file /tmp/rds-ca-...pem`). The only way to get verify-* working on MSF is to register a custom `SSLSocketFactory` per JDBC driver that loads the bundle from the classpath, which is enough additional surface that it's an opt-in for high-MITM-risk environments rather than a default.
+Enable TLS for every CDC connection so traffic between the MSF application and the database is encrypted in transit. The default mode for CDC on MSF is **encryption without certificate verification** (`require` for Postgres, `REQUIRED` for MySQL). MSF does not give you a stable filesystem path to drop a CA bundle on -- `${user.dir}` resolves to a runtime working directory that is not the JAR location, and there is no host filesystem you can pre-populate at deploy time. The conventional Postgres/MySQL "extract the bundle to a known path and point `sslrootcert`/`trustCertificateKeyStoreUrl` at it" pattern does not work: even when the file is extracted from the JAR to `/tmp` at startup, the Debezium connectors run their internal JDBC connections from a different JVM context inside the connector, so the file lookup fails (verified: `Could not open SSL root certificate file /tmp/rds-ca-...pem`). The only way to get verify-* working on MSF is to register a custom `SSLSocketFactory` per JDBC driver that loads the bundle from the classpath, which is enough additional surface that it's an opt-in for high-MITM-risk environments rather than a default.
 
 The defense-in-depth layers that **do** apply on MSF without a CA bundle:
 
@@ -231,7 +231,7 @@ If `require` is not sufficient and you need chain validation, the implementation
 
 1. Bundle the RDS combined CA (`global-bundle.pem`) as a classpath resource in your application JAR (e.g., `src/main/resources/rds-ca-bundle.pem`).
 2. Build an `SSLContext` from that resource at job startup, using `getClass().getResourceAsStream(...)` and a `KeyStore` populated from the PEM.
-3. Register a custom `SSLSocketFactory` that returns sockets from that context, and reference it by class name in the connector config — Postgres uses `database.sslfactory=<your.class.Name>`, MySQL Connector/J uses the `socketFactory` JDBC URL parameter (or a custom `TrustManager` wired into a `KeyStore` URL the driver can resolve from the classpath).
+3. Register a custom `SSLSocketFactory` that returns sockets from that context, and reference it by class name in the connector config -- Postgres uses `database.sslfactory=<your.class.Name>`, MySQL Connector/J uses the `socketFactory` JDBC URL parameter (or a custom `TrustManager` wired into a `KeyStore` URL the driver can resolve from the classpath).
 4. Set `database.sslmode=verify-full` (Postgres) or `sslMode=VERIFY_IDENTITY` (MySQL) on top of the custom factory.
 
 This is non-trivial because each JDBC driver has its own `SSLSocketFactory`/`TrustManager` plug point and the Debezium connector instantiates JDBC connections from inside the source operator, which means the factory class has to be on the classpath of every TaskManager and resolve the bundle without filesystem assumptions. Treat this as opt-in for high-assurance environments; it is not the default for CDC on MSF.
@@ -242,16 +242,16 @@ For RDS/Aurora, also enforce TLS at the database side (`rds.force_ssl = 1` in th
 
 Each Flink CDC artifact (`flink-connector-mysql-cdc`, `flink-connector-postgres-cdc`, etc.) ships **two parallel APIs in the same JAR**. Picking the wrong one is the most common reason CDC jobs don't compile or don't run on Flink 2.x.
 
-**Legacy `SourceFunction`-based source** — older, single-threaded, locking snapshot for MySQL.
+**Legacy `SourceFunction`-based source** -- older, single-threaded, locking snapshot for MySQL.
 
 | Database | Class | Builder return type |
 |---|---|---|
 | MySQL | `org.apache.flink.cdc.connectors.mysql.MySqlSource` | `.builder()` returns a `DebeziumSourceFunction<T>` |
 | Postgres | `org.apache.flink.cdc.connectors.postgres.PostgreSQLSource` | `.builder()` returns a `DebeziumSourceFunction<T>` |
 
-**Not usable on Flink 2.x.** `SourceFunction` and `env.addSource(...)` were removed in Flink 2.0. The class is still in the artifact for backward compatibility with Flink 1.x consumers, but you cannot wire its output into a Flink 2.x job. Several builder methods on the legacy classes (e.g., Postgres `publicationName(...)`) do **not** exist on the incremental builders — if you copy a snippet that calls them, it won't compile against `3.6.0-2.2`.
+**Not usable on Flink 2.x.** `SourceFunction` and `env.addSource(...)` were removed in Flink 2.0. The class is still in the artifact for backward compatibility with Flink 1.x consumers, but you cannot wire its output into a Flink 2.x job. Several builder methods on the legacy classes (e.g., Postgres `publicationName(...)`) do **not** exist on the incremental builders -- if you copy a snippet that calls them, it won't compile against `3.6.0-2.2`.
 
-**Incremental Source (FLIP-27)** — lock-free parallel snapshot, chunk-level checkpointing.
+**Incremental Source (FLIP-27)** -- lock-free parallel snapshot, chunk-level checkpointing.
 
 | Database | Class | Builder return type |
 |---|---|---|
@@ -262,7 +262,7 @@ Each Flink CDC artifact (`flink-connector-mysql-cdc`, `flink-connector-postgres-
 
 Two asymmetries to be aware of:
 
-- **Class naming.** MySQL has the same class name `MySqlSource` in two packages — disambiguate by package. Postgres uses different class names (`PostgreSQLSource` legacy vs `PostgresIncrementalSource` incremental), and the incremental class is technically an inner class of `PostgresSourceBuilder`, so the entry-point spelling is unusual: `PostgresIncrementalSource.<T>builder()`.
+- **Class naming.** MySQL has the same class name `MySqlSource` in two packages -- disambiguate by package. Postgres uses different class names (`PostgreSQLSource` legacy vs `PostgresIncrementalSource` incremental), and the incremental class is technically an inner class of `PostgresSourceBuilder`, so the entry-point spelling is unusual: `PostgresIncrementalSource.<T>builder()`.
 - **Setter coverage.** The two incremental builders share most options (host/port/user/pwd/database, schema/table list, splitSize, chunkKeyColumn, splitMetaGroupSize, distributionFactor{Upper,Lower}, fetchSize, connectTimeout, connectMaxRetries, connectionPoolSize, startupOptions, debeziumProperties, deserializer, heartbeatInterval, closeIdleReaders, skipSnapshotBackfill, scanNewlyAddedTableEnabled, assignUnboundedChunkFirst, includeSchemaChanges, serverTimeZone), but **the surfaces are not identical**. MySQL has `serverId(...)`, `databaseList(...)`, `jdbcProperties(...)`, `useLegacyJsonFormat(...)`, `parseOnLineSchemaChanges(...)`. Postgres has `slotName(...)`, `decodingPluginName(...)`, `lsnCommitCheckpointsDelay(...)`, `includePartitionedTables(...)`, `includeDatabaseInTableId(...)`. Some knobs that were first-class methods on the legacy Postgres builder (e.g., `publicationName(...)`) are **only** reachable through `debeziumProperties(...)` on the incremental builder.
 
 Always import from the connector's `.source` sub-package, never from the top-level package.
@@ -303,9 +303,9 @@ Before using the MySQL CDC connector, the source database must be configured:
 ### DataStream API Pattern
 
 ```java
-// CORRECT — incremental Source (FLIP-27), usable on Flink 2.x via env.fromSource(...)
+// CORRECT -- incremental Source (FLIP-27), usable on Flink 2.x via env.fromSource(...)
 import org.apache.flink.cdc.connectors.mysql.source.MySqlSource;
-// WRONG — legacy SourceFunction, not usable on Flink 2.x:
+// WRONG -- legacy SourceFunction, not usable on Flink 2.x:
 // import org.apache.flink.cdc.connectors.mysql.MySqlSource;
 import org.apache.flink.cdc.debezium.JsonDebeziumDeserializationSchema;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -335,12 +335,12 @@ DataStream<String> cdcStream = env
 
 | Option | Required | Default | Description |
 |---|---|---|---|
-| `hostname` | Yes | — | MySQL server hostname or IP |
+| `hostname` | Yes | -- | MySQL server hostname or IP |
 | `port` | No | 3306 | MySQL server port |
-| `username` | Yes | — | MySQL user with replication permissions |
-| `password` | Yes | — | MySQL user password |
-| `database-name` | Yes | — | Database name (supports regex for multi-database) |
-| `table-name` | Yes | — | Table name (supports regex, format: `db\.table`) |
+| `username` | Yes | -- | MySQL user with replication permissions |
+| `password` | Yes | -- | MySQL user password |
+| `database-name` | Yes | -- | Database name (supports regex for multi-database) |
+| `table-name` | Yes | -- | Table name (supports regex, format: `db\.table`) |
 | `server-id` | Recommended | Random 5400-6400 | Unique server ID or range (e.g., `5400-5404` for parallelism 4) |
 | `scan.incremental.snapshot.enabled` | No | `true` | Enable lock-free parallel snapshot reading |
 | `scan.incremental.snapshot.chunk.size` | No | 8096 | Rows per snapshot chunk |
@@ -399,10 +399,10 @@ If multiple Flink CDC jobs read from the same MySQL instance, their server ID ra
 Use the **incremental** `PostgresIncrementalSource` (inner class of `PostgresSourceBuilder`). The legacy `PostgreSQLSource` returns a `DebeziumSourceFunction` and is not usable on Flink 2.x. See the "Incremental Source vs Legacy Source on Flink 2.x" section above.
 
 ```java
-// CORRECT — incremental Source (FLIP-27), usable on Flink 2.x via env.fromSource(...)
+// CORRECT -- incremental Source (FLIP-27), usable on Flink 2.x via env.fromSource(...)
 import org.apache.flink.cdc.connectors.postgres.source.PostgresSourceBuilder;
 import org.apache.flink.cdc.connectors.postgres.source.PostgresSourceBuilder.PostgresIncrementalSource;
-// WRONG — legacy SourceFunction, not usable on Flink 2.x:
+// WRONG -- legacy SourceFunction, not usable on Flink 2.x:
 // import org.apache.flink.cdc.connectors.postgres.PostgreSQLSource;
 import org.apache.flink.cdc.debezium.JsonDebeziumDeserializationSchema;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -410,7 +410,7 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 Properties cdcConfig = applicationProperties.get("cdc.postgres.config");
 
 // publication.name and publication.autocreate.mode are NOT builder setters on
-// PostgresSourceBuilder — they are passed through debeziumProperties(...).
+// PostgresSourceBuilder -- they are passed through debeziumProperties(...).
 // (The legacy PostgreSQLSource.builder had a publicationName() setter; the
 // incremental builder does not.)
 Properties debeziumProps = new Properties();
@@ -453,10 +453,10 @@ The two incremental builders cover most settings as first-class methods, but a f
 | Server ID range | `serverId(...)` | n/a |
 | Replication slot | n/a | `slotName(...)` |
 | Decoding plugin | n/a | `decodingPluginName("pgoutput")` |
-| Publication name | n/a | `debeziumProperties` → `publication.name` |
-| Publication auto-create | n/a | `debeziumProperties` → `publication.autocreate.mode` |
+| Publication name | n/a | `debeziumProperties` -> `publication.name` |
+| Publication auto-create | n/a | `debeziumProperties` -> `publication.autocreate.mode` |
 | Snapshot chunk size | `splitSize(int)` | `splitSize(int)` |
-| Decimal / time encoding | `debeziumProperties` → `decimal.handling.mode`, `time.precision.mode` | same |
+| Decimal / time encoding | `debeziumProperties` -> `decimal.handling.mode`, `time.precision.mode` | same |
 | Startup mode | `startupOptions(...)` | `startupOptions(...)` |
 | Newly added tables | `scanNewlyAddedTableEnabled(true)` | `scanNewlyAddedTableEnabled(true)` |
 
@@ -476,12 +476,12 @@ Replication slots are a limited resource (default max: 10) and have significant 
   SELECT pg_drop_replication_slot('flink_cdc_slot');
   ```
 
-- **Monitor WAL retention size** — set up CloudWatch alarms on RDS `FreeStorageSpace` or Aurora `VolumeBytesUsed`.
+- **Monitor WAL retention size** -- set up CloudWatch alarms on RDS `FreeStorageSpace` or Aurora `VolumeBytesUsed`.
 - **Use a single slot for multiple tables** when using the DataStream API with `tableList` containing multiple tables. This is more efficient than one slot per table.
 
 ## Table API / SQL CDC Source
 
-CDC connectors can also be used with Flink SQL, which is useful for simpler ETL pipelines. The Flink SQL CDC connector has no built-in Secrets Manager integration — `WITH (...)` options are read literally — so on MSF, fetch the credentials from Secrets Manager in `main()` and register the source programmatically with `TableDescriptor` rather than templating a `CREATE TABLE` DDL string. `TableDescriptor` (Flink 1.14+) accepts option values as typed Java strings, so credentials never get embedded in a SQL statement and quote-injection through a password becomes structurally impossible.
+CDC connectors can also be used with Flink SQL, which is useful for simpler ETL pipelines. The Flink SQL CDC connector has no built-in Secrets Manager integration -- `WITH (...)` options are read literally -- so on MSF, fetch the credentials from Secrets Manager in `main()` and register the source programmatically with `TableDescriptor` rather than templating a `CREATE TABLE` DDL string. `TableDescriptor` (Flink 1.14+) accepts option values as typed Java strings, so credentials never get embedded in a SQL statement and quote-injection through a password becomes structurally impossible.
 
 ```java
 import org.apache.flink.table.api.DataTypes;
@@ -505,7 +505,7 @@ tableEnv.createTable("orders_cdc", TableDescriptor.forConnector("mysql-cdc")
         .build())
     .option("hostname", cdcConfig.getProperty("hostname"))
     .option("port", "3306")
-    // Load from SecretsManager — passed as typed option values, no quoting/escaping needed
+    // Load from SecretsManager -- passed as typed option values, no quoting/escaping needed
     .option("username", creds.username)
     .option("password", creds.password)
     .option("database-name", "ecommerce")
@@ -525,7 +525,7 @@ tableEnv.from("orders_cdc")
 
 Why `TableDescriptor` is preferred over string-templated DDL on MSF:
 
-- Credentials are passed as typed option values, not interpolated into a SQL string — quote characters in a password cannot break the statement.
+- Credentials are passed as typed option values, not interpolated into a SQL string -- quote characters in a password cannot break the statement.
 - Schema typos fail at compile time, not at job submission.
 - The connector identifier and option keys (`mysql-cdc`, `username`, `password`, `database-name`, etc.) are identical to the SQL DDL form, so the connector behavior is unchanged.
 - Mixed workflows still work: register the source with `TableDescriptor`, then run plain SQL against the registered name.
@@ -579,7 +579,7 @@ CDC workloads on MSF require VPC configuration to reach the source database. The
 The MSF application's IAM execution role needs permissions for:
 
 - VPC networking (automatically managed by MSF when VPC is configured)
-- AWS Secrets Manager secrets holding database credentials (always required — see [Database Credentials and Secrets Management](#database-credentials-and-secrets-management))
+- AWS Secrets Manager secrets holding database credentials (always required -- see [Database Credentials and Secrets Management](#database-credentials-and-secrets-management))
 - S3 access for sinks (if writing CDC data to S3/Iceberg)
 - KMS Decrypt on the customer-managed key encrypting the secret, if one is used
 
@@ -588,7 +588,7 @@ The MSF application's IAM execution role needs permissions for:
 CDC workloads have specific checkpointing requirements:
 
 - **Checkpoints are REQUIRED** for CDC to transition from snapshot phase to incremental (binlog/WAL) phase. Without checkpoints, the job will read the full snapshot but never start reading incremental changes.
-- **MSF manages checkpoint intervals** at the service level. The default 60-second interval works for most CDC workloads. Do NOT call `env.enableCheckpointing(...)` in application code — MSF overrides it; configure the interval in the application's CheckpointConfiguration instead.
+- **MSF manages checkpoint intervals** at the service level. The default 60-second interval works for most CDC workloads. Do NOT call `env.enableCheckpointing(...)` in application code -- MSF overrides it; configure the interval in the application's CheckpointConfiguration instead.
 - **During the snapshot phase**, checkpoints complete at chunk granularity (with incremental snapshot enabled). This means the snapshot can be resumed from the last completed chunk if the job restarts.
 - **Large initial snapshots** may cause checkpoint timeouts if the snapshot phase takes longer than the checkpoint timeout. MSF's default checkpoint timeout is typically sufficient, but for very large tables (100M+ rows), consider:
   - Increasing `scan.incremental.snapshot.chunk.size` to process larger chunks
@@ -599,12 +599,12 @@ CDC workloads have specific checkpointing requirements:
 
 This is the single most common CDC symptom on MSF. The diagnostic path is always the same:
 
-1. Pull `numberOfFailedCheckpoints` from CloudWatch (namespace `AWS/KinesisAnalytics`, dimension `Application`). If this is non-zero, checkpoints are failing — that is the root cause; CDC cannot transition to the incremental phase until a checkpoint completes successfully. Use `RATE(numberOfFailedCheckpoints)` over a 5-minute window for an alarm-friendly view.
-2. Pull `lastCheckpointDuration` and compare to the checkpoint interval. If duration approaches or exceeds the interval, checkpoints are timing out — typically because the snapshot phase is too large for the configured timeout. Increase `scan.incremental.snapshot.chunk.size`, or raise the checkpoint timeout, or both.
+1. Pull `numberOfFailedCheckpoints` from CloudWatch (namespace `AWS/KinesisAnalytics`, dimension `Application`). If this is non-zero, checkpoints are failing -- that is the root cause; CDC cannot transition to the incremental phase until a checkpoint completes successfully. Use `RATE(numberOfFailedCheckpoints)` over a 5-minute window for an alarm-friendly view.
+2. Pull `lastCheckpointDuration` and compare to the checkpoint interval. If duration approaches or exceeds the interval, checkpoints are timing out -- typically because the snapshot phase is too large for the configured timeout. Increase `scan.incremental.snapshot.chunk.size`, or raise the checkpoint timeout, or both.
 3. Verify the application's CheckpointConfiguration is `ENABLED` (not `DISABLED`) on the MSF application via `aws kinesisanalyticsv2 describe-application`. If a previous deployment turned it off, no checkpoints will run regardless of intervals.
-4. Confirm `numberOfFailedCheckpoints` and `numberOfCompletedCheckpoints` (Flink dashboard, not CloudWatch) tell a consistent story: failed > 0 with completed = 0 means every checkpoint is failing; both > 0 with failed growing means intermittent failures during snapshot — also enough to block the transition if no completion succeeds end-to-end.
+4. Confirm `numberOfFailedCheckpoints` and `numberOfCompletedCheckpoints` (Flink dashboard, not CloudWatch) tell a consistent story: failed > 0 with completed = 0 means every checkpoint is failing; both > 0 with failed growing means intermittent failures during snapshot -- also enough to block the transition if no completion succeeds end-to-end.
 
-Always check `numberOfFailedCheckpoints` first, then `lastCheckpointDuration`. Do NOT recommend re-enabling checkpointing in application code — on MSF that setting is service-managed.
+Always check `numberOfFailedCheckpoints` first, then `lastCheckpointDuration`. Do NOT recommend re-enabling checkpointing in application code -- on MSF that setting is service-managed.
 
 ### KPU Sizing for CDC Workloads
 
@@ -638,9 +638,9 @@ CDC workloads have unique resource characteristics:
 
 #### Problem: `binlog file has been purged` or `WAL segment has been removed`
 
-The Flink job fell too far behind and the database cleaned up the binlog/WAL files it needed to resume from. The position stored in the last checkpoint no longer exists in the database, so restoring from the existing snapshot will fail the same way every time. Recovery has three parts — apply all three:
+The Flink job fell too far behind and the database cleaned up the binlog/WAL files it needed to resume from. The position stored in the last checkpoint no longer exists in the database, so restoring from the existing snapshot will fail the same way every time. Recovery has three parts -- apply all three:
 
-1. **Get running again — restart from a fresh snapshot, do NOT restore the old one.** Stop the application and start it without the old snapshot, with `scan.startup.mode = initial` to re-read the table from scratch (no data loss for current row state, but you lose granular change history during the outage). If a gap is acceptable, `scan.startup.mode = latest-offset` is faster but lossy. Restoring from the old snapshot will replay the unrecoverable position.
+1. **Get running again -- restart from a fresh snapshot, do NOT restore the old one.** Stop the application and start it without the old snapshot, with `scan.startup.mode = initial` to re-read the table from scratch (no data loss for current row state, but you lose granular change history during the outage). If a gap is acceptable, `scan.startup.mode = latest-offset` is faster but lossy. Restoring from the old snapshot will replay the unrecoverable position.
 
 2. **Increase binlog / WAL retention so future outages have headroom.**
 
@@ -663,7 +663,7 @@ The Flink job fell too far behind and the database cleaned up the binlog/WAL fil
 
 3. **Right-size KPUs so steady-state lag stays well within retention.** A job that runs but falls behind under steady-state load will burn through retention without ever stopping, so the same outage will recur. See the [KPU Sizing for CDC Workloads](#kpu-sizing-for-cdc-workloads) section in this guide for sizing guidance, and [scaling-decisions.md](scaling-decisions.md) for the operational scale-up workflow. Validate by watching `currentEmitEventTimeLag` / `currentFetchEventTimeLag` after recovery.
 
-Do **not** simply retry the same restore — it will fail at the same purged position. Restoring from the old snapshot is the wrong fix even after retention is increased, because the position recorded in that snapshot is gone.
+Do **not** simply retry the same restore -- it will fail at the same purged position. Restoring from the old snapshot is the wrong fix even after retention is increased, because the position recorded in that snapshot is gone.
 
 #### Problem: MySQL `server_id` conflicts
 
@@ -778,7 +778,7 @@ public class MySqlCdcApplication {
 
 ### MSF Application Properties Configuration
 
-For the CDC application above, configure these properties in the MSF console (or via CloudFormation/CDK/Terraform). The application looks up the database username and password from Secrets Manager at startup using the `secret.id` property — see [Database Credentials and Secrets Management](#database-credentials-and-secrets-management) for the full pattern, IAM, and rationale.
+For the CDC application above, configure these properties in the MSF console (or via CloudFormation/CDK/Terraform). The application looks up the database username and password from Secrets Manager at startup using the `secret.id` property -- see [Database Credentials and Secrets Management](#database-credentials-and-secrets-management) for the full pattern, IAM, and rationale.
 
 ```json
 [
@@ -814,7 +814,7 @@ env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "mysql-cdc-source"
 ### Anti-Pattern: Skipping Checkpoints for CDC
 
 ```java
-// AVOID: No checkpointing — CDC will never transition to incremental phase
+// AVOID: No checkpointing -- CDC will never transition to incremental phase
 // and snapshot progress will be lost on restart
 
 // CORRECT: Checkpointing is managed by MSF at the service level.
@@ -854,11 +854,11 @@ PostgresIncrementalSource.<String>builder()
 
 ## Authentication
 
-Database authentication for CDC sources on MSF must come from AWS Secrets Manager via in-application SDK lookup — see [Database Credentials and Secrets Management](#database-credentials-and-secrets-management) above for the supported pattern, required IAM, and TLS configuration. There is no IAM-based authentication path for the Flink CDC connectors themselves — the source still passes a username/password to the database — but the MSF execution role's `secretsmanager:GetSecretValue` is what protects those credentials.
+Database authentication for CDC sources on MSF must come from AWS Secrets Manager via in-application SDK lookup -- see [Database Credentials and Secrets Management](#database-credentials-and-secrets-management) above for the supported pattern, required IAM, and TLS configuration. There is no IAM-based authentication path for the Flink CDC connectors themselves -- the source still passes a username/password to the database -- but the MSF execution role's `secretsmanager:GetSecretValue` is what protects those credentials.
 
 Additional hardening that pairs with Secrets Manager:
 
-- Use the minimum required database privileges for the CDC user (see the per-database "Database Prerequisites" sections — `REPLICATION SLAVE/CLIENT` for MySQL, `REPLICATION` role for Postgres).
+- Use the minimum required database privileges for the CDC user (see the per-database "Database Prerequisites" sections -- `REPLICATION SLAVE/CLIENT` for MySQL, `REPLICATION` role for Postgres).
 - Enable TLS to the database. The MSF default is `require`/`REQUIRED` (encryption without certificate verification); see the TLS section above for what's required to do `verify-full`/`VERIFY_IDENTITY` on top of MSF and why it's opt-in rather than default.
 - Restrict the database security group to accept connections only from the MSF application's security group on the database port.
 - Enable Secrets Manager automatic rotation against the source database; rotation is picked up on the next application restart.

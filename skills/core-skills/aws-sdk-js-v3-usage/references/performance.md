@@ -11,7 +11,7 @@ import { NodeHttpHandler } from "@aws-sdk/config/requestHandler";
 import { Agent } from "node:https";
 
 const client = new S3Client({
-  cacheMiddleware: true, // cache middleware resolution — only if not adding custom middleware
+  cacheMiddleware: true, // cache middleware resolution -- only if not adding custom middleware
   requestHandler: new NodeHttpHandler({
     httpsAgent: new Agent({ keepAlive: true, maxSockets: 50 }),
   }),
@@ -23,7 +23,7 @@ const client = new S3Client({
 });
 ```
 
-Too few sockets → queuing slowdown. Too many → new socket overhead + risk of `EMFILE` (too many open files).
+Too few sockets -> queuing slowdown. Too many -> new socket overhead + risk of `EMFILE` (too many open files).
 
 ### Sharing Credentials and Socket Pool
 

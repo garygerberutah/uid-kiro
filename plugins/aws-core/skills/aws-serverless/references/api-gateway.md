@@ -18,20 +18,20 @@ Exact quotas and the handful of gotchas worth pinning down. Assumes you know the
 Default to **HTTP API** (lower latency, lower cost, simpler); reach for **REST API** only when you need one of its exclusive features:
 
 ```
-Need any of these? → REST API
-  ├── API keys / usage plans / per-client throttling
-  ├── Request validation (built-in)
-  ├── Request/response body transformation (VTL)
-  ├── Caching (built-in)
-  ├── Private API endpoints
-  ├── Edge-optimized endpoints
-  ├── Canary deployments
-  ├── Execution logs / X-Ray tracing
-  ├── Resource policies
-  ├── Mock integrations
-  └── Response streaming
+Need any of these? -> REST API
+  +-- API keys / usage plans / per-client throttling
+  +-- Request validation (built-in)
+  +-- Request/response body transformation (VTL)
+  +-- Caching (built-in)
+  +-- Private API endpoints
+  +-- Edge-optimized endpoints
+  +-- Canary deployments
+  +-- Execution logs / X-Ray tracing
+  +-- Resource policies
+  +-- Mock integrations
+  +-- Response streaming
 
-None of the above? → HTTP API (lower latency, simpler)
+None of the above? -> HTTP API (lower latency, simpler)
 ```
 
 ---
@@ -40,7 +40,7 @@ None of the above? → HTTP API (lower latency, simpler)
 
 | | REST API | HTTP API |
 |---|---|---|
-| Integration timeout | 50ms–29s (default 29s; **raisable only for Regional/private**) | **30s hard max** (lowerable, not raisable) |
+| Integration timeout | 50ms-29s (default 29s; **raisable only for Regional/private**) | **30s hard max** (lowerable, not raisable) |
 | Payload size | 10 MB | 10 MB |
 | Endpoint types | Edge, Regional, Private | Regional only |
 | Response streaming | Yes (proxy, STREAM mode) | No |
@@ -51,11 +51,11 @@ None of the above? → HTTP API (lower latency, simpler)
 
 ## Throttling and quotas
 
-Throttling applies most-specific → least-specific: per-client/method (usage plan + API key, REST only) → per-method → account-level → AWS Regional (hard). Token bucket: empty bucket → `429 Too Many Requests`; burst allows temporary spikes.
+Throttling applies most-specific -> least-specific: per-client/method (usage plan + API key, REST only) -> per-method -> account-level -> AWS Regional (hard). Token bucket: empty bucket -> `429 Too Many Requests`; burst allows temporary spikes.
 
 ### Account-level
 
-Confirm the current account-level steady-state RPS and burst limits for the Region rather than assuming a default — they vary by Region and are adjustable:
+Confirm the current account-level steady-state RPS and burst limits for the Region rather than assuming a default -- they vary by Region and are adjustable:
 
 ```bash
 aws service-quotas get-service-quota --service-code apigateway --quota-code L-8A5B8E43
@@ -71,7 +71,7 @@ aws service-quotas get-service-quota --service-code apigateway --quota-code L-8A
 | Usage plans per account | 300 | Yes |
 | Custom domains per Region | 120 | Yes |
 | Header value size | 10,240 bytes | No |
-| Cache TTL | 0–3600s | No |
+| Cache TTL | 0-3600s | No |
 | Mapping template size | 300 KB | No |
 
 ### HTTP API
@@ -97,9 +97,9 @@ Client-side 429 handling: exponential backoff with jitter, respect `Retry-After`
 | Available on | REST API only | REST API + HTTP API |
 | Recommendation | Legacy | **Preferred for new APIs** |
 
-Caching: default TTL **300s** (range 0–3600). **A cached policy applies to ALL methods/resources.** If any specified identity source is missing/null/empty → **401 without invoking Lambda**.
+Caching: default TTL **300s** (range 0-3600). **A cached policy applies to ALL methods/resources.** If any specified identity source is missing/null/empty -> **401 without invoking Lambda**.
 
-The authorizer must return an IAM policy: `{ principalId, policyDocument: { Version, Statement: [{ Action: "execute-api:Invoke", Effect: "Allow"|"Deny", Resource: methodArn }] }, context: {...} }`. HTTP API JWT authorizers need no Lambda — configure `issuer` + `audience` directly on the API.
+The authorizer must return an IAM policy: `{ principalId, policyDocument: { Version, Statement: [{ Action: "execute-api:Invoke", Effect: "Allow"|"Deny", Resource: methodArn }] }, context: {...} }`. HTTP API JWT authorizers need no Lambda -- configure `issuer` + `audience` directly on the API.
 
 ---
 
@@ -115,7 +115,7 @@ Routes: `$connect` (auth, store connectionId), `$disconnect` (best-effort cleanu
 
 Close codes: **1001** idle/max-duration, 1003 unsupported binary, 1006 abnormal (no close frame), **1008** throttled, **1009** message too large, 1011 internal error, 1012 service restart.
 
-Store `connectionId` in DynamoDB with a **TTL attribute set to now + 7200s** (the 2-hour max duration) so stale connections are auto-cleaned even when `$disconnect` is missed — enable DynamoDB TTL on that attribute.
+Store `connectionId` in DynamoDB with a **TTL attribute set to now + 7200s** (the 2-hour max duration) so stale connections are auto-cleaned even when `$disconnect` is missed -- enable DynamoDB TTL on that attribute.
 
 ---
 

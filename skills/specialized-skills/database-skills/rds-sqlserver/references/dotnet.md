@@ -1,4 +1,4 @@
-# .NET — Microsoft.Data.SqlClient
+# .NET -- Microsoft.Data.SqlClient
 
 Use `Microsoft.Data.SqlClient` for all new .NET code. `System.Data.SqlClient` is legacy (.NET Framework only) and does not get new features or security fixes.
 
@@ -31,9 +31,9 @@ var version = (string)await cmd.ExecuteScalarAsync();
 | `Server` | `<rds-endpoint>,1433` | **Comma** between host and port, not colon |
 | `Database` | target database | Required to bypass master |
 | `Encrypt` | `Mandatory` (5.x+ default) | TLS required |
-| `TrustServerCertificate` | `False` | Force cert validation — don't disable in prod |
+| `TrustServerCertificate` | `False` | Force cert validation -- don't disable in prod |
 | `Connection Timeout` | `30` | Network connection timeout (not command timeout) |
-| `MultiSubnetFailover` | `True` | For Multi-AZ — parallelize to both IPs during failover |
+| `MultiSubnetFailover` | `True` | For Multi-AZ -- parallelize to both IPs during failover |
 
 ### Default behavior changes in SqlClient 5.x
 
@@ -41,7 +41,7 @@ var version = (string)await cmd.ExecuteScalarAsync();
 - `TrustServerCertificate` defaults to `False`
 - Connection will fail if the server cert can't be validated
 
-If you see `A connection was successfully established... but an error occurred during the pre-login handshake`, the server cert chain isn't trusted on the client — see `encryption.md` for CA bundle setup.
+If you see `A connection was successfully established... but an error occurred during the pre-login handshake`, the server cert chain isn't trusted on the client -- see `encryption.md` for CA bundle setup.
 
 ## Windows auth (Kerberos)
 
@@ -105,7 +105,7 @@ dotnet add package AWSSDK.SecretsManager.Caching
 
 ## Connection pooling
 
-ADO.NET has built-in pooling — enabled by default. Tune in the connection string:
+ADO.NET has built-in pooling -- enabled by default. Tune in the connection string:
 
 ```csharp
 var connStr = "Server=mydb.xxxx.us-east-1.rds.amazonaws.com,1433;" +
@@ -116,7 +116,7 @@ var connStr = "Server=mydb.xxxx.us-east-1.rds.amazonaws.com,1433;" +
               "Connection Lifetime=300;";  // recycle after 5 min (Multi-AZ safety)
 ```
 
-Pools are per process + per unique connection string. If you're running many replicas of a web app, total connections = replicas × Max Pool Size.
+Pools are per process + per unique connection string. If you're running many replicas of a web app, total connections = replicas x Max Pool Size.
 
 ## Async and cancellation
 
@@ -133,7 +133,7 @@ using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
 while (await reader.ReadAsync(cancellationToken)) { /* ... */ }
 ```
 
-Synchronous calls (`conn.Open()`) block the thread pool — costly in high-throughput apps.
+Synchronous calls (`conn.Open()`) block the thread pool -- costly in high-throughput apps.
 
 ## Lambda (.NET)
 
@@ -145,7 +145,7 @@ using Amazon.Lambda.Core;
 [assembly: LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
 
 public class Function {
-    // Module-scope — reused across warm invocations
+    // Module-scope -- reused across warm invocations
     private static readonly AmazonSecretsManagerClient _sm = new(Amazon.RegionEndpoint.USEast1);
     private static Lazy<Task<string>> _connStr = new(BuildConnStringAsync);
 
@@ -167,7 +167,7 @@ public class Function {
 }
 ```
 
-Small `Max Pool Size` (e.g. 2) per Lambda — Lambda's concurrency model means many containers × large pool = too many connections to RDS. Use RDS Proxy for serverless-scale apps.
+Small `Max Pool Size` (e.g. 2) per Lambda -- Lambda's concurrency model means many containers x large pool = too many connections to RDS. Use RDS Proxy for serverless-scale apps.
 
 ## Verify
 

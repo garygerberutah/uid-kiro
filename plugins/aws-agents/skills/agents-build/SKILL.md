@@ -45,9 +45,9 @@ Add capabilities to your AgentCore agent project.
 
 Do NOT use for:
 
-- Connecting to external tools/APIs via Gateway (OpenAPI specs, Lambda, MCP servers, credentials, policies) → use `agents-connect`
-- Scaffolding a new project → use `agents-get-started`
-- Deploying → use `agents-deploy`
+- Connecting to external tools/APIs via Gateway (OpenAPI specs, Lambda, MCP servers, credentials, policies) -> use `agents-connect`
+- Scaffolding a new project -> use `agents-get-started`
+- Deploying -> use `agents-deploy`
 
 ## Input
 
@@ -55,7 +55,7 @@ Do NOT use for:
 
 - A capability: "memory", "integrate", "vpc", "multi-agent", "migrate", "browser", "code-interpreter", "payments", "teardown"
 - A description of what they want: "remember user preferences", "call from React app", "scrape a website", "run pandas in the agent", "delete my agent", "clean up resources"
-- Empty — the skill will determine the workflow from context
+- Empty -- the skill will determine the workflow from context
 
 ## Process
 
@@ -67,23 +67,23 @@ If older: "Run `agentcore update` to get the latest version."
 
 ### Step 1: Read project context
 
-Read `agentcore/agentcore.json` to understand the current project — framework, existing resources, agent configuration.
+Read `agentcore/agentcore.json` to understand the current project -- framework, existing resources, agent configuration.
 
 If `agentcore/agentcore.json` is not found:
 
 1. **Check if the developer is in the wrong directory.** Look for `agentcore/agentcore.json` in parent directories (up to 3 levels). If found, tell them: "Found an AgentCore project at `<path>`. Are you working in that project?"
 2. **If no project exists anywhere nearby**, ask what capability they wanted to add. Then offer two paths:
-   - "I can walk you through creating a project first and then adding CAPABILITY — want to do that?" (run the get-started flow inline, then continue with the build workflow)
+   - "I can walk you through creating a project first and then adding CAPABILITY -- want to do that?" (run the get-started flow inline, then continue with the build workflow)
    - "If you already have a project elsewhere, `cd` into it and try again."
 
-Do not just say "go use agents-get-started" and stop — that loses the developer's context about what they actually wanted to do.
+Do not just say "go use agents-get-started" and stop -- that loses the developer's context about what they actually wanted to do.
 
 ### Step 2: Determine the workflow
 
-**Important disambiguation** — before routing to a build reference, check if the prompt is actually a connect or debug concern:
+**Important disambiguation** -- before routing to a build reference, check if the prompt is actually a connect or debug concern:
 
-- If the phrase mentions external APIs, Lambda functions, OpenAPI specs, gateways, credentials, MCP servers, or policies → this is `agents-connect`, not build
-- If the developer says something is broken (wrong answers, errors, tool failures) → this is `agents-debug`, not build
+- If the phrase mentions external APIs, Lambda functions, OpenAPI specs, gateways, credentials, MCP servers, or policies -> this is `agents-connect`, not build
+- If the developer says something is broken (wrong answers, errors, tool failures) -> this is `agents-debug`, not build
 - Build is for **adding new capabilities** to a working project, not fixing broken ones
 
 Based on the developer's prompt and `$ARGUMENTS`, load the appropriate reference:
@@ -100,11 +100,11 @@ Based on the developer's prompt and `$ARGUMENTS`, load the appropriate reference
 | Code Interpreter, execute code, sandbox, run Python/JS/TS, data analysis in agent, pandas | [`references/code-interpreter.md`](references/code-interpreter.md) |
 | Payments, pay for x402 or MPP content, 402 Payment Required, Machine Payments Protocol, WWW-Authenticate: Payment, microtransactions, paid API/tool, payment manager/connector | [`references/payments.md`](references/payments.md) |
 | Delete agent, remove resource, tear down, clean up, destroy, start fresh | [`references/teardown.md`](references/teardown.md) |
-| Change model, switch model, use Haiku/Sonnet/Nova, different model | Inline — see "Changing the model" below |
+| Change model, switch model, use Haiku/Sonnet/Nova, different model | Inline -- see "Changing the model" below |
 
 If the developer asks about the difference between local dev and deployed (e.g., "why does my memory work after deploy but not locally?"), load [`references/local-vs-deployed.md`](references/local-vs-deployed.md) alongside the specific workflow reference.
 
-Read the matching file into context and follow its Process section step by step — do not summarize.
+Read the matching file into context and follow its Process section step by step -- do not summarize.
 
 If the intent is ambiguous, ask the developer which capability they want to add.
 
@@ -126,20 +126,20 @@ return BedrockModel(model_id="us.anthropic.claude-3-5-haiku-20241022-v1:0")
 return BedrockModel(model_id="amazon.nova-lite-v1:0")
 ```
 
-Cross-region inference profile prefixes (`us.`, `eu.`, `apac.`, `global.`) control where inference runs. Use `global.` for maximum throughput, or a geographic prefix for data residency. Not all models support all prefixes — check the Bedrock inference profiles docs.
+Cross-region inference profile prefixes (`us.`, `eu.`, `apac.`, `global.`) control where inference runs. Use `global.` for maximum throughput, or a geographic prefix for data residency. Not all models support all prefixes -- check the Bedrock inference profiles docs.
 
 After changing the model:
 
-- Verify the model is enabled in your region: AWS Console → Amazon Bedrock → Model access
+- Verify the model is enabled in your region: AWS Console -> Amazon Bedrock -> Model access
 - For cross-region profiles, enable in all destination regions
 - If using `agents-harden`, update the IAM policy to scope to the new model ARN
 - Run `agentcore dev` to test locally, then `agentcore deploy` to update the deployed agent
 
-No `agentcore.json` change is needed — the model is configured in code, not in the project config.
+No `agentcore.json` change is needed -- the model is configured in code, not in the project config.
 
 ### Pre-flight: validate any `--name` before generating the CLI command
 
-Whichever reference you load, most end up producing an `agentcore add <resource> --name <something>` command. The CLI fails **late** on invalid names — you'll see the error after walking through prompts, not before running the command. Validate up front:
+Whichever reference you load, most end up producing an `agentcore add <resource> --name <something>` command. The CLI fails **late** on invalid names -- you'll see the error after walking through prompts, not before running the command. Validate up front:
 
 | Resource | Max chars | Allowed | Starts with |
 |---|---|---|---|
@@ -152,7 +152,7 @@ Note: `agentcore create --name` (the project name) has a **stricter 23-char limi
 
 ## Output
 
-Depends on the workflow — see the loaded reference for specific outputs.
+Depends on the workflow -- see the loaded reference for specific outputs.
 
 ## Quality criteria
 

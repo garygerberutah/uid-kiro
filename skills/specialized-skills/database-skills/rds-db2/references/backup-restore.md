@@ -1,4 +1,4 @@
-# RDS for Db2 — Backup and Restore Reference
+# RDS for Db2 -- Backup and Restore Reference
 
 Source blog: https://aws.amazon.com/blogs/database/restore-self-managed-db2-linux-databases-in-amazon-rds-for-db2/
 
@@ -8,7 +8,7 @@ Source blog: https://aws.amazon.com/blogs/database/restore-self-managed-db2-linu
 
 ### Automated backups
 
-RDS for Db2 takes daily automated backups during the backup window. Retention period: 0–35 days.
+RDS for Db2 takes daily automated backups during the backup window. Retention period: 0-35 days.
 
 Enable/configure via console or CLI:
 
@@ -114,14 +114,14 @@ db2 "CATALOG STORAGE ACCESS ALIAS db2S3 VENDOR S3
 
 ### Take multi-part backup to S3
 
-Use multiple paths for parallel backup (recommended — improves restore performance):
+Use multiple paths for parallel backup (recommended -- improves restore performance):
 
 ```bash
-# 5 parallel streams → produces .001 .002 .003 .004 .005
+# 5 parallel streams -> produces .001 .002 .003 .004 .005
 db2 backup database <DBNAME> to DB2REMOTE://db2S3, DB2REMOTE://db2S3, DB2REMOTE://db2S3, DB2REMOTE://db2S3, DB2REMOTE://db2S3
 
 # For smaller databases, still use multi-part (minimum 5, up to 20 for large DBs)
-# Single-part backup is NOT recommended — S3 streaming is less efficient
+# Single-part backup is NOT recommended -- S3 streaming is less efficient
 ```
 
 ### Take backup to local filesystem (then copy to S3)

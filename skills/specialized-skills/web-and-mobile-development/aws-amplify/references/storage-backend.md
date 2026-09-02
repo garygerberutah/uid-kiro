@@ -1,4 +1,4 @@
-# Storage — Backend
+# Storage -- Backend
 
 > **Prerequisites:** Backend defined in `amplify/backend.ts` with `defineBackend({ auth, data })`.
 
@@ -39,14 +39,14 @@ defineBackend({ auth, storage });
 ## Access Rules
 
 Path patterns control who can access files. The `{entity_id}` placeholder
-resolves to the authenticated user's identity ID at runtime — each user
+resolves to the authenticated user's identity ID at runtime -- each user
 gets an isolated directory.
 
 Actions: `'read'`, `'write'`, `'delete'` (granular: `'get'` and `'list'`
 instead of `'read'`). Subjects: `allow.guest.to([...])`,
 `allow.authenticated.to([...])`, `allow.groups(['Admins']).to([...])`,
 `allow.entity('identity').to([...])`. Every rule must end with `.to()`
-specifying the permitted actions — omitting `.to()` means NO permissions
+specifying the permitted actions -- omitting `.to()` means NO permissions
 are granted.
 
 **WARNING:** Storage access rules use `allow.guest` (PROPERTY, no
@@ -58,11 +58,11 @@ causes TypeScript errors.
 `allow.entity('identity')`. Using `{entity_id}` in a path without
 `allow.entity('identity')` in that path's rules has no effect.
 
-> `{entity_id}` must be the last path segment before `/*` — you cannot add path segments after it.
+> `{entity_id}` must be the last path segment before `/*` -- you cannot add path segments after it.
 >
-> ✅ `'avatar/{entity_id}/*'`
-> ✅ `'documents/{entity_id}/*'`
-> ❌ `'protected/{entity_id}/avatar/*'` — fails with `InvalidStorageAccessPathError`
+> [YES] `'avatar/{entity_id}/*'`
+> [YES] `'documents/{entity_id}/*'`
+> [NO] `'protected/{entity_id}/avatar/*'` -- fails with `InvalidStorageAccessPathError`
 
 Paths must end with `/*` to match all objects under that prefix.
 Paths must not start with `/`.
@@ -127,7 +127,7 @@ export const handler: S3Handler = async (event) => {
 
 ## Pitfalls
 
-- **Paths without `/*`:** A path like `'public'` matches nothing — you
+- **Paths without `/*`:** A path like `'public'` matches nothing -- you
   use `'public/*'` to match files under that prefix.
 - **Missing `{entity_id}`:** Using `'private/*'` instead of
   `'private/{entity_id}/*'` exposes every user's private files to all
@@ -135,9 +135,9 @@ export const handler: S3Handler = async (event) => {
 - **Forgetting `isDefault`:** With multiple buckets and no `isDefault: true`,
   client operations fail because no default bucket is resolved.
 - **`grantReadWrite()` path argument:** Do NOT pass a path argument to
-  `grantReadWrite(lambda)` — it operates on the whole bucket. There is no
+  `grantReadWrite(lambda)` -- it operates on the whole bucket. There is no
   per-path grant API.
-- **Missing `.to([])`:** `allow.authenticated` without `.to(['read', 'write'])` causes a silent failure — no access is granted.
+- **Missing `.to([])`:** `allow.authenticated` without `.to(['read', 'write'])` causes a silent failure -- no access is granted.
 - **Leading slash:** Paths must NOT start with `/`. Use `'photos/*'` not `'/photos/*'`.
 
 ## Links

@@ -10,9 +10,9 @@ User wants to create a new Timestream for InfluxDB instance or cluster, connect 
 
 Ask the user one question: "Are you starting a new project or working with an existing InfluxDB deployment?"
 
-- **New project** → Recommend InfluxDB 3 (SQL support, Processing Engine, better high-cardinality handling)
-- **Existing V2 deployment** → Stay on V2 unless they want to migrate (route to `migration`)
-- **Need read scaling** → InfluxDB 2 Read Replica Clusters (requires Marketplace subscription)
+- **New project** -> Recommend InfluxDB 3 (SQL support, Processing Engine, better high-cardinality handling)
+- **Existing V2 deployment** -> Stay on V2 unless they want to migrate (route to `migration`)
+- **Need read scaling** -> InfluxDB 2 Read Replica Clusters (requires Marketplace subscription)
 
 ### 2. Provision
 
@@ -32,11 +32,11 @@ aws timestream-influxdb create-db-instance \
   --organization my-org --bucket my-bucket
 ```
 
-> **Security best practice — InfluxDB V2 credentials:**
+> **Security best practice -- InfluxDB V2 credentials:**
 >
 > - Generate the initial admin password as a strong random value rather than choosing one by hand, e.g. `aws secretsmanager get-random-password --exclude-punctuation --password-length 32 --query RandomPassword --output text` (InfluxDB requires an alphanumeric password, hence `--exclude-punctuation`).
 > - Rotate the initial admin password immediately after first login; it is set during instance creation and should not be used by applications.
-> - Create scoped API tokens for each application or service — never share the operator token.
+> - Create scoped API tokens for each application or service -- never share the operator token.
 > - The engine does not support automatic token expiration or rotation. Token rotation is the customer's responsibility. There is no automatic synchronization between AWS Secrets Manager and the engine's token management layer.
 > - For InfluxDB V3 or new deployments, the preferred approach is Secrets Manager-based Bearer tokens provisioned automatically by the service.
 
@@ -67,7 +67,7 @@ aws timestream-influxdb create-db-cluster \
   --vpc-security-group-ids sg-abc
 ```
 
-> ⚠️ **CRITICAL V3 WARNING:** You **MUST NOT** pass `--username`, `--password`, `--organization`, `--bucket`, or `--deployment-type` when creating V3 clusters. These parameters switch the cluster into a non-V3 initialization mode. V3 clusters use `Bearer` token auth provisioned automatically via Secrets Manager.
+> [WARNING] **CRITICAL V3 WARNING:** You **MUST NOT** pass `--username`, `--password`, `--organization`, `--bucket`, or `--deployment-type` when creating V3 clusters. These parameters switch the cluster into a non-V3 initialization mode. V3 clusters use `Bearer` token auth provisioned automatically via Secrets Manager.
 
 **Literal parameter group identifiers:** You can use `InfluxDBV3Core` or `InfluxDBV3Enterprise` as literal identifiers without creating a custom parameter group first. Create a custom group only when you need to override defaults.
 
@@ -91,20 +91,20 @@ aws secretsmanager get-secret-value \
   --query SecretString --output text
 ```
 
-The `READONLY-` prefix means the secret is service-managed — modifying it does not change the cluster's actual token.
+The `READONLY-` prefix means the secret is service-managed -- modifying it does not change the cluster's actual token.
 
 ### 4. Connect
 
 **Security group configuration for publicly accessible instances:**
 
-When creating an instance or cluster with `--publicly-accessible`, the endpoint is exposed over the public internet. Public access is a supported opt-in feature at creation time — by default, instances are private (VPC-only). For publicly accessible deployments, the default security group blocks all inbound traffic. You must add an inbound rule for the InfluxDB port:
+When creating an instance or cluster with `--publicly-accessible`, the endpoint is exposed over the public internet. Public access is a supported opt-in feature at creation time -- by default, instances are private (VPC-only). For publicly accessible deployments, the default security group blocks all inbound traffic. You must add an inbound rule for the InfluxDB port:
 
 ```bash
 # V2 (port 8086)
 aws ec2 authorize-security-group-ingress \
   --group-id <sg-id> \
   --protocol tcp --port 8086 \
-  --cidr <your-ip>/32   # or a CIDR range — avoid 0.0.0.0/0 in production
+  --cidr <your-ip>/32   # or a CIDR range -- avoid 0.0.0.0/0 in production
 
 # V3 (port 8181)
 aws ec2 authorize-security-group-ingress \
@@ -144,8 +144,8 @@ curl -X POST "https://<endpoint>:8181/api/v3/query_sql" \
 ### 5. Post-Setup
 
 - Configure maintenance window
-- Set up CloudWatch alarms → route to `monitoring`
-- Design schema → route to `schema-design`
+- Set up CloudWatch alarms -> route to `monitoring`
+- Design schema -> route to `schema-design`
 
 ## Private Access via SSM Bastion
 
@@ -185,7 +185,7 @@ Logs are delivered hourly to S3. The bucket **must** be in the same account and 
 }
 ```
 
-Add an `aws:SourceArn` condition to your S3 bucket policy to prevent confused deputy attacks — this ensures requests to the bucket can only originate from your Timestream for InfluxDB instance, not from other AWS services that share the same service principal. This bucket policy applies to your logs bucket (the S3 bucket you configure to receive InfluxDB service logs). The InfluxDB 3 data bucket is provisioned and managed by the service — you do not configure a bucket policy for it directly.
+Add an `aws:SourceArn` condition to your S3 bucket policy to prevent confused deputy attacks -- this ensures requests to the bucket can only originate from your Timestream for InfluxDB instance, not from other AWS services that share the same service principal. This bucket policy applies to your logs bucket (the S3 bucket you configure to receive InfluxDB service logs). The InfluxDB 3 data bucket is provisioned and managed by the service -- you do not configure a bucket policy for it directly.
 
 Enable via create or update:
 
@@ -211,19 +211,19 @@ aws timestream-influxdb reboot-db-cluster --db-cluster-id <cluster-id> \
 
 ### InfluxDB 2 (`update-db-instance`)
 
-- `--db-instance-type` — triggers reboot
-- `--db-parameter-group-identifier` — triggers reboot
-- `--db-storage-type` — triggers reboot
-- `--allocated-storage` — increase only
-- `--deployment-type` — SINGLE_AZ ↔ WITH_MULTIAZ_STANDBY
+- `--db-instance-type` -- triggers reboot
+- `--db-parameter-group-identifier` -- triggers reboot
+- `--db-storage-type` -- triggers reboot
+- `--allocated-storage` -- increase only
+- `--deployment-type` -- SINGLE_AZ <-> WITH_MULTIAZ_STANDBY
 - `--port`
 - `--log-delivery-configuration`
 - `--maintenance-schedule`
 
 ### InfluxDB 3 (`update-db-cluster`)
 
-- `--db-instance-type` — triggers reboot
-- `--db-parameter-group-identifier` — triggers reboot
+- `--db-instance-type` -- triggers reboot
+- `--db-parameter-group-identifier` -- triggers reboot
 - `--port`
 - `--failover-mode`
 - `--log-delivery-configuration`
@@ -236,22 +236,22 @@ aws timestream-influxdb reboot-db-cluster --db-cluster-id <cluster-id> \
 After initial provisioning, the credentials in Secrets Manager give you UI access but not a full API operator token. To create one:
 
 1. Sign in to the InfluxDB UI at `https://<endpoint>:8086` with the username/password from Secrets Manager
-2. Navigate to **Load Data → API Tokens → Generate API Token → All Access API Token**
-3. Copy the generated token — this is your operator token for all API operations
-4. Create scoped tokens (read/write per bucket) for application use — avoid using the all-access token in production applications
+2. Navigate to **Load Data -> API Tokens -> Generate API Token -> All Access API Token**
+3. Copy the generated token -- this is your operator token for all API operations
+4. Create scoped tokens (read/write per bucket) for application use -- avoid using the all-access token in production applications
 
 ## Prerequisites for Read Replicas and InfluxDB 3 Enterprise
 
 Both require:
 
-1. **AWS Marketplace subscription** for InfluxData licensed features — subscribe before provisioning
-2. **IAM policies** — attach these managed policies to your IAM role/user:
+1. **AWS Marketplace subscription** for InfluxData licensed features -- subscribe before provisioning
+2. **IAM policies** -- attach these managed policies to your IAM role/user:
    - `AmazonTimestreamInfluxDBFullAccess`
    - `AmazonTimestreamConsoleFullAccess`
 
 > **Note:** `AmazonTimestreamInfluxDBFullAccess` is suitable for initial setup and experimentation. For production workloads, replace it with a scoped custom IAM policy that grants only the specific actions your application requires. Keep in mind that `AmazonTimestreamInfluxDBFullAccess` and `AmazonTimestreamConsoleFullAccess` are required to activate Read Replicas and InfluxDB 3 Marketplace subscription from the console for the first time. **After initial setup and first-time activation are complete, replace both `AmazonTimestreamInfluxDBFullAccess` and `AmazonTimestreamConsoleFullAccess` with the scoped custom policy below for all production and operational use.**
 
-Example scoped policy for day-to-day operations (read plus the operational write actions this guide uses — update, reboot, tag):
+Example scoped policy for day-to-day operations (read plus the operational write actions this guide uses -- update, reboot, tag):
 
 ```json
 {
@@ -283,14 +283,14 @@ Example scoped policy for day-to-day operations (read plus the operational write
 | Aspect | InfluxDB 2 | InfluxDB 3 |
 |--------|-----------|-----------|
 | Query language | Flux | SQL, InfluxQL |
-| Data model | Orgs → Buckets → Measurements | Databases → Tables |
+| Data model | Orgs -> Buckets -> Measurements | Databases -> Tables |
 | Storage | Local disk (TSM engine), allocated at creation | S3-backed (Apache Parquet), no allocated storage parameter |
 | Cardinality | Hard limits, performance degrades | Handles high cardinality natively |
 | Processing Engine | Not available | Python plugins with triggers |
 | Port | 8086 | 8181 |
 | AWS resource | `create-db-instance` | `create-db-cluster` |
 | Deployment types | SINGLE_AZ, WITH_MULTIAZ_STANDBY | Determined by failover-mode (no deployment-type param) |
-| Password | Required at creation | N/A — must not be provided (Bearer token via Secrets Manager) |
+| Password | Required at creation | N/A -- must not be provided (Bearer token via Secrets Manager) |
 | Storage scaling | Yes (update-db-instance) | N/A (S3-backed) |
 
 ## Instance Types

@@ -11,8 +11,8 @@ Once the developer confirms delegation and funding are done, **modify their exis
 > often lives.
 >
 > The custom `x402_fetch` tool handles the full flow internally:
-> request → detect 402 → extract challenge (body OR header) → ProcessPayment →
-> build proof → retry with fresh client → return content.
+> request -> detect 402 -> extract challenge (body OR header) -> ProcessPayment ->
+> build proof -> retry with fresh client -> return content.
 >
 > **Critical: Use a fresh httpx client for the retry.** Some merchants set cookies
 > on the 402 response that cause the retry to fail if sent back.
@@ -38,7 +38,7 @@ import boto3
 PAYMENT_MANAGER_ARN = os.getenv("PAYMENT_MANAGER_ARN")
 PAYMENT_INSTRUMENT_ID = os.getenv("PAYMENT_INSTRUMENT_ID")
 PAYMENT_SESSION_ID = os.getenv("PAYMENT_SESSION_ID")
-PAYMENT_USER_ID = os.environ.get("PAYMENT_USER_ID")  # Required — no insecure default
+PAYMENT_USER_ID = os.environ.get("PAYMENT_USER_ID")  # Required -- no insecure default
 REGION = os.getenv("AWS_REGION", "us-west-2")
 
 # AgentCore Payments data plane client
@@ -226,7 +226,7 @@ def _x402_fetch_impl(url: str, method: str = "GET") -> str:
             timeout=30
         )
 
-    # payment_made reflects the actual retry status — a 2xx means the merchant
+    # payment_made reflects the actual retry status -- a 2xx means the merchant
     # accepted the proof. Do NOT hardcode this True: ProcessPayment can succeed
     # (proof generated) while the retry still returns 402 (e.g. wrong proof
     # shape, expired proof, or an on-chain settlement failure).
@@ -238,7 +238,7 @@ def _x402_fetch_impl(url: str, method: str = "GET") -> str:
     })
 ```
 
-## Strands — tool decorator pattern
+## Strands -- tool decorator pattern
 
 ```python
 from strands import Agent, tool
@@ -261,13 +261,13 @@ agent = Agent(
     tools=[x402_fetch],
     system_prompt=(
         "You are a helpful assistant that can access paid APIs and content. "
-        "Use the x402_fetch tool to access URLs that may require payment — "
+        "Use the x402_fetch tool to access URLs that may require payment -- "
         "it handles x402 payments automatically."
     ),
 )
 ```
 
-## LangGraph — tool pattern
+## LangGraph -- tool pattern
 
 ```python
 from langchain_core.tools import tool
@@ -295,7 +295,7 @@ result = graph.invoke({"messages": [("human", "Fetch https://paid-api.example.co
 print(result["messages"][-1].content)
 ```
 
-## OpenAI Agents SDK — function_tool pattern
+## OpenAI Agents SDK -- function_tool pattern
 
 ```python
 from agents import Agent, Runner, function_tool
@@ -317,7 +317,7 @@ agent = Agent(
     name="PaymentAgent",
     instructions=(
         "You are a helpful assistant that can access paid APIs and content. "
-        "Use the x402_fetch tool to access URLs that may require payment — "
+        "Use the x402_fetch tool to access URLs that may require payment -- "
         "it handles x402 payments automatically."
     ),
     tools=[x402_fetch],

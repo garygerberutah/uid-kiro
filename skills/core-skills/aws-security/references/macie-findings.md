@@ -117,7 +117,7 @@ If Workflow A returns zero findings, skip and report no sensitive data detection
 |---|---|
 | AccessDeniedException | Macie not enabled or insufficient permissions |
 | ValidationException on list-findings | Use attributeName "severity.score" with orderBy "DESC" |
-| Empty get-finding-statistics | No findings — report zero findings as clean posture |
+| Empty get-finding-statistics | No findings -- report zero findings as clean posture |
 
 ## Output Sensitivity
 

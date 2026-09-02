@@ -18,18 +18,18 @@ Each step has stop conditions. Do not proceed to the next step unless the curren
 ### Check 1: Deployment model
 
 ```
-Serverless  → Tier A (CloudWatch) plus limited client-side diagnostics.
+Serverless  -> Tier A (CloudWatch) plus limited client-side diagnostics.
               Tiers B and C are not available.
               See "Serverless-specific considerations" below for the full diagnostic order.
-Node-based  → All tiers available, proceed through Check 2.
+Node-based  -> All tiers available, proceed through Check 2.
 ```
 
 ### Check 2: Engine and version (node-based only)
 
 ```
-Valkey 8.0+ cluster mode (node-based only) → Tier B (CLUSTER SLOT-STATS) is available and preferred.
-Valkey 7.x, Redis OSS 7.x   → Skip Tier B. Use Tier A to find the hot node, then Tier C.
-Cluster mode disabled        → Single shard. Skip Tier B. Tier A and Tier C only.
+Valkey 8.0+ cluster mode (node-based only) -> Tier B (CLUSTER SLOT-STATS) is available and preferred.
+Valkey 7.x, Redis OSS 7.x   -> Skip Tier B. Use Tier A to find the hot node, then Tier C.
+Cluster mode disabled        -> Single shard. Skip Tier B. Tier A and Tier C only.
 ```
 
 Check engine version (use `describe-cache-clusters` which exposes both fields):
@@ -51,10 +51,10 @@ aws elasticache describe-cache-parameters \
   --output text --region <region>
 ```
 
-- **LFU policy set** → Tier C is available.
+- **LFU policy set** -> Tier C is available.
 - **Non-LFU, can change** -> Change via parameter group; `maxmemory-policy` takes effect immediately (no restart needed), then Tier C.
-- **Non-LFU, cannot change** → Skip Tier C. Fallback: Tier B if Valkey 8.0+ cluster mode, otherwise slow log analysis, then `valkey-cli --bigkeys`, then client-side instrumentation. Note: `valkey-cli --hotkeys` also requires LFU.
-- **Serverless** → Skip Tier C entirely. Serverless blocks `OBJECT FREQ`.
+- **Non-LFU, cannot change** -> Skip Tier C. Fallback: Tier B if Valkey 8.0+ cluster mode, otherwise slow log analysis, then `valkey-cli --bigkeys`, then client-side instrumentation. Note: `valkey-cli --hotkeys` also requires LFU.
+- **Serverless** -> Skip Tier C entirely. Serverless blocks `OBJECT FREQ`.
 
 ## Tier A: Triage with CloudWatch
 
@@ -64,7 +64,7 @@ Always-available first step. Tells you whether the problem is real and narrows w
 
 Query `EngineCPUUtilization` per node using the `CacheClusterId` dimension. Do NOT query with `ReplicationGroupId`; the aggregate hides imbalance.
 
-> **Note on CPU metrics:** `EngineCPUUtilization` measures only the main Valkey/Redis OSS engine thread. On nodes with 4+ vCPUs where enhanced I/O features are active, network I/O and TLS processing are offloaded to dedicated I/O threads not captured by `EngineCPUUtilization`, so it may appear lower than expected. For smaller node types with 2 vCPUs or less, use `CPUUtilization` instead. Also check `TrafficManagementActive`; a value of 1 indicates the node may be underscaled for the workload — ElastiCache is actively managing/throttling traffic to protect the engine.
+> **Note on CPU metrics:** `EngineCPUUtilization` measures only the main Valkey/Redis OSS engine thread. On nodes with 4+ vCPUs where enhanced I/O features are active, network I/O and TLS processing are offloaded to dedicated I/O threads not captured by `EngineCPUUtilization`, so it may appear lower than expected. For smaller node types with 2 vCPUs or less, use `CPUUtilization` instead. Also check `TrafficManagementActive`; a value of 1 indicates the node may be underscaled for the workload -- ElastiCache is actively managing/throttling traffic to protect the engine.
 
 ```bash
 aws cloudwatch get-metric-statistics \

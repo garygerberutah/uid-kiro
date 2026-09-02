@@ -70,7 +70,7 @@ Failure causes:
 
 ## Step 3: TLS Handshake
 
-Serverless always requires TLS. Node-based requires TLS only if created with `--transit-encryption-enabled`, or if TLS was enabled later via the preferred→required migration path (available for Redis OSS 7.0+/Valkey 7.2+).
+Serverless always requires TLS. Node-based requires TLS only if created with `--transit-encryption-enabled`, or if TLS was enabled later via the preferred->required migration path (available for Redis OSS 7.0+/Valkey 7.2+).
 
 ElastiCache-specific failures:
 

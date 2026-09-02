@@ -15,9 +15,9 @@ Code examples in this guide use Flink 2.2 APIs by default, which are also compat
 - Use the correct state type for each use case, and perform updates to state in performant way (e.g. make updates to a map key, rather than replacing the entire map).
 - AVOID: Storing large objects or unbounded collections in state
 
-### Pick the Right State Type — `MapState` vs `ValueState<Map>`
+### Pick the Right State Type -- `MapState` vs `ValueState<Map>`
 
-Use `MapState<K, V>` whenever you need per-key updates inside a logical map. Storing a `Map<K, V>` inside `ValueState<Map<K, V>>` and reading-mutating-writing it on every event is `O(map size)` per access — RocksDB has to deserialize every entry, your code mutates one, and the whole map gets re-serialized and written back. `MapState` is `O(1)` per `put`/`get`/`remove`: each map entry maps to its own RocksDB key, so only the touched entry is read or written.
+Use `MapState<K, V>` whenever you need per-key updates inside a logical map. Storing a `Map<K, V>` inside `ValueState<Map<K, V>>` and reading-mutating-writing it on every event is `O(map size)` per access -- RocksDB has to deserialize every entry, your code mutates one, and the whole map gets re-serialized and written back. `MapState` is `O(1)` per `put`/`get`/`remove`: each map entry maps to its own RocksDB key, so only the touched entry is read or written.
 
 There is also a state-migration consequence specific to MSF: nested generic collections inside `ValueState` (e.g. `ValueState<Map<String, MyType>>`) typically fall back to Kryo serialization, and **Kryo-serialized state does not migrate from Flink 1.x to 2.x.** `MapState` uses a dedicated `MapSerializer` that does carry across the upgrade. See [serialization-guide.md](serialization-guide.md) for the wider Kryo guidance and [flink-2x-migration.md](flink-2x-migration.md) for the migration impact.
 

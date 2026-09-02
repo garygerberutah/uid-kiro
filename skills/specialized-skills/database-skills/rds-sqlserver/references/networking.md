@@ -1,6 +1,6 @@
-# Networking — VPC, Security Groups, Cross-VPC, DNS
+# Networking -- VPC, Security Groups, Cross-VPC, DNS
 
-## Security groups — the key rule
+## Security groups -- the key rule
 
 **Same VPC:** use security group IDs as the source.
 **Cross-VPC (peering, Transit Gateway):** use CIDR blocks as the source. SG-to-SG references do not cross VPC boundaries.
@@ -37,11 +37,11 @@ CIDR should be the source VPC or subnet range.
 
 ```
 mydb.xxxxxxxxxxxx.us-east-1.rds.amazonaws.com
-│     │             │          │
-│     │             │          └── AWS service domain
-│     │             └── Region
-│     └── Random identifier
-└── DB instance identifier
+|     |             |          |
+|     |             |          +-- AWS service domain
+|     |             +-- Region
+|     +-- Random identifier
++-- DB instance identifier
 ```
 
 The endpoint always resolves to a **private** IPv4 address when your VPC has `enableDnsSupport=true` and `enableDnsHostnames=true`. It can also resolve to a public IP if:
@@ -63,7 +63,7 @@ aws ec2 create-vpc-peering-connection \
 aws ec2 accept-vpc-peering-connection \
   --vpc-peering-connection-id pcx-xxxx
 
-# Route table in each VPC — add routes to the other's CIDR
+# Route table in each VPC -- add routes to the other's CIDR
 aws ec2 create-route --route-table-id rtb-app \
   --destination-cidr-block 10.1.0.0/16 \
   --vpc-peering-connection-id pcx-xxxx
@@ -94,7 +94,7 @@ aws ec2 create-transit-gateway-vpc-attachment \
   --vpc-id vpc-rds \
   --subnet-ids subnet-rds-a subnet-rds-b
 
-# Route tables — each VPC points the other's CIDR at TGW
+# Route tables -- each VPC points the other's CIDR at TGW
 aws ec2 create-route --route-table-id rtb-app \
   --destination-cidr-block 10.1.0.0/16 \
   --transit-gateway-id tgw-xxxx
@@ -115,11 +115,11 @@ aws ec2 modify-vpc-peering-connection-options \
   --requester-peering-connection-options '{"AllowDnsResolutionFromRemoteVpc":true}'
 ```
 
-Without this, cross-VPC `nslookup` returns public IPs, and connections bypass the peering connection entirely — going over the public internet (and often failing due to RDS being private).
+Without this, cross-VPC `nslookup` returns public IPs, and connections bypass the peering connection entirely -- going over the public internet (and often failing due to RDS being private).
 
 For TGW, you typically need a Route 53 private hosted zone shared with each attached VPC (use RAM) so DNS resolution works consistently.
 
-## Route 53 private hosted zone — friendly endpoints
+## Route 53 private hosted zone -- friendly endpoints
 
 Give RDS a friendly DNS name that works across VPCs:
 
@@ -151,14 +151,14 @@ aws route53 change-resource-record-sets \
   }'
 ```
 
-Clients connect to `prod-db.db.internal` — shorter, environment-aware, and can be updated for blue/green deployments without code changes.
+Clients connect to `prod-db.db.internal` -- shorter, environment-aware, and can be updated for blue/green deployments without code changes.
 
 ### CNAME for AD DNS (Windows auth)
 
 Windows auth requires Kerberos, which requires the server name to match an SPN in Active Directory. The RDS endpoint has no SPN. You must:
 
 1. Create a CNAME in your AD DNS pointing to the RDS endpoint
-   (e.g. `database-1.corp.example.com` → `mydb.xxxx.us-east-1.rds.amazonaws.com`)
+   (e.g. `database-1.corp.example.com` -> `mydb.xxxx.us-east-1.rds.amazonaws.com`)
 2. Register the SPN for the CNAME (RDS does this automatically for AWS Managed Microsoft AD)
 3. Clients connect to the CNAME, not the RDS endpoint
 
@@ -191,12 +191,12 @@ Endpoint SG inbound 443 from app SG.
 
 Common endpoints to create for RDS SQL Server workloads:
 
-- `secretsmanager` — fetch DB credentials
-- `kms` — decrypt customer-managed secret keys
-- `logs` — CloudWatch Logs for audit/metrics
-- `ec2` — if SDK calls describe-instances etc.
-- `s3` (gateway — free) — ECR image layer pulls, S3 integration
-- `ecr.api` + `ecr.dkr` — ECS/EKS image pulls
+- `secretsmanager` -- fetch DB credentials
+- `kms` -- decrypt customer-managed secret keys
+- `logs` -- CloudWatch Logs for audit/metrics
+- `ec2` -- if SDK calls describe-instances etc.
+- `s3` (gateway -- free) -- ECR image layer pulls, S3 integration
+- `ecr.api` + `ecr.dkr` -- ECS/EKS image pulls
 
 ## Testing connectivity
 
@@ -229,7 +229,7 @@ For full diagnostics including TDS/pre-login, use the bundled `scripts/test_conn
 
 ## Multi-AZ
 
-RDS Multi-AZ creates a standby in a different AZ. The endpoint automatically switches to the standby during failover. No code changes — just tune driver timeouts to handle the 60-120 second failover window.
+RDS Multi-AZ creates a standby in a different AZ. The endpoint automatically switches to the standby during failover. No code changes -- just tune driver timeouts to handle the 60-120 second failover window.
 
 Pool settings for failover robustness:
 

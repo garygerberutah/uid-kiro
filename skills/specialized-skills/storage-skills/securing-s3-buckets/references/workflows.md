@@ -5,7 +5,7 @@
 Run all steps in order. Do not skip.
 
 ```bash
-# 1. Create in account regional namespace (REQUIRED — not global namespace)
+# 1. Create in account regional namespace (REQUIRED -- not global namespace)
 # Pattern: <your-prefix>-<account-id>-<region>-an
 aws s3api create-bucket \
   --bucket <your-prefix>-111122223333-us-east-1-an \
@@ -28,21 +28,21 @@ aws s3api put-bucket-encryption \
   --server-side-encryption-configuration \
   '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"},"BucketKeyEnabled":true,"BlockedEncryptionTypes":{"EncryptionType":["SSE-C"]}}]}'
 
-# 4. Enable logging (CONDITIONAL — choose one option)
+# 4. Enable logging (CONDITIONAL -- choose one option)
 #
 # Ask the user which option they prefer before proceeding.
 # Present the trade-offs:
 #
-#   Option A — S3 Server Access Logging
+#   Option A -- S3 Server Access Logging
 #     - No per-request charge; you pay only for the storage of the log files in S3
 #     - Captures all HTTP requests including unauthenticated/presigned URL access
 #     - No IAM principal ARN attribution; limited identity context
 #     - No real-time alerting capability
 #     - Good default for cost-sensitive workloads
 #
-#   Option B — CloudTrail Data Events
+#   Option B -- CloudTrail Data Events
 #     - Per-event charge applies (see CloudTrail pricing)
-#     - Full IAM principal ARN on every event — best for security investigations
+#     - Full IAM principal ARN on every event -- best for security investigations
 #     - Integrates with EventBridge and CloudWatch for real-time alerting
 #     - Logs anonymous (unauthenticated) requests and AccessDenied failures
 #     - Does NOT log requests that fail authentication (invalid/malformed credentials)
@@ -55,7 +55,7 @@ aws s3api put-bucket-encryption \
 # WARNING: put-bucket-policy replaces the entire existing policy.
 # Attempt to retrieve existing policy first:
 aws s3api get-bucket-policy --bucket <logging-bucket> --output text
-# If NoSuchBucketPolicy is returned, no backup needed — proceed with a new policy containing only the S3LogDelivery statement.
+# If NoSuchBucketPolicy is returned, no backup needed -- proceed with a new policy containing only the S3LogDelivery statement.
 # If a policy exists, back it up before modification:
 aws s3api get-bucket-policy --bucket <logging-bucket> --output text > backup-policy-$(date +%s).json
 # Add S3LogDelivery statement to existing policy's Statement array, then apply:
@@ -83,7 +83,7 @@ aws cloudtrail put-event-selectors \
 aws s3api get-bucket-policy --bucket <bucket-name> --output text
 # If a policy exists, back it up before modification:
 aws s3api get-bucket-policy --bucket <bucket-name> --output text > backup-policy-$(date +%s).json
-# If NoSuchBucketPolicy is returned, no backup needed — proceed with a new policy.
+# If NoSuchBucketPolicy is returned, no backup needed -- proceed with a new policy.
 # Add DenyInsecureTransport statement to existing policy's Statement array (or create new), then apply:
 aws s3api put-bucket-policy --bucket <bucket-name> --policy \
   '{"Version":"2012-10-17","Statement":[<...existing statements...>,{"Sid":"DenyInsecureTransport","Effect":"Deny","Principal":"*","Action":"s3:*","Resource":["arn:aws:s3:::<bucket-name>/*","arn:aws:s3:::<bucket-name>"],"Condition":{"Bool":{"aws:SecureTransport":"false"}}}]}'
@@ -97,7 +97,7 @@ aws s3api put-bucket-abac \
 ## Workflow E: Enable Monitoring
 
 ```bash
-# GuardDuty — check if detector already exists before creating
+# GuardDuty -- check if detector already exists before creating
 aws guardduty list-detectors --region <region>
 # Only run create-detector if list-detectors returns empty:
 aws guardduty create-detector --enable --region <region>
@@ -144,7 +144,7 @@ aws s3api get-object-lock-configuration --bucket <bucket-name>
 # Policy checks (Critical: public policy + HTTPS enforcement)
 aws s3api get-bucket-policy --bucket <bucket-name> --output text
 
-# Logging — CloudTrail data events (Medium)
+# Logging -- CloudTrail data events (Medium)
 aws cloudtrail describe-trails --query 'trailList[*].[Name,HomeRegion]'
 aws cloudtrail get-event-selectors \
   --trail-name <trail-name> \
@@ -158,7 +158,7 @@ aws guardduty get-detector --detector-id <detector-id> --region <region>
 # Check if an analyzer exists
 aws accessanalyzer list-analyzers --region <region>
 # If empty, report as finding: "No IAM Access Analyzer configured in <region>"
-# Do NOT create an analyzer during audit — remediate separately via Workflow C.
+# Do NOT create an analyzer during audit -- remediate separately via Workflow C.
 # If an analyzer exists, list S3 findings:
 aws accessanalyzer list-findings \
   --analyzer-arn <analyzer-arn> \

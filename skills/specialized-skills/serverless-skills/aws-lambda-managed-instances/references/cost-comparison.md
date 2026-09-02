@@ -13,5 +13,5 @@ When building a cost comparison for a user, gather: region, runtime, requests/mo
 
 ## Tools
 
-- [LMI Pricing Calculator](https://aws-samples.github.io/sample-aws-lambda-managed-instances/) — interactive comparison tool
-- [AWS Pricing Calculator](https://calculator.aws/) — general AWS cost estimation
+- [LMI Pricing Calculator](https://aws-samples.github.io/sample-aws-lambda-managed-instances/) -- interactive comparison tool
+- [AWS Pricing Calculator](https://calculator.aws/) -- general AWS cost estimation

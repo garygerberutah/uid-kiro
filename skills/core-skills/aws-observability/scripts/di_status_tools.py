@@ -67,7 +67,7 @@ def _parse_iso_timestamp(value: str) -> datetime:
 
     A naive input (no 'Z' or offset, e.g. ``2025-02-03T18:42:00``) is assumed
     to be UTC rather than host-local. Without this, downstream ``astimezone``
-    calls in ``assess()`` would reinterpret it in the host timezone — on a
+    calls in ``assess()`` would reinterpret it in the host timezone -- on a
     UTC-8 host ``18:42`` becomes ``02:42Z``, shifting the whole status query
     window and causing ACTIVE/READY events to be missed.
     """

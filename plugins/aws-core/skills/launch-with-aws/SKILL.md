@@ -58,9 +58,9 @@ Other frameworks may also work. If the user's app doesn't match these, see **Uns
 | Frontend & hosting | Migrated to AWS (S3 + CloudFront + Lambda) |
 | Edge functions / server functions | Migrated to AWS Lambda |
 | AI calls (e.g. Lovable AI Gateway) | Migrated to Amazon Bedrock |
-| Database (Supabase DB) | Stays on Supabase — not migrated |
-| Auth (Supabase Auth) | Stays on Supabase — not migrated |
-| Storage & Realtime | Stays on Supabase — not migrated |
+| Database (Supabase DB) | Stays on Supabase -- not migrated |
+| Auth (Supabase Auth) | Stays on Supabase -- not migrated |
+| Storage & Realtime | Stays on Supabase -- not migrated |
 
 The app continues to call Supabase for database, auth, storage, and realtime from the AWS-hosted application.
 
@@ -70,8 +70,8 @@ The app continues to call Supabase for database, auth, storage, and realtime fro
 |-----------|-------------|
 | Frontend & hosting | Migrated to AWS (S3 + CloudFront + Lambda) |
 | Server logic (Express.js) | Migrated to AWS Lambda (API Gateway) |
-| Database (PostgreSQL) | Schema and code migrated to AWS (Aurora Serverless / DynamoDB). Existing data is NOT migrated — customers must export and import their data separately. |
-| Auth (Replit Auth) | Code migrated to AWS (Cognito). Existing user accounts are NOT migrated — customers must re-create or invite users in Cognito. |
+| Database (PostgreSQL) | Schema and code migrated to AWS (Aurora Serverless / DynamoDB). Existing data is NOT migrated -- customers must export and import their data separately. |
+| Auth (Replit Auth) | Code migrated to AWS (Cognito). Existing user accounts are NOT migrated -- customers must re-create or invite users in Cognito. |
 | Realtime (WebSockets) | Migrated to AWS (API Gateway WebSocket) |
 | File storage | Migrated to AWS (S3). Existing files are NOT migrated. |
 
@@ -142,15 +142,15 @@ The launch starts in `analyzing` status and automatically progresses through ana
 python3 scripts/launch_with_aws.py get-launch-status <launch-id>
 ```
 
-Poll until `status` is `planned` (ready for execution), `awaiting_input` (needs context answers — see step 4), or `failed`. Key status progression:
+Poll until `status` is `planned` (ready for execution), `awaiting_input` (needs context answers -- see step 4), or `failed`. Key status progression:
 
-- `analyzing` → detecting app type and dependencies
-- `awaiting_input` → needs context answers (see `refine-plan`)
-- `planning` → generating migration plan
-- `planned` → ready for execution
-- `executing` → deployment in progress
-- `completed` → done
-- `failed` → check `failureReason`
+- `analyzing` -> detecting app type and dependencies
+- `awaiting_input` -> needs context answers (see `refine-plan`)
+- `planning` -> generating migration plan
+- `planned` -> ready for execution
+- `executing` -> deployment in progress
+- `completed` -> done
+- `failed` -> check `failureReason`
 
 If `status` is `awaiting_input`, check `contextInputs` for the questions that need answering. Inputs with `required: true` must be answered before the launch can proceed; others are optional enrichment.
 
@@ -172,7 +172,7 @@ Get full launch details. Optional second argument is a comma-separated include l
 
 Present the cost estimate and plan to the user. The `costEstimate` field in the response contains `estimatedMonthlyCost`, `region`, and a `services` breakdown with per-service costs.
 
-**Confirmation Gate — present and wait for explicit approval:**
+**Confirmation Gate -- present and wait for explicit approval:**
 
 > **Migration Summary**
 >
@@ -199,7 +199,7 @@ Starts deployment. Then poll with `get-launch-status` until `status` is `complet
 python3 scripts/launch_with_aws.py get-launch-download-url <launch-id>
 ```
 
-**Always present the full download URL to the user** — they may need it to download the migrated snapshot directly or for reference.
+**Always present the full download URL to the user** -- they may need it to download the migrated snapshot directly or for reference.
 
 ### 8. List or Delete Launches
 
@@ -245,8 +245,8 @@ git diff --stat
 
 Review the changes with the user. Key additions to highlight:
 
-- `aws-blocks/` — AWS Blocks infrastructure definition
-- `DEPLOY.md` — deployment instructions
+- `aws-blocks/` -- AWS Blocks infrastructure definition
+- `DEPLOY.md` -- deployment instructions
 - Any modified config files
 
 If there are conflicts with the user's existing files, present them and ask how to resolve.
@@ -260,7 +260,7 @@ Read the `DEPLOY.md` file in the project root and follow its instructions to dep
 3. Deploy: `npx cdk deploy --all --progress events`
 4. Verify the CloudFront URL that CDK prints on completion.
 
-**Important:** Always read `DEPLOY.md` from the migrated output — it is generated specifically for this app and architecture. Do not assume deployment steps from memory.
+**Important:** Always read `DEPLOY.md` from the migrated output -- it is generated specifically for this app and architecture. Do not assume deployment steps from memory.
 
 ## Unsupported Application Handling
 

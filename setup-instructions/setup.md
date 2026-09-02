@@ -26,7 +26,7 @@ Constraints for parameter acquisition:
 
 - You MUST detect the OS automatically before asking the user
 - The user MUST either provide the AWS Region in the prompt or you MUST ask for it
-- You MUST NOT ask the user for AWS credentials, access keys, or secret keys — authentication is handled entirely through `aws login` browser flow
+- You MUST NOT ask the user for AWS credentials, access keys, or secret keys -- authentication is handled entirely through `aws login` browser flow
 - You MUST inform the user that credentials are valid for 12 hours and can be renewed for 90 days without re-authenticating in the browser
 
 ## Dependencies
@@ -42,7 +42,7 @@ Constraints:
 - You MUST ask if the user wants to proceed despite missing tools
 - You MUST respect the customer's decision to abort at any point
 - You MUST explain to the customer what step is being executed, why, and which tool is being called
-- You MUST NOT require node, python3, or any other runtime beyond the shell and uv — the installer handles all other dependencies
+- You MUST NOT require node, python3, or any other runtime beyond the shell and uv -- the installer handles all other dependencies
 - IF the AWS experience parameter is "our new AWS experience" THEN the user's account is part of a "project". Always use the term "project" when talking to the user.
 
 ## General error handling
@@ -68,8 +68,8 @@ Determine the operating system. Check session context first; if it's not there, 
 
 Then:
 
-- **macOS or Linux** → Proceed to Step 2 (macOS/Linux)
-- **Windows** → Proceed to Step 2 (Windows)
+- **macOS or Linux** -> Proceed to Step 2 (macOS/Linux)
+- **Windows** -> Proceed to Step 2 (Windows)
 
 ### Step 2 (if using macOS or Linux):
 
@@ -196,7 +196,7 @@ Run the following command to install AI coding agents, install default AWS skill
 aws configure agent-toolkit --yes --region us-east-1 --profile <profile_name>
 ```
 
-**Note:** The Agent Toolkit service is currently only available in `us-east-1`, regardless of your Region. Use `us-east-1` here and in Step 6 — do not substitute the user's current Region.
+**Note:** The Agent Toolkit service is currently only available in `us-east-1`, regardless of your Region. Use `us-east-1` here and in Step 6 -- do not substitute the user's current Region.
 
 **Success:** Command exits with code 0.
 
@@ -211,9 +211,9 @@ aws configure agent-toolkit --yes --region us-east-1 --profile <profile_name>
 
 #### Point the AWS MCP Server at the user's profile
 
-After the command completes, the Agent Toolkit writes an `aws-mcp` server entry into each detected AI tool's MCP configuration file. This entry does NOT reference the profile the user authenticated with in Step 3 — it falls back to the `default` profile. Because this set up file always authenticates under a named `<profile_name>`, you MUST propagate that profile into each generated `aws-mcp` entry, or the MCP server will fail to start with `JSON-RPC error: -32602: Invalid request parameters("")` (it cannot locate credentials under the `default` profile).
+After the command completes, the Agent Toolkit writes an `aws-mcp` server entry into each detected AI tool's MCP configuration file. This entry does NOT reference the profile the user authenticated with in Step 3 -- it falls back to the `default` profile. Because this set up file always authenticates under a named `<profile_name>`, you MUST propagate that profile into each generated `aws-mcp` entry, or the MCP server will fail to start with `JSON-RPC error: -32602: Invalid request parameters("")` (it cannot locate credentials under the `default` profile).
 
-For each MCP configuration file the Agent Toolkit updated, open the file, locate the `aws-mcp` entry under `mcpServers`, and add an `env` block that sets `AWS_MCP_PROXY_PROFILES` to `<profile_name>`. You MUST NOT remove or modify any other server entries. Only the `env` block is added — leave `command`, `args`, `timeout`, and `transport` exactly as generated:
+For each MCP configuration file the Agent Toolkit updated, open the file, locate the `aws-mcp` entry under `mcpServers`, and add an `env` block that sets `AWS_MCP_PROXY_PROFILES` to `<profile_name>`. You MUST NOT remove or modify any other server entries. Only the `env` block is added -- leave `command`, `args`, `timeout`, and `transport` exactly as generated:
 
 ```json
 "aws-mcp": {
@@ -285,7 +285,7 @@ https://raw.githubusercontent.com/aws/agent-toolkit-for-aws/refs/heads/main/rule
 
 Please make a single page webapp game and deploy it to AWS.
 
-If you’re looking to explore what you can do on AWS, that prompt will get you started with a fun project. You can replace the game request with anything you’d like to build"
+If you're looking to explore what you can do on AWS, that prompt will get you started with a fun project. You can replace the game request with anything you'd like to build"
 
 **Error handling:**
 

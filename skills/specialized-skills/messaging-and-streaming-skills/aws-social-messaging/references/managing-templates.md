@@ -1,6 +1,6 @@
 # Managing WhatsApp Message Templates
 
-> **Security:** Template parameters appear in CloudTrail logs — avoid embedding sensitive data. See [SKILL.md — Security Considerations](../SKILL.md#security-considerations).
+> **Security:** Template parameters appear in CloudTrail logs -- avoid embedding sensitive data. See [SKILL.md -- Security Considerations](../SKILL.md#security-considerations).
 
 ## Contents
 
@@ -13,7 +13,7 @@
 
 ## Create a Template
 
-The `--template-definition` parameter is a blob type — base64-encode the JSON.
+The `--template-definition` parameter is a blob type -- base64-encode the JSON.
 
 ### Utility Template (transactional)
 
@@ -50,7 +50,7 @@ aws socialmessaging create-whatsapp-message-template \
 
 ```
 
-Authentication templates do not require `parameter_format` — Meta handles the OTP parameter automatically. The `COPY_CODE` button type lets recipients tap to copy the code.
+Authentication templates do not require `parameter_format` -- Meta handles the OTP parameter automatically. The `COPY_CODE` button type lets recipients tap to copy the code.
 
 ### Expected Output
 
@@ -66,21 +66,21 @@ Authentication templates do not require `parameter_format` — Meta handles the 
 ### Rules
 
 - `parameter_format`: MUST be `"positional"` when using `{{N}}` parameters
-- `example`: MUST include sample values for each component — Meta requires this for review
+- `example`: MUST include sample values for each component -- Meta requires this for review
 - UTILITY body MUST be clearly transactional; ambiguous text gets reclassified as MARKETING
 - Template names: lowercase letters, numbers, underscores only
 
 ### Choosing the Right Category
 
-Meta enforces strict categorization rules. Choosing the wrong category causes **reclassification** (UTILITY → MARKETING), which changes pricing and may disrupt sending. Select the correct category upfront:
+Meta enforces strict categorization rules. Choosing the wrong category causes **reclassification** (UTILITY -> MARKETING), which changes pricing and may disrupt sending. Select the correct category upfront:
 
 | Category | Use When | Key Signals |
 |----------|----------|-------------|
 | **UTILITY** | Confirming or updating an existing transaction the user initiated | Order confirmations, shipping updates, appointment reminders, payment receipts, account alerts |
 | **MARKETING** | Promoting products/services, re-engaging users, or any content the user did not explicitly request | Promotions, discounts, product recommendations, back-in-stock alerts, newsletters, upsells |
-| **AUTHENTICATION** | Sending one-time passwords or verification codes | Login codes, 2FA, account verification — must use OTP button component |
+| **AUTHENTICATION** | Sending one-time passwords or verification codes | Login codes, 2FA, account verification -- must use OTP button component |
 
-**Common reclassification triggers (UTILITY → MARKETING):**
+**Common reclassification triggers (UTILITY -> MARKETING):**
 
 - Body text contains promotional language ("Get X% off", "Limited time", "Shop now", "Don't miss")
 - Template includes a call-to-action unrelated to the transaction (e.g., "Check out our new products")
@@ -90,16 +90,16 @@ Meta enforces strict categorization rules. Choosing the wrong category causes **
 
 **How to avoid reclassification:**
 
-1. Keep UTILITY templates focused on a single transaction — reference the specific order/appointment/account action
-2. Do NOT mix promotional content into transactional templates — create a separate MARKETING template for promotions
+1. Keep UTILITY templates focused on a single transaction -- reference the specific order/appointment/account action
+2. Do NOT mix promotional content into transactional templates -- create a separate MARKETING template for promotions
 3. Use explicit transaction references in the body: "Your order #{{1}}", "Your appointment on {{1}}", "Your payment of {{1}}"
-4. If in doubt, use MARKETING — it always works; reclassification only happens UTILITY → MARKETING, never the reverse
+4. If in doubt, use MARKETING -- it always works; reclassification only happens UTILITY -> MARKETING, never the reverse
 5. Configure [event destinations](configuring-event-destinations.md) to receive `TEMPLATE_STATUS_UPDATE` events that alert you to reclassifications in real-time
 
 **Detecting reclassification after the fact:**
 
 - Via event destinations: `"eventType": "TEMPLATE_STATUS_UPDATE"` with `previousCategory` and `newCategory`
-- Via API: `list-whatsapp-message-templates` — compare `templateCategory` against your expected category
+- Via API: `list-whatsapp-message-templates` -- compare `templateCategory` against your expected category
 - **Recovery:** Delete the reclassified template and recreate with corrected content or as MARKETING
 
 ## Create from Library
@@ -161,11 +161,11 @@ aws socialmessaging update-whatsapp-message-template \
 
 ```
 
-The `--template-components` parameter is a blob type — base64-encode the JSON components array. Updated templates go back to PENDING for Meta re-review.
+The `--template-components` parameter is a blob type -- base64-encode the JSON components array. Updated templates go back to PENDING for Meta re-review.
 
 ## Delete a Template
 
-⚠️ The delete parameter is `--template-name` (NOT `--meta-template-name`, NOT `--meta-template-id`). There is no `--meta-template-name` parameter — it does not exist.
+[WARNING] The delete parameter is `--template-name` (NOT `--meta-template-name`, NOT `--meta-template-id`). There is no `--meta-template-name` parameter -- it does not exist.
 
 ```bash
 aws socialmessaging delete-whatsapp-message-template \

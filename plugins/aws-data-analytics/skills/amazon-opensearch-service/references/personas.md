@@ -1,4 +1,4 @@
-# Personas — communication style and what they want
+# Personas -- communication style and what they want
 
 Match your response style and depth to the detected persona.
 
@@ -42,10 +42,10 @@ Match your response style and depth to the detected persona.
 **They ACTUALLY ask:**
 
 1. "How do I keep costs from exploding as logs grow?"
-2. "Cluster went red/yellow/read-only — how to recover without data loss?"
+2. "Cluster went red/yellow/read-only -- how to recover without data loss?"
 3. "Why does the cluster get throttled / 429 under load?"
 4. "How do I migrate from Splunk / Datadog / ELK without losing alerting?"
-5. "Data Prepper vs Logstash vs Firehose vs OSI — which one?"
+5. "Data Prepper vs Logstash vs Firehose vs OSI -- which one?"
 
 **Format wanted:** Architecture diagrams + ISM policy JSON + CloudWatch alarm thresholds + dashboards JSON. Tables comparing tiering with $/GB/month and query latency trade-offs.
 
@@ -65,9 +65,9 @@ Match your response style and depth to the detected persona.
 
 1. "How do I tune BM25? When do I switch to LTR or hybrid?"
 2. "How do I A/B test ranking changes?"
-3. "Custom analyzer pipeline — synonyms, stemming, language-specific. What breaks?"
-4. "Hybrid (BM25 + vector) — how to combine scores?"
-5. "Sparse vector / SPLADE / ELSER alternative — what's the OS-native equivalent?"
+3. "Custom analyzer pipeline -- synonyms, stemming, language-specific. What breaks?"
+4. "Hybrid (BM25 + vector) -- how to combine scores?"
+5. "Sparse vector / SPLADE / ELSER alternative -- what's the OS-native equivalent?"
 
 **Format wanted:** Concept-first, then JSON. Discussion of trade-offs with offline NDCG/MRR/Recall@k framing. Side-by-side ranking output examples.
 
@@ -85,13 +85,13 @@ Match your response style and depth to the detected persona.
 
 **They ACTUALLY ask:**
 
-1. "FAISS vs Lucene vs NMSLIB — which engine for what?"
+1. "FAISS vs Lucene vs NMSLIB -- which engine for what?"
 2. "How big can my vectors be? float32 vs byte vs binary?"
 3. "How do I do filtered k-NN (metadata + vector)?"
 4. "How do I plug in my embedding model? OpenAI, Bedrock, SageMaker, local?"
 5. "How do I do hybrid (text + vector) properly?"
 
-**Format wanted:** Architecture sketch (encoder → ingest pipeline → index → search pipeline → reranker), then concrete index/query JSON. Memory and recall trade-offs in a table.
+**Format wanted:** Architecture sketch (encoder -> ingest pipeline -> index -> search pipeline -> reranker), then concrete index/query JSON. Memory and recall trade-offs in a table.
 
 **Turn-offs:**
 
@@ -107,10 +107,10 @@ Match your response style and depth to the detected persona.
 
 **They ACTUALLY ask:**
 
-1. "ES 7.10 → OpenSearch — what actually breaks? Clients, X-Pack-only features, watcher, ML, transforms, geo?"
+1. "ES 7.10 -> OpenSearch -- what actually breaks? Clients, X-Pack-only features, watcher, ML, transforms, geo?"
 2. "Can I lift-and-shift snapshots? What versions are forward-compatible?"
-3. "Solr → OpenSearch — is there a migration path? What's the equivalent of solrconfig.xml?"
-4. "ELK self-hosted → AWS OpenSearch — what's the cost delta?"
+3. "Solr -> OpenSearch -- is there a migration path? What's the equivalent of solrconfig.xml?"
+4. "ELK self-hosted -> AWS OpenSearch -- what's the cost delta?"
 5. "What's downtime tolerance? Blue/green re-shard? Reindex API? Cross-cluster replication for cutover?"
 
 **Format wanted:** Decision tables (feature parity, cost, downtime). Concrete runbooks with rollback. Step-by-step commands.
@@ -131,7 +131,7 @@ Match your response style and depth to the detected persona.
 
 1. "Should we use OpenSearch, DynamoDB, RDS, or Aurora pgvector for X?"
 2. "What's it going to cost at our scale?"
-3. "OpenSearch managed vs Serverless vs self-hosted EC2 vs EKS — when each?"
+3. "OpenSearch managed vs Serverless vs self-hosted EC2 vs EKS -- when each?"
 4. "What's the operational burden? Will my team need a dedicated person?"
 5. "Vendor lock-in / portability?"
 
@@ -151,11 +151,11 @@ Match your response style and depth to the detected persona.
 
 **They ACTUALLY ask:**
 
-1. "FGAC + IAM + Cognito + SAML — which combo for which use case?"
-2. "Document-level / field-level security — does it scale? Perf hit?"
-3. "VPC-only domain, private endpoint, customer-managed KMS — what's the recipe?"
-4. "Audit logs — what gets logged, where, retention, who can read?"
-5. "Compliance — HIPAA / PCI / FedRAMP / SOC2 — what's in scope?"
+1. "FGAC + IAM + Cognito + SAML -- which combo for which use case?"
+2. "Document-level / field-level security -- does it scale? Perf hit?"
+3. "VPC-only domain, private endpoint, customer-managed KMS -- what's the recipe?"
+4. "Audit logs -- what gets logged, where, retention, who can read?"
+5. "Compliance -- HIPAA / PCI / FedRAMP / SOC2 -- what's in scope?"
 
 **Format wanted:** Reference architecture diagrams, IAM policy snippets, threat-model framing, compliance checklist.
 
@@ -172,7 +172,7 @@ Match your response style and depth to the detected persona.
 
 **They ACTUALLY ask:**
 
-- "We're moving off Solr — what do you need from me to put a plan together?"
+- "We're moving off Solr -- what do you need from me to put a plan together?"
 - "What does my team need to be prepared for?"
 - "What does it cost?"
 
@@ -194,12 +194,12 @@ Match your response style and depth to the detected persona.
 1. **Asking 3+ clarifying questions before any answer.** Lead with a default recommendation, then say "this changes if X / Y / Z".
 2. **"It depends" without specifying what it depends on.**
 3. **Linking to docs without summarizing.**
-4. **Assuming OpenSearch ≡ Elasticsearch.** They diverged in 2021. X-Pack features (ML, watcher, transforms, EQL, ES|QL, ESRE) are NOT in OpenSearch.
+4. **Assuming OpenSearch == Elasticsearch.** They diverged in 2021. X-Pack features (ML, watcher, transforms, EQL, ES|QL, ESRE) are NOT in OpenSearch.
 5. **Ignoring cost.**
 6. **Treating "managed", "Serverless", "self-hosted" as interchangeable.**
 7. **Pretending hybrid search and relevance tuning are solved problems.**
 8. **Skipping rollback / failure modes when proposing a change.**
-9. **Persona meta-commentary** ("I detect this as a Business Stakeholder framing..."). Never surface persona detection — just respond appropriately.
+9. **Persona meta-commentary** ("I detect this as a Business Stakeholder framing..."). Never surface persona detection -- just respond appropriately.
 
 ## First-sentence rules (every persona, no exceptions)
 

@@ -1,10 +1,10 @@
 # Getting started
 
-End-to-end: prerequisites → package → create image → run MicroVM → authenticate → call.
+End-to-end: prerequisites -> package -> create image -> run MicroVM -> authenticate -> call.
 
 ## Prerequisites
 
-0. **Check regional availability.** Confirm Lambda MicroVMs is available in your target region — check the Lambda MicroVMs documentation for supported regions. The S3 artifact bucket and any network connectors must be in the same region as the image.
+0. **Check regional availability.** Confirm Lambda MicroVMs is available in your target region -- check the Lambda MicroVMs documentation for supported regions. The S3 artifact bucket and any network connectors must be in the same region as the image.
 1. **S3 bucket** in the region you'll create the image in. Cross-region access is rejected (`S3_CROSS_REGION_ACCESS_DENIED`).
 2. **Build IAM role** that Lambda assumes during image build. Trust policy:
 
@@ -28,19 +28,19 @@ End-to-end: prerequisites → package → create image → run MicroVM → authe
    - `s3:GetObject` on the artifact key, `s3:PutObject` for build outputs (if you write any).
    - `logs:CreateLogGroup`, `logs:CreateLogStream`, `logs:PutLogEvents`.
    - `ecr:GetAuthorizationToken` if your `Dockerfile` `FROM` references private ECR.
-3. **(Optional) Execution role** for runtime — Lambda uses this to ship logs and to expose AWS credentials inside the MicroVM via IMDSv2. Same trust policy as the build role. Without an execution role, application stdout is *not* shipped to CloudWatch.
+3. **(Optional) Execution role** for runtime -- Lambda uses this to ship logs and to expose AWS credentials inside the MicroVM via IMDSv2. Same trust policy as the build role. Without an execution role, application stdout is *not* shipped to CloudWatch.
 
 See [`iam-and-security.md`](iam-and-security.md) for the full breakdown.
 
-## Step 1 — Package the application
+## Step 1 -- Package the application
 
 A code artifact is a zip containing a `Dockerfile` at the **root** plus any files it references.
 
 ```
 my-app.zip
-├── Dockerfile
-├── app.py
-└── requirements.txt
++-- Dockerfile
++-- app.py
++-- requirements.txt
 ```
 
 **Minimal Python example** (Flask app on port 8080, lifecycle hooks on port 9000):
@@ -91,7 +91,7 @@ zip my-app.zip Dockerfile app.py
 aws s3 cp my-app.zip s3://${BUCKET}/microvm-images/my-first-image/code-artifact.zip
 ```
 
-## Step 2 — List managed base images
+## Step 2 -- List managed base images
 
 A custom image must be built *on top of* a Lambda-managed base image (Amazon Linux 2023 + service components).
 
@@ -101,7 +101,7 @@ aws lambda-microvms list-managed-microvm-images
 
 Pick an `imageArn` from the output (e.g. `arn:aws:lambda:<region>:aws:microvm-image:al2023-1`).
 
-## Step 3 — Create the MicroVM image
+## Step 3 -- Create the MicroVM image
 
 ```bash
 aws lambda-microvms create-microvm-image \
@@ -133,7 +133,7 @@ Response includes the `imageArn` and a starting `state` of `CREATING`.
 
 Build proceeds: Lambda fetches the zip, compiles the Dockerfile into an OCI image, starts your app via `CMD`/`ENTRYPOINT`, calls `/ready`, captures the snapshot, then optionally calls `/validate` on a test run.
 
-## Step 4 — Wait for the build to succeed
+## Step 4 -- Wait for the build to succeed
 
 Pass the `imageArn` returned by `create-microvm-image` to `--image-identifier`. Image versions are `major.minor`; use the full string (e.g. `1.0`).
 
@@ -143,7 +143,7 @@ aws lambda-microvms get-microvm-image \
   --query 'state'
 ```
 
-Image state: `CREATING` → `CREATED`. Version state: `PENDING` → `IN_PROGRESS` → `SUCCESSFUL` (or `FAILED`). Inspect per-architecture builds:
+Image state: `CREATING` -> `CREATED`. Version state: `PENDING` -> `IN_PROGRESS` -> `SUCCESSFUL` (or `FAILED`). Inspect per-architecture builds:
 
 ```bash
 aws lambda-microvms list-microvm-image-builds \
@@ -153,7 +153,7 @@ aws lambda-microvms list-microvm-image-builds \
 
 If a build fails, `stateReason` carries an error code from [`troubleshooting.md`](troubleshooting.md).
 
-## Step 5 — Run a MicroVM
+## Step 5 -- Run a MicroVM
 
 `run-microvm` requires the **full `major.minor` version string** (`1.0`); Pass the image ARN as `--image-identifier`.
 
@@ -185,11 +185,11 @@ Response:
 }
 ```
 
-The MicroVM is ready when you can successfully ingress into it. Note that `get-microvm` state is eventually consistent and may lag behind reality — determine readiness by attempting to connect rather than polling the API.
+The MicroVM is ready when you can successfully ingress into it. Note that `get-microvm` state is eventually consistent and may lag behind reality -- determine readiness by attempting to connect rather than polling the API.
 
-Typically ready within 1–10 s depending on snapshot size.
+Typically ready within 1-10 s depending on snapshot size.
 
-## Step 6 — Authenticate and call
+## Step 6 -- Authenticate and call
 
 Generate an auth token (max 60 min):
 
@@ -207,7 +207,7 @@ curl "https://<microvm-endpoint>/" \
 
 Default proxy target is **port 8080** inside the MicroVM. Override per-request with `X-aws-proxy-port`. For browsers / WebSockets see [`networking.md`](networking.md).
 
-## Step 7 — Suspend / resume / terminate
+## Step 7 -- Suspend / resume / terminate
 
 ```bash
 # Manual lifecycle control
@@ -218,7 +218,7 @@ aws lambda-microvms terminate-microvm --microvm-identifier microvm-...
 
 If `autoResumeEnabled: true`, the proxy resumes a suspended MicroVM transparently when ingress traffic arrives.
 
-## Step 8 — Iterate (versions)
+## Step 8 -- Iterate (versions)
 
 To ship new code, **create a new version** of the image. Use:
 
@@ -232,12 +232,12 @@ aws lambda-microvms update-microvm-image \
 
 Then `update-microvm-image-version --status ACTIVE|INACTIVE` to control which versions are usable, and `delete-microvm-image-version` to clean up.
 
-Note: image **versions incur storage cost** even when no MicroVMs are running on them — clean up old ones. `delete-microvm-image-version` cannot remove the **last remaining version** — use `delete-microvm-image` to remove the whole image instead.
+Note: image **versions incur storage cost** even when no MicroVMs are running on them -- clean up old ones. `delete-microvm-image-version` cannot remove the **last remaining version** -- use `delete-microvm-image` to remove the whole image instead.
 
 ## Common pitfalls (quick list)
 
-- Forgetting to `EXPOSE <your application port>` in the Dockerfile — all apps run in a container, so the port your hooks and server bind to must be exposed.
-- Forgetting to bind hooks to `0.0.0.0` — Lambda calls hooks over the network namespace, so localhost-only listeners are unreachable.
-- Generating per-instance state in the Dockerfile — that state is **shared** across all MicroVMs from the snapshot. See [`snapshots-and-uniqueness.md`](snapshots-and-uniqueness.md).
+- Forgetting to `EXPOSE <your application port>` in the Dockerfile -- all apps run in a container, so the port your hooks and server bind to must be exposed.
+- Forgetting to bind hooks to `0.0.0.0` -- Lambda calls hooks over the network namespace, so localhost-only listeners are unreachable.
+- Generating per-instance state in the Dockerfile -- that state is **shared** across all MicroVMs from the snapshot. See [`snapshots-and-uniqueness.md`](snapshots-and-uniqueness.md).
 - We recommend using `public.ecr.aws/lambda/microvms:al2023-minimal` as the base registry. See [`snapshots-and-uniqueness.md`](snapshots-and-uniqueness.md).
-- Cross-region S3 artifact — must match the image's region.
+- Cross-region S3 artifact -- must match the image's region.

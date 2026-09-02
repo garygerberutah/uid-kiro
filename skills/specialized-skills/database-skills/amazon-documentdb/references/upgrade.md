@@ -1,4 +1,4 @@
-# DocumentDB — Major Version Upgrade
+# DocumentDB -- Major Version Upgrade
 
 Orchestrate DocumentDB major version upgrades. Supports two paths:
 
@@ -7,10 +7,10 @@ Orchestrate DocumentDB major version upgrades. Supports two paths:
 
 Two approaches:
 
-- **Option A: In-place MVU** — simpler, has downtime (multiple reboots). Best for dev/staging, small clusters, or when downtime is acceptable.
-- **Option B: Near-zero downtime** — clone + MVU on clone + CDC + cutover. Source stays online. Best for production.
+- **Option A: In-place MVU** -- simpler, has downtime (multiple reboots). Best for dev/staging, small clusters, or when downtime is acceptable.
+- **Option B: Near-zero downtime** -- clone + MVU on clone + CDC + cutover. Source stays online. Best for production.
 
-**Cannot skip versions** (3.6 must go 3.6->5.0->8.0). **Elastic Clusters:** MVU is not supported — no workaround. **Global Clusters:** direct in-place MVU is not supported. Workaround: remove the cluster from the Global Cluster first (this converts it to a standalone regional cluster), perform the upgrade using Option A or B below, then re-add it to the Global Cluster.
+**Cannot skip versions** (3.6 must go 3.6->5.0->8.0). **Elastic Clusters:** MVU is not supported -- no workaround. **Global Clusters:** direct in-place MVU is not supported. Workaround: remove the cluster from the Global Cluster first (this converts it to a standalone regional cluster), perform the upgrade using Option A or B below, then re-add it to the Global Cluster.
 
 ## What to ask upfront
 
@@ -26,9 +26,9 @@ Two approaches:
 
 **Pre-upgrade checks:**
 
-- Manual snapshot created and available (use polling loop — `aws docdb wait` is not in all CLI versions)
+- Manual snapshot created and available (use polling loop -- `aws docdb wait` is not in all CLI versions)
 - Pending OS maintenance applied
-- No `db.r4` instances (not supported on 4.0+) — upgrade to `db.r5+` first
+- No `db.r4` instances (not supported on 4.0+) -- upgrade to `db.r5+` first
 - Burstable instance index counts within limits: `db.t4g.medium` <= 3,000 indexes, `db.t3.medium` <= 10,000. If over, scale primary to `db.r5.large` before upgrading
 
 ## Option A: In-Place MVU
@@ -107,7 +107,7 @@ Record clone creation time (DMS CDC start = 2 min before, as Unix epoch). Add in
 
 ### Step 3: Upgrade the clone in place
 
-Apply Option A Steps 2–4 to the clone. Do NOT write to the clone after it's upgraded.
+Apply Option A Steps 2-4 to the clone. Do NOT write to the clone after it's upgraded.
 
 ### Step 4: Set up CDC replication (DMS is the primary method)
 
@@ -119,7 +119,7 @@ Follow `references/migration.md` for DMS setup:
 - Endpoints created with `--ssl-mode verify-full` and the cert ARN
 - Both endpoint connection tests pass (`successful`)
 
-Then create the replication task with `migration-type cdc` (data changes only — clone already has the data) and CDC start time = 2 minutes before clone creation:
+Then create the replication task with `migration-type cdc` (data changes only -- clone already has the data) and CDC start time = 2 minutes before clone creation:
 
 ```bash
 aws dms create-replication-task \
@@ -134,7 +134,7 @@ aws dms create-replication-task \
   --region <region>
 ```
 
-Start the task. Monitor `CDCLatencySource` — should decrease toward 0.
+Start the task. Monitor `CDCLatencySource` -- should decrease toward 0.
 
 **Fallback:** `amazon-documentdb-tools/migration/mvu-tool/mvu-cdc-migrator.py`. Source URI MUST NOT include `readPreference=secondaryPreferred` (change streams are primary-only).
 
@@ -152,8 +152,8 @@ Start the task. Monitor `CDCLatencySource` — should decrease toward 0.
 3. Final document count verification
 4. Stop the DMS task; update app connection strings to the upgraded clone's endpoint
 5. Update driver version if needed; start app; run smoke tests
-6. Monitor CloudWatch for 15–30 minutes
-7. Keep source running read-only for 24–48 hours as rollback — do NOT write to it
+6. Monitor CloudWatch for 15-30 minutes
+7. Keep source running read-only for 24-48 hours as rollback -- do NOT write to it
 
 ### Step 7: Rollback
 
@@ -163,7 +163,7 @@ Start the task. Monitor `CDCLatencySource` — should decrease toward 0.
 aws docdb delete-db-cluster --db-cluster-identifier <clone-id> --skip-final-snapshot
 ```
 
-**After cutover, within 24–48 hours:** point app back at source (still has data up to cutover). Manual reconciliation needed for writes made to the clone after cutover.
+**After cutover, within 24-48 hours:** point app back at source (still has data up to cutover). Manual reconciliation needed for writes made to the clone after cutover.
 
 **If source was already deleted:** restore from the pre-upgrade snapshot:
 
@@ -173,7 +173,7 @@ aws docdb restore-db-cluster-from-snapshot \
   --snapshot-identifier <pre-upgrade-snapshot-id> --engine docdb
 ```
 
-### Step 8: Post-cutover cleanup (after 24–48 hours)
+### Step 8: Post-cutover cleanup (after 24-48 hours)
 
 - Delete old source cluster; disable change streams on upgraded cluster
 - Delete DMS resources (instance, endpoints, task)
@@ -184,4 +184,4 @@ aws docdb restore-db-cluster-from-snapshot \
 
 **4.0 -> 5.0:** Vector search, LZ4 compression (off by default), I/O-Optimized storage, partial indexes, text indexes v1. Recommended but optional: `db.collection.reIndex()` on low-cardinality indexes.
 
-**5.0 -> 8.0:** Query Planner v3 (7× faster aggregations), Zstd compression (on by default, 5× ratio), Text v2 parser, Collation (default-on), Views, new stages (`$merge`, `$bucket`, `$replaceWith`, `$vectorSearch`), 30× faster vector index builds. No index rebuild needed. Update driver to MongoDB 6.0+/7.0+/8.0 to use new features.
+**5.0 -> 8.0:** Query Planner v3 (7x faster aggregations), Zstd compression (on by default, 5x ratio), Text v2 parser, Collation (default-on), Views, new stages (`$merge`, `$bucket`, `$replaceWith`, `$vectorSearch`), 30x faster vector index builds. No index rebuild needed. Update driver to MongoDB 6.0+/7.0+/8.0 to use new features.

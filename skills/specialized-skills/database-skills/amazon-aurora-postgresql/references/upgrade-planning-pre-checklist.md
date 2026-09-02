@@ -29,11 +29,11 @@
      --resource-identifier arn:aws:rds:{region}:{account}:cluster:{cluster} --region {region}
    ```
 
-4. **Capture baseline performance metrics** — CloudWatch: CPUUtilization, DatabaseConnections, ReadLatency, WriteLatency, FreeableMemory, BufferCacheHitRatio. Save EXPLAIN plans for critical queries.
+4. **Capture baseline performance metrics** -- CloudWatch: CPUUtilization, DatabaseConnections, ReadLatency, WriteLatency, FreeableMemory, BufferCacheHitRatio. Save EXPLAIN plans for critical queries.
 
 5. **Consider Blue/Green Deployments** for minimal downtime. Ref: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/blue-green-deployments.html
 
-6. **Plan maintenance window** — schedule during lowest traffic (use Performance Insights).
+6. **Plan maintenance window** -- schedule during lowest traffic (use Performance Insights).
 
 ## Aurora PostgreSQL-Specific
 
@@ -47,8 +47,8 @@
 
 3. **Check encoding/locale compatibility** with target.
 
-4. **Test on snapshot-restored cluster** — Aurora handles pg_upgrade internally.
+4. **Test on snapshot-restored cluster** -- Aurora handles pg_upgrade internally.
 
-5. **Check objects owned by rdsadmin** — can block upgrades.
+5. **Check objects owned by rdsadmin** -- can block upgrades.
 
-6. **Drop unused logical replication slots** — active slots block major upgrades.
+6. **Drop unused logical replication slots** -- active slots block major upgrades.

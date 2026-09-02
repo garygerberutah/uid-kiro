@@ -1,11 +1,11 @@
-# RDS for Oracle — SSM Port Forwarding
+# RDS for Oracle -- SSM Port Forwarding
 
 Connect to a private RDS Oracle from your laptop via SSM without a bastion host, VPN, or public endpoint.
 
 Two patterns:
 
-- **Pattern A — Local → SSM port forward → RDS.** Forward a local port through an EC2 instance; local tools connect to `localhost`. Use for SQL Developer / Toad / sqlplus from your laptop.
-- **Pattern B — SSM shell into EC2 → connect to RDS.** Start an interactive SSM session on an EC2 and connect from there. Use when the EC2 has Oracle client installed.
+- **Pattern A -- Local -> SSM port forward -> RDS.** Forward a local port through an EC2 instance; local tools connect to `localhost`. Use for SQL Developer / Toad / sqlplus from your laptop.
+- **Pattern B -- SSM shell into EC2 -> connect to RDS.** Start an interactive SSM session on an EC2 and connect from there. Use when the EC2 has Oracle client installed.
 
 ## Prerequisites
 
@@ -17,10 +17,10 @@ Two patterns:
   brew install --cask session-manager-plugin   # macOS
   ```
 
-- Security group: EC2 → RDS on 1521
-- Verify SSM registration: `aws ssm describe-instance-information --filters "Key=InstanceIds,Values=<id>" --query 'InstanceInformationList[0].PingStatus'` → `"Online"`
+- Security group: EC2 -> RDS on 1521
+- Verify SSM registration: `aws ssm describe-instance-information --filters "Key=InstanceIds,Values=<id>" --query 'InstanceInformationList[0].PingStatus'` -> `"Online"`
 
-## Pattern A — Port forward
+## Pattern A -- Port forward
 
 ```bash
 aws ssm start-session \
@@ -37,11 +37,11 @@ Keep the terminal open. If local port 1521 is busy, use `"11521"` (or any free p
 
 Then connect local tools to `localhost:1521`:
 
-**SQL Developer** — Hostname `localhost`, Port `1521`, Service Name `ORCL`, Username `admin`.
+**SQL Developer** -- Hostname `localhost`, Port `1521`, Service Name `ORCL`, Username `admin`.
 
-**Toad for Oracle** — Host `localhost`, Port `1521`, Service Name `ORCL`, Connect As **Normal** (not SYSDBA — RDS doesn't allow SYS). Requires Oracle Client (thick mode) since Toad cannot do thin.
+**Toad for Oracle** -- Host `localhost`, Port `1521`, Service Name `ORCL`, Connect As **Normal** (not SYSDBA -- RDS doesn't allow SYS). Requires Oracle Client (thick mode) since Toad cannot do thin.
 
-**sqlplus / SQLcl** — never pass password on command line:
+**sqlplus / SQLcl** -- never pass password on command line:
 
 ```bash
 sqlplus /nolog
@@ -66,13 +66,13 @@ String url = "jdbc:oracle:thin:@localhost:1521/ORCL";
 Connection conn = DriverManager.getConnection(url, "admin", "<from-secrets-manager>");
 ```
 
-## Pattern B — SSM shell
+## Pattern B -- SSM shell
 
 ```bash
 aws ssm start-session --target i-xxxxxxxxxxxxxxxxx
 ```
 
-Drops you into a shell on the EC2 — no SSH key needed. From there, connect to RDS using the EC2's locally-installed tools.
+Drops you into a shell on the EC2 -- no SSH key needed. From there, connect to RDS using the EC2's locally-installed tools.
 
 ### Quick reachability check from EC2
 
@@ -116,7 +116,7 @@ aws ssm start-session \
   }'
 ```
 
-**Critical: `SSL_SERVER_DN_MATCH = FALSE` for tunnel access.** The RDS cert CN is the endpoint hostname, but the client connects to `localhost` — DN matching will fail.
+**Critical: `SSL_SERVER_DN_MATCH = FALSE` for tunnel access.** The RDS cert CN is the endpoint hostname, but the client connects to `localhost` -- DN matching will fail.
 
 **Python**:
 
@@ -146,19 +146,19 @@ WALLET_LOCATION =
     (METHOD_DATA = (DIRECTORY = /path/to/wallet)))
 ```
 
-> **⚠️ Use `SSL_SERVER_DN_MATCH=FALSE` ONLY for local SSM tunnel dev.** It disables server identity verification. Never in production — prod apps connect directly from VPC-resident compute with DN matching enabled.
+> **[WARNING] Use `SSL_SERVER_DN_MATCH=FALSE` ONLY for local SSM tunnel dev.** It disables server identity verification. Never in production -- prod apps connect directly from VPC-resident compute with DN matching enabled.
 
 ## Auth over tunnel
 
 | Method | Works? |
 |---|---|
-| Username/password | ✅ Yes |
-| Secrets Manager (fetch locally, then connect) | ✅ Yes |
-| Kerberos | ❌ No — tickets don't traverse the tunnel; only the Oracle port is forwarded. Use password for tunnel access. |
+| Username/password | [YES] Yes |
+| Secrets Manager (fetch locally, then connect) | [YES] Yes |
+| Kerberos | [NO] No -- tickets don't traverse the tunnel; only the Oracle port is forwarded. Use password for tunnel access. |
 
 ## SQL Developer / DBeaver built-in SSH tunnel (alternative)
 
-SQL Developer 23+ and DBeaver have their own SSH tunneling UI. Both require the EC2 bastion to accept **SSH (port 22)** inbound — not SSM-only. If you have SSM-only bastions, use the separate-terminal `aws ssm start-session` approach above.
+SQL Developer 23+ and DBeaver have their own SSH tunneling UI. Both require the EC2 bastion to accept **SSH (port 22)** inbound -- not SSM-only. If you have SSM-only bastions, use the separate-terminal `aws ssm start-session` approach above.
 
 ## Quick-connect script
 
@@ -183,7 +183,7 @@ aws ssm start-session \
 | Symptom | Cause | Fix |
 |---|---|---|
 | `TargetNotConnected` | SSM agent down, missing IAM role | Check IAM instance profile has `AmazonSSMManagedInstanceCore`; verify agent: `systemctl status amazon-ssm-agent` |
-| Session starts but Oracle connect times out | EC2 → RDS SG path broken | EC2 SG outbound 1521 to RDS SG; RDS SG inbound 1521 from EC2 SG |
+| Session starts but Oracle connect times out | EC2 -> RDS SG path broken | EC2 SG outbound 1521 to RDS SG; RDS SG inbound 1521 from EC2 SG |
 | `Address already in use` on local port | Another local process on 1521 | Use `localPortNumber: 11521` (or any free port) |
 | Session drops after 20 min idle | SSM default idle timeout | Raise in Session Manager preferences, or reconnect |
 | `Session Manager plugin not found` | Plugin not installed | `brew install --cask session-manager-plugin` |

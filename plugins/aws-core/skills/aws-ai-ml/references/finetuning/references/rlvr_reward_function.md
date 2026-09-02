@@ -15,9 +15,9 @@ Tell user: I will now review your use case and data, as well as my own resources
 Reward functions are specific to the use case and dataset. Consider the task and data format to understand what constitutes a good output and how to measure it.
 
 1. Review these materials:
-   - `use_case_spec.md` — problem description and success criteria
-   - Conversation context — the user's goals
-   - 20 rows of training data — structure and content of the expected responses
+   - `use_case_spec.md` -- problem description and success criteria
+   - Conversation context -- the user's goals
+   - 20 rows of training data -- structure and content of the expected responses
 
 2. Answer these questions internally (involve the user if you need clarification):
    - Given the analysis in (1), what makes a good response? A bad response? A partially correct response?
@@ -57,12 +57,12 @@ Reward functions are specific to the use case and dataset. Consider the task and
 
 Add at least two mechanisms to detect and penalize gaming behavior. Common gaming patterns include:
 
-- **Padding** — inserting filler characters to inflate response length
-- **Skipping steps** — jumping to a final answer without showing required reasoning
-- **Repetition** — filling length requirements with repeated whitespace or words
-- **Dummy content** — using placeholder text instead of genuine answers
-- **Echo attack** — repeating the prompt or question back as the answer
-- **Nonsense** — producing incoherent or irrelevant text
+- **Padding** -- inserting filler characters to inflate response length
+- **Skipping steps** -- jumping to a final answer without showing required reasoning
+- **Repetition** -- filling length requirements with repeated whitespace or words
+- **Dummy content** -- using placeholder text instead of genuine answers
+- **Echo attack** -- repeating the prompt or question back as the answer
+- **Nonsense** -- producing incoherent or irrelevant text
 
 ---
 
@@ -70,15 +70,15 @@ Add at least two mechanisms to detect and penalize gaming behavior. Common gamin
 
 If the use case allows, think of rewards as a pyramid where each layer depends on the one beneath it. No credit is given for higher layers until lower ones are fully satisfied.
 
-- **Layer 1 (Foundation) — Structure**
+- **Layer 1 (Foundation) -- Structure**
   - Is the output formatted correctly and machine-parsable?
   - Example: If JSON is expected, is it valid JSON? Are all required fields filled?
 
-- **Layer 2 (Core) — Semantics**
+- **Layer 2 (Core) -- Semantics**
   - Is the output factually correct and does it deliver real value?
   - Example: Can generated code pass unit tests? Is the math answer correct?
 
-- **Layer 3 (Polish) — Behavior**
+- **Layer 3 (Polish) -- Behavior**
   - Does the output meet operational and safety requirements?
   - Example: Is the response concise? Free from toxic content? Complete?
 
@@ -94,22 +94,22 @@ If the use case allows, think of rewards as a pyramid where each layer depends o
 1. Create a file called `lambda_function.py` in the project's scripts directory.
 2. Read the `directory-management` reference to determine the correct directory for storing scripts.
 3. Consult the reward function templates for structural reference:
-   - Nova 2.0 Lite → `templates/nova_rlvr_reward_function_source_template.py`
-   - All other models → `templates/rlvr_reward_function_source_template.py`
+   - Nova 2.0 Lite -> `templates/nova_rlvr_reward_function_source_template.py`
+   - All other models -> `templates/rlvr_reward_function_source_template.py`
 
 **Critical rules:**
 
 - The `lambda_handler` function must be copied to `lambda_function.py` exactly as given in the template. Do not change its signature or internal logic.
 - The chat template used in the example reward functions is correct. Use it to extract the assistant's response. Then apply the parsing logic from Step 2 to extract the parts of the response you want to score.
-- Do not copy anything beyond the `lambda_handler` and the assistant-response extraction. The rest of the template is an example that **will not work** out of the box. You **must customize** the reward logic based on the use case and data, as described in Steps 1–5. Copying the template's reward logic without customization will likely produce flat rewards, wasting the user's time and compute budget.
+- Do not copy anything beyond the `lambda_handler` and the assistant-response extraction. The rest of the template is an example that **will not work** out of the box. You **must customize** the reward logic based on the use case and data, as described in Steps 1-5. Copying the template's reward logic without customization will likely produce flat rewards, wasting the user's time and compute budget.
 
 **Code writing principles:**
 
-1. **Provide a learning gradient:** Return diverse scores across [-1.0, 1.0], with partial credit for partial answers where appropriate — not just {-1, 0, 1}.
+1. **Provide a learning gradient:** Return diverse scores across [-1.0, 1.0], with partial credit for partial answers where appropriate -- not just {-1, 0, 1}.
 2. **Verify correctly:** Use actual parsing tools (`json.loads`, `ast.parse`, etc.), not string matching.
 3. **Include all necessary imports:** Add every required import statement at the top of the file.
 4. **Execute fast:** Complete in <100 ms with no API calls or blocking operations.
-5. **Be deterministic:** Same input → same output, always.
+5. **Be deterministic:** Same input -> same output, always.
 6. **Be bounded:** The final score must always fall within [-1.0, 1.0]. Add `return min(1.0, max(-1.0, score))` at the end.
 7. **Comment thoroughly:** Include detailed comments explaining the reward logic.
 
@@ -118,10 +118,10 @@ If the use case allows, think of rewards as a pyramid where each layer depends o
 Test the reward function by executing it against crafted sample data:
 
 1. **Build test input.** Infer the expected Lambda event and response format from the `lambda_handler` function in the appropriate source template. Choose one prompt from the training data reviewed in Step 1. Construct four test events that mimic what SageMaker sends to the Lambda:
-   - An **excellent** response — use the response from the data.
-   - A **partially correct** response — generate one that gets some things right but misses others.
-   - A **bad** response — generate one that is clearly wrong or off-topic, but without gaming.
-   - A **gaming** response — generate one that tries to get rewards by gaming.
+   - An **excellent** response -- use the response from the data.
+   - A **partially correct** response -- generate one that gets some things right but misses others.
+   - A **bad** response -- generate one that is clearly wrong or off-topic, but without gaming.
+   - A **gaming** response -- generate one that tries to get rewards by gaming.
 
 2. Explain what you are doing and show the user the four responses that you want to test.
 
@@ -181,5 +181,5 @@ print(f"Reward Function ARN: {CUSTOM_REWARD_FUNCTION}")
 
 Generate an appropriate name for the Evaluator based on the use case and current context.
 
-- Format: lowercase, alphanumeric with hyphens only, 1–20 characters
+- Format: lowercase, alphanumeric with hyphens only, 1-20 characters
 - Pattern: `[a-zA-Z0-9](-*[a-zA-Z0-9]){0,20}`

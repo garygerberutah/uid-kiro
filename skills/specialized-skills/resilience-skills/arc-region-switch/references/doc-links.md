@@ -1,4 +1,4 @@
-# ARC Region switch — Documentation Links
+# ARC Region switch -- Documentation Links
 
 Curated documentation index for Amazon Application Recovery Controller (ARC) Region switch.
 Load this to answer "where are the docs for X" questions and to attach doc links to answers.
@@ -25,11 +25,11 @@ Load this to answer "where are the docs for X" questions and to attach doc links
 
 **When to link:**
 
-- How-to questions → "Working with Region switch" or "Creating a plan"
-- Architecture questions → "Components & concepts"
-- Availability questions → "AWS Regions & endpoints"
-- API/automation questions → API Reference or CLI reference
-- Security questions → "Security & IAM" or "Logging and monitoring"
-- Limits questions → "Quotas"
-- IaC questions → "Terraform provider"
-- General overview → "Region switch overview"
+- How-to questions -> "Working with Region switch" or "Creating a plan"
+- Architecture questions -> "Components & concepts"
+- Availability questions -> "AWS Regions & endpoints"
+- API/automation questions -> API Reference or CLI reference
+- Security questions -> "Security & IAM" or "Logging and monitoring"
+- Limits questions -> "Quotas"
+- IaC questions -> "Terraform provider"
+- General overview -> "Region switch overview"

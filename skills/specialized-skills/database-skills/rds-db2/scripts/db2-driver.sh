@@ -7,9 +7,9 @@ FILE_FUNCTIONS="functions.sh"
 FILE_README="README.txt"
 INCLUDE_OTHER_TOOLS=${INCLUDE_OTHER_TOOLS:-TRUE}
 
-# Db2 version selection — set DB2_VER before running:
-#   DB2_VER=11.5  (default) → installs Db2 11.5.9 RT client
-#   DB2_VER=12.1            → installs Db2 12.1.3 RT client
+# Db2 version selection -- set DB2_VER before running:
+#   DB2_VER=11.5  (default) -> installs Db2 11.5.9 RT client
+#   DB2_VER=12.1            -> installs Db2 12.1.3 RT client
 DB2_VER=${DB2_VER:-"11.5"}
 
 case "$DB2_VER" in
@@ -35,16 +35,16 @@ esac
 SOURCE_URL="https://aws-blogs-artifacts-public.s3.amazonaws.com/artifacts/DBBLOG-4900"
 
 # =============================================================================
-# db2-driver.sh  —  Install RDS DB2 RT client
+# db2-driver.sh  --  Install RDS DB2 RT client
 # =============================================================================
-# Works in two modes — auto-detected based on whether BUCKET is set:
+# Works in two modes -- auto-detected based on whether BUCKET is set:
 #
 # ONLINE mode  (CloudShell / EC2 with internet access):
 #   curl -sL https://bit.ly/getdb2driver | bash
-#   — or —
+#   -- or --
 #   REGION=us-east-1 ./${SCRIPT_CLIENT}
 #
-# AIRGAP mode  (private subnet, no internet — run ${SCRIPT_AIRGAP} first):
+# AIRGAP mode  (private subnet, no internet -- run ${SCRIPT_AIRGAP} first):
 #   export BUCKET=db2client-artifacts-<account>-<region> REGION=<region>
 #   ./${SCRIPT_CLIENT}
 # =============================================================================
@@ -168,13 +168,13 @@ validate() {
 }
 
 # =============================================================================
-# Ensure jq is available — install from private bucket if missing
+# Ensure jq is available -- install from private bucket if missing
 # =============================================================================
 ensure_jq() {
   command -v jq &>/dev/null && return 0
   if [ -n "${BUCKET:-}" ]; then
-    # Airgap mode — pull the static jq binary staged in the private bucket
-    log_info "jq not found — downloading from s3://${BUCKET}/scripts/jq ..."
+    # Airgap mode -- pull the static jq binary staged in the private bucket
+    log_info "jq not found -- downloading from s3://${BUCKET}/scripts/jq ..."
     local tmp_jq
     tmp_jq=$(mktemp)
     aws s3 cp "s3://${BUCKET}/scripts/jq" "$tmp_jq" \
@@ -183,8 +183,8 @@ ensure_jq() {
     sudo chmod +x /usr/local/bin/jq
     log_success "jq installed from private bucket"
   else
-    # Online mode — BUCKET is empty, so install via the OS package manager
-    log_info "jq not found — installing via package manager ..."
+    # Online mode -- BUCKET is empty, so install via the OS package manager
+    log_info "jq not found -- installing via package manager ..."
     sudo yum install -y jq &>/dev/null || sudo apt-get install -y jq &>/dev/null
     if ! command -v jq &>/dev/null; then
       log_error "Failed to install jq. Please install it manually and re-run."
@@ -195,13 +195,13 @@ ensure_jq() {
 }
 
 # =============================================================================
-# Credentials — probe CloudShell, EC2 IMDSv2, then fall back to profile/env
+# Credentials -- probe CloudShell, EC2 IMDSv2, then fall back to profile/env
 # Precedence:
-#   1. Exported AWS_ACCESS_KEY_ID/SECRET  → use immediately
-#   2. PROFILE explicitly set             → validate with sts, exit if fails
-#   3. No profile                         → probe CloudShell IMDS → EC2 IMDS → exit if neither works
+#   1. Exported AWS_ACCESS_KEY_ID/SECRET  -> use immediately
+#   2. PROFILE explicitly set             -> validate with sts, exit if fails
+#   3. No profile                         -> probe CloudShell IMDS -> EC2 IMDS -> exit if neither works
 #
-# SECURITY: exported AWS_ACCESS_KEY_ID/SECRET are long-lived static keys —
+# SECURITY: exported AWS_ACCESS_KEY_ID/SECRET are long-lived static keys --
 # acceptable only for temporary CI/CD automation, NEVER for production. In
 # production, obtain credentials exclusively through an EC2 instance profile /
 # IAM role (CloudShell or EC2 IMDS below), never hard-coded or long-lived keys.
@@ -216,7 +216,7 @@ set_credentials() {
     return 0
   fi
 
-  # Priority 2: explicit profile — skip IMDS, validate immediately
+  # Priority 2: explicit profile -- skip IMDS, validate immediately
   if [ -n "$PROFILE" ]; then
     PROFILE_ARG="--profile $PROFILE"
     log_info "Using explicit profile: $PROFILE"
@@ -264,7 +264,7 @@ set_credentials() {
 }
 
 # =============================================================================
-# Download artifacts — online (curl from public S3) or airgap (aws s3 cp)
+# Download artifacts -- online (curl from public S3) or airgap (aws s3 cp)
 # =============================================================================
 curl_download() {
   local url="$1" dest="$2"
@@ -329,7 +329,7 @@ create_db2_user() {
 
 
 # =============================================================================
-# Install RT Client (runtime client)  — mirrors install_rt_client() in db2-driver.sh
+# Install RT Client (runtime client)  -- mirrors install_rt_client() in db2-driver.sh
 # =============================================================================
 install_rt_client() {
   local work_dir="$1"
@@ -352,18 +352,18 @@ install_rt_client() {
   # db2_install only if not already done for this version
   if [ ! -d "${DB2_INSTALL_DIR}" ]; then
     log_info "Installing Db2 ${DB2_VERSION_LABEL} runtime client"
-    # AL2023 ships without libcrypt.so.1 — db2iure requires it
+    # AL2023 ships without libcrypt.so.1 -- db2iure requires it
     if ! ldconfig -p | grep -q libcrypt.so.1; then
       log_info "Installing libxcrypt-compat for AL2023 compatibility"
       sudo yum install -y libxcrypt-compat &>/dev/null
     fi
     (cd "${work_dir}/rtcl" && sudo TMPDIR=/var/tmp ./db2_install -f sysreq -y -b /opt/ibm/db2 2>/tmp/db2install_err) || true
     if [ ! -d "/opt/ibm/db2" ]; then
-      log_error "db2_install failed — /opt/ibm/db2 not found."
+      log_error "db2_install failed -- /opt/ibm/db2 not found."
       return 1
     fi
   else
-    log_info "Db2 software already installed at ${DB2_INSTALL_DIR} — skipping db2_install"
+    log_info "Db2 software already installed at ${DB2_INSTALL_DIR} -- skipping db2_install"
   fi
   rm -rf "${work_dir}/rtcl"
 
@@ -372,7 +372,7 @@ install_rt_client() {
   local tmp_free
   tmp_free=$(df /tmp --output=avail | tail -1)
   if [ "$tmp_free" -lt 524288 ]; then
-    log_info "/tmp has insufficient space (${tmp_free}KB) — bind-mounting /var/tmp over /tmp"
+    log_info "/tmp has insufficient space (${tmp_free}KB) -- bind-mounting /var/tmp over /tmp"
     sudo mount --bind /var/tmp /tmp
     trap "sudo umount /tmp 2>/dev/null; rm -rf $work_dir" EXIT
   fi
@@ -382,7 +382,7 @@ install_rt_client() {
     /opt/ibm/db2/instance/db2icrt -s client "$DB2USER_NAME" 2>&1) || true
 
   if [ ! -d "/home/$DB2USER_NAME/sqllib" ]; then
-    log_error "db2icrt failed — /home/$DB2USER_NAME/sqllib not found."
+    log_error "db2icrt failed -- /home/$DB2USER_NAME/sqllib not found."
     log_error "db2icrt output: $icrt_out"
     return 1
   fi
@@ -395,7 +395,7 @@ install_rt_client() {
 
   if [ "$INCLUDE_OTHER_TOOLS" = "TRUE" ] && [ -f "${work_dir}/${TOOLS_ZIP}" ]; then
     log_info "Installing tools from ${TOOLS_ZIP}..."
-    # Extract tools zip — expected contents: db2exfmt, db2advis, db2advisbind.zip
+    # Extract tools zip -- expected contents: db2exfmt, db2advis, db2advisbind.zip
     local tools_dir="${work_dir}/tools"
     mkdir -p "$tools_dir"
     unzip -o "${work_dir}/${TOOLS_ZIP}" -d "$tools_dir" &>/dev/null
@@ -422,11 +422,11 @@ install_rt_client() {
     done
     rm -rf "$tools_dir"
   else
-    log_info "Skipping additional tools — set INCLUDE_OTHER_TOOLS=TRUE to enable"
+    log_info "Skipping additional tools -- set INCLUDE_OTHER_TOOLS=TRUE to enable"
   fi
 
   # Grant db2inst1 passwordless sudo ONLY for the Db2 binaries/instance tools it
-  # needs post-install (least privilege) — not blanket NOPASSWD:ALL. db2client-configure.sh
+  # needs post-install (least privilege) -- not blanket NOPASSWD:ALL. db2client-configure.sh
   # and the Db2 admin commands run out of these paths.
   cat <<SUDOERS | sudo tee "/etc/sudoers.d/$DB2USER_NAME" >/dev/null
 $DB2USER_NAME ALL=(ALL) NOPASSWD: /opt/ibm/db2/bin/*, /opt/ibm/db2/V*/bin/*, /opt/ibm/db2/V*/instance/*, /opt/ibm/db2/V*/adm/*
@@ -442,10 +442,10 @@ SUDOERS
 }
 
 # =============================================================================
-# Curl-pipe handler — download script then exit so user can run it directly
+# Curl-pipe handler -- download script then exit so user can run it directly
 # =============================================================================
 handle_curl_pipe() {
-  log_info "Curl-pipe detected — downloading $SCRIPT_CLIENT and $SCRIPT_AIRGAP for direct use"
+  log_info "Curl-pipe detected -- downloading $SCRIPT_CLIENT and $SCRIPT_AIRGAP for direct use"
   local dest_client="./$SCRIPT_CLIENT"
   local dest_airgap="./$SCRIPT_AIRGAP"
   curl -fsSL "${SOURCE_URL}/${SCRIPT_CLIENT}" -o "$dest_client" && chmod +x "$dest_client"
@@ -461,7 +461,7 @@ handle_curl_pipe() {
   echo "    DB2_VER=12.1 REGION=<region> ./$SCRIPT_CLIENT   # install Db2 12.1"
   echo "    DB2_VER=11.5 REGION=<region> ./$SCRIPT_CLIENT   # install Db2 11.5 (default)"
   echo
-  echo "  AIRGAP mode (no internet — private subnet):"
+  echo "  AIRGAP mode (no internet -- private subnet):"
   echo "    Step 1: On any machine WITH internet, download all artifacts:"
   echo "      DB2_VER=12.1 ./$SCRIPT_AIRGAP --mode download --region <region>"
   echo "                       # saves to ./db2client-artifacts/"

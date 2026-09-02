@@ -1,6 +1,6 @@
 # Connection Troubleshooting
 
-Diagnose Glue connection failures. Run checks in order: network → credentials → driver → SSL. Most failures are network.
+Diagnose Glue connection failures. Run checks in order: network -> credentials -> driver -> SSL. Most failures are network.
 
 ## Contents
 

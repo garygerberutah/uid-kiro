@@ -10,14 +10,14 @@ risky patterns (new device, unusual IP), and risk-based adaptive MFA.
 
 Threat protection features require the **Plus** feature plan:
 
-- `AdvancedSecurityMode = AUDIT | ENFORCED` — Plus only.
-- Adaptive-auth risk configuration — Plus only.
-- Threat-protection log delivery (`userAuthEvents` event source) — Plus only.
+- `AdvancedSecurityMode = AUDIT | ENFORCED` -- Plus only.
+- Adaptive-auth risk configuration -- Plus only.
+- Threat-protection log delivery (`userAuthEvents` event source) -- Plus only.
 
 Attempting these on a lower tier returns `FeatureUnavailableInTierException`.
 Set via `update-user-pool --user-pool-tier PLUS`.
 
-## `AdvancedSecurityMode` — three modes
+## `AdvancedSecurityMode` -- three modes
 
 Lives on `UserPool.UserPoolAddOns.AdvancedSecurityMode` (nested, not top-level):
 
@@ -33,7 +33,7 @@ Toggle via `update-user-pool` (NOT `set-risk-configuration`):
 aws cognito-idp update-user-pool \
   --user-pool-id <pool-id> \
   --user-pool-add-ons AdvancedSecurityMode=ENFORCED \
-  ... (re-send every other existing field — full-replace API)
+  ... (re-send every other existing field -- full-replace API)
 ```
 
 ## Compromised-credentials protection
@@ -56,7 +56,7 @@ aws cognito-idp set-risk-configuration \
 
 Cognito classifies each sign-in as **No Risk / Low / Medium / High**. The API
 exposes **three configurable action tiers** (`LowAction` / `MediumAction` /
-`HighAction`) — `No Risk` proceeds without triggering any Action.
+`HighAction`) -- `No Risk` proceeds without triggering any Action.
 
 ```
 aws cognito-idp set-risk-configuration \
@@ -73,7 +73,7 @@ aws cognito-idp set-risk-configuration \
     }'
 ```
 
-### `EventAction` — four values per tier
+### `EventAction` -- four values per tier
 
 | Value | Behavior |
 |-------|----------|
@@ -82,8 +82,8 @@ aws cognito-idp set-risk-configuration \
 | `MFA_REQUIRED` | Require MFA; block if user has no MFA method (**required MFA**) |
 | `BLOCK` | Reject the sign-in outright |
 
-Do NOT collapse `MFA_IF_CONFIGURED` and `MFA_REQUIRED` — they behave differently.
-Typical: `Low → NO_ACTION`, `Medium → MFA_IF_CONFIGURED`, `High → MFA_REQUIRED`
+Do NOT collapse `MFA_IF_CONFIGURED` and `MFA_REQUIRED` -- they behave differently.
+Typical: `Low -> NO_ACTION`, `Medium -> MFA_IF_CONFIGURED`, `High -> MFA_REQUIRED`
 or `BLOCK`.
 
 ### `NotifyConfiguration`
@@ -116,7 +116,7 @@ aws cognito-idp set-log-delivery-configuration \
 | `userAuthEvents` | `INFO` | Threat-protection sign-in events | Plus |
 | `userNotification` | `ERROR` | Message-delivery errors (SMS, email) | Lite+ |
 
-**Encrypt the target CloudWatch Logs log group with a customer-managed KMS key** —
+**Encrypt the target CloudWatch Logs log group with a customer-managed KMS key** --
 threat-protection events contain user PII (IP addresses, user identifiers) and sign-in
 risk metadata. Either set the KMS key at log-group creation, or associate one after the
 fact:
@@ -141,12 +141,12 @@ aws cognito-idp get-log-delivery-configuration --user-pool-id <pool-id>
 
 ## Gotchas
 
-- `UserPoolAddOns` block may be absent if threat protection never enabled —
+- `UserPoolAddOns` block may be absent if threat protection never enabled --
   inspect defensively: `pool.get("UserPoolAddOns", {}).get("AdvancedSecurityMode")`.
-- Downgrading Plus → lower tier fails while `AdvancedSecurityMode` is
+- Downgrading Plus -> lower tier fails while `AdvancedSecurityMode` is
   `AUDIT`/`ENFORCED`. Set to `OFF` first, then change tier.
 - `set-risk-configuration` with only `UserPoolId` clears the config to defaults
-  — always read-modify-write.
+  -- always read-modify-write.
 
 ## Authoritative sources
 

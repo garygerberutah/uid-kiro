@@ -45,17 +45,17 @@ API requests: `productFamily: "API Request"`, check `group` for request type (PU
 
 - `databaseEngine`: `"MySQL"`, `"PostgreSQL"`, `"MariaDB"`, `"Aurora MySQL"`, `"Aurora PostgreSQL"`, `"SQL Server"`, `"Oracle"`, `"Db2"`
 - `deploymentOption`: `"Single-AZ"`, `"Multi-AZ"`, `"Multi-AZ (readable standbys)"`
-- `databaseEdition`: for Oracle/SQL Server — `"Standard"`, `"Enterprise"`, `"Express"`, `"Web"`
+- `databaseEdition`: for Oracle/SQL Server -- `"Standard"`, `"Enterprise"`, `"Express"`, `"Web"`
 - `licenseModel`: important for Oracle and SQL Server
 - Instances: `productFamily: "Database Instance"`. Storage: `"Database Storage"`. Aurora Serverless: `"Serverless"` or `"ServerlessV2"`
 
 ## General Rules
 
-- **Price List API is only available in `us-east-1` and `ap-south-1`** — always specify `--region us-east-1`
+- **Price List API is only available in `us-east-1` and `ap-south-1`** -- always specify `--region us-east-1`
 - AWS uses binary system: 1 KB = 1,024 bytes
 - Monthly calculations: use 730 hours/month
 - Volume-based pricing: check `beginRange` and `endRange` in `priceDimensions`
-- Pricing is public on-demand only — does not reflect customer-specific discounts
+- Pricing is public on-demand only -- does not reflect customer-specific discounts
 - Always refer customers to the AWS Pricing Calculator for detailed estimates
 
 ```bash

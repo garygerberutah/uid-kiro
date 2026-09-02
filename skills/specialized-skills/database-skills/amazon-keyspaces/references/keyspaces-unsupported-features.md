@@ -1,6 +1,6 @@
 # Keyspaces unsupported features
 
-Authoritative list of Apache Cassandra features that Amazon Keyspaces does **not** support. Cited by Modes 2 and 3. Compatibility is binary — every listed feature is either supported or it is not; do not describe detected features as "supported with caveats".
+Authoritative list of Apache Cassandra features that Amazon Keyspaces does **not** support. Cited by Modes 2 and 3. Compatibility is binary -- every listed feature is either supported or it is not; do not describe detected features as "supported with caveats".
 
 Source: [Amazon Keyspaces functional differences from Cassandra](https://docs.aws.amazon.com/keyspaces/latest/devguide/functional-differences.html).
 
@@ -24,7 +24,7 @@ Not supported.
 
 Not supported.
 
-**Migration:** maintain a second table in the application via dual-write. Key the second table for the alternate access pattern. Accept eventual consistency between the two tables — Cassandra materialized views have the same tradeoff.
+**Migration:** maintain a second table in the application via dual-write. Key the second table for the alternate access pattern. Accept eventual consistency between the two tables -- Cassandra materialized views have the same tradeoff.
 
 ### User-defined functions (`CREATE FUNCTION`)
 
@@ -36,11 +36,11 @@ Not supported.
 
 Not supported.
 
-**Migration:** same as UDFs — compute client-side or in a stream/batch job.
+**Migration:** same as UDFs -- compute client-side or in a stream/batch job.
 
 ### LWT inside `BEGIN UNLOGGED BATCH`
 
-Not supported. Keyspaces rejects any lightweight-transaction (`IF NOT EXISTS`, `IF EXISTS`, `IF <col>=…`) issued inside an unlogged batch.
+Not supported. Keyspaces rejects any lightweight-transaction (`IF NOT EXISTS`, `IF EXISTS`, `IF <col>=...`) issued inside an unlogged batch.
 
 **Migration:** issue the LWT as a single-statement conditional outside any batch:
 
@@ -56,22 +56,22 @@ Keyspaces rejects `COUNT(`, `MIN(`, `MAX(`, `SUM(`, `AVG(` in `SELECT` statement
 
 **Migration:**
 
-- **COUNT** — maintain a counter table updated by the application on every write.
-- **MIN / MAX** — maintain pre-aggregated summary rows, or read the first/last row by clustering-key order.
-- **SUM / AVG** — compute client-side from a paginated `SELECT`, or maintain rolled-up summary tables updated by a stream processor.
+- **COUNT** -- maintain a counter table updated by the application on every write.
+- **MIN / MAX** -- maintain pre-aggregated summary rows, or read the first/last row by clustering-key order.
+- **SUM / AVG** -- compute client-side from a paginated `SELECT`, or maintain rolled-up summary tables updated by a stream processor.
 
 ## Not detected by the tool (but still unsupported or different)
 
-The compatibility tool is a first-pass screen, not a full audit. The following differences are not flagged but still matter — point the user at the [functional differences page](https://docs.aws.amazon.com/keyspaces/latest/devguide/functional-differences.html) for the full catalog.
+The compatibility tool is a first-pass screen, not a full audit. The following differences are not flagged but still matter -- point the user at the [functional differences page](https://docs.aws.amazon.com/keyspaces/latest/devguide/functional-differences.html) for the full catalog.
 
-- **`ALLOW FILTERING`** — supported in Keyspaces but may be rate-limited. The tool does not flag it because it is usable.
-- **`TRUNCATE`** — supported in Keyspaces as a throughput-controlled operation.
-- **`CREATE CUSTOM INDEX` (SASI, SAI)** — Keyspaces does not support custom index implementations. Detected by the schema parser (the regex matches both `CREATE INDEX` and `CREATE CUSTOM INDEX`), so these will appear as secondary index findings in the compatibility report.
-- **`COUNTER` columns** — supported in Keyspaces.
-- **Clustering-order-reverse queries** — supported.
-- **Lightweight-transaction serial consistency (`LOCAL_SERIAL`)** — supported.
-- **Consistency level `EACH_QUORUM`** — not supported on reads.
-- **Driver-level features** — some drivers expose Cassandra-specific features (e.g. `tuple` types) that Keyspaces supports only partially. Verify against the driver compatibility page.
+- **`ALLOW FILTERING`** -- supported in Keyspaces but may be rate-limited. The tool does not flag it because it is usable.
+- **`TRUNCATE`** -- supported in Keyspaces as a throughput-controlled operation.
+- **`CREATE CUSTOM INDEX` (SASI, SAI)** -- Keyspaces does not support custom index implementations. Detected by the schema parser (the regex matches both `CREATE INDEX` and `CREATE CUSTOM INDEX`), so these will appear as secondary index findings in the compatibility report.
+- **`COUNTER` columns** -- supported in Keyspaces.
+- **Clustering-order-reverse queries** -- supported.
+- **Lightweight-transaction serial consistency (`LOCAL_SERIAL`)** -- supported.
+- **Consistency level `EACH_QUORUM`** -- not supported on reads.
+- **Driver-level features** -- some drivers expose Cassandra-specific features (e.g. `tuple` types) that Keyspaces supports only partially. Verify against the driver compatibility page.
 
 ## Informational (not issues)
 
@@ -82,7 +82,7 @@ Not a compatibility issue. The compatibility output reports `query_patterns.ttl_
 - Mode 2 can treat those tables as TTL-driven for write accounting, even when DDL lacks `default_time_to_live`.
 - The user can sanity-check that the TTL pricing signal matches their actual workload.
 
-Display as "tables using `USING TTL`: …" — do not style it as an issue.
+Display as "tables using `USING TTL`: ..." -- do not style it as an issue.
 
 ## Guidance style
 

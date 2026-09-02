@@ -8,7 +8,7 @@ In general it is critical to avoid making assumptions about EKS Auto Mode cluste
 
 EKS Auto Mode relies on Karpenter autoscaling to provision and manage cluster compute, and nodes are designed to be treated like appliances. EKS Auto Mode does the following:
 
-- Chooses an appropriate AMI that’s configured with many services needed to run your workloads without intervention.
+- Chooses an appropriate AMI that's configured with many services needed to run your workloads without intervention.
 - Locks down access to files on the AMI using SELinux enforcing mode and a read-only root file system.
 - Prevents direct access to the nodes by disallowing SSH or SSM access.
 - Includes GPU support, with separate kernel drivers and plugins for NVIDIA and Neuron GPUs, enabling high-performance workloads.
@@ -22,7 +22,7 @@ EKS Auto Mode uses a node class CRD that is different from standard Karpenter. Y
 
 ### Node Pools
 
-Amazon EKS node pools offer a flexible way to manage compute resources in your Kubernetes cluster. This topic demonstrates how to create and configure node pools by using Karpenter, a node provisioning tool that helps optimize cluster scaling and resource utilization. With Karpenter’s NodePool resource, you can define specific requirements for your compute resources, including instance types, availability zones, architectures, and capacity types.
+Amazon EKS node pools offer a flexible way to manage compute resources in your Kubernetes cluster. This topic demonstrates how to create and configure node pools by using Karpenter, a node provisioning tool that helps optimize cluster scaling and resource utilization. With Karpenter's NodePool resource, you can define specific requirements for your compute resources, including instance types, availability zones, architectures, and capacity types.
 
 EKS Auto Mode uses different labels than Karpenter. Labels related to EC2 managed instances start with `eks.amazonaws.com`.
 

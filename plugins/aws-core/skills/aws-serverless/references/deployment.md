@@ -18,8 +18,8 @@ SAM templates extend CloudFormation with `Transform: AWS::Serverless-2016-10-31`
 | Resource Type | Purpose |
 |---|---|
 | `AWS::Serverless::Function` | Lambda + IAM role + event source mappings |
-| `AWS::Serverless::HttpApi` | HTTP API (API Gateway v2) — recommended |
-| `AWS::Serverless::Api` | REST API (v1) — WAF, usage plans, request validation |
+| `AWS::Serverless::HttpApi` | HTTP API (API Gateway v2) -- recommended |
+| `AWS::Serverless::Api` | REST API (v1) -- WAF, usage plans, request validation |
 | `AWS::Serverless::SimpleTable` | DynamoDB with minimal config |
 | `AWS::Serverless::LayerVersion` | Lambda layer |
 | `AWS::Serverless::StateMachine` | Step Functions state machine |
@@ -40,19 +40,19 @@ Eliminates duplication across functions/APIs. Supported types: `Function`, `Api`
 | Type | Behavior |
 |---|---|
 | Primitives (string, number, boolean) | Resource value **replaces** global |
-| Maps (dictionaries) | **Merged** — resource keys override matching global keys |
+| Maps (dictionaries) | **Merged** -- resource keys override matching global keys |
 | Lists (arrays) | Global entries **prepended** to resource entries |
 
 ---
 
 ## CDK serverless constructs
 
-Prefer L2 constructs — they provide sensible defaults and least-privilege IAM via `grant*` methods.
+Prefer L2 constructs -- they provide sensible defaults and least-privilege IAM via `grant*` methods.
 
 | Construct | Module | Use for |
 |---|---|---|
-| `NodejsFunction` | `aws-cdk-lib/aws-lambda-nodejs` | Node.js/TypeScript — bundles with esbuild automatically |
-| `PythonFunction` | `@aws-cdk/aws-lambda-python-alpha` | Python — requires Docker for bundling |
+| `NodejsFunction` | `aws-cdk-lib/aws-lambda-nodejs` | Node.js/TypeScript -- bundles with esbuild automatically |
+| `PythonFunction` | `@aws-cdk/aws-lambda-python-alpha` | Python -- requires Docker for bundling |
 | `HttpApi` | `aws-cdk-lib/aws-apigatewayv2` | HTTP API with CORS, JWT auth |
 | `HttpLambdaIntegration` | `aws-cdk-lib/aws-apigatewayv2-integrations` | Connect Lambda to HttpApi |
 
@@ -60,12 +60,12 @@ Prefer L2 constructs — they provide sensible defaults and least-privilege IAM 
 
 ## Fast iteration
 
-Both tools are **development-only** — they bypass CloudFormation safety and introduce drift. Use `sam deploy` or CI/CD for production.
+Both tools are **development-only** -- they bypass CloudFormation safety and introduce drift. Use `sam deploy` or CI/CD for production.
 
 ### SAM Accelerate
 
 ```bash
-sam sync --watch --stack-name my-stack                            # Watch mode — auto-syncs on save
+sam sync --watch --stack-name my-stack                            # Watch mode -- auto-syncs on save
 sam sync --code --watch --stack-name my-stack                     # Code-only (minimal sync time)
 sam sync --code --resource-id MyFunction --watch --stack-name my-stack  # Single function
 ```

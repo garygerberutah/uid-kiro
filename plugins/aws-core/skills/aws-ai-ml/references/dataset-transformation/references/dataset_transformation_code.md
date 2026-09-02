@@ -11,7 +11,7 @@ When generating:
 
 ## Related Files
 
-- `scripts/transformation_tools.py` — contains `execute_transformation_job()` for running the generated script as a SageMaker Processing Job. Use this when the user wants remote execution instead of local.
+- `scripts/transformation_tools.py` -- contains `execute_transformation_job()` for running the generated script as a SageMaker Processing Job. Use this when the user wants remote execution instead of local.
 
 ## Requirements
 
@@ -111,7 +111,7 @@ python transform.py --input s3://my-bucket/data/input.jsonl --output s3://my-buc
 
 ### SageMaker Processing Job
 
-Use `execute_transformation_job` from `scripts/transformation_tools.py` to run the script as a SageMaker Processing Job. This function handles container setup, S3 input/output mounting, and job orchestration. Do not manually construct Processing Job logic — always delegate to this tool.
+Use `execute_transformation_job` from `scripts/transformation_tools.py` to run the script as a SageMaker Processing Job. This function handles container setup, S3 input/output mounting, and job orchestration. Do not manually construct Processing Job logic -- always delegate to this tool.
 
 The job is submitted asynchronously (`wait=False`). Use `describe_transformation_job` to check job status.
 

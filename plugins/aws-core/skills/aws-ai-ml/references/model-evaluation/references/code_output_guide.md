@@ -4,11 +4,11 @@
 
 Ask the user once before generating code: **"Would you like me to generate a Jupyter notebook or a Python script?"**
 
-If the output format has already been decided in the conversation context, keep consistent — do not re-ask.
+If the output format has already been decided in the conversation context, keep consistent -- do not re-ask.
 
 ## Shared Rules (Both Modes)
 
-- Use EXACTLY the imports shown in each code template — do not add extras
+- Use EXACTLY the imports shown in each code template -- do not add extras
 - Replace `[PLACEHOLDER]` values with user-specific configuration
 
 ## SageMaker Python SDK
@@ -27,8 +27,8 @@ Write a `.ipynb` file in `<project-dir>/notebooks/`.
 **Naming and appending:**
 
 - Notebook path: `<project-dir>/notebooks/<project-name>.ipynb`
-- If the notebook already exists → ask: _"Would you like me to append cells to the existing notebook, or create a new one?"_
-- If it doesn't exist → create it
+- If the notebook already exists -> ask: _"Would you like me to append cells to the existing notebook, or create a new one?"_
+- If it doesn't exist -> create it
 - When appending, use the template's `# Cell 0 [markdown]:` cell as the section divider before the new cells
 
 **Formatting:**
@@ -58,14 +58,14 @@ Write a numbered `.py` file in `<project-dir>/scripts/`.
 
 **Naming:**
 
-- Format: `NN_<descriptive_name>.py` (e.g., `01_sft_finetuning.py`) — use the next available number in `<project-dir>/scripts/`
+- Format: `NN_<descriptive_name>.py` (e.g., `01_sft_finetuning.py`) -- use the next available number in `<project-dir>/scripts/`
 
 **Formatting:**
 
 - Plain Python file, standard text
 - Use `# %%` cell markers to preserve logical sections (IDE-compatible)
 - Include a docstring at the top describing what the script does
-- `# Cell 0 [markdown]:` → a comment block or docstring
+- `# Cell 0 [markdown]:` -> a comment block or docstring
 
 **Dependencies:**
 

@@ -6,7 +6,7 @@
 
 Help AI coding agents build, deploy, and manage applications on AWS.
 
-The Agent Toolkit for AWS gives AI coding agents the tools, knowledge, and guardrails they need to work with AWS services. It works with the coding agents developers already use — including Claude Code, Codex, Cursor, and Kiro.
+The Agent Toolkit for AWS gives AI coding agents the tools, knowledge, and guardrails they need to work with AWS services. It works with the coding agents developers already use -- including Claude Code, Codex, Cursor, and Kiro.
 
 ## Quick start
 
@@ -76,13 +76,13 @@ Then launch Codex and run `/plugins` to browse and install the **aws-core** plug
 
 ### Cursor
 
-Add this repository as a team marketplace from **Settings → Plugins → Team Marketplaces → Add Marketplace → Import from Repo**, pointing it at `aws/agent-toolkit-for-aws`. Cursor indexes the plugins listed in [`.cursor-plugin/marketplace.json`](.cursor-plugin/marketplace.json) on import.
+Add this repository as a team marketplace from **Settings -> Plugins -> Team Marketplaces -> Add Marketplace -> Import from Repo**, pointing it at `aws/agent-toolkit-for-aws`. Cursor indexes the plugins listed in [`.cursor-plugin/marketplace.json`](.cursor-plugin/marketplace.json) on import.
 
 Then open the **Plugins** panel and install the **aws-core** plugin (start here), or **aws-agents** and **aws-data-analytics** as needed. Each plugin bundles the AWS MCP Server configuration and agent skills.
 
 ### Kiro
 
-Kiro setup has two independent parts: the AWS MCP Server (for runtime AWS API access and documentation search) and local skills (for task-specific agent guidance). They complement each other but work independently — skills don't require the MCP server, and the MCP server doesn't serve locally-installed skills.
+Kiro setup has two independent parts: the AWS MCP Server (for runtime AWS API access and documentation search) and local skills (for task-specific agent guidance). They complement each other but work independently -- skills don't require the MCP server, and the MCP server doesn't serve locally-installed skills.
 
 **1. Add the AWS MCP Server** to your Kiro MCP configuration (`.kiro/settings/mcp.json`):
 
@@ -145,7 +145,7 @@ Plugins are currently available for Claude Code, Codex, and Cursor. For other ag
 
 ### Skills
 
-Agent skills are curated packages of instructions and reference materials that help agents complete specific AWS tasks. Skills are loaded on demand — agents discover and retrieve only what's relevant to the current task.
+Agent skills are curated packages of instructions and reference materials that help agents complete specific AWS tasks. Skills are loaded on demand -- agents discover and retrieve only what's relevant to the current task.
 
 ```
 npx skills add aws/agent-toolkit-for-aws/skills
@@ -155,7 +155,7 @@ Browse the [`skills/`](skills/) directory to see all available skills.
 
 ### Rules files
 
-Recommended project-level configuration files that tell agents how to use AWS most effectively — for example, by using the AWS MCP Server, discovering available skills, or searching documentation before acting.
+Recommended project-level configuration files that tell agents how to use AWS most effectively -- for example, by using the AWS MCP Server, discovering available skills, or searching documentation before acting.
 
 See [`rules/`](rules/) for details.
 
@@ -163,23 +163,23 @@ See [`rules/`](rules/) for details.
 
 The [AWS MCP Server](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/understanding-mcp-server-tools.html) is a managed server that gives agents access to AWS through the Model Context Protocol. It provides:
 
-- **Full AWS API coverage** — Interact with any of the 300+ AWS services through a single authenticated endpoint.
-- **Sandboxed script execution** — Agents can run Python scripts in an isolated environment for complex multi-step operations.
-- **Real-time documentation access** — Search and retrieve current AWS documentation, API references, and service capabilities without authentication.
-- **Enterprise controls** — Amazon CloudWatch metrics, IAM context keys for agent-specific policies, and AWS CloudTrail audit logging.
+- **Full AWS API coverage** -- Interact with any of the 300+ AWS services through a single authenticated endpoint.
+- **Sandboxed script execution** -- Agents can run Python scripts in an isolated environment for complex multi-step operations.
+- **Real-time documentation access** -- Search and retrieve current AWS documentation, API references, and service capabilities without authentication.
+- **Enterprise controls** -- Amazon CloudWatch metrics, IAM context keys for agent-specific policies, and AWS CloudTrail audit logging.
 
 For details on operation, available tools, authentication, and supported Regions, see the [AWS MCP Server documentation](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/understanding-mcp-server-tools.html).
 
 ## Documentation
 
-- [User guide](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/) — Setup, configuration, and reference documentation.
-- [AWS MCP Server tools](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/understanding-mcp-server-tools.html) — Reference for all available MCP tools.
+- [User guide](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/) -- Setup, configuration, and reference documentation.
+- [AWS MCP Server tools](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/understanding-mcp-server-tools.html) -- Reference for all available MCP tools.
 
 ## How the Agent Toolkit relates to the MCP servers, skills, and plugins in AWS Labs
 
 In 2025, AWS began releasing MCP servers, skills, and plugins as part of [AWS Labs](https://github.com/awslabs). The Agent Toolkit for AWS is the successor to those tools. We recommend using the Agent Toolkit for AWS, because it offers key features including:
 
-- IAM condition keys that distinguish between agent actions and human actions, so you can write policies that apply only to agents. For example, you can write policies that only allow read-only actions through the MCP server, even if the user’s underlying IAM role can take write actions).
+- IAM condition keys that distinguish between agent actions and human actions, so you can write policies that apply only to agents. For example, you can write policies that only allow read-only actions through the MCP server, even if the user's underlying IAM role can take write actions).
 - CloudWatch metrics and CloudTrail audit logging for every request, so you can monitor and audit coding agent activity.
 - Agent skills that have undergone thorough end-to-end evaluations, so you can be confident that workflows will complete successfully.
 

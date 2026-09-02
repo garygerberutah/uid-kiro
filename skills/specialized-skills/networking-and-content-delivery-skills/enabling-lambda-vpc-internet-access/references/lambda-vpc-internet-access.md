@@ -103,8 +103,8 @@ Present the planned infrastructure changes and estimated costs to the user for e
 **Constraints:**
 
 - You MUST present a summary of ALL resources that will be created, including:
-  - NAT Gateway (high monthly base cost + per-GB data processing charges — refer to AWS NAT Gateway pricing documentation for current rates)
-  - Elastic IP (billed for the public IPv4 address whether associated or not, plus additional charges when unassociated — refer to AWS Elastic IP pricing documentation for current rates)
+  - NAT Gateway (high monthly base cost + per-GB data processing charges -- refer to AWS NAT Gateway pricing documentation for current rates)
+  - Elastic IP (billed for the public IPv4 address whether associated or not, plus additional charges when unassociated -- refer to AWS Elastic IP pricing documentation for current rates)
   - Any new subnets or route tables
   - Internet Gateway (if needed)
 - You MUST list the target VPC, availability zone, and affected Lambda function

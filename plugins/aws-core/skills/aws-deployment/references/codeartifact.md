@@ -121,7 +121,7 @@ Or use repository policies for finer-grained control.
 
 **`login` sets global config**: `aws codeartifact login --tool npm` modifies `~/.npmrc` globally. In CodeBuild this is fine (ephemeral environment), but locally it overwrites existing registry config. Use `--namespace` or manual token setup for multi-registry scenarios.
 
-**Domain policy vs repository policy**: For cross-account access, you need BOTH — missing either causes AccessDenied. Domain policy: grants `codeartifact:GetAuthorizationToken` to the consuming account. Repository policy: grants `codeartifact:ReadFromRepository` to the consuming account. Plus identity-based policy on the consuming role. All three are required.
+**Domain policy vs repository policy**: For cross-account access, you need BOTH -- missing either causes AccessDenied. Domain policy: grants `codeartifact:GetAuthorizationToken` to the consuming account. Repository policy: grants `codeartifact:ReadFromRepository` to the consuming account. Plus identity-based policy on the consuming role. All three are required.
 
 **External connection limit**: Each repository can have only ONE external connection. Use upstream chaining to combine multiple public sources (e.g., one repo connected to npmjs, another to pypi, a third repo listing both as upstreams).
 
@@ -142,7 +142,7 @@ Or use repository policies for finer-grained control.
 - MUST use a customer-managed KMS key for domain encryption (`--encryption-key`); the default AWS-managed key does NOT support cross-account access
 - Scope `codeartifact:ReadFromRepository` to specific repository ARNs; avoid `*`
 - Use domain policies (not just repository policies) for cross-account access grants
-- Enable CloudTrail for `codeartifact:*` API auditing — critical for cross-account scenarios to track who is accessing packages
+- Enable CloudTrail for `codeartifact:*` API auditing -- critical for cross-account scenarios to track who is accessing packages
 - Rotate auth tokens regularly; default 12-hour TTL is the maximum
 - See [CodeArtifact security best practices](https://docs.aws.amazon.com/codeartifact/latest/ug/security-best-practices.html)
 

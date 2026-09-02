@@ -3,7 +3,7 @@
 
 Fetches/searches the snapshot data a breakpoint captured. Snapshot data is read from public
 CloudWatch Logs Insights (`/aws/service-events/{service}`) via boto3 `logs`; no bundled model
-is needed. Self-contained — requires only `python3` + `boto3`.
+is needed. Self-contained -- requires only `python3` + `boto3`.
 
 ARCHITECTURE
   - The two operation implementations (get_sample_snapshot_for_breakpoint,
@@ -44,7 +44,7 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 
-# ── the 2-op contract: op name -> (vendored module, function) ───────────────────────────
+# -- the 2-op contract: op name -> (vendored module, function) ---------------------------
 _OPS = {
     "sample": ("di_snapshot_tools", "get_sample_snapshot_for_breakpoint"),
     "search": ("di_snapshot_tools", "search_snapshots_for_status_event"),
@@ -62,7 +62,7 @@ def _dispatch_table() -> Dict[str, Any]:
     dependency (the build env omits boto3 and must still import this module). Note this does
     NOT make ``--print-contract`` boto3-free: calling ``_resolve_tool`` runs this function and
     triggers the lazy ``botocore`` import. (The old import cycle that also required this is
-    gone — the logs-client seam moved to ``di_logs_client``.)
+    gone -- the logs-client seam moved to ``di_logs_client``.)
 
     ``_resolve_tool`` and the ``test_dispatch_table_keys_match_ops`` sync guard both key off
     this table, so an op added to ``_OPS`` without a matching binding here fails loudly rather
@@ -117,7 +117,7 @@ _ARG_HINTS = {
 #   1. Deterministic INPUT failures (bad location_hash / timestamp / limit / unbalanced
 #      custom_filters) return a bare "ERROR: ..." string.
 #   2. AWS-QUERY failures (log group missing, throttle, polling timeout, Failed/Cancelled)
-#      return a JSON string whose inner `status` field carries the failure — the string starts
+#      return a JSON string whose inner `status` field carries the failure -- the string starts
 #      with "{", so a prefix check never catches it. _execute_cloudwatch_query emits status in
 #      {Error, Polling Timeout, Failed, Cancelled}; the renderers map those to an inner
 #      "status" of "ERROR"/"TIMEOUT" (or pass the raw status through). Only Complete/SUCCESS and
@@ -157,7 +157,7 @@ def _write_out(path: str, text: str) -> None:
       - O_NOFOLLOW: refuse to follow a symlink at `path` (an attacker-planted symlink in a
         shared dir would otherwise leak the snapshot into / clobber the link target).
       - O_EXCL semantics are too strict for a re-runnable CLI (would fail on a stale file), so
-        we instead fchmod the fd to 0600 explicitly AFTER open — this restricts both freshly
+        we instead fchmod the fd to 0600 explicitly AFTER open -- this restricts both freshly
         created files (regardless of umask) AND a pre-existing file whose mode was looser
         (O_CREAT's mode arg is ignored when the file already exists).
     """
@@ -244,12 +244,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--json-file",
         dest="json_file",
-        help="read the op's JSON arguments from PATH (or '-' for stdin) — keeps values off "
+        help="read the op's JSON arguments from PATH (or '-' for stdin) -- keeps values off "
         "the shell command line",
     )
     ap.add_argument(
         "--out",
-        help="write the result to FILE (0600 perms) instead of stdout — for large results "
+        help="write the result to FILE (0600 perms) instead of stdout -- for large results "
         "the agent will parse with jq/python (see SKILL.md). Snapshots may contain PII.",
     )
     ap.add_argument(

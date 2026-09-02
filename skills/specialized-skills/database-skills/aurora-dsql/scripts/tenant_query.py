@@ -1,8 +1,8 @@
 """Fetch all rows from `entities` for a given tenant.
 
-req.tenant is untrusted input — it MUST be validated before interpolation.
+req.tenant is untrusted input -- it MUST be validated before interpolation.
 The execution path here builds a raw SQL string (for cases where a driver's
-native parameter binding cannot be used — e.g., dynamic identifiers, shell
+native parameter binding cannot be used -- e.g., dynamic identifiers, shell
 pipelines). safe_query.build() is the injection defense.
 
 Authorization note: format validation (regex) confirms the value looks like a

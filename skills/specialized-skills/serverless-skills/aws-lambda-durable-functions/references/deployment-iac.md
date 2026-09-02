@@ -168,9 +168,9 @@ durableFunction.role?.addManagedPolicy(
 
 **When to use:**
 
-- ✅ Production environments where log retention policies must be enforced
-- ✅ Development/test environments where automatic cleanup saves costs
-- ✅ Multi-function stacks where consistent log management is needed
+- [YES] Production environments where log retention policies must be enforced
+- [YES] Development/test environments where automatic cleanup saves costs
+- [YES] Multi-function stacks where consistent log management is needed
 
 **Important:** Don't forget to add `AWSLambdaBasicDurableExecutionRolePolicy` when using explicit log groups.
 
@@ -302,7 +302,7 @@ DurableFunction:
       RetentionPeriodInDays: 1       # Short retention
     Environment:
       Variables:
-        LOG_LEVEL: DEBUG             # Use INFO or higher in non-dev — DEBUG may expose step results and execution state
+        LOG_LEVEL: DEBUG             # Use INFO or higher in non-dev -- DEBUG may expose step results and execution state
         ENVIRONMENT: development
 ```
 
@@ -351,7 +351,7 @@ new DurableFunctionStack(app, 'DurableFunction-Prod', {
 
 ### Critical Requirements
 
-**⚠️ Important Invocation Rules:**
+**[WARNING] Important Invocation Rules:**
 
 1. **Qualified Function Name Required**: You MUST provide a qualified function name with version, alias, or `:$LATEST`
 2. **Idempotency with durable-execution-name**: Use this parameter to ensure the same execution name always refers to the same execution
@@ -434,7 +434,7 @@ aws lambda invoke \
 Durable functions require qualified ARNs (version, alias, or `$LATEST`):
 
 ```bash
-# ✅ Invoke specific version
+# [YES] Invoke specific version
 aws lambda invoke \
   --function-name 'myDurableFunction:1' \
   --invocation-type RequestResponse \
@@ -443,7 +443,7 @@ aws lambda invoke \
   --cli-binary-format raw-in-base64-out \
   response.json
 
-# ✅ Invoke using alias
+# [YES] Invoke using alias
 aws lambda invoke \
   --function-name 'myDurableFunction:live' \
   --invocation-type RequestResponse \
@@ -452,7 +452,7 @@ aws lambda invoke \
   --cli-binary-format raw-in-base64-out \
   response.json
 
-# ❌ Unqualified - will fail!
+# [NO] Unqualified - will fail!
 aws lambda invoke \
   --function-name 'myDurableFunction' \
   --payload '{"test":"data"}' \
@@ -527,11 +527,11 @@ DurableFunctionErrorAlarm:
 **Solution:** Use version, alias, or `$LATEST`:
 
 ```bash
-# ✅ Correct
+# [YES] Correct
 aws lambda invoke --function-name myFunction:live ...
 aws lambda invoke --function-name myFunction:1 ...
 
-# ❌ Wrong
+# [NO] Wrong
 aws lambda invoke --function-name myFunction ...
 ```
 

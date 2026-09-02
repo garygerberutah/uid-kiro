@@ -1,4 +1,4 @@
-# Aurora MySQL — Query Load Analysis & Explain Plan Review
+# Aurora MySQL -- Query Load Analysis & Explain Plan Review
 
 ## Purpose
 
@@ -42,7 +42,7 @@ EXPLAIN FORMAT=JSON SELECT ... FROM ... WHERE col = 1;
 
 Analyze each EXPLAIN output for these patterns and flag accordingly:
 
-### 🔴 Critical — Behavior Changes That Will Impact Performance
+### [RED] Critical -- Behavior Changes That Will Impact Performance
 
 | Pattern in EXPLAIN | Why It Matters in 8.0 | Action |
 |---|---|---|
@@ -50,7 +50,7 @@ Analyze each EXPLAIN output for these patterns and flag accordingly:
 | `"using_filesort": true` with large `rows_examined` | The sort algorithm changed in 8.0. New optimizer may choose different sort strategies. | Benchmark these queries on a snapshot-restored test cluster before upgrade. |
 | Hash join absent on large joins | MySQL 8.0 introduces hash joins for equi-joins without indexes. Optimizer may choose different plans. | Queries that were slow due to nested loop joins may improve, but verify with EXPLAIN on 8.0. |
 
-### 🟡 Warning — Optimizer Behavior Differences
+### [YELLOW] Warning -- Optimizer Behavior Differences
 
 | Pattern in EXPLAIN | Why It Matters in 8.0 | Action |
 |---|---|---|
@@ -60,7 +60,7 @@ Analyze each EXPLAIN output for these patterns and flag accordingly:
 | Full table scan on small tables | 8.0 optimizer cost model updated. May choose index where 5.7 chose scan (or vice versa). | Run EXPLAIN on test cluster to compare. |
 | `"query_cost"` significantly different | Cost model recalibrated in 8.0. | Use as baseline comparison only. |
 
-### 🟢 Clean — No Upgrade Impact
+### [GREEN] Clean -- No Upgrade Impact
 
 | Pattern | Notes |
 |---|---|

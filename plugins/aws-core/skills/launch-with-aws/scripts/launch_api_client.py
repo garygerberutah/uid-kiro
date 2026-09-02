@@ -30,7 +30,7 @@ from launch_config import (
     load_config,
 )
 
-# ── Boto3 custom service client ──────────────────────────────────────────
+# -- Boto3 custom service client ------------------------------------------
 
 _SERVICE_MODEL_PATH = Path(__file__).parent.parent / "references" / "launchwithaws-2026-06-15.json"
 
@@ -124,7 +124,7 @@ def create_client(
     )
 
 
-# ── API client ───────────────────────────────────────────────────────────
+# -- API client -----------------------------------------------------------
 
 
 class ApiError(Exception):
@@ -184,7 +184,7 @@ def _get_boto3_client() -> Any:
     )
 
 
-# ── Public API functions ─────────────────────────────────────────────────
+# -- Public API functions -------------------------------------------------
 
 
 def create_upload_url() -> Any:
@@ -211,7 +211,7 @@ def put_archive(upload_url: str, archive: bytes) -> None:
         raise ApiError(err.code, "PUT", "(presigned S3 upload)", err.read().decode()) from err
 
 
-# ── Launch resource API ──────────────────────────────────────────────────
+# -- Launch resource API --------------------------------------------------
 
 
 def create_launch(
@@ -219,7 +219,7 @@ def create_launch(
     source: Dict[str, Any],
     client_token: Optional[str] = None,
 ) -> Any:
-    """POST /api/launches — create a new launch from an upload or GitHub repo."""
+    """POST /api/launches -- create a new launch from an upload or GitHub repo."""
     client = _get_boto3_client()
     kwargs: Dict[str, Any] = {"name": name, "source": source}
     if client_token:
@@ -231,7 +231,7 @@ def create_launch(
 
 
 def get_launch(launch_id: str, include: Optional[str] = None) -> Any:
-    """GET /api/launches/:launchId — get launch details with optional sections."""
+    """GET /api/launches/:launchId -- get launch details with optional sections."""
     client = _get_boto3_client()
     kwargs: Dict[str, Any] = {"launchIdentifier": launch_id}
     if include:
@@ -244,7 +244,7 @@ def get_launch(launch_id: str, include: Optional[str] = None) -> Any:
 
 
 def list_launches(max_results: Optional[int] = None) -> Any:
-    """GET /api/launches — list all launches for the current user."""
+    """GET /api/launches -- list all launches for the current user."""
     client = _get_boto3_client()
     kwargs: Dict[str, Any] = {}
     if max_results is not None:
@@ -256,7 +256,7 @@ def list_launches(max_results: Optional[int] = None) -> Any:
 
 
 def delete_launch(launch_id: str) -> None:
-    """DELETE /api/launches/:launchId — delete a launch (returns 204 No Content)."""
+    """DELETE /api/launches/:launchId -- delete a launch (returns 204 No Content)."""
     client = _get_boto3_client()
     try:
         client.delete_launch(launchIdentifier=launch_id)
@@ -270,7 +270,7 @@ def refine_plan(
     prompt: Optional[str] = None,
     client_token: Optional[str] = None,
 ) -> Any:
-    """POST /api/launches/:launchId/refine — provide context answers to refine the plan."""
+    """POST /api/launches/:launchId/refine -- provide context answers to refine the plan."""
     client = _get_boto3_client()
     kwargs: Dict[str, Any] = {"launchIdentifier": launch_id}
     if context_answers:
@@ -286,7 +286,7 @@ def refine_plan(
 
 
 def start_launch_execution(launch_id: str, client_token: Optional[str] = None) -> Any:
-    """POST /api/launches/:launchId/start — start execution of the deployment plan."""
+    """POST /api/launches/:launchId/start -- start execution of the deployment plan."""
     client = _get_boto3_client()
     kwargs: Dict[str, Any] = {"launchIdentifier": launch_id}
     if client_token:

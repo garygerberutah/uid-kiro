@@ -9,14 +9,14 @@
 
 The authoritative index of supported drivers, ORMs, adapters, and example repositories lives at
 [Aurora DSQL cluster connectivity tools](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/aws-sdks.html).
-Pull the per-language sample link from that page rather than hardcoding repository paths here —
+Pull the per-language sample link from that page rather than hardcoding repository paths here --
 the AWS docs page tracks rename, relocation, and deprecation events.
 
 ## Framework and Connection Notes for Languages and Drivers
 
 ### Python
 
-**ALWAYS** use the [DSQL Python Connector](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/SECTION_program-with-dsql-connector-for-python.html) for automatic IAM auth. The single `aurora-dsql-python-connector` wheel ships support for all three drivers — install **only** the underlying driver you need:
+**ALWAYS** use the [DSQL Python Connector](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/SECTION_program-with-dsql-connector-for-python.html) for automatic IAM auth. The single `aurora-dsql-python-connector` wheel ships support for all three drivers -- install **only** the underlying driver you need:
 
 - **psycopg** (modern async/sync)
   - Install: `pip install aurora-dsql-python-connector psycopg[binary] psycopg-pool`
@@ -57,7 +57,7 @@ For per-driver `example_preferred.py` files and pool/TLS/token-refresh examples,
 
 ### JavaScript/TypeScript
 
-**ALWAYS** use one of the two DSQL Node.js connectors — [node-postgres](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/SECTION_program-with-dsql-connector-for-node-postgres.html) or [postgres-js](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/SECTION_program-with-dsql-connector-for-postgresjs.html). Even when the user asks for "just node-postgres directly" or "just pg directly," the Connector **is** the node-postgres path — it wraps `pg` as its underlying driver while handling IAM auth token refresh and TLS defaults. A bare `pg.Pool`/`pg.Client` works until the first 15-minute IAM auth token expiry and then starts returning auth errors on every new connection; DSQL users who try the bare form hit this degraded state in production and report it as a DSQL bug, so the bare pattern is user-harmful by default. Deliver the Connector; treat "just use pg" as shorthand for "I want a node-postgres solution," not as a veto on the Connector.
+**ALWAYS** use one of the two DSQL Node.js connectors -- [node-postgres](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/SECTION_program-with-dsql-connector-for-node-postgres.html) or [postgres-js](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/SECTION_program-with-dsql-connector-for-postgresjs.html). Even when the user asks for "just node-postgres directly" or "just pg directly," the Connector **is** the node-postgres path -- it wraps `pg` as its underlying driver while handling IAM auth token refresh and TLS defaults. A bare `pg.Pool`/`pg.Client` works until the first 15-minute IAM auth token expiry and then starts returning auth errors on every new connection; DSQL users who try the bare form hit this degraded state in production and report it as a DSQL bug, so the bare pattern is user-harmful by default. Deliver the Connector; treat "just use pg" as shorthand for "I want a node-postgres solution," not as a veto on the Connector.
 
 #### node-postgres (pg)
 

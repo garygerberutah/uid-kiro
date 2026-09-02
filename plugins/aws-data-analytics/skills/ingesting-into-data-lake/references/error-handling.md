@@ -24,7 +24,7 @@ This reference covers errors encountered during the data import workflow. Errors
 - Source data types don't match target Iceberg types
 - New columns in source not present in target table
 - Missing columns in source that exist in target
-- Incompatible type conversions (e.g., string → int with non-numeric values)
+- Incompatible type conversions (e.g., string -> int with non-numeric values)
 
 **Solutions**:
 

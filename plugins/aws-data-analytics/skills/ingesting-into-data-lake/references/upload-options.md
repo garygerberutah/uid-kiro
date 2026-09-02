@@ -7,7 +7,7 @@
 | `aws s3 cp` | Single file, or directory with `--recursive` |
 | `aws s3 sync` | Directory upload, skips unchanged files on re-run |
 
-`sync` is idempotent — safe to re-run after interruption. Prefer `sync` for directories.
+`sync` is idempotent -- safe to re-run after interruption. Prefer `sync` for directories.
 
 ## Multipart Upload
 
@@ -27,7 +27,7 @@ gzip file.csv
 aws s3 cp file.csv.gz s3://<bucket>/<prefix>/
 ```
 
-Do NOT compress Parquet, Avro, or ORC — they have built-in compression.
+Do NOT compress Parquet, Avro, or ORC -- they have built-in compression.
 
 ## Overwrite Protection
 

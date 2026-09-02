@@ -13,10 +13,10 @@ Help a developer call their deployed agent from an application.
 
 Do NOT use for:
 
-- Giving the agent tools to call external APIs → use `agents-connect`
-- Deploying the agent → use `agents-deploy`
-- Debugging agent responses → use `agents-debug`
-- Securing the agent endpoint for production → use `agents-harden` (but this skill covers the client-side auth code)
+- Giving the agent tools to call external APIs -> use `agents-connect`
+- Deploying the agent -> use `agents-deploy`
+- Debugging agent responses -> use `agents-debug`
+- Securing the agent endpoint for production -> use `agents-harden` (but this skill covers the client-side auth code)
 
 ## Input
 
@@ -24,7 +24,7 @@ Do NOT use for:
 
 - A language or framework: "from React", "in Python", "Node.js backend"
 - An auth preference: "using IAM", "with JWT"
-- Empty — the skill will detect the project context and guide accordingly
+- Empty -- the skill will detect the project context and guide accordingly
 
 ## Process
 
@@ -48,9 +48,9 @@ agentcore fetch access --name <AgentName> --type agent
 
 This returns:
 
-- **Agent Runtime ARN** — needed for SDK invocation
-- **Endpoint URL** — for direct HTTPS calls
-- **Auth configuration** — what auth method is configured
+- **Agent Runtime ARN** -- needed for SDK invocation
+- **Endpoint URL** -- for direct HTTPS calls
+- **Auth configuration** -- what auth method is configured
 
 Note the auth type from the output. It determines how the client app authenticates.
 
@@ -72,7 +72,7 @@ Read the agent's `authorizerType` field from `agentcore/agentcore.json` (it's a 
 
 Based on the developer's language preference (from `$ARGUMENTS` or ask), generate the appropriate client code.
 
-#### Python (boto3) — IAM auth
+#### Python (boto3) -- IAM auth
 
 ```python
 import boto3
@@ -91,14 +91,14 @@ try:
         runtimeSessionId="session-123",  # reuse for multi-turn conversations
     )
 
-    # Handle streaming response — response["response"] is a StreamingBody
+    # Handle streaming response -- response["response"] is a StreamingBody
     stream = response["response"]
     if hasattr(stream, "iter_lines"):
         for line in stream.iter_lines():
             if line:
                 print(line.decode(), end="", flush=True)
     else:
-        # Some SDK versions return raw bytes — read all at once
+        # Some SDK versions return raw bytes -- read all at once
         content = stream.read()
         print(content.decode() if isinstance(content, bytes) else content)
 
@@ -117,7 +117,7 @@ except ClientError as e:
         raise
 ```
 
-#### Python (HTTPS) — JWT auth
+#### Python (HTTPS) -- JWT auth
 
 ```python
 import requests
@@ -139,7 +139,7 @@ for chunk in response.iter_content(chunk_size=None):
     print(chunk.decode(), end="", flush=True)
 ```
 
-#### JavaScript/TypeScript (AWS SDK) — IAM auth
+#### JavaScript/TypeScript (AWS SDK) -- IAM auth
 
 ```typescript
 import {
@@ -167,7 +167,7 @@ for await (const chunk of response.response) {
 }
 ```
 
-#### JavaScript/TypeScript (fetch) — JWT auth
+#### JavaScript/TypeScript (fetch) -- JWT auth
 
 ```typescript
 const AGENT_URL = "<ENDPOINT_URL>";
@@ -195,9 +195,9 @@ while (true) {
 
 Explain how sessions work:
 
-- **`runtimeSessionId`** — pass the same value across multiple calls to maintain conversation context
+- **`runtimeSessionId`** -- pass the same value across multiple calls to maintain conversation context
 - Generate a unique session ID per user conversation (e.g., UUID)
-- Sessions are server-side — the agent remembers the conversation history for that session ID
+- Sessions are server-side -- the agent remembers the conversation history for that session ID
 - If you omit the session ID, each call is stateless (no conversation memory)
 
 ```python
@@ -212,7 +212,7 @@ invoke(session_id, "What's the weather in Seattle?")
 # Follow-up in same conversation
 invoke(session_id, "What about tomorrow?")
 
-# New conversation — new session
+# New conversation -- new session
 new_session_id = str(uuid.uuid4())
 invoke(new_session_id, "Different topic entirely")
 ```
@@ -231,25 +231,25 @@ Read the agent's `protocol` from `agentcore/agentcore.json`.
 
 Two patterns come up often enough in support cases to call out directly.
 
-**API Gateway `/{proxy+}` with a URL-encoded Runtime ARN.** Fronting AgentCore Runtime with an API Gateway REST API whose resource is `/{proxy+}` and whose integration URI is the encoded runtime ARN appears to work — the deploy succeeds and short requests return. Longer requests fail at around 2 minutes with `Integration closed connection prematurely` in the logs, regardless of `integrationTimeoutInMillis`. `HTTP_PROXY` is a generic forwarding integration; it doesn't handle SigV4, streaming, or session semantics the way the SDK client does.
+**API Gateway `/{proxy+}` with a URL-encoded Runtime ARN.** Fronting AgentCore Runtime with an API Gateway REST API whose resource is `/{proxy+}` and whose integration URI is the encoded runtime ARN appears to work -- the deploy succeeds and short requests return. Longer requests fail at around 2 minutes with `Integration closed connection prematurely` in the logs, regardless of `integrationTimeoutInMillis`. `HTTP_PROXY` is a generic forwarding integration; it doesn't handle SigV4, streaming, or session semantics the way the SDK client does.
 
 Use one of these instead:
 
 - Call Runtime directly from the client with the `bedrock-agentcore` SDK (Step 4 above). This is the intended path.
-- Put a Lambda between API Gateway and Runtime if you need API Gateway for rate limiting, a public HTTPS endpoint, or other reasons. The Lambda receives the request, calls `invoke_agent_runtime`, and streams the response back. The Lambda's execution role needs `bedrock-agentcore:InvokeAgentRuntime`. Be aware that API Gateway has a 29-second hard ceiling on synchronous responses — this works only for fast agents. For anything multi-step, use the direct SDK path instead.
+- Put a Lambda between API Gateway and Runtime if you need API Gateway for rate limiting, a public HTTPS endpoint, or other reasons. The Lambda receives the request, calls `invoke_agent_runtime`, and streams the response back. The Lambda's execution role needs `bedrock-agentcore:InvokeAgentRuntime`. Be aware that API Gateway has a 29-second hard ceiling on synchronous responses -- this works only for fast agents. For anything multi-step, use the direct SDK path instead.
 
-**Lambda-in-front for synchronous agent responses hits a short timeout ceiling.** A `Client → API Gateway → Lambda → Runtime` chain caps at ~29 seconds because of the API Gateway synchronous response limit. Any agent that reasons, calls multiple tools, or uses a non-trivial model will exceed it. If you're hitting timeouts on a Lambda wrapping Runtime, the fix is usually to drop the Lambda and let the client call Runtime directly — Runtime supports streaming responses natively, which is typically the reason teams add a Lambda in the first place.
+**Lambda-in-front for synchronous agent responses hits a short timeout ceiling.** A `Client -> API Gateway -> Lambda -> Runtime` chain caps at ~29 seconds because of the API Gateway synchronous response limit. Any agent that reasons, calls multiple tools, or uses a non-trivial model will exceed it. If you're hitting timeouts on a Lambda wrapping Runtime, the fix is usually to drop the Lambda and let the client call Runtime directly -- Runtime supports streaming responses natively, which is typically the reason teams add a Lambda in the first place.
 
 ### Step 8: Cross-account invocation
 
-Calling an agent in a different AWS account than your caller uses standard AWS cross-account IAM patterns — no AgentCore-specific plumbing. The caller account assumes a role in the agent's account, gets temporary credentials, and uses them to sign the invoke request.
+Calling an agent in a different AWS account than your caller uses standard AWS cross-account IAM patterns -- no AgentCore-specific plumbing. The caller account assumes a role in the agent's account, gets temporary credentials, and uses them to sign the invoke request.
 
 **Setup in the agent's account (Account B):**
 
 Create an IAM role that trusts the caller account and has permission to invoke the runtime.
 
 ```json
-// Trust policy — who can assume this role
+// Trust policy -- who can assume this role
 {
   "Version": "2012-10-17",
   "Statement": [{
@@ -264,7 +264,7 @@ Create an IAM role that trusts the caller account and has permission to invoke t
 ```
 
 ```json
-// Permissions policy — what this role can do
+// Permissions policy -- what this role can do
 {
   "Version": "2012-10-17",
   "Statement": [{
@@ -314,25 +314,25 @@ response = agentcore.invoke_agent_runtime(
 - Cache the assumed-role credentials. They're valid for the session duration (default 1 hour). Re-assume when they're close to expiring, not on every request.
 - Boto3's `Session` with a profile using `role_arn` and `source_profile` can automate this if your caller environment supports AWS config profiles. `assume_role` in code is the explicit version.
 - If the caller is in a Lambda, ECS task, or EC2 instance, the execution/task role is what gets the AssumeRole permission. That role's trust policy is what gets listed in Account B's trust policy.
-- The runtime's own resource policy (if any) is separate from IAM. Typically you don't need a resource policy for cross-account — the IAM role in Account B is what grants access.
+- The runtime's own resource policy (if any) is separate from IAM. Typically you don't need a resource policy for cross-account -- the IAM role in Account B is what grants access.
 
 ## Running shell commands inside a live agent session (`InvokeAgentRuntimeCommand`)
 
-Once an agent's session is running, you can execute shell commands inside that **same session's microVM** — same filesystem, same env, same network namespace — and stream the output back. This sits alongside `InvokeAgentRuntime` (which drives the agent's reasoning loop), not in place of it.
+Once an agent's session is running, you can execute shell commands inside that **same session's microVM** -- same filesystem, same env, same network namespace -- and stream the output back. This sits alongside `InvokeAgentRuntime` (which drives the agent's reasoning loop), not in place of it.
 
 When this is useful:
 
 - Coding/devops agents where your app runs deterministic ops (git pull, build, test, file system inspection) instead of asking the LLM to reason about them
 - Seeding the session's filesystem before the agent runs (drop a dataset into `/tmp`, then invoke the agent to analyze it)
-- Debugging a stuck or misbehaving session — run `ps`, `ls`, `cat /tmp/log` from outside without going through the agent
+- Debugging a stuck or misbehaving session -- run `ps`, `ls`, `cat /tmp/log` from outside without going through the agent
 - Any workflow where you want the reliability of a scripted command and the context of a warm session
 
 When it's the wrong tool:
 
-- Spawning new sessions to run arbitrary code for users — use the [`code-interpreter.md`](code-interpreter.md) built-in tool instead; it's purpose-built, sandboxed differently, and doesn't consume an agent's session
-- Running anything an unrelated caller shouldn't be able to do — commands execute with the runtime's execution role and filesystem
+- Spawning new sessions to run arbitrary code for users -- use the [`code-interpreter.md`](code-interpreter.md) built-in tool instead; it's purpose-built, sandboxed differently, and doesn't consume an agent's session
+- Running anything an unrelated caller shouldn't be able to do -- commands execute with the runtime's execution role and filesystem
 
-**IAM permission required:** `bedrock-agentcore:InvokeAgentRuntimeCommand` on the runtime ARN. This is a **separate** action from `InvokeAgentRuntime` — scope it explicitly to the callers who need it.
+**IAM permission required:** `bedrock-agentcore:InvokeAgentRuntimeCommand` on the runtime ARN. This is a **separate** action from `InvokeAgentRuntime` -- scope it explicitly to the callers who need it.
 
 ```python
 import boto3
@@ -353,7 +353,7 @@ for chunk in response["response"].iter_chunks():
 
 **Session must exist.** `InvokeAgentRuntimeCommand` attaches to a running session; it won't create one. If the session has expired or never existed, the call fails. Invoke the agent first (to start the session), then use the session ID for subsequent command calls.
 
-**Same microVM, same filesystem.** A file written by the command is visible to the agent on the next invoke, and vice versa. Use this to pre-load artifacts, then reason over them in the agent. Session isolation still applies — other sessions cannot see these files.
+**Same microVM, same filesystem.** A file written by the command is visible to the agent on the next invoke, and vice versa. Use this to pre-load artifacts, then reason over them in the agent. Session isolation still applies -- other sessions cannot see these files.
 
 > [!WARNING]
 > InvokeAgentRuntimeCommand executes arbitrary shell commands inside a live agent
@@ -362,9 +362,9 @@ for chunk in response["response"].iter_chunks():
 > bedrock-agentcore:InvokeAgentRuntime unless they explicitly need shell access.
 > Always create a separate IAM policy for command execution. Always enable CloudTrail
 > logging for InvokeAgentRuntimeCommand calls. If commands are constructed from
-> user-supplied input, validate and sanitize — this is a command injection surface.
+> user-supplied input, validate and sanitize -- this is a command injection surface.
 
-**IAM separation:** `InvokeAgentRuntimeCommand` is a distinct IAM action from `InvokeAgentRuntime`. Grant it only to the callers that need shell access — not to every identity that can invoke the agent. Minimal example:
+**IAM separation:** `InvokeAgentRuntimeCommand` is a distinct IAM action from `InvokeAgentRuntime`. Grant it only to the callers that need shell access -- not to every identity that can invoke the agent. Minimal example:
 
 ```json
 {
@@ -376,7 +376,7 @@ for chunk in response["response"].iter_chunks():
 
 Keep this in a separate IAM policy from the one that grants `InvokeAgentRuntime`. Attach it only to roles that explicitly need to run commands inside agent sessions.
 
-**Command injection:** The code example above uses a hardcoded command string — intentionally. If your real usage constructs commands from user-supplied input, validate before passing: reject strings containing `&&`, `;`, `$(...)`, backticks, `|`, or other shell metacharacters. Passing unsanitized user input to `InvokeAgentRuntimeCommand` is a direct code execution vulnerability.
+**Command injection:** The code example above uses a hardcoded command string -- intentionally. If your real usage constructs commands from user-supplied input, validate before passing: reject strings containing `&&`, `;`, `$(...)`, backticks, `|`, or other shell metacharacters. Passing unsanitized user input to `InvokeAgentRuntimeCommand` is a direct code execution vulnerability.
 
 **CloudTrail monitoring:** Enable an EventBridge rule to alert on unexpected `InvokeAgentRuntimeCommand` calls:
 
@@ -387,17 +387,17 @@ aws events put-rule \
   --state ENABLED
 ```
 
-A compromised caller with this permission can read/write the agent's filesystem, reach any network resource the agent can reach, and use the execution role's credentials — CloudTrail logging is the minimum detection baseline.
+A compromised caller with this permission can read/write the agent's filesystem, reach any network resource the agent can reach, and use the execution role's credentials -- CloudTrail logging is the minimum detection baseline.
 
 ## Reference integrations
 
 Two common integration targets have published, reusable patterns you can start from instead of building the integration layer yourself.
 
-**Slack.** [Integrating Amazon Bedrock AgentCore with Slack](https://aws.amazon.com/blogs/machine-learning/integrating-amazon-bedrock-agentcore-with-slack/) walks through a reusable integration layer that brings any AgentCore agent into a Slack workspace. The architecture (API Gateway → Lambda → SQS → AgentCore) handles Slack's 3-second webhook timeout via asynchronous processing: one Lambda validates the Slack signature and returns immediately, another posts a "Processing..." placeholder, and a third invokes the agent and replaces the placeholder with the real response. The pattern maps Slack thread timestamps to AgentCore Memory session IDs and Slack user IDs to actor IDs, so conversation context persists in the same thread over time. The integration layer is decoupled from the agent — you swap in any agent (FinOps, DevOps, incident response) without touching the Slack infrastructure. Deploys with one `cdk deploy`.
+**Slack.** [Integrating Amazon Bedrock AgentCore with Slack](https://aws.amazon.com/blogs/machine-learning/integrating-amazon-bedrock-agentcore-with-slack/) walks through a reusable integration layer that brings any AgentCore agent into a Slack workspace. The architecture (API Gateway -> Lambda -> SQS -> AgentCore) handles Slack's 3-second webhook timeout via asynchronous processing: one Lambda validates the Slack signature and returns immediately, another posts a "Processing..." placeholder, and a third invokes the agent and replaces the placeholder with the real response. The pattern maps Slack thread timestamps to AgentCore Memory session IDs and Slack user IDs to actor IDs, so conversation context persists in the same thread over time. The integration layer is decoupled from the agent -- you swap in any agent (FinOps, DevOps, incident response) without touching the Slack infrastructure. Deploys with one `cdk deploy`.
 
-**Microsoft Teams.** The same async-processing architecture (API Gateway → Lambda → queue → AgentCore) applies to Teams. See [How Amazon Bedrock transforms Microsoft Teams conversations into actionable insights](https://aws.amazon.com/blogs/industries/how-amazon-bedrock-transforms-microsoft-teams-conversations-into-actionable-insights/) for Teams-specific setup (Bot Framework registration, bot channel configuration). If you've already built the Slack pattern above, the Teams version is primarily a different webhook validator and response formatter.
+**Microsoft Teams.** The same async-processing architecture (API Gateway -> Lambda -> queue -> AgentCore) applies to Teams. See [How Amazon Bedrock transforms Microsoft Teams conversations into actionable insights](https://aws.amazon.com/blogs/industries/how-amazon-bedrock-transforms-microsoft-teams-conversations-into-actionable-insights/) for Teams-specific setup (Bot Framework registration, bot channel configuration). If you've already built the Slack pattern above, the Teams version is primarily a different webhook validator and response formatter.
 
-Both patterns handle the "webhook platform with short timeout" problem in the same way — the chat platform gets an immediate ack and a placeholder, the real agent call happens asynchronously, and the response replaces the placeholder when ready. If you're integrating a third chat platform not listed here, use either blog as a template.
+Both patterns handle the "webhook platform with short timeout" problem in the same way -- the chat platform gets an immediate ack and a placeholder, the real agent call happens asynchronously, and the response replaces the placeholder when ready. If you're integrating a third chat platform not listed here, use either blog as a template.
 
 ## Output
 
@@ -413,4 +413,4 @@ Both patterns handle the "webhook platform with short timeout" problem in the sa
 - Auth method matches what's configured on the agent
 - Streaming response handling is included (not just request/response)
 - Session ID pattern is explained
-- Code is complete and runnable — includes imports, error handling basics
+- Code is complete and runnable -- includes imports, error handling basics

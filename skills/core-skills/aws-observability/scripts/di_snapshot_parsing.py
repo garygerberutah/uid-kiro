@@ -47,7 +47,7 @@ def _preview_captured_value(captured_value: object) -> object:
             elif "value" in fval:
                 fields_preview[fname] = fval["value"]
             else:
-                # Nested object/collection — show type only
+                # Nested object/collection -- show type only
                 fields_preview[fname] = f'<{fval.get("type", "object")}>'
         preview["fields_preview"] = fields_preview
         if "size" in captured_value:
@@ -90,7 +90,7 @@ def _parse_snapshot_fields(result: dict) -> dict:
 
     Handles the OTLP log record format where:
     - Metadata is in top-level `attributes` (aws.di.*)
-    - Resource info is in `resource.attributes` (service.name, deployment.environment —
+    - Resource info is in `resource.attributes` (service.name, deployment.environment --
       the Java agent's autoconfig path may alternatively publish deployment.environment.name)
     - Captures and stack are nested under `body`
     - Trace/span IDs are at root level (`traceId`, `spanId`)

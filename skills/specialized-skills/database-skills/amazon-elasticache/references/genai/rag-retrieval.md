@@ -68,7 +68,7 @@ client.execute_command(
 
 After creation, if matching keys already exist, Valkey backfills the index in the background. **Query operations attempted while an index is undergoing backfill are not allowed and are terminated with an error.** Wait for readiness before querying:
 
-> **Backfill types:** During initial index creation (FT.CREATE), queries against the index are blocked and return an error until backfill completes. However, during scaling events (e.g., adding shards), the index may undergo backfill with reduced recall for search queries — queries are allowed but may return incomplete results.
+> **Backfill types:** During initial index creation (FT.CREATE), queries against the index are blocked and return an error until backfill completes. However, during scaling events (e.g., adding shards), the index may undergo backfill with reduced recall for search queries -- queries are allowed but may return incomplete results.
 
 ```python
 import time

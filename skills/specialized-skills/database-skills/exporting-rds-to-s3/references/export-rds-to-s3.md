@@ -111,7 +111,7 @@ Identify the snapshot to export based on user preferences.
     Status: creating (0:30)
     Status: creating (1:00)
     Status: creating (1:30)
-    Status: available (2:15) ✓
+    Status: available (2:15) [OK]
     Snapshot created successfully!
     ```
 
@@ -430,7 +430,7 @@ Start the export process to transfer snapshot data to S3.
 - You MUST display export task initiation confirmation:
 
   ```
-  ✓ Export task started successfully!
+  [OK] Export task started successfully!
 
   Export Task ID: production-mysql-export-20251014-153045
   Snapshot: production-mysql-snapshot-2025-10-14
@@ -475,7 +475,7 @@ Track the export operation until completion.
   Status: in_progress (50%, 25 GB exported, 2:30 elapsed)
   Status: in_progress (75%, 37.5 GB exported, 3:45 elapsed)
   Status: in_progress (90%, 45 GB exported, 4:30 elapsed)
-  Status: complete (100%, 50 GB exported, 5:00 elapsed) ✓
+  Status: complete (100%, 50 GB exported, 5:00 elapsed) [OK]
   ```
 
 - You MUST handle different status outcomes:
@@ -528,16 +528,16 @@ Confirm the export completed successfully and data is accessible in S3.
 
     ```
     s3://bucket/prefix/export-task-id/
-    ├── schema1/
-    │   ├── table1/
-    │   │   ├── data1.parquet
-    │   │   ├── data2.parquet
-    │   │   └── ...
-    │   └── table2/
-    │       └── data1.parquet
-    └── schema2/
-        └── table3/
-            └── data1.parquet
+    +-- schema1/
+    |   +-- table1/
+    |   |   +-- data1.parquet
+    |   |   +-- data2.parquet
+    |   |   +-- ...
+    |   +-- table2/
+    |       +-- data1.parquet
+    +-- schema2/
+        +-- table3/
+            +-- data1.parquet
     ```
 
   - Each table has one or more Parquet files
@@ -550,7 +550,7 @@ Confirm the export completed successfully and data is accessible in S3.
   - Sum file sizes from S3 listing
   - Compare to original snapshot size
   - Show compression ratio (Parquet vs snapshot)
-  - Example: "50 GB snapshot → 18 GB Parquet (64% reduction)"
+  - Example: "50 GB snapshot -> 18 GB Parquet (64% reduction)"
 - You MUST verify at least one Parquet file exists for expected tables:
   - If selective export, check specified tables are present
   - If full export, verify major tables exist
@@ -880,7 +880,7 @@ export_type: latest-snapshot
 # RDS Snapshot Export to S3 - Summary Report
 
 **Export Task ID:** production-mysql-export-20251014-153045
-**Status:** ✓ Completed Successfully
+**Status:** [OK] Completed Successfully
 **Generated:** 2025-10-14 20:45:30 UTC
 
 ---
@@ -893,7 +893,7 @@ Successfully exported RDS MySQL snapshot to S3 for analytics and backup purposes
 - **Snapshot:** production-mysql-automated-2025-10-14-12-30
 - **Export Status:** Complete
 - **Duration:** 5 hours 15 minutes
-- **Data Exported:** 245 GB → 92 GB Parquet (62% compression)
+- **Data Exported:** 245 GB -> 92 GB Parquet (62% compression)
 
 ---
 
@@ -939,18 +939,18 @@ Successfully exported RDS MySQL snapshot to S3 for analytics and backup purposes
 ```
 
 s3://analytics-data-lake/rds-exports/mysql/production-mysql-export-20251014-153045/
-├── appdb/
-│   ├── users/
-│   │   ├── 1.parquet
-│   │   ├── 2.parquet
-│   │   └── ... (15 files, 8.2 GB)
-│   ├── orders/
-│   │   ├── 1.parquet
-│   │   └── ... (42 files, 18.5 GB)
-│   ├── products/
-│   │   └── 1.parquet (2.1 GB)
-│   └── ... (87 tables total)
-└── ...
++-- appdb/
+|   +-- users/
+|   |   +-- 1.parquet
+|   |   +-- 2.parquet
+|   |   +-- ... (15 files, 8.2 GB)
+|   +-- orders/
+|   |   +-- 1.parquet
+|   |   +-- ... (42 files, 18.5 GB)
+|   +-- products/
+|   |   +-- 1.parquet (2.1 GB)
+|   +-- ... (87 tables total)
++-- ...
 
 ```
 
@@ -1137,7 +1137,7 @@ df.count()
 
 ### Monthly Storage Costs (S3 Standard)
 
-- **92 GB × $0.023/GB-month = $2.12/month**
+- **92 GB x $0.023/GB-month = $2.12/month**
 
 ### Ongoing Query Costs
 
@@ -1200,10 +1200,10 @@ aws iam delete-role --role-name production-mysql-export-role
 
 ### Immediate Actions
 
-1. ✓ Verify exported data is accessible via Athena or Glue
-2. ✓ Test queries on sample tables to confirm data integrity
-3. ✓ Set up Athena workgroup with query result location
-4. ✓ Document table schemas and relationships for team reference
+1. [OK] Verify exported data is accessible via Athena or Glue
+2. [OK] Test queries on sample tables to confirm data integrity
+3. [OK] Set up Athena workgroup with query result location
+4. [OK] Document table schemas and relationships for team reference
 
 ### Short-Term Actions
 

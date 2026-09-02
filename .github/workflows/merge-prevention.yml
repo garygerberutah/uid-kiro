@@ -2,12 +2,12 @@
 # Prevents unintentional merges beyond what branch rulesets can express.
 #
 # Two independent gates:
-#   1. Label gate  — a PR labelled with `do-not-merge` (or `vars.DO_NOT_MERGE_LABEL`)
+#   1. Label gate  -- a PR labelled with `do-not-merge` (or `vars.DO_NOT_MERGE_LABEL`)
 #      is blocked until the label is removed.
-#   2. Global gate — the `HALT_MERGES` repo variable blocks all merges when set:
-#        HALT_MERGES=0       → gate disabled (default)
-#        HALT_MERGES=<N>     → only PR #N is allowed to merge
-#        HALT_MERGES=-1      → all merges blocked
+#   2. Global gate -- the `HALT_MERGES` repo variable blocks all merges when set:
+#        HALT_MERGES=0       -> gate disabled (default)
+#        HALT_MERGES=<N>     -> only PR #N is allowed to merge
+#        HALT_MERGES=-1      -> all merges blocked
 #
 # Both gates are cheap escape hatches for incident response; they are not a
 # replacement for branch protection rules.

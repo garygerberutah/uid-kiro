@@ -352,7 +352,7 @@ def resolve_one(ref):
 
 
 def resolve_string(s):
-    """Single-pass substitution — resolved values are never re-scanned."""
+    """Single-pass substitution -- resolved values are never re-scanned."""
     return PATTERN.sub(lambda m: resolve_one(m.group(1)), s)
 
 
@@ -373,7 +373,7 @@ def main():
     args = [resolve_string(a) if PATTERN.search(a) else a for a in cmd_args]
 
     # Resolve references in exported environment variables (documented behavior).
-    # Uses the same single-pass re.sub as argv — resolved values are never re-scanned.
+    # Uses the same single-pass re.sub as argv -- resolved values are never re-scanned.
     # Secret values flow only to the child process and never return to the calling agent.
     child_env = {
         k: (resolve_string(v) if PATTERN.search(v) else v)

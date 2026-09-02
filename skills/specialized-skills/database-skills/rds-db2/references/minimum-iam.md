@@ -1,4 +1,4 @@
-# RDS for Db2 — Minimum IAM Permissions Reference
+# RDS for Db2 -- Minimum IAM Permissions Reference
 
 Source:
 
@@ -25,7 +25,7 @@ snapshot management, instance modify/delete, and SNS event notifications.
 
 The trust policy uses an `ExternalId` so the role can only be assumed by a principal in your
 account that supplies the agreed external ID (the recommended guard for an IAM-principal-assumed
-role). Note: `aws:SourceArn` / `aws:SourceAccount` are *service* confused-deputy keys — they are
+role). Note: `aws:SourceArn` / `aws:SourceAccount` are *service* confused-deputy keys -- they are
 only populated when an AWS service (e.g. `rds.amazonaws.com`) assumes the role on your behalf, and
 are absent when an IAM principal calls `sts:AssumeRole`. Including them here with an `AWS` (root)
 principal would make the role unassumable, so this trust policy uses `ExternalId` only:
@@ -85,13 +85,13 @@ services such as Lambda or EC2.
 `Resource: "*"` on mutating actions because AWS does not support practical resource-level scoping for
 them at creation time:
 
-- **`VPCNetworking`** — `ec2:CreateSecurityGroup` and the `ec2:Authorize/RevokeSecurityGroupIngress/Egress`
+- **`VPCNetworking`** -- `ec2:CreateSecurityGroup` and the `ec2:Authorize/RevokeSecurityGroupIngress/Egress`
   actions. A security group ARN does not exist until after `CreateSecurityGroup` runs, so the create
   call cannot be ARN-scoped; the authorize/revoke calls are commonly left at `"*"` alongside it. Narrow
   these with VPC/security-group condition keys (for example `ec2:Vpc`) in environments that require it.
-- **`DirectoryServiceIntegration`** — `ds:AuthorizeApplication` / `ds:UnauthorizeApplication` do not
+- **`DirectoryServiceIntegration`** -- `ds:AuthorizeApplication` / `ds:UnauthorizeApplication` do not
   support resource-level permissions, so they require `Resource: "*"`.
-- **`KMSNonResourceActions`** — `kms:CreateKey` (plus `kms:ListKeys` / `kms:ListAliases`). A KMS key ARN
+- **`KMSNonResourceActions`** -- `kms:CreateKey` (plus `kms:ListKeys` / `kms:ListAliases`). A KMS key ARN
   does not exist until after `CreateKey` runs, so the create call cannot be ARN-scoped; the list calls are
   account-wide and cannot be scoped either. All other KMS actions in the policy (encrypt, decrypt, grant,
   replicate, tag) remain scoped to `key/*` and `alias/*` ARNs.
@@ -103,20 +103,20 @@ ARNs as your account structure allows.
 
 ## 4. Security notes (Layer 3 least-privilege)
 
-- **No `*FullAccess` managed policies** and **no `service:*` wildcard actions** — each statement lists
+- **No `*FullAccess` managed policies** and **no `service:*` wildcard actions** -- each statement lists
   explicit action names.
-- **Minimal `Resource: "*"`** — read-only describe actions use `"*"` (they cannot be ARN-scoped), and
+- **Minimal `Resource: "*"`** -- read-only describe actions use `"*"` (they cannot be ARN-scoped), and
   three mutating statements (`VPCNetworking` security-group create/authorize/revoke,
   `DirectoryServiceIntegration` `ds:Authorize/UnauthorizeApplication`, and `KMSNonResourceActions`
   `kms:CreateKey`) keep `"*"` because AWS does not support resource-level permissions for them at
-  creation time. Every other mutating statement is ARN-pattern-scoped. See §3 for the full exception
+  creation time. Every other mutating statement is ARN-pattern-scoped. See Section 3 for the full exception
   rationale.
 - **External ID required** for role assumption. The role is assumed by an IAM principal, so it
   relies on `sts:ExternalId` rather than the service-only `aws:SourceArn` / `aws:SourceAccount`
   confused-deputy keys (which are absent for `sts:AssumeRole` by an IAM principal). For roles a
   *service* assumes (for example the Db2 audit role that `rds.amazonaws.com` assumes), use
-  `aws:SourceArn` / `aws:SourceAccount` instead — see [db2-audit.md](db2-audit.md).
-- Minimal action set per operation — add actions only when a new workflow needs them.
+  `aws:SourceArn` / `aws:SourceAccount` instead -- see [db2-audit.md](db2-audit.md).
+- Minimal action set per operation -- add actions only when a new workflow needs them.
 
 ---
 
@@ -140,9 +140,9 @@ Repeat `--action-names` for each action a workflow performs (for example `rds:Mo
 
 The minimal policy is intentionally narrow. Add scoped permissions when your deployment uses:
 
-- **CloudFormation** — if you provision RDS for Db2 through Infrastructure as Code.
-- **Secrets Manager** — if you store master credentials there (preferred over inline passwords); pairs
+- **CloudFormation** -- if you provision RDS for Db2 through Infrastructure as Code.
+- **Secrets Manager** -- if you store master credentials there (preferred over inline passwords); pairs
   with `--manage-master-user-password`.
-- **Lambda** — if custom functions participate in provisioning or event handling.
+- **Lambda** -- if custom functions participate in provisioning or event handling.
 
 Add each as a separate, ARN-scoped statement rather than widening an existing one.

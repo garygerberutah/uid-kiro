@@ -1,12 +1,12 @@
-# Amazon OpenSearch Serverless — Deploy Search Configuration
+# Amazon OpenSearch Serverless -- Deploy Search Configuration
 
 Deploy indices, ML models, and pipelines to a provisioned serverless collection.
 
 ## Route by Strategy
 
-- **Neural Sparse** → Neural Sparse Path
-- **Dense Vector or Hybrid** → Dense Vector Path
-- **BM25** → BM25 Path
+- **Neural Sparse** -> Neural Sparse Path
+- **Dense Vector or Hybrid** -> Dense Vector Path
+- **BM25** -> BM25 Path
 
 ---
 

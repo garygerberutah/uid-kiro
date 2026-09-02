@@ -1,4 +1,4 @@
-# Historical network inventory — not deployable
+# Historical network inventory -- not deployable
 
 This directory records a past read of the State of Utah organization-owned dev
 VPC. It is not a Terraform root:

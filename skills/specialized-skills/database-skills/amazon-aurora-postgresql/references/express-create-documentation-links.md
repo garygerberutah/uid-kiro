@@ -41,14 +41,14 @@
 ## Migration
 
 - Aurora PostgreSQL logical replication: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Replication.Logical.html
-- PostgreSQL community — logical replication: https://www.postgresql.org/docs/current/logical-replication.html
-- PostgreSQL community — pg_dump: https://www.postgresql.org/docs/current/app-pgdump.html
-- PostgreSQL community — pg_restore: https://www.postgresql.org/docs/current/app-pgrestore.html
+- PostgreSQL community -- logical replication: https://www.postgresql.org/docs/current/logical-replication.html
+- PostgreSQL community -- pg_dump: https://www.postgresql.org/docs/current/app-pgdump.html
+- PostgreSQL community -- pg_restore: https://www.postgresql.org/docs/current/app-pgrestore.html
 
 ## AWS Database Blog
 
-- AWS Database Blog — Aurora tag: https://aws.amazon.com/blogs/database/tag/amazon-aurora/
+- AWS Database Blog -- Aurora tag: https://aws.amazon.com/blogs/database/tag/amazon-aurora/
 
 ## Subject-to-change note
 
-Verify every URL in this directory before citing it in customer-facing material — page slugs, availability, and content can change as the feature evolves and AWS documentation is updated.
+Verify every URL in this directory before citing it in customer-facing material -- page slugs, availability, and content can change as the feature evolves and AWS documentation is updated.

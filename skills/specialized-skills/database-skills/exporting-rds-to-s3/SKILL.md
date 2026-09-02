@@ -28,7 +28,7 @@ Verify the database identifier spelling, case, and region. For Aurora, use `desc
 Snapshot export supports MySQL, PostgreSQL, MariaDB, Aurora MySQL, and Aurora PostgreSQL only. Oracle and SQL Server are not supported.
 
 ### IAM role permission errors
-Ensure the role trust policy allows `export.rds.amazonaws.com` with `aws:SourceAccount` and `aws:SourceArn` conditions for confused deputy protection, and has S3 PutObject and KMS permissions. Wait 10–15 seconds after role creation for propagation.
+Ensure the role trust policy allows `export.rds.amazonaws.com` with `aws:SourceAccount` and `aws:SourceArn` conditions for confused deputy protection, and has S3 PutObject and KMS permissions. Wait 10-15 seconds after role creation for propagation.
 
 ### Export stuck or failed
 Check the export task status for failure reasons. Common causes: S3 bucket deleted, IAM role modified, or KMS key disabled during export. See the [full procedure](references/export-rds-to-s3.md) for detailed troubleshooting.

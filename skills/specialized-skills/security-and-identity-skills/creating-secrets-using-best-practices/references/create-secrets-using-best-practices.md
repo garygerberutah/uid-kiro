@@ -107,7 +107,7 @@ Create an IAM policy that grants minimal necessary permissions.
   - `kms:Decrypt` for the specific KMS key ARN
   - `kms:DescribeKey` for the specific KMS key ARN
 - You MUST include the condition key `aws:SecureTransport` set to true to enforce HTTPS
-- You MUST scope all resource ARNs to the specific secret and KMS key — do NOT use wildcards
+- You MUST scope all resource ARNs to the specific secret and KMS key -- do NOT use wildcards
 - If enable_rotation is true, You MUST create a separate rotation policy that additionally allows:
   - `secretsmanager:PutSecretValue` for the specific secret ARN
   - `secretsmanager:UpdateSecretVersionStage` for the specific secret ARN

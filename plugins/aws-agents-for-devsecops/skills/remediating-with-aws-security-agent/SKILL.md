@@ -5,7 +5,7 @@ description: >-
   remediation. Use this whenever the user mentions Security Agent, security findings,
   pentest or penetration test results, code review findings, vulnerabilities found in
   their AWS account, "what did the security scan find", remediating or triaging security
-  risks, or wants to start fixing reported vulnerabilities — even if they don't name the
+  risks, or wants to start fixing reported vulnerabilities -- even if they don't name the
   service explicitly. Trigger it for phrases like "get my security findings", "what
   vulnerabilities do we have", "let's fix the pentest results", or "triage the security
   report". The skill discovers scans, exports findings to a gitignored local directory
@@ -39,13 +39,13 @@ path is gitignored before anything is written.**
 
 Find out what the account has. All commands are read-only `list-*` operations.
 
-AWS Security Agent organizes data as a hierarchy — work down it:
+AWS Security Agent organizes data as a hierarchy -- work down it:
 
 ```
 Application (account + Region)
-└── Agent Space        (workspace for design review, code review, and pentests)
-    ├── Penetration test → Pentest job → Findings
-    └── Code review      → Code review job → Findings
++-- Agent Space        (workspace for design review, code review, and pentests)
+    +-- Penetration test -> Pentest job -> Findings
+    +-- Code review      -> Code review job -> Findings
 ```
 
 Run these to orient yourself and show the user what exists:
@@ -65,7 +65,7 @@ Job `status` is one of `IN_PROGRESS`, `STOPPING`, `STOPPED`, `FAILED`, `COMPLETE
 
 Agent spaces, pentests, and code reviews are named after the application they target.
 Before asking the user to pick from a raw list, make an informed guess about which scan
-corresponds to *this* repository — the user is working in a codebase for a reason, and
+corresponds to *this* repository -- the user is working in a codebase for a reason, and
 the relevant findings are almost always for the app in front of them.
 
 Infer the app identity from the workspace using cheap, high-signal sources:
@@ -78,7 +78,7 @@ Infer the app identity from the workspace using cheap, high-signal sources:
 
 Compare those signals against the agent space / scan names (case-insensitive, allow
 partial and fuzzy matches).
-Then **always confirm before exporting** — present your best guess and your reasoning, and
+Then **always confirm before exporting** -- present your best guess and your reasoning, and
 let the user correct it:
 
 > "This repo looks like **`<product>`** (from `<signal>`), which matches the **<name>** agent
@@ -89,8 +89,8 @@ than forcing a wrong guess. Never export from a guessed scan without the user's 
 
 ## Stage 2: Export findings to `.security-agent/` (gitignored)
 
-Pull findings using AWS CLI commands. Write everything into `.security-agent/` in the repo —
-never to chat or stdout — because findings include working attack scripts, reproduction
+Pull findings using AWS CLI commands. Write everything into `.security-agent/` in the repo --
+never to chat or stdout -- because findings include working attack scripts, reproduction
 steps, and sometimes leaked secrets.
 
 ### 1. Lock down the output directory before pulling anything
@@ -159,9 +159,9 @@ and any other fields). Do not leave off any fields.
 
 ### Edge cases
 
-- **No agent space, scan, or COMPLETED job** — stop and surface that to the user rather
+- **No agent space, scan, or COMPLETED job** -- stop and surface that to the user rather
   than retrying.
-- **Credentials or service unavailable** — confirm with `aws sts get-caller-identity` and
+- **Credentials or service unavailable** -- confirm with `aws sts get-caller-identity` and
   check the Region (default `us-east-1`; Security Agent is regional).
 - **Don't paste finding contents into chat** beyond short titles and counts. The detail
   belongs in the gitignored files.
@@ -177,16 +177,16 @@ files from `.security-agent/` and sort them deterministically.
 Sort ascending by this composite key (lower wins, i.e. more urgent first):
 
 1. **Risk level**, in this order:
-   `CRITICAL` (0) → `HIGH` (1) → `MEDIUM` (2) → `LOW` (3) → `INFORMATIONAL` (4) →
+   `CRITICAL` (0) -> `HIGH` (1) -> `MEDIUM` (2) -> `LOW` (3) -> `INFORMATIONAL` (4) ->
    `UNKNOWN` / missing (5).
 2. **Risk score**, highest first. `riskScore` is a numeric string on pentest findings
-   (e.g. `"10.0"`), often absent on code-review findings — treat missing as the lowest
+   (e.g. `"10.0"`), often absent on code-review findings -- treat missing as the lowest
    possible score so it sorts after scored findings of the same level.
 3. **Confidence**, in this order:
-   `HIGH` (0) → `MEDIUM` (1) → `LOW` (2) → `UNCONFIRMED` (3) → `FALSE_POSITIVE` (4).
+   `HIGH` (0) -> `MEDIUM` (1) -> `LOW` (2) -> `UNCONFIRMED` (3) -> `FALSE_POSITIVE` (4).
 
-Also compute a severity-count summary across all findings (e.g. `2 CRITICAL · 5 HIGH ·
-3 MEDIUM`) for the header of the report.
+Also compute a severity-count summary across all findings (e.g.
+`2 CRITICAL / 5 HIGH / 3 MEDIUM`) for the header of the report.
 
 ### Pulling the code location
 
@@ -204,19 +204,19 @@ For each finding, derive a single short `location` string:
 Write a compact summary for the user:
 
 ```
-## Security Agent triage — <agent space name>
+## Security Agent triage -- <agent space name>
 
-<N> findings exported (<P pentest, C code review>) · confidence: <levels> · severity: <counts>
+<N> findings exported (<P pentest, C code review>) / confidence: <levels> / severity: <counts>
 
 ### Priority order
-1. [CRITICAL · score 10.0 · HIGH confidence] <finding name>
-   - Type: <riskType> · Source: <pentest|code-review>
+1. [CRITICAL / score 10.0 / HIGH confidence] <finding name>
+   - Type: <riskType> / Source: <pentest|code-review>
    - Where: <file:line or endpoint, if present>
    - Impact: <one-line plain-language summary>
-2. [HIGH · ...] ...
+2. [HIGH / ...] ...
 
 ### Recommended remediation order
-<short rationale: which to fix first and why — e.g. "1 and 3 are both
+<short rationale: which to fix first and why -- e.g. "1 and 3 are both
 unauthenticated RCE on internet-facing endpoints; fix those before the
 stored-XSS issues.">
 ```
@@ -226,17 +226,17 @@ by severity at the bottom.
 
 ### What to keep out of chat
 
-The full `description`, `reasoning`, and `attackScript` stay in the gitignored files —
+The full `description`, `reasoning`, and `attackScript` stay in the gitignored files --
 they contain working exploit detail. In the chat summary keep impact lines to one line
 each, in plain language. Code-review findings usually carry a `filePath`/location and a
 `suggestedFix`; call those out since they map directly to repo changes. Pentest findings
 describe endpoints and attack chains; map them to the responsible code where you can.
 Look for findings that corroborate each other (a pentest and a code review flagging the
-same root cause) — those are strong signals for what to fix first.
+same root cause) -- those are strong signals for what to fix first.
 
 ## Stage 4: Offer to remediate
 
-After presenting the triage, offer to start fixing — don't silently begin editing code.
+After presenting the triage, offer to start fixing -- don't silently begin editing code.
 
 Ask the user something like: "Want me to start fixing the top finding(s)? I'd recommend
 starting with #1 (<name>)." If they agree, work top-down by priority:

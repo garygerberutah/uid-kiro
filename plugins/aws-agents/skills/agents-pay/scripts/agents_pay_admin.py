@@ -2,7 +2,7 @@
 """Trusted admin CLI for agents-pay. A HUMAN runs this, never the agent.
 
 This is the deliberate separation of onboarding from runtime. The agent's runtime
-surface can only SPEND an already-approved, budget-bounded session — it can pay,
+surface can only SPEND an already-approved, budget-bounded session -- it can pay,
 check remaining budget, and obtain a browser handle, and nothing more. Creating
 sessions, approving new payees, writing config, and provisioning payment resources
 all live here, behind a human at a terminal.
@@ -21,7 +21,7 @@ interface.
 
 Commands
 --------
-    init-config       Write ~/.agents-pay/config.json (0600) — resources + policy
+    init-config       Write ~/.agents-pay/config.json (0600) -- resources + policy
     show-config       Print the active config and its file permissions
     create-instrument Create the per-user wallet (ManagementRole)
     new-session       Create a budget-bounded session (ManagementRole, TTY approval)
@@ -51,7 +51,7 @@ def _check_aws_credentials(region: str | None = None) -> bool:
     A cheap, read-only STS call (no IAM permissions beyond the default caller
     identity) run BEFORE any interactive prompts. Without this, a user can type
     through the entire setup-openclaw wizard only to discover at instrument or
-    session creation — several prompts later — that their credentials expired,
+    session creation -- several prompts later -- that their credentials expired,
     forcing a full re-run. boto3 is already a hard dependency of
     bedrock-agentcore, so this adds no new dependency.
     """
@@ -168,7 +168,7 @@ def resolve_manager_arn(explicit: str | None, config_path: Path) -> str | None:
     """Manager ARN from --flag, else the environment, else config.json, else the CLI deploy record.
 
     config.json's resources.payment_manager_arn is exactly the value create-instrument
-    (and init-config, when discoverable) persist right after a successful call — the
+    (and init-config, when discoverable) persist right after a successful call -- the
     same source of truth resolve_region() now reads for region. Checking it here means
     a repeat run of new-session from a different directory (no deployed-state.json in
     reach) still finds the manager ARN the tool itself already saved, instead of
@@ -192,7 +192,7 @@ def resolve_region(explicit: str | None, config_path: Path) -> str | None:
 
     init-config (and create-instrument, on success) persist the region actually
     used into resources.region, right alongside the manager ARN it goes with.
-    Preferring that saved value here — instead of a hardcoded default — keeps
+    Preferring that saved value here -- instead of a hardcoded default -- keeps
     the PaymentManager client in the same region as the manager ARN it was just
     told to use. Returning None when nothing is configured lets boto3's own
     session/profile resolution take over, rather than silently forcing a
@@ -278,7 +278,7 @@ def resolve_user_id(explicit: str | None, config_path: Path) -> str | None:
 
     This skill treats one installation as one payer. The AgentCore Payments API still
     needs a userId to scope the instrument and session, but there is no reason to make
-    an operator invent one and then retype it identically at every step — mismatching
+    an operator invent one and then retype it identically at every step -- mismatching
     it between create-instrument and new-session produces a session that cannot spend
     the instrument, which is a confusing failure to debug.
     """
@@ -346,7 +346,7 @@ def cmd_init_config(args: argparse.Namespace) -> int:
     save_config(path, config)
     print(f"Wrote config to {path} (mode 0600, in a 0700 directory)")
     print(f"Payer identity: {user_id}"
-          + ("  (generated — single tenant, no need to pass it again)"
+          + ("  (generated -- single tenant, no need to pass it again)"
              if not args.user_id and not existing_user else ""))
     print(json.dumps({"resources": config["resources"], "policy": config["policy"]}, indent=2))
     print(
@@ -394,9 +394,9 @@ def cmd_show_config(args: argparse.Namespace) -> int:
     dir_st = path.parent.lstat()
     print(f"Config    : {path}")
     print(f"File mode : {stat.filemode(st.st_mode)} "
-          f"{'OK' if not (st.st_mode & 0o077) else '*** TOO OPEN — chmod 600 ***'}")
+          f"{'OK' if not (st.st_mode & 0o077) else '*** TOO OPEN -- chmod 600 ***'}")
     print(f"Dir mode  : {stat.filemode(dir_st.st_mode)} "
-          f"{'OK' if not (dir_st.st_mode & 0o022) else '*** WRITABLE BY OTHERS — chmod 700 ***'}")
+          f"{'OK' if not (dir_st.st_mode & 0o022) else '*** WRITABLE BY OTHERS -- chmod 700 ***'}")
     print(f"Owner     : uid {st.st_uid} {'(you)' if st.st_uid == os.getuid() else '*** NOT YOU ***'}")
     config = load_raw_config(path)
     print("\n--- resources (what to pay WITH; no secrets) ---")
@@ -591,11 +591,11 @@ def cmd_new_session(args: argparse.Namespace) -> int:
     print(f"Recorded in            : {config_path}  (nothing to copy by hand)")
     print(
         f"\nThis session allows {args.budget} USD of CUMULATIVE spend. Each individual\n"
-        "payment is additionally capped by max_per_payment_usd in the policy section —\n"
+        "payment is additionally capped by max_per_payment_usd in the policy section --\n"
         "run show-config to see it. Both bounds apply."
     )
     print(
-        "\nWhen this budget is spent, the agent CANNOT mint another session — by design.\n"
+        "\nWhen this budget is spent, the agent CANNOT mint another session -- by design.\n"
         "Re-run this command yourself to authorize more spending."
     )
     return 0
@@ -685,7 +685,7 @@ def build_openclaw_config(
 
 
 def cmd_setup_openclaw(args: argparse.Namespace) -> int:
-    """Interactive guided setup for OpenClaw — collects inputs once and threads through."""
+    """Interactive guided setup for OpenClaw -- collects inputs once and threads through."""
     if not sys.stdin.isatty():
         print("setup-openclaw requires an interactive terminal.", file=sys.stderr)
         return 1
@@ -699,15 +699,15 @@ def cmd_setup_openclaw(args: argparse.Namespace) -> int:
         return 1
 
     print("\n" + "=" * 60)
-    print("  AWS Agents Pay — OpenClaw Setup")
+    print("  AWS Agents Pay -- OpenClaw Setup")
     print("=" * 60)
     print("\nThis wizard provisions payment resources and generates your")
     print("OpenClaw plugin configuration. You'll need:")
-    print("  • agentcore CLI installed and deployed (agentcore deploy)")
-    print("  • bedrock-agentcore Python package (>=1.19.0)")
-    print("  • AWS credentials with the ManagementRole")
+    print("  * agentcore CLI installed and deployed (agentcore deploy)")
+    print("  * bedrock-agentcore Python package (>=1.19.0)")
+    print("  * AWS credentials with the ManagementRole")
     if project_dir:
-        print(f"  • AgentCore project: {project_dir}")
+        print(f"  * AgentCore project: {project_dir}")
     print()
 
     # --- Prerequisites check ---
@@ -747,13 +747,13 @@ def cmd_setup_openclaw(args: argparse.Namespace) -> int:
     # --- Step 4: Recipient mode ---
     print("\n--- Step 3: Recipient Mode ---")
     print("  1. Allowlist specific merchant addresses (recommended)")
-    print("  2. Allow any recipient (high risk — publisher chooses beneficiary)")
+    print("  2. Allow any recipient (high risk -- publisher chooses beneficiary)")
     mode = _prompt("Choice", "1")
     recipients: list[str] = []
     allow_any = False
     if mode == "2":
         allow_any = True
-        print("  ⚠ allow-any-recipient enabled.")
+        print("  [WARNING] allow-any-recipient enabled.")
     else:
         print("Enter merchant wallet addresses (one per line, blank to finish):")
         while True:
@@ -810,7 +810,7 @@ def cmd_setup_openclaw(args: argparse.Namespace) -> int:
     print("\n--- Step 5: Paid Content Return ---")
     print(
         "By default, paid publisher content is withheld from the model's context "
-        "as a security\ncontrol — the response body may contain prompt injection. "
+        "as a security\ncontrol -- the response body may contain prompt injection. "
         "Returning it lets the agent\nread/summarize what it paid for, at that risk."
     )
     return_body_answer = _prompt("Return paid response body to the agent? (y/n)", "y")
@@ -862,7 +862,7 @@ def cmd_setup_openclaw(args: argparse.Namespace) -> int:
         print(f"  Discovered connector ID: {connector_id}")
 
     save_config(config_path, config)
-    print(f"\n  ✓ Config written to {config_path}")
+    print(f"\n  [OK] Config written to {config_path}")
     print(
         f"  Paid response body will be {'RETURNED to' if return_body else 'WITHHELD from'} "
         "the agent (policy.return_body)."
@@ -898,7 +898,7 @@ def cmd_setup_openclaw(args: argparse.Namespace) -> int:
     redirect_url = wallet.get("redirectUrl")
 
     update_resources(config_path, payment_instrument_id=instrument_id)
-    print(f"  ✓ Instrument created: {instrument_id}")
+    print(f"  [OK] Instrument created: {instrument_id}")
     print(f"    Wallet: {wallet_address}")
 
     # --- Delegation + funding ---
@@ -939,11 +939,11 @@ def cmd_setup_openclaw(args: argparse.Namespace) -> int:
     )
     session_id = session["paymentSessionId"]
     update_resources(config_path, payment_session_id=session_id)
-    print(f"  ✓ Session created: {session_id}")
+    print(f"  [OK] Session created: {session_id}")
 
     # --- Generate OpenClaw config ---
     print("\n" + "=" * 60)
-    print("  ✅ Setup complete!")
+    print("  [YES] Setup complete!")
     print("=" * 60)
     print("\nAdd this to your OpenClaw config (~/.openclaw/openclaw.json):")
     print()

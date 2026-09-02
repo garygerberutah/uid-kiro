@@ -43,7 +43,7 @@ Security Hub CSPM APIs share the `aws securityhub` CLI namespace with Security H
 
 ## Read-Only APIs
 
-### CSPM APIs (V1 — ASFF)
+### CSPM APIs (V1 -- ASFF)
 
 | API | Purpose |
 |-----|---------|

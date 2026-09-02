@@ -4,7 +4,7 @@ description: Manages WhatsApp messaging through AWS End User Messaging Social. C
 version: 1
 ---
 
-# AWS End User Messaging Social — WhatsApp
+# AWS End User Messaging Social -- WhatsApp
 
 ## Overview
 
@@ -20,7 +20,7 @@ WhatsApp messaging via AWS End User Messaging Social: template management, sendi
 
 **Constraints:**
 
-- The AWS MCP server is recommended for seamless API execution but not required — all commands use standard AWS CLI syntax
+- The AWS MCP server is recommended for seamless API execution but not required -- all commands use standard AWS CLI syntax
 - You MUST verify the AWS CLI is installed and configured with appropriate credentials
 - You SHOULD recommend the user assume an IAM role with ephemeral credentials
 - You MUST inform the user if any required tool is missing and how to install/configure it
@@ -45,10 +45,10 @@ Create, update, and delete message templates (utility, marketing, authentication
 - `update-whatsapp-message-template`: modify existing template content
 - `delete-whatsapp-message-template`: requires `--template-name` (NOT `--meta-template-name`); always include `--delete-all-languages`
 - `list-whatsapp-message-templates`: response fields are `templateStatus` and `templateCategory` (NOT `status`/`category`)
-- Templates with `{{N}}` parameters MUST include `"parameter_format": "positional"` (exception: AUTHENTICATION — Meta handles OTP parameters automatically) and `"example"`
+- Templates with `{{N}}` parameters MUST include `"parameter_format": "positional"` (exception: AUTHENTICATION -- Meta handles OTP parameters automatically) and `"example"`
 - Meta reviews all templates (minutes to 24h); MUST NOT send with PENDING/REJECTED
-- Choosing the wrong category causes reclassification (UTILITY → MARKETING) which changes pricing — see [managing-templates.md — Choosing the Right Category](references/managing-templates.md) for guidance on selecting UTILITY vs MARKETING vs AUTHENTICATION
-- You MUST confirm the intended category (UTILITY, MARKETING, or AUTHENTICATION) with the user before creating a template — explain the categorization criteria and reclassification risk if the choice is ambiguous
+- Choosing the wrong category causes reclassification (UTILITY -> MARKETING) which changes pricing -- see [managing-templates.md -- Choosing the Right Category](references/managing-templates.md) for guidance on selecting UTILITY vs MARKETING vs AUTHENTICATION
+- You MUST confirm the intended category (UTILITY, MARKETING, or AUTHENTICATION) with the user before creating a template -- explain the categorization criteria and reclassification risk if the choice is ambiguous
 
 See [managing-templates.md](references/managing-templates.md).
 
@@ -59,14 +59,14 @@ See [managing-templates.md](references/managing-templates.md).
 - Use for: transactional updates (utility), promotions (marketing), verification codes (authentication)
 - Collect: phone number ID, recipient (E.164 with `+`), template name, language, parameters
 - Marketing templates may include image headers
-- `--message` is blob type — MUST base64-encode JSON
+- `--message` is blob type -- MUST base64-encode JSON
 
 #### Freeform Messages (24h window required)
 
 - Use for: customer service replies within 24h of customer's last inbound message
-- Supports: text, image, document, video, audio — see [WhatsApp Cloud API media reference](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/media) for supported format and size constraints
-- No API to check window status — user must confirm from logs or event history
-- Media URLs MUST be publicly accessible HTTPS and remain available for the full 30-day message availability window (Meta can re-fetch anytime). For sensitive content (receipts, invoices, PII), upload via `post-whatsapp-message-media` and reference by media ID instead — presigned URLs cannot satisfy the 30-day availability requirement
+- Supports: text, image, document, video, audio -- see [WhatsApp Cloud API media reference](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/media) for supported format and size constraints
+- No API to check window status -- user must confirm from logs or event history
+- Media URLs MUST be publicly accessible HTTPS and remain available for the full 30-day message availability window (Meta can re-fetch anytime). For sensitive content (receipts, invoices, PII), upload via `post-whatsapp-message-media` and reference by media ID instead -- presigned URLs cannot satisfy the 30-day availability requirement
 
 **Constraints for all sends:**
 
@@ -78,7 +78,7 @@ See [managing-templates.md](references/managing-templates.md).
   - Language codes use Meta's locale format with underscores (e.g., `en_US`, `pt_BR`)
   - `--meta-api-version` is `v{Major}.{Minor}` format (e.g., `v21.0`)
 - `"messaging_product"` MUST be `"whatsapp"` in the JSON body; check [Meta's Graph API changelog](https://developers.facebook.com/docs/graph-api/changelog) for the supported Meta Graph API version
-- `--message` is blob type — MUST base64-encode the JSON payload
+- `--message` is blob type -- MUST base64-encode the JSON payload
 - A successful `messageId` means queued, not delivered
 - You MUST ask for all required parameters upfront in a single prompt
 - You MUST accept parameters as individual values, JSON objects, or file references
@@ -108,7 +108,7 @@ Set up delivery tracking, template status notifications, and reclassification al
 Set up delivery tracking, template status notifications, and reclassification alerts. A WABA can only have one event destination. See [configuring-event-destinations.md](references/configuring-event-destinations.md) for prerequisites (IAM role, SNS topic with KMS encryption, HTTPS-only subscription endpoints, condition keys) and full security controls.
 
 ### 6. Troubleshoot Delivery
-Diagnostic flow: WABA status → phone number → templates → event destinations → quotas.
+Diagnostic flow: WABA status -> phone number -> templates -> event destinations -> quotas.
 
 - `get-linked-whatsapp-business-account`: registration MUST be COMPLETE
 - `get-linked-whatsapp-business-account-phone-number`: verify phone number health
@@ -120,7 +120,7 @@ Diagnostic flow: WABA status → phone number → templates → event destinatio
 
 See [troubleshooting-delivery.md](references/troubleshooting-delivery.md).
 
-## Quick Reference — Common Errors
+## Quick Reference -- Common Errors
 
 - **Access denied**: verify IAM permissions scoped to WABA/phone number ARNs
 - **Template rejected**: body must match category; include `parameter_format` and `example`
@@ -134,13 +134,13 @@ See [troubleshooting-delivery.md](references/troubleshooting-delivery.md).
 
 - Use least-privilege IAM policies scoped to specific `social-messaging:` actions and WABA/phone number ARNs
 - Use ephemeral credentials (IAM roles) instead of long-lived access keys
-- Store secrets in AWS Secrets Manager or Parameter Store — never in code or environment variables
+- Store secrets in AWS Secrets Manager or Parameter Store -- never in code or environment variables
 - Enable CloudTrail for auditing all `social-messaging` API calls; encrypt logs with KMS CMK
 - Encrypt SNS topics for event destinations with KMS (callbacks contain recipient metadata)
 - Encrypt CloudWatch Logs with KMS if monitoring social-messaging activity
 - Avoid sensitive data in template parameters and freeform message content (they appear in CloudTrail logs)
 - Validate recipient phone numbers to prevent unauthorized messaging
-- Verify SNS subscription endpoints are authorized by your team — validate that all subscribed email addresses and systems belong to personnel/systems that should receive sensitive delivery status and recipient metadata before confirming subscriptions. Use HTTPS-only endpoints
+- Verify SNS subscription endpoints are authorized by your team -- validate that all subscribed email addresses and systems belong to personnel/systems that should receive sensitive delivery status and recipient metadata before confirming subscriptions. Use HTTPS-only endpoints
 - Add condition keys (`aws:SourceArn`, `aws:SourceAccount`) to SNS topic policies to prevent confused deputy attacks
 - Implement rate limiting via service quotas and CloudWatch alarms on send rates
 

@@ -5,7 +5,7 @@ argument-hint: [test profile ID]
 
 Read and follow the `running-release-tests` skill for full execution details.
 
-## Step 0 — Choose your execution path (DO THIS FIRST)
+## Step 0 -- Choose your execution path (DO THIS FIRST)
 
 Check your available tools. Do you have ALL of these tools?
 
@@ -15,20 +15,20 @@ Check your available tools. Do you have ALL of these tools?
 - `aws_devops_agent__get_release_ui_testing_report`
 - `aws_devops_agent__get_release_api_testing_report`
 
-These tools are NOT deferred/lazy-loaded — if they do not appear in your tool list, they are unavailable. Do NOT search for them via ToolSearch.
+These tools are NOT deferred/lazy-loaded -- if they do not appear in your tool list, they are unavailable. Do NOT search for them via ToolSearch.
 
-- **YES (all present)** → Use the "Remote Server" path (steps 4-8 below)
-- **NO** → Tell the user: "Remote server not configured." Then prompt the user with instructions from the `setup-devops-agent` skill if they intend to set up the connection. If not, mention that you are "proceeding with the AWS CLI fallback." Then use the Fallback (CLI) path below.
+- **YES (all present)** -> Use the "Remote Server" path (steps 4-8 below)
+- **NO** -> Tell the user: "Remote server not configured." Then prompt the user with instructions from the `setup-devops-agent` skill if they intend to set up the connection. If not, mention that you are "proceeding with the AWS CLI fallback." Then use the Fallback (CLI) path below.
 
 ---
 
-## Steps 1-3 — Common to both paths (see skill: "Gathering test parameters")
+## Steps 1-3 -- Common to both paths (see skill: "Gathering test parameters")
 
 1. If `$ARGUMENTS` contains a test profile ID (e.g., `ki-12345`), use it directly.
 2. If `$ARGUMENTS` is empty, ask the user which test profile to use.
 3. Ask if the user has a specific test requirement or focus area.
 
-## Steps 4-8 — Remote Server path (see skill: "Core workflow")
+## Steps 4-8 -- Remote Server path (see skill: "Core workflow")
 
 1. Call `aws_devops_agent__create_release_testing_job(test_profile_id="...", webhook_event_message="...")`.
 2. Tell the user tests take 10+ minutes and you'll keep them posted.
@@ -36,7 +36,7 @@ These tools are NOT deferred/lazy-loaded — if they do not appear in your tool 
 4. Stream progress via `aws_devops_agent__list_journal_records(execution_id=EXEC_ID, order="ASC")`.
 5. On `COMPLETED`: call `aws_devops_agent__get_release_ui_testing_report(execution_id=EXEC_ID)` (UI) or `aws_devops_agent__get_release_api_testing_report(execution_id=EXEC_ID)` (API), and save to file.
 
-## Steps 9-12 — Fallback (CLI) path
+## Steps 9-12 -- Fallback (CLI) path
 
 Use this path when the remote server tools are unavailable.
 

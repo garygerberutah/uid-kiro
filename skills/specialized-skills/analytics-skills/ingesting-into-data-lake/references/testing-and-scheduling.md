@@ -97,7 +97,7 @@ aws logs tail /aws-glue/jobs/output --follow \
 
 **Solution:**
 
-1. Test connection in Glue console: Connections → Select connection → Test
+1. Test connection in Glue console: Connections -> Select connection -> Test
 2. Verify security groups allow inbound from Glue's security group
 3. Check database firewall allows connections from Glue subnet CIDR
 4. Ensure NAT gateway/internet gateway for outbound connectivity (if needed)

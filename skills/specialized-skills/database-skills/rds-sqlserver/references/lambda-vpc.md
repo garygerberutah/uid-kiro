@@ -1,4 +1,4 @@
-# Lambda — RDS SQL Server from Lambda in VPC
+# Lambda -- RDS SQL Server from Lambda in VPC
 
 ## Lambda in VPC checklist
 
@@ -7,16 +7,16 @@ Before writing code, confirm:
 - [ ] Lambda configured with VPC: `--vpc-config SubnetIds=subnet-a,subnet-b SecurityGroupIds=sg-lambda`
 - [ ] Subnets are **private** (RDS is private)
 - [ ] Either: VPC endpoint for Secrets Manager in the same subnets, OR NAT gateway for internet access
-- [ ] Lambda SG outbound allows TCP 443 (Secrets Manager) + TCP 1433 (RDS) — default "allow all outbound" works
+- [ ] Lambda SG outbound allows TCP 443 (Secrets Manager) + TCP 1433 (RDS) -- default "allow all outbound" works
 - [ ] RDS SG inbound 1433 from Lambda SG
 - [ ] Lambda execution role has `secretsmanager:GetSecretValue` + `kms:Decrypt` + VPC permissions
-- [ ] Lambda timeout ≥ 15s for cold start + DB connect
+- [ ] Lambda timeout >= 15s for cold start + DB connect
 
 ## Why VPC endpoints matter
 
 A Lambda in a VPC has no internet access by default. Calling Secrets Manager from inside the handler will hang until timeout because the default route has no IGW.
 
-### Option A — VPC endpoint for Secrets Manager (recommended)
+### Option A -- VPC endpoint for Secrets Manager (recommended)
 
 ```bash
 aws ec2 create-vpc-endpoint \
@@ -30,9 +30,9 @@ aws ec2 create-vpc-endpoint \
 
 Endpoint SG inbound: TCP 443 from Lambda SG.
 
-With `--private-dns-enabled`, `secretsmanager.<region>.amazonaws.com` resolves to the endpoint's private IP automatically — no code changes.
+With `--private-dns-enabled`, `secretsmanager.<region>.amazonaws.com` resolves to the endpoint's private IP automatically -- no code changes.
 
-### Option B — NAT gateway
+### Option B -- NAT gateway
 
 Simpler if Lambda needs broad internet access (multiple AWS services, third-party APIs):
 
@@ -40,12 +40,12 @@ Simpler if Lambda needs broad internet access (multiple AWS services, third-part
 aws ec2 allocate-address --domain vpc
 aws ec2 create-nat-gateway --subnet-id subnet-public-a --allocation-id eipalloc-xxxx
 
-# Private subnet route table: 0.0.0.0/0 → NAT
+# Private subnet route table: 0.0.0.0/0 -> NAT
 aws ec2 create-route --route-table-id rtb-private \
   --destination-cidr-block 0.0.0.0/0 --nat-gateway-id nat-xxxx
 ```
 
-## Code — Python (pymssql)
+## Code -- Python (pymssql)
 
 Package pymssql in a layer for `manylinux2014_x86_64`:
 
@@ -93,7 +93,7 @@ def handler(event, context):
 
 Module-scope client and secret caching avoid re-initialization on warm invocations. Keep the connection *per invocation* unless using RDS Proxy (see below).
 
-## Code — .NET
+## Code -- .NET
 
 ```csharp
 using Microsoft.Data.SqlClient;
@@ -128,9 +128,9 @@ public class Function {
 }
 ```
 
-Small `Max Pool Size` (2-5) per Lambda is important — Lambda's concurrency model means 1000 concurrent Lambda containers × 100 pool size would create 100,000 connections. RDS SQL Server `max_connections` is typically 32,767 but memory/CPU pressure kicks in well before that.
+Small `Max Pool Size` (2-5) per Lambda is important -- Lambda's concurrency model means 1000 concurrent Lambda containers x 100 pool size would create 100,000 connections. RDS SQL Server `max_connections` is typically 32,767 but memory/CPU pressure kicks in well before that.
 
-## Code — Node.js (tedious/mssql)
+## Code -- Node.js (tedious/mssql)
 
 ```javascript
 const sql = require('mssql');
@@ -177,7 +177,7 @@ aws lambda put-provisioned-concurrency-config \
 
 Provisioned containers keep the secret cached and (with a pool) can keep warm connections. Pair with SnapStart (Java only, free) or regular provisioned concurrency for Python/Node/.NET.
 
-## For high concurrency — use RDS Proxy
+## For high concurrency -- use RDS Proxy
 
 At high Lambda concurrency (thousands of simultaneous executions), RDS Proxy is almost mandatory. See `rds-proxy.md`. Without it you'll hit:
 
@@ -187,7 +187,7 @@ At high Lambda concurrency (thousands of simultaneous executions), RDS Proxy is 
 
 With RDS Proxy, Lambda connects to the proxy endpoint, not RDS directly. The proxy multiplexes connections.
 
-## IAM role — full example
+## IAM role -- full example
 
 ```json
 {

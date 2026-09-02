@@ -58,6 +58,6 @@ aws ce get-reservation-coverage \
 ## Gotchas
 
 - Standard RIs can be sold on Marketplace; Convertible cannot
-- Regional RIs provide size flexibility; AZ-scoped provide capacity reservation — pick one
-- DynamoDB Reserved Capacity is deprecated — use Database Savings Plans instead
-- RI modifications (splitting/merging) don't change the term or payment — only the instance count and AZ
+- Regional RIs provide size flexibility; AZ-scoped provide capacity reservation -- pick one
+- DynamoDB Reserved Capacity is deprecated -- use Database Savings Plans instead
+- RI modifications (splitting/merging) don't change the term or payment -- only the instance count and AZ

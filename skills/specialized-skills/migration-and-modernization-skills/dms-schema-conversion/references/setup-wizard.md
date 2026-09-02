@@ -3,28 +3,28 @@
 ## Table of Contents
 
 - [Global Constraints](#global-constraints)
-- [Phase 1 — Project Name](#phase-1--project-name)
-- [Phase 2 — Target Type Selection](#phase-2--target-type-selection)
-- [Phase 3 — Source Database](#phase-3--source-database)
-  - [3d — Offline source configuration](#3d--offline-source-configuration)
-- [Phase 4 — Network Investigation & Connectivity](#phase-4--network-investigation--connectivity)
-- [Phase 5 — Create DMS Subnet Group](#phase-5--create-dms-subnet-group)
-- [Phase 6 — Database Credentials](#phase-6--database-credentials)
-- [Phase 7 — Create Data Providers](#phase-7--create-data-providers)
-- [Phase 8 — S3 Bucket](#phase-8--s3-bucket)
-- [Phase 9 — IAM Roles](#phase-9--iam-roles)
-- [Phase 10 — Create Instance Profile](#phase-10--create-instance-profile)
-- [Phase 11 — Transformation Rules (Optional)](#phase-11--transformation-rules-optional)
-- [Phase 12 — Create Migration Project & Summary](#phase-12--create-migration-project--summary)
+- [Phase 1 -- Project Name](#phase-1--project-name)
+- [Phase 2 -- Target Type Selection](#phase-2--target-type-selection)
+- [Phase 3 -- Source Database](#phase-3--source-database)
+  - [3d -- Offline source configuration](#3d--offline-source-configuration)
+- [Phase 4 -- Network Investigation & Connectivity](#phase-4--network-investigation--connectivity)
+- [Phase 5 -- Create DMS Subnet Group](#phase-5--create-dms-subnet-group)
+- [Phase 6 -- Database Credentials](#phase-6--database-credentials)
+- [Phase 7 -- Create Data Providers](#phase-7--create-data-providers)
+- [Phase 8 -- S3 Bucket](#phase-8--s3-bucket)
+- [Phase 9 -- IAM Roles](#phase-9--iam-roles)
+- [Phase 10 -- Create Instance Profile](#phase-10--create-instance-profile)
+- [Phase 11 -- Transformation Rules (Optional)](#phase-11--transformation-rules-optional)
+- [Phase 12 -- Create Migration Project & Summary](#phase-12--create-migration-project--summary)
 
 ---
 
 ## Global Constraints
 
-> Execute commands using available tools from the AWS MCP server when connected — it provides sandboxed execution, audit logging, and observability. When the MCP server is not available, fall back to the AWS CLI or shell as needed.
+> Execute commands using available tools from the AWS MCP server when connected -- it provides sandboxed execution, audit logging, and observability. When the MCP server is not available, fall back to the AWS CLI or shell as needed.
 
 - You MUST resolve `aws_account_id` by running `aws sts get-caller-identity` and extracting the `Account` field
-- You MUST present one phase at a time — do NOT ask for all parameters at once
+- You MUST present one phase at a time -- do NOT ask for all parameters at once
 - You MUST confirm each resource was created successfully before moving to the next phase
 - You MUST show a running summary of collected values at the start of each new phase
 - You MUST handle `ResourceAlreadyExistsFault` and similar errors by reusing the existing resource
@@ -33,14 +33,14 @@
 
 ---
 
-## Phase 1 — Project Name
+## Phase 1 -- Project Name
 
 **Goal:** Establish a project name prefix used for all resource names.
 
 Ask:
-> "What would you like to name this migration project? This will be used as a prefix for all created resources (e.g., `myproject` → `myproject-instance-profile`, `myproject-s3-bucket`, etc.)."
+> "What would you like to name this migration project? This will be used as a prefix for all created resources (e.g., `myproject` -> `myproject-instance-profile`, `myproject-s3-bucket`, etc.)."
 
-**Resource Naming Convention — you MUST use these exact names (no variations):**
+**Resource Naming Convention -- you MUST use these exact names (no variations):**
 
 | Resource | Name pattern |
 |----------|-------------|
@@ -78,7 +78,7 @@ Ask:
 
   ```
 
-- For each lookup, treat `NotFoundException`, `ResourceNotFoundException`, `NoSuchEntity`, or `404` as "not found" — do NOT surface these as errors to the customer
+- For each lookup, treat `NotFoundException`, `ResourceNotFoundException`, `NoSuchEntity`, or `404` as "not found" -- do NOT surface these as errors to the customer
 - After all lookups complete, present a table of what already exists vs. what will be created:
 
   | Resource | Status |
@@ -100,15 +100,15 @@ Ask:
 
 ---
 
-## Phase 2 — Target Type Selection
+## Phase 2 -- Target Type Selection
 
 **Goal:** Determine whether the target is a live database instance or a virtual target.
 
 Explain:
 > "DMS Schema Conversion supports two target modes:
 >
-> - **Live database** — connects to a live Amazon RDS, Aurora, or Redshift instance. DMS reads its network config automatically.
-> - **Virtual** — no live target database needed. Useful for reviewing converted schema without an actual DB.
+> - **Live database** -- connects to a live Amazon RDS, Aurora, or Redshift instance. DMS reads its network config automatically.
+> - **Virtual** -- no live target database needed. Useful for reviewing converted schema without an actual DB.
 >
 > Which would you like? (live / virtual)"
 
@@ -146,37 +146,37 @@ Explain:
 
   ```
 
-  Map `target_engine` → Settings key and default port:
-  - `aurora-postgresql` or `postgres` → `PostgreSqlSettings`, port 5432
-  - `mysql` or `aurora` → `MySqlSettings`, port 3306
-  - `redshift` → `RedshiftSettings`, port 5439
-  - `db2` → `IbmDb2LuwSettings`, port 50000
+  Map `target_engine` -> Settings key and default port:
+  - `aurora-postgresql` or `postgres` -> `PostgreSqlSettings`, port 5432
+  - `mysql` or `aurora` -> `MySqlSettings`, port 3306
+  - `redshift` -> `RedshiftSettings`, port 5439
+  - `db2` -> `IbmDb2LuwSettings`, port 50000
 
 ---
 
-## Phase 3 — Source Database
+## Phase 3 -- Source Database
 
 **Goal:** Collect source engine and connection details.
 
-### 3a — Source type
+### 3a -- Source type
 
-Ask for source engine. Supported source engines: `sqlserver`, `oracle`, `mysql`, `postgres`, `db2`, `db2-zos`, `sybase`. See [DMS SC supported source databases](https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Introduction.Sources.html#CHAP_Introduction.Sources.SchemaConversion) for the full list. The customer may provide the engine name in any format — map it to the correct API identifier automatically.
+Ask for source engine. Supported source engines: `sqlserver`, `oracle`, `mysql`, `postgres`, `db2`, `db2-zos`, `sybase`. See [DMS SC supported source databases](https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Introduction.Sources.html#CHAP_Introduction.Sources.SchemaConversion) for the full list. The customer may provide the engine name in any format -- map it to the correct API identifier automatically.
 
-### 3b — Source mode (online / offline)
+### 3b -- Source mode (online / offline)
 
 **If source engine is `sqlserver`**, ask:
 > "Would you like to connect directly to the source database (online mode), or use exported DDL scripts from S3 (offline mode)?
 >
-> - **Online** — DMS connects to your database to read metadata directly.
-> - **Offline** — DMS reads metadata from DDL scripts you've uploaded to S3. No database connectivity required."
+> - **Online** -- DMS connects to your database to read metadata directly.
+> - **Offline** -- DMS reads metadata from DDL scripts you've uploaded to S3. No database connectivity required."
 
 Store as `source_mode` (`online` or `offline`).
 
-**If offline:** Proceed to [Phase 3d — Offline Source Configuration](#3d--offline-source-configuration).
+**If offline:** Proceed to [Phase 3d -- Offline Source Configuration](#3d--offline-source-configuration).
 
 **If source engine is NOT `sqlserver`**, set `source_mode = online` (offline is available only for SQL Server).
 
-### 3c — Source connection (online mode only)
+### 3c -- Source connection (online mode only)
 
 **Skip this step if `source_mode = offline`.**
 
@@ -188,18 +188,18 @@ Ask for hostname, port, and database name in a single prompt. If the source is a
 
 Store as `source_hostname`, `source_port`, `source_database_name`.
 
-### 3d — Offline source configuration
+### 3d -- Offline source configuration
 
 **Skip this step if `source_mode = online`.**
 
-#### Step 1 — DDL Scripts (Offline Source)
+#### Step 1 -- DDL Scripts (Offline Source)
 
 Ask:
 > "What is the current state of your DDL scripts?
 >
 > 1. Already exported and uploaded to S3
 > 2. Already exported but not yet uploaded to S3
-> 3. Not yet exported — I'd like help"
+> 3. Not yet exported -- I'd like help"
 
 **Option 1 (exported + uploaded):** Proceed to Step 2.
 
@@ -212,15 +212,15 @@ Ensure the DDL scripts end up as individual `.sql` files in S3. If the customer 
 
 **Constraints:**
 
-- Do NOT generate presigned URLs as the default upload method — prefer `aws s3 sync` or `aws s3 cp`.
-- Do NOT ask the customer about encryption for files the agent uploads — always use `--sse AES256`.
-- Do NOT ask for the database name during upload — derive it from DDL content after upload (see Step 3). Use any reasonable prefix for the initial upload (e.g., `ddl/` or the project name).
+- Do NOT generate presigned URLs as the default upload method -- prefer `aws s3 sync` or `aws s3 cp`.
+- Do NOT ask the customer about encryption for files the agent uploads -- always use `--sse AES256`.
+- Do NOT ask for the database name during upload -- derive it from DDL content after upload (see Step 3). Use any reasonable prefix for the initial upload (e.g., `ddl/` or the project name).
 
 Verify upload: `aws s3 ls s3://<bucket>/<prefix>/ --recursive | head -10`. Proceed to Step 2.
 
 **Option 3 (not exported):**
 
-Provide the customer with a template export script. Do NOT ask for database credentials — always present the script with placeholder variables for the customer to fill in.
+Provide the customer with a template export script. Do NOT ask for database credentials -- always present the script with placeholder variables for the customer to fill in.
 
 Read [Export SQL Server database objects](https://docs.aws.amazon.com/dms/latest/userguide/export-sql-server-database-objects.html) and generate a PowerShell SMO script with clearly marked placeholders (hostname, database name, output directory, username, password). Let the customer run it independently.
 
@@ -236,7 +236,7 @@ Alternatively, provide the documentation link and DDL structure requirements (be
 - All objects for one database under a single S3 prefix
 - No DML or DROP statements
 
-#### Step 2 — S3 Configuration (Offline Source)
+#### Step 2 -- S3 Configuration (Offline Source)
 
 1. **S3 path:** Ask:
    > "Please provide the S3 path to your DDL scripts (e.g., `s3://my-bucket/MyDatabase/`)."
@@ -277,9 +277,9 @@ Alternatively, provide the documentation link and DDL structure requirements (be
    - **If yes:** Ask for the KMS key ARN. Store as `s3_kms_key_arn`. The S3 access role will need `kms:Decrypt` permission on this key (handled in Phase 9e).
    - **If no:** No additional configuration needed (SSE-S3 is the default and requires no extra permissions).
 
-   **Constraint:** Do NOT ask about encryption if you already uploaded the files yourself — you know the answer.
+   **Constraint:** Do NOT ask about encryption if you already uploaded the files yourself -- you know the answer.
 
-#### Step 3 — Prepare Source Data Provider Settings (Offline Source)
+#### Step 3 -- Prepare Source Data Provider Settings (Offline Source)
 
 **Derive DatabaseName from DDL content:**
 
@@ -295,7 +295,7 @@ To derive the correct value:
 
    ```
 
-2. Look for `USE [<name>]` or `CREATE DATABASE [<name>]` — extract `<name>` as the database name. Do not log or persist this output.
+2. Look for `USE [<name>]` or `CREATE DATABASE [<name>]` -- extract `<name>` as the database name. Do not log or persist this output.
 3. If no `USE`/`CREATE DATABASE` statement is found, use the last path segment of `ddl_s3_path` (the folder name containing the DDL scripts) as the database name.
 4. If the DDL scripts are at the bucket root (no prefix folder), ask the customer for the database name.
 
@@ -329,19 +329,19 @@ Use `source_data_provider_params` directly as the `params` argument when calling
 
 ---
 
-## Phase 4 — Network Investigation & Connectivity
+## Phase 4 -- Network Investigation & Connectivity
 
 **Goal:** Determine VPC, subnets, and security groups for the DMS instance profile.
 
-### 4a — Derive or ask for VPC
+### 4a -- Derive or ask for VPC
 
-**Skip Phase 4 entirely (4a, 4b, 4c) if `source_mode = offline` AND `use_virtual_target = true`.** No network configuration is needed — the instance profile will be created without subnet group or security groups.
+**Skip Phase 4 entirely (4a, 4b, 4c) if `source_mode = offline` AND `use_virtual_target = true`.** No network configuration is needed -- the instance profile will be created without subnet group or security groups.
 
 - **If live target:** Use `target_vpc_id` from Phase 2. Ask if the customer also wants to reuse the target subnets and security groups. If yes, skip to 4c.
   > **Note:** Reusing the same security group is less secure than creating a dedicated SG with minimal permissions.
 - **If virtual target AND `source_mode = online`:** Use the VPC where the source database resides. If the source is an RDS instance, derive the VPC from the RDS metadata. Otherwise, ask the customer which VPC the source database is in.
 
-### 4b — Collect subnets and security groups manually
+### 4b -- Collect subnets and security groups manually
 
 - Ask for at least two subnet IDs from different AZs (comma-separated)
 - Validate with: `aws ec2 describe-subnets --subnet-ids <ids> --query Subnets[*].{ID:SubnetId,AZ:AvailabilityZone,VPC:VpcId}`
@@ -349,9 +349,9 @@ Use `source_data_provider_params` directly as the `params` argument when calling
 - Ask for security group IDs (comma-separated)
 - After collecting security group IDs, run `aws ec2 describe-security-groups --group-ids <ids>` and check for rules referencing `0.0.0.0/0` or `::/0`. If found, warn the customer and recommend scoping rules to the specific database port and source CIDR or security group reference.
 
-### 4c — Connectivity confirmation
+### 4c -- Connectivity confirmation
 
-**Skip this step if `source_mode = offline`** — no source database connectivity is needed.
+**Skip this step if `source_mode = offline`** -- no source database connectivity is needed.
 
 Ask:
 > "Does your source database require special network setup to be reachable from this VPC? (VPN, Direct Connect, VPC peering, firewall rules) (yes / no)"
@@ -363,7 +363,7 @@ Store final `vpc_id`, `subnet_ids`, `security_group_ids`.
 
 ---
 
-## Phase 5 — Create DMS Subnet Group
+## Phase 5 -- Create DMS Subnet Group
 
 **Skip this phase if `source_mode = offline` AND `use_virtual_target = true`.**
 
@@ -382,11 +382,11 @@ Store `subnet_group_identifier`. On `ResourceAlreadyExistsFault`, reuse existing
 
 ---
 
-## Phase 6 — Database Credentials
+## Phase 6 -- Database Credentials
 
 **Goal:** Collect the Secrets Manager secrets for both source and target database credentials.
 
-### 6a — Source credentials
+### 6a -- Source credentials
 
 Ask if the customer needs help setting up source database credentials. Guide the customer based on [source data provider prerequisites](https://docs.aws.amazon.com/dms/latest/userguide/data-providers-source.html) for required permissions.
 
@@ -397,11 +397,11 @@ Ask for the Secrets Manager secret ARN containing the source database credential
 
 Store as `source_secret_arn`.
 
-### 6b — Target credentials
+### 6b -- Target credentials
 
 Ask if the customer needs help setting up target database credentials. Guide the customer based on [target data provider prerequisites](https://docs.aws.amazon.com/dms/latest/userguide/data-providers-target.html) for required permissions.
 
-**If virtual target:** A secret is still required by DMS even though it won't be used for an actual connection. Create a placeholder secret automatically (the password is non-sensitive — used only to satisfy the API schema requirement):
+**If virtual target:** A secret is still required by DMS even though it won't be used for an actual connection. Create a placeholder secret automatically (the password is non-sensitive -- used only to satisfy the API schema requirement):
 
 ```
 
@@ -424,11 +424,11 @@ Store as `target_secret_arn`.
 
 ---
 
-## Phase 7 — Create Data Providers
+## Phase 7 -- Create Data Providers
 
 **Goal:** Register source and target data providers in DMS.
 
-### 7a — Source data provider
+### 7a -- Source data provider
 
 **If `source_mode = offline`:**
 
@@ -453,9 +453,9 @@ aws dms create-data-provider \
 
 Store `source_data_provider_arn`. Do NOT include credentials in settings.
 
-**SSL/TLS:** For offline mode, SslMode is already set to `"none"` — do NOT ask the customer. For online mode, ask the customer which SSL mode to use (`require`, `verify-ca`, `verify-full`, `none`). Recommend `require` or higher. Warning: `none` transmits credentials and data unencrypted — use only in isolated test environments with no sensitive data.
+**SSL/TLS:** For offline mode, SslMode is already set to `"none"` -- do NOT ask the customer. For online mode, ask the customer which SSL mode to use (`require`, `verify-ca`, `verify-full`, `none`). Recommend `require` or higher. Warning: `none` transmits credentials and data unencrypted -- use only in isolated test environments with no sensitive data.
 
-### 7b — Target data provider
+### 7b -- Target data provider
 
 **If virtual target:**
 
@@ -468,7 +468,7 @@ aws dms create-data-provider \
 
 ```
 
-Use the same engine → Settings key mapping from Phase 2 (`PostgreSqlSettings`/5432, `MySqlSettings`/3306, `RedshiftSettings`/5439, `IbmDb2LuwSettings`/50000).
+Use the same engine -> Settings key mapping from Phase 2 (`PostgreSqlSettings`/5432, `MySqlSettings`/3306, `RedshiftSettings`/5439, `IbmDb2LuwSettings`/50000).
 
 **If live target:**
 
@@ -484,7 +484,7 @@ Do NOT pass `Virtual` for live targets.
 
 Store `target_data_provider_arn`.
 
-### 7c — Verify Virtual flag
+### 7c -- Verify Virtual flag
 
 You MUST verify both data providers have the correct `Virtual` flag immediately after creation.
 
@@ -526,11 +526,11 @@ aws dms create-data-provider \
 
 ```
 
-Repeat for the target data provider. After any recreate, re-store the new ARN from the `create-data-provider` response — the old ARN is no longer valid. Do NOT proceed to Phase 8 until both data providers have the correct `Virtual` flag.
+Repeat for the target data provider. After any recreate, re-store the new ARN from the `create-data-provider` response -- the old ARN is no longer valid. Do NOT proceed to Phase 8 until both data providers have the correct `Virtual` flag.
 
 ---
 
-## Phase 8 — S3 Bucket
+## Phase 8 -- S3 Bucket
 
 **Goal:** Ensure an S3 bucket exists for migration artifacts.
 
@@ -572,25 +572,25 @@ aws s3api put-bucket-policy --bucket <bucket_name> --policy '{
 **Constraints:**
 
 - The bucket name MUST include the region suffix: `<project_name>-sc-bucket-<aws_account_id>-<aws_region>`
-- Do NOT configure SSE-KMS — DMS Schema Conversion only supports SSE-S3 (default)
+- Do NOT configure SSE-KMS -- DMS Schema Conversion only supports SSE-S3 (default)
 - Store `bucket_name`
 
 ---
 
-## Phase 9 — IAM Roles
+## Phase 9 -- IAM Roles
 
 **Goal:** Create IAM roles: Secrets Manager access role, S3 access role, DMS VPC role, and DMS CloudWatch Logs role.
 
-**Important — two distinct S3 roles exist. Do NOT confuse them when troubleshooting:**
+**Important -- two distinct S3 roles exist. Do NOT confuse them when troubleshooting:**
 
 | Role | Name pattern | Purpose | Permissions |
 |---|---|---|---|
 | **S3 Role** (9b) | `<project_name>-sc-s3-role` | DMS reads/writes **migration artifacts** (reports, converted DDL, tree data) to the artifacts bucket | `s3:GetObject`, `s3:GetObjectVersion`, `s3:PutObject` + bucket-level `s3:ListBucket`, `s3:GetBucketLocation`, `s3:GetBucketVersioning` on the **artifacts bucket** |
 | **S3 Access Role** (9e) | `<project_name>-sc-s3-access-role` | DMS reads **DDL scripts** from the offline source bucket | `s3:GetObject`, `s3:ListBucket` on the **DDL scripts bucket** |
 
-When an S3 permission error occurs during import, the problem is almost always the **S3 Access Role** (9e) — not the S3 Role (9b). When an S3 error occurs during project creation or export, the problem is the **S3 Role** (9b).
+When an S3 permission error occurs during import, the problem is almost always the **S3 Access Role** (9e) -- not the S3 Role (9b). When an S3 error occurs during project creation or export, the problem is the **S3 Role** (9b).
 
-### 9a — Secrets Manager Role
+### 9a -- Secrets Manager Role
 
 Ask if an existing role is available. If yes, validate with `aws iam get-role`. If no, create:
 
@@ -608,7 +608,7 @@ Ask if an existing role is available. If yes, validate with `aws iam get-role`. 
 
 Store `secrets_role_arn`.
 
-### 9b — S3 Role
+### 9b -- S3 Role
 
 Ask if an existing role is available. If yes, validate. If no, create:
 
@@ -622,13 +622,13 @@ Ask if an existing role is available. If yes, validate. If no, create:
 
    ```
 
-2. Attach a policy granting S3 access to the artifacts bucket. Follow the exact policy from [IAM policies for DMS SC](https://docs.aws.amazon.com/dms/latest/userguide/set-up.html#set-up-iam): two statements — bucket-level (`s3:ListBucket`, `s3:GetBucketLocation`, `s3:GetBucketVersioning` on `arn:aws:s3:::<bucket_name>`) and object-level (`s3:PutObject`, `s3:GetObject`, `s3:GetObjectVersion` on `arn:aws:s3:::<bucket_name>/*`). Add `aws:ResourceAccount` condition for least-privilege.
+2. Attach a policy granting S3 access to the artifacts bucket. Follow the exact policy from [IAM policies for DMS SC](https://docs.aws.amazon.com/dms/latest/userguide/set-up.html#set-up-iam): two statements -- bucket-level (`s3:ListBucket`, `s3:GetBucketLocation`, `s3:GetBucketVersioning` on `arn:aws:s3:::<bucket_name>`) and object-level (`s3:PutObject`, `s3:GetObject`, `s3:GetObjectVersion` on `arn:aws:s3:::<bucket_name>/*`). Add `aws:ResourceAccount` condition for least-privilege.
 
 Store `s3_role_arn`.
 
-### 9c — DMS VPC Role
+### 9c -- DMS VPC Role
 
-Required by DMS to manage VPC and ENI resources. The role name MUST be exactly `dms-vpc-role` — DMS looks it up by this fixed name. See [IAM roles for DMS](https://docs.aws.amazon.com/dms/latest/userguide/set-up.html#set-up-iam-roles) for details.
+Required by DMS to manage VPC and ENI resources. The role name MUST be exactly `dms-vpc-role` -- DMS looks it up by this fixed name. See [IAM roles for DMS](https://docs.aws.amazon.com/dms/latest/userguide/set-up.html#set-up-iam-roles) for details.
 
 First check if the role exists:
 
@@ -660,7 +660,7 @@ If the role already exists (found in Phase 1 lookup or via the check above), ski
 
    ```
 
-### 9d — DMS CloudWatch Logs Role
+### 9d -- DMS CloudWatch Logs Role
 
 Required by DMS to publish schema conversion logs to CloudWatch. The role name MUST be exactly `dms-cloudwatch-logs-role`. See [IAM roles for DMS](https://docs.aws.amazon.com/dms/latest/userguide/set-up.html#set-up-iam-roles) for details.
 
@@ -694,7 +694,7 @@ If the role already exists (found in Phase 1 lookup or via the check above), ski
 
    ```
 
-### 9e — S3 Access Role for Offline Source
+### 9e -- S3 Access Role for Offline Source
 
 **Skip this step if `source_mode = online` or the customer already provided `offline_s3_access_role_arn` in Phase 3d.**
 
@@ -736,7 +736,7 @@ Store `offline_s3_access_role_arn`.
 
 ---
 
-## Phase 10 — Create Instance Profile
+## Phase 10 -- Create Instance Profile
 
 **Goal:** Create the DMS instance profile that ties together the subnet group and security groups.
 
@@ -764,18 +764,18 @@ Store `instance_profile_arn` and `instance_profile_name`.
 
 ---
 
-## Phase 11 — Transformation Rules (Optional)
+## Phase 11 -- Transformation Rules (Optional)
 
 You MUST ask the customer about transformation rules before proceeding to Phase 12:
-> "Would you like to apply any transformation rules during conversion — such as renaming schemas, converting object names to uppercase/lowercase, or adding prefixes/suffixes? (yes / no)"
+> "Would you like to apply any transformation rules during conversion -- such as renaming schemas, converting object names to uppercase/lowercase, or adding prefixes/suffixes? (yes / no)"
 
 If yes, help them build the rules JSON. See [Transformation rules in DMS Schema Conversion](https://docs.aws.amazon.com/dms/latest/userguide/sc-transformation-rules.html) for format and options. Store as `transformation_rules`. If no, set to `null`.
 
 ---
 
-## Phase 12 — Create Migration Project & Summary
+## Phase 12 -- Create Migration Project & Summary
 
-### 12a — Create Migration Project
+### 12a -- Create Migration Project
 
 Build source descriptor (always includes secret):
 
@@ -799,11 +799,11 @@ aws dms create-migration-project \
 
 Store `migration_project_arn` and `migration_project_name`.
 
-### 12b — Verify
+### 12b -- Verify
 
 If `create-migration-project` returns an error, surface the error message to the customer and refer to [troubleshooting.md](troubleshooting.md) for diagnosis. Common sync errors include `AccessDeniedFault` (IAM permissions), `ResourceNotFoundFault` (instance profile or data provider not found), and `InvalidResourceStateFault`.
 
-### 12c — Summary Table
+### 12c -- Summary Table
 
 | Resource | Name | ARN / ID |
 |---|---|---|

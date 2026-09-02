@@ -38,7 +38,7 @@ For this step, you need: **a name for the deployed custom model.**
 
 Suggest a name based on the training job or use case, e.g., `nova-micro-bedrock-<timestamp>`. Ask the user to confirm or provide their own.
 
-⏸ Wait for user before moving on.
+[PAUSE] Wait for user before moving on.
 
 ### Step 3: Verify IAM Role
 
@@ -46,7 +46,7 @@ Use the IAM role from the training job (extracted in Step 1 of the main workflow
 
 ### Step 4: Confirm Region
 
-The region was identified in Step 1 of the main workflow. Nova → Bedrock deployment is supported in **us-east-1** (this may be outdated — region availability can change and there is no API to query it). If the training job is in a different region, warn the user that Bedrock deployment for this model is likely limited to us-east-1; if an import is attempted elsewhere and fails (note: Nova → Bedrock uses Custom Model Import under the hood, so an unsupported region typically returns an access/authorization-style error rather than a clear region error), confirm it is not supported there.
+The region was identified in Step 1 of the main workflow. Nova -> Bedrock deployment is supported in **us-east-1** (this may be outdated -- region availability can change and there is no API to query it). If the training job is in a different region, warn the user that Bedrock deployment for this model is likely limited to us-east-1; if an import is attempted elsewhere and fails (note: Nova -> Bedrock uses Custom Model Import under the hood, so an unsupported region typically returns an access/authorization-style error rather than a clear region error), confirm it is not supported there.
 
 ### Step 5: Confirm Configuration
 
@@ -60,7 +60,7 @@ The region was identified in Step 1 of the main workflow. Nova → Bedrock deplo
 >
 > Does this look right?"
 
-⏸ Wait for user approval.
+[PAUSE] Wait for user approval.
 
 ### Step 6: Generate Code
 
@@ -68,7 +68,7 @@ Read `../references/code_output_guide.md` for output format rules.
 
 If a project directory already exists (from earlier in the workflow), use it. Otherwise, load the **directory-management** reference to set one up.
 
-⏸ Wait for user.
+[PAUSE] Wait for user.
 
 ## Code Structure
 
@@ -87,7 +87,7 @@ If a project directory already exists (from earlier in the workflow), use it. Ot
 
 ### Cells
 
-Each cell's content comes from `../code_templates/deploy-nova-bedrock.py`, split on the `# Cell N:` comments. Each marker starts a new notebook cell — everything between one marker and the next becomes that cell's content.
+Each cell's content comes from `../code_templates/deploy-nova-bedrock.py`, split on the `# Cell N:` comments. Each marker starts a new notebook cell -- everything between one marker and the next becomes that cell's content.
 
 - **Cell 1**: Setup (pip install)
 - **Cell 2**: Configuration (env vars, imports, placeholders)
@@ -99,10 +99,10 @@ Each cell's content comes from `../code_templates/deploy-nova-bedrock.py`, split
 
 Cell 2:
 
-- `[REGION]` → AWS region (us-east-1)
-- `[TRAINING_JOB_NAME]` → SageMaker training job name
-- `[ROLE_ARN]` → IAM role ARN
-- `[CUSTOM_MODEL_NAME]` → Name for the custom model
+- `[REGION]` -> AWS region (us-east-1)
+- `[TRAINING_JOB_NAME]` -> SageMaker training job name
+- `[ROLE_ARN]` -> IAM role ARN
+- `[CUSTOM_MODEL_NAME]` -> Name for the custom model
 
 All other cells have no placeholders.
 
@@ -110,11 +110,11 @@ All other cells have no placeholders.
 
 ```
 To run:
-1. Cell 1 — install SDK packages
-2. Cell 2 — set configuration values
-3. Cell 3 — creates custom model via BedrockModelBuilder and deploys (blocks until Active)
-4. Cell 4 — test inference with a sample prompt via Converse API
-5. Cell 5 — saves the deployment manifest to `manifests/deploy-<name>.json`
+1. Cell 1 -- install SDK packages
+2. Cell 2 -- set configuration values
+3. Cell 3 -- creates custom model via BedrockModelBuilder and deploys (blocks until Active)
+4. Cell 4 -- test inference with a sample prompt via Converse API
+5. Cell 5 -- saves the deployment manifest to `manifests/deploy-<name>.json`
 
 ```
 

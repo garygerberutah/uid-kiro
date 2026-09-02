@@ -1,4 +1,4 @@
-# Amazon OpenSearch Service Domain — Agentic Search Setup
+# Amazon OpenSearch Service Domain -- Agentic Search Setup
 
 Configure conversational agents with QueryPlanningTool for natural language search. Requires OpenSearch 3.3+ on a managed AOS domain. Uses Bedrock Claude as reasoning model.
 

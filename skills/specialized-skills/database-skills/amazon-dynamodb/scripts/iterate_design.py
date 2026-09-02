@@ -23,7 +23,7 @@ reimplementing them: prod-marker refusal, --yes-deploy, the resource prefix
 guard, and the pre-spend cost guardrail all still apply.
 
 Token-efficiency: the agent reads only the compact artifacts this round
-produces — design_findings.json, cost_report.md, and loop_state.json. It never
+produces -- design_findings.json, cost_report.md, and loop_state.json. It never
 needs to read perf_raw.jsonl (large) or performance_report.md (human-facing).
 
 Usage:
@@ -57,7 +57,7 @@ except Exception:  # pragma: no cover
 try:
     # Imported only for its mode-preset table, so the resolved config this
     # script writes (and records in loop_state) matches exactly what
-    # benchmark_model.py would compute. No banner is printed here — we read the
+    # benchmark_model.py would compute. No banner is printed here -- we read the
     # preset dict directly rather than calling _apply_mode_preset.
     import benchmark_model as bm
 except Exception:  # pragma: no cover
@@ -98,7 +98,7 @@ def _resolve_config(cfg: dict) -> dict:
     """Return cfg with the mode preset filled in (explicit values always win).
 
     This MUST match benchmark_model.py's _apply_mode_preset so the config this
-    script writes to its overlay — and records in loop_state — is byte-identical
+    script writes to its overlay -- and records in loop_state -- is byte-identical
     to what the benchmark would resolve. The subprocesses re-read a file from
     disk, so resolving the preset only in memory here (as a bare
     cfg["mode"]=... ) would be silently dropped: the whole point of the loop's
@@ -125,14 +125,14 @@ def _resolve_config(cfg: dict) -> dict:
 def _apply_change(model: dict, change: dict) -> dict:
     """Apply a user-agreed change to the design. Two supported shapes:
 
-      1. JSON merge-patch  — {"merge": {<partial design to deep-merge>}}
-      2. Op list (RFC6902-lite) — {"ops": [{"op": "...", "path": "/a/b", "value": ...}]}
+      1. JSON merge-patch  -- {"merge": {<partial design to deep-merge>}}
+      2. Op list (RFC6902-lite) -- {"ops": [{"op": "...", "path": "/a/b", "value": ...}]}
          ops: "replace" | "add" | "remove". Paths are JSON-pointer-ish
          ("/tables/0/gsis/1/projection/type"); list indices are integers, and
          "-" appends to a list (for "add").
 
     The script applies ONLY what it is handed. It contains no logic to decide
-    what should change — that is the user's call, surfaced by the agent."""
+    what should change -- that is the user's call, surfaced by the agent."""
     if "merge" in change:
         return _deep_merge(model, change["merge"])
     if "ops" in change:
@@ -215,7 +215,7 @@ def _apply_op(model: dict, op: dict):
 
 
 # ---------------------------------------------------------------------------
-# Schema fingerprint — drives reuse-vs-redeploy
+# Schema fingerprint -- drives reuse-vs-redeploy
 # ---------------------------------------------------------------------------
 
 
@@ -223,7 +223,7 @@ def _schema_fingerprint(model: dict) -> str:
     """A short, stable hash of everything that requires a physical redeploy if
     it changes: per table the key schema, the GSIs (name + keys + projection +
     sorted non-key attributes), and the stream config. RPS / item-size /
-    consistency changes do NOT affect this — they only change the driven load
+    consistency changes do NOT affect this -- they only change the driven load
     and the calculator-expected numbers, so they can REUSE the deployment."""
     import hashlib
 
@@ -272,7 +272,7 @@ def _schema_fingerprint(model: dict) -> str:
 def _headline_from_artifacts(model: dict, workdir: Path, have_bench: bool) -> dict:
     """Build the small numeric snapshot recorded per round. Pulls from the
     compact artifacts only (design_findings.json, perf_summary.json) plus the
-    calculator for the canonical monthly cost — never the large raw file."""
+    calculator for the canonical monthly cost -- never the large raw file."""
     h: dict = {
         "extrapolated_monthly_usd": None,
         "calculator_monthly_usd": None,
@@ -373,7 +373,7 @@ def _run(cmd: list[str], step: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Main — one round
+# Main -- one round
 # ---------------------------------------------------------------------------
 
 
@@ -394,7 +394,7 @@ def main():
     p.add_argument(
         "--loop-state",
         required=True,
-        help="path to loop_state.json — the compact per-round genealogy "
+        help="path to loop_state.json -- the compact per-round genealogy "
         "this script appends to (created if absent)",
     )
     p.add_argument(
@@ -453,7 +453,7 @@ def main():
     cfg = _load_json(Path(args.config))
     cfg.setdefault("mode", args.mode)
     # Resolve the mode preset NOW (zipf, representative scale, items_per_partition,
-    # …) and persist it to an overlay the subprocesses read from disk. Passing the
+    # ...) and persist it to an overlay the subprocesses read from disk. Passing the
     # user's original --config to deploy/benchmark would drop --mode entirely,
     # because those scripts re-read the file and would see no "mode" unless the
     # user had hand-set it. The overlay carries the fully-resolved knobs, and the
@@ -523,7 +523,7 @@ def main():
     )
 
     # --- 3. Calculator-only fast path: re-cost, record, STOP ---
-    # (No AWS, no benchmark — calculate_costs reads --model only, so no config
+    # (No AWS, no benchmark -- calculate_costs reads --model only, so no config
     # overlay is needed on this path.)
     if deploy_decision == "calculator-only":
         cost_out = workdir / COST_REPORT
@@ -584,8 +584,8 @@ def main():
             applied_diff,
         )
     finally:
-        # Clean up both transient overlays — the main resolved-config overlay and
-        # the dry-run variant — even if a subprocess died mid-round (a failed
+        # Clean up both transient overlays -- the main resolved-config overlay and
+        # the dry-run variant -- even if a subprocess died mid-round (a failed
         # _run raises SystemExit, which propagates through here).
         for transient in (cfg_overlay_path, workdir / ".iterate_dry_config.json"):
             if transient.exists():
@@ -612,7 +612,7 @@ def _run_round_body(
     deploy_decision,
     applied_diff,
 ):
-    """Deploy-or-reuse → benchmark → report → cost → record. Split out so the
+    """Deploy-or-reuse -> benchmark -> report -> cost -> record. Split out so the
     caller can guarantee overlay cleanup in a `finally`."""
     # --- 4. Deploy (gated) or reuse ---
     if deploy_decision == "deploy":
@@ -622,7 +622,7 @@ def _run_round_body(
                 "active deployment), but --yes-deploy was not passed. Re-run "
                 "with --yes-deploy after confirming the target is a sandbox "
                 "account. (Existing deployments from a prior round are NOT "
-                "torn down automatically — run the prior teardown.sh first if "
+                "torn down automatically -- run the prior teardown.sh first if "
                 "the schema changed.)",
                 code=4,
             )
@@ -630,7 +630,7 @@ def _run_round_body(
             print(
                 "[iterate_design] NOTE: schema changed since the last "
                 "deployment. The prior resources are NOT torn down "
-                "automatically — run the prior teardown.sh to avoid orphans."
+                "automatically -- run the prior teardown.sh to avoid orphans."
             )
         deploy_cfg_path = cfg_overlay_path
         if args.dry_run:
@@ -821,7 +821,7 @@ def _emit_summary(
         else:
             print("  hot-pattern throttles: none observed")
         if headline.get("max_gsi_amplification") is not None:
-            print(f"  max GSI amplification: {headline['max_gsi_amplification']}×")
+            print(f"  max GSI amplification: {headline['max_gsi_amplification']}x")
     if prev_round:
         delta = _compute_deltas(headline, prev_round.get("headline"))
         print(f"  delta vs round {prev_round['round']}: {json.dumps(delta)}")
@@ -831,7 +831,7 @@ def _emit_summary(
     )
     print("=" * 72)
     print(
-        f"=== ROUND {round_idx} COMPLETE — handing back to user. "
+        f"=== ROUND {round_idx} COMPLETE -- handing back to user. "
         "The loop does not self-iterate. Review the findings, decide a "
         "change, and re-run for the next round. ==="
     )

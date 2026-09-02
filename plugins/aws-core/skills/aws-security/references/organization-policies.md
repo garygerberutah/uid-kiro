@@ -13,7 +13,7 @@ AWS Organizations supports service-specific policy types for centralized configu
 
 ## Common Discovery Pattern
 
-The same CLI pattern applies to all policy types — substitute the appropriate `POLICY_TYPE` value:
+The same CLI pattern applies to all policy types -- substitute the appropriate `POLICY_TYPE` value:
 
 ```bash
 # List policies of a given type
@@ -26,9 +26,9 @@ aws organizations describe-policy --policy-id <id>
 aws organizations list-targets-for-policy --policy-id <id>
 ```
 
-These are `organizations` namespace APIs — not service-specific APIs like `securityhub` or `inspector2`.
+These are `organizations` namespace APIs -- not service-specific APIs like `securityhub` or `inspector2`.
 
-> **Execution environment:** The AWS MCP server is recommended for running these API calls but is not required — standard AWS CLI access is sufficient.
+> **Execution environment:** The AWS MCP server is recommended for running these API calls but is not required -- standard AWS CLI access is sufficient.
 
 ## Read-Only APIs
 

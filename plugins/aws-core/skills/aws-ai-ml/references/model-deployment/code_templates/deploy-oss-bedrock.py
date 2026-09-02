@@ -1,4 +1,4 @@
-# Cell 0 [markdown]: Model Deployment — Bedrock
+# Cell 0 [markdown]: Model Deployment -- Bedrock
 
 # Cell 1: Setup
 

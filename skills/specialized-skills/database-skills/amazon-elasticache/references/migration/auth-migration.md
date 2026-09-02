@@ -199,7 +199,7 @@ Cluster-mode disabled uses a single shard (primary + replicas). Cluster-mode ena
 - **For in-place migration:** Minimum engine version of Valkey 7.2 or Redis OSS 7.0 is required
 - **For in-place migration:** Auto-failover must be enabled with at least 1 replica
 - **For in-place migration:** The cluster may only have keys in database 0 (multiple databases are not supported)
-- **For in-place migration:** CMD→CME is a one-way operation. Once cluster mode is set to `enabled`, it **cannot be reverted back to disabled**. You can only revert from `compatible` back to `disabled`
+- **For in-place migration:** CMD->CME is a one-way operation. Once cluster mode is set to `enabled`, it **cannot be reverted back to disabled**. You can only revert from `compatible` back to `disabled`
 
 ### Impact Assessment
 
@@ -345,7 +345,7 @@ client = valkey.cluster.ValkeyCluster(
 
 ### Rollback Plan
 
-**For the in-place migration path (Valkey 7.2+/Redis OSS 7.0+):** Once cluster mode is set to `enabled`, the change is **irreversible** — you cannot convert back to cluster-mode disabled. You can only revert from `compatible` back to `disabled` before completing the final step. Take a snapshot before setting `enabled`.
+**For the in-place migration path (Valkey 7.2+/Redis OSS 7.0+):** Once cluster mode is set to `enabled`, the change is **irreversible** -- you cannot convert back to cluster-mode disabled. You can only revert from `compatible` back to `disabled` before completing the final step. Take a snapshot before setting `enabled`.
 
 **For the new-cluster migration path:** The old cluster remains running throughout the migration:
 

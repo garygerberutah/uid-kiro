@@ -56,7 +56,7 @@ aws athena start-query-execution \
 - You MUST NOT include a LOCATION clause
 - You MUST NOT put catalog name in the SQL -- use execution context
 - Output S3 bucket MUST be in the same region
-- The querying principal needs `athena:StartQueryExecution`, `athena:GetQueryExecution`, `athena:GetQueryResults` plus S3 access to the results bucket. Also requires S3 Tables and Glue permissions — see `access-control.md`.
+- The querying principal needs `athena:StartQueryExecution`, `athena:GetQueryExecution`, `athena:GetQueryResults` plus S3 access to the results bucket. Also requires S3 Tables and Glue permissions -- see `access-control.md`.
 
 ## Schema Evolution
 

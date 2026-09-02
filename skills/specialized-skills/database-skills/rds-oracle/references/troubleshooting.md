@@ -1,10 +1,10 @@
-# RDS for Oracle — Troubleshooting
+# RDS for Oracle -- Troubleshooting
 
 Common Oracle connectivity errors and fixes. Pair with the `networking.md`, `connection-auth.md`, and compute-runtime references for deeper context.
 
 ## Connection errors (ORA-*)
 
-### `ORA-12170` — TNS: Connect timeout
+### `ORA-12170` -- TNS: Connect timeout
 
 Network can't reach RDS.
 
@@ -21,15 +21,15 @@ nc -zv <rds-endpoint> 1521
 bash scripts/test_connectivity.sh <endpoint> 1521
 ```
 
-### `ORA-12541` — TNS: no listener
+### `ORA-12541` -- TNS: no listener
 
 Wrong endpoint or port.
 
 - Verify: `aws rds describe-db-instances --db-instance-identifier <id> --query 'DBInstances[0].Endpoint'`
-- Don't use the instance ID as the hostname — use the full `*.rds.amazonaws.com` endpoint
+- Don't use the instance ID as the hostname -- use the full `*.rds.amazonaws.com` endpoint
 - Check the custom port if `Port` isn't 1521
 
-### `ORA-12514` — service not known
+### `ORA-12514` -- service not known
 
 Wrong `SERVICE_NAME` or `SID`.
 
@@ -37,7 +37,7 @@ Wrong `SERVICE_NAME` or `SID`.
 - Try both: `(CONNECT_DATA=(SERVICE_NAME=ORCL))` vs `(CONNECT_DATA=(SID=ORCL))`
 - After failover, the listener may take a moment to re-register
 
-### `ORA-12505` — SID not known
+### `ORA-12505` -- SID not known
 
 Using SID syntax when a Service Name is required (common for newer tools). Switch to:
 
@@ -45,21 +45,21 @@ Using SID syntax when a Service Name is required (common for newer tools). Switc
 (CONNECT_DATA=(SERVICE_NAME=ORCL))
 ```
 
-### `ORA-01017` — invalid username/password
+### `ORA-01017` -- invalid username/password
 
 - Verify Secrets Manager value: `aws secretsmanager get-secret-value --secret-id <name> --query SecretString --output text`
-- Password rotation — fetch fresh creds
+- Password rotation -- fetch fresh creds
 - Case-sensitive passwords (RDS setting)
 - Special chars in password may need escaping in connection strings
 
-### `ORA-28040` — no matching auth protocol
+### `ORA-28040` -- no matching auth protocol
 
 Client driver too old.
 
 - Update to Oracle 21c+ thin drivers: `python-oracledb 6+`, `ojdbc11` 23.x, `node-oracledb 6+`, ODP.NET Core latest
 - Thin mode avoids this entirely
 
-### `ORA-29024` — certificate validation failure (TLS)
+### `ORA-29024` -- certificate validation failure (TLS)
 
 Client doesn't trust RDS CA.
 
@@ -72,7 +72,7 @@ curl -o global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global
 - .NET: add to OS trust store (`update-ca-certificates`)
 - Over SSM tunnel: `SSL_SERVER_DN_MATCH = FALSE` (cert CN won't match `localhost`)
 
-### `ORA-28860` — fatal SSL error
+### `ORA-28860` -- fatal SSL error
 
 TLS version or cipher mismatch.
 
@@ -82,7 +82,7 @@ TLS version or cipher mismatch.
 
 ## Driver-specific
 
-### Python — `DPI-1047`
+### Python -- `DPI-1047`
 
 Thick mode can't locate Oracle Client.
 
@@ -90,17 +90,17 @@ Thick mode can't locate Oracle Client.
 - If you need thick: `oracledb.init_oracle_client(lib_dir="/usr/lib/oracle/21/client64/lib")`
 - Install `libaio` on Linux
 
-### Python — `DPY-6005` (thin-mode limitation)
+### Python -- `DPY-6005` (thin-mode limitation)
 
 Some operation isn't supported in thin mode. Usually Kerberos with in-memory tickets or Advanced Queuing. Switch to thick for just that code path, or find the thin-compatible equivalent.
 
-### Python — `ModuleNotFoundError: oracledb`
+### Python -- `ModuleNotFoundError: oracledb`
 
 ```bash
 pip install oracledb
 ```
 
-### Java — `ClassNotFoundException: oracle.jdbc.driver.OracleDriver`
+### Java -- `ClassNotFoundException: oracle.jdbc.driver.OracleDriver`
 
 Add `ojdbc11` dependency:
 
@@ -112,52 +112,52 @@ Add `ojdbc11` dependency:
 </dependency>
 ```
 
-### Java — UCP `Cannot get Connection from Datasource`
+### Java -- UCP `Cannot get Connection from Datasource`
 
 Pool exhausted.
 
 - `maxPoolSize` too low for workload
 - Connections not returned (use try-with-resources)
-- RDS `max_connections` exceeded across all app instances — check CloudWatch `DatabaseConnections`
+- RDS `max_connections` exceeded across all app instances -- check CloudWatch `DatabaseConnections`
 
-### Secrets Manager — `AccessDeniedException`
+### Secrets Manager -- `AccessDeniedException`
 
 - Role has `secretsmanager:GetSecretValue` on the correct ARN (including the random suffix)
 - If KMS-encrypted with a customer-managed key: add `kms:Decrypt` permission
 - VPC endpoint for Secrets Manager? Endpoint policy allows the role?
 - From VPC with no internet: need VPC endpoint for Secrets Manager
 
-### Secrets Manager — timeout from Lambda/ECS/EKS
+### Secrets Manager -- timeout from Lambda/ECS/EKS
 
 - Lambda in VPC: VPC endpoint or NAT gateway for Secrets Manager
 - SG allows outbound 443 to Secrets Manager endpoint
 
 ## Platform-specific
 
-### Lambda — cold start > 5s
+### Lambda -- cold start > 5s
 
 - Use thin mode (no Oracle Client load)
 - Initialize pool at module scope (outside handler), reused across warm invocations
 - Provisioned concurrency for latency-sensitive workloads
 - Keep memory reasonable (higher memory is faster but costlier; ENI attachment is fixed ~1-2s)
 
-### Lambda — too many RDS connections
+### Lambda -- too many RDS connections
 
-Each Lambda instance has its own pool. High concurrency → many connections.
+Each Lambda instance has its own pool. High concurrency -> many connections.
 
 - Keep pool `max` small (1-2 per instance)
 - Set Lambda reserved concurrency to cap total instances
 - Monitor RDS `DatabaseConnections` CloudWatch metric
-- Total max = concurrency × pool max
+- Total max = concurrency x pool max
 
-### ECS Fargate — secrets not injected
+### ECS Fargate -- secrets not injected
 
 - Task **execution** role (not task role) has `secretsmanager:GetSecretValue`
 - Secret ARN in task definition matches exactly (with random suffix)
 - Subnets have NAT or VPC endpoint for Secrets Manager
-- Thin mode preferred for containers — no Oracle Client in image
+- Thin mode preferred for containers -- no Oracle Client in image
 
-### EKS — pod can't access Secrets Manager via IRSA
+### EKS -- pod can't access Secrets Manager via IRSA
 
 - OIDC provider associated with cluster
 - ServiceAccount annotated with IAM role ARN
@@ -165,10 +165,10 @@ Each Lambda instance has its own pool. High concurrency → many connections.
 - Role has `secretsmanager:GetSecretValue`
 - Pod spec: `serviceAccountName: <sa-name>`
 
-### EKS — too many connections from scaled pods
+### EKS -- too many connections from scaled pods
 
 - Pool `max` small (1-3 per pod)
-- HPA `maxReplicas × max` ≤ RDS capacity budget
+- HPA `maxReplicas x max` <= RDS capacity budget
 - Monitor `DatabaseConnections`, set CloudWatch alarms
 
 ## SSM port forwarding
@@ -177,7 +177,7 @@ Each Lambda instance has its own pool. High concurrency → many connections.
 
 SSM agent not running, or missing IAM.
 
-- `aws ssm describe-instance-information --filters "Key=InstanceIds,Values=<id>"` — PingStatus should be `Online`
+- `aws ssm describe-instance-information --filters "Key=InstanceIds,Values=<id>"` -- PingStatus should be `Online`
 - IAM instance profile has `AmazonSSMManagedInstanceCore`
 - `systemctl status amazon-ssm-agent`
 
@@ -203,9 +203,9 @@ Then connect to `localhost:11521`.
 
 ## Kerberos
 
-### `ORA-12631` — Username retrieval failed
+### `ORA-12631` -- Username retrieval failed
 
-- `klist` — no ticket? Run `okinit joedoe@REALM`
+- `klist` -- no ticket? Run `okinit joedoe@REALM`
 - `sqlnet.ora` has `SQLNET.AUTHENTICATION_SERVICES = (KERBEROS5PRE,KERBEROS5)`
 - `SQLNET.KERBEROS5_CC_NAME` points to correct cache file
 - Windows SQL*Plus: `OSMSFT:` for in-memory; SQL Developer: use file cache
@@ -239,7 +239,7 @@ Then connect to `localhost:11521`.
 
 - PHZ associated with the correct VPC
 - VPC `enableDnsSupport` and `enableDnsHostnames` both enabled
-- `aws route53 list-resource-record-sets --hosted-zone-id <id>` — record exists
+- `aws route53 list-resource-record-sets --hosted-zone-id <id>` -- record exists
 
 ### On-prem can't resolve PHZ
 
@@ -252,7 +252,7 @@ Then connect to `localhost:11521`.
 ### Pool exhausted
 
 - `max` too low for workload
-- Connections leak — use try-with-resources / context managers
+- Connections leak -- use try-with-resources / context managers
 - `wait_timeout` set so requests don't hang
 - Monitor CloudWatch `DatabaseConnections`
 
@@ -264,7 +264,7 @@ Enable validation-on-borrow:
 - Java UCP: `setValidateConnectionOnBorrow(true)` + `setSQLForValidateConnection("SELECT 1 FROM dual")`
 - HikariCP: `setConnectionTestQuery("SELECT 1 FROM dual")`
 
-### `ORA-02396` — exceeded maximum idle time
+### `ORA-02396` -- exceeded maximum idle time
 
 RDS `IDLE_TIME` profile parameter is closing idle connections.
 
@@ -288,7 +288,7 @@ RDS `IDLE_TIME` profile parameter is closing idle connections.
 - CMAN running: `cmctl show status -c CMAN`
 - Client DSN points to CMAN IP, not RDS directly
 
-### `ORA-12529` — connection rejected
+### `ORA-12529` -- connection rejected
 
 Source IP not in an `ACCEPT` rule. Add the CIDR to `RULE_LIST` in `cman.ora`.
 

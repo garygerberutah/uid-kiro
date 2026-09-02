@@ -96,7 +96,7 @@ The Kinesis `GetRecords` API has a hard limit of 5 calls per second per shard, s
 | Config Option | Description | Default | Recommendation |
 |---|---|---|---|
 | `SHARD_GET_RECORDS_MAX` | Max records per `GetRecords` call | 10,000 (but Kinesis limit is 10,000 records / 10 MB per call; throttling occurs at 1,000 records for some stream configurations) | Lower to 1,000 or less if seeing throttling |
-| `READER_EMPTY_RECORDS_FETCH_INTERVAL` | Interval between polling calls when no records are returned | 200ms (5 calls/sec) | Increase to 500ms–1s if sharing shards with other consumers or if the default rate exceeds the per-shard limit |
+| `READER_EMPTY_RECORDS_FETCH_INTERVAL` | Interval between polling calls when no records are returned | 200ms (5 calls/sec) | Increase to 500ms-1s if sharing shards with other consumers or if the default rate exceeds the per-shard limit |
 | `SHARD_DISCOVERY_INTERVAL` | Interval for discovering new shards via `ListShards` | 10s | Increase if `ListShards` rate limiting is observed |
 
 **Tuning polling to avoid throttling:**
@@ -108,7 +108,7 @@ Configuration sourceConfig = new Configuration();
 sourceConfig.set(KinesisSourceConfigOptions.SHARD_GET_RECORDS_MAX, 1000);
 
 // Increase polling interval to reduce GetRecords call rate
-// Default is 200ms (5 calls/sec) — increase if sharing shards with other consumers
+// Default is 200ms (5 calls/sec) -- increase if sharing shards with other consumers
 sourceConfig.set(KinesisSourceConfigOptions.READER_EMPTY_RECORDS_FETCH_INTERVAL, Duration.ofMillis(500));
 
 KinesisStreamsSource<String> source = KinesisStreamsSource.<String>builder()
@@ -120,7 +120,7 @@ KinesisStreamsSource<String> source = KinesisStreamsSource.<String>builder()
 
 **When polling tuning is sufficient (vs switching to EFO):**
 
-- Single consumer reading from the stream: tune polling — EFO is unnecessary cost since there is no shared-quota contention.
+- Single consumer reading from the stream: tune polling -- EFO is unnecessary cost since there is no shared-quota contention.
 - 2+ consumers and still seeing `ReadProvisionedThroughputExceeded` after raising `READER_EMPTY_RECORDS_FETCH_INTERVAL`: switch to EFO. Tuning polling intervals across multiple consumers is fragile; EFO eliminates the shared quota entirely.
 - Polling interval increase introduces unacceptable latency: switch to EFO (HTTP/2 push has no polling delay).
 - You expect to scale to more consumers later: prefer EFO upfront.
@@ -129,7 +129,7 @@ See [kinesis-efo-guide.md](kinesis-efo-guide.md) for EFO configuration, consumer
 
 **Diagnosing polling throttling:**
 
-- Check CloudWatch metric `ReadProvisionedThroughputExceeded` on the Kinesis stream — sustained values > 0 indicate throttling.
+- Check CloudWatch metric `ReadProvisionedThroughputExceeded` on the Kinesis stream -- sustained values > 0 indicate throttling.
 - Check Managed Service for Apache Flink CloudWatch logs for `LimitExceededException` errors.
 - Monitor `GetRecords.Latency` and `GetRecords.Success` metrics to correlate throttling with read performance.
 

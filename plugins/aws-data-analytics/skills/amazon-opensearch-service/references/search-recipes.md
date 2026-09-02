@@ -1,6 +1,6 @@
-# Search recipes — query DSL for app developers
+# Search recipes -- query DSL for app developers
 
-The summary is in `SKILL.md` (§ Build a search feature). This file owns the recipes — copy-paste DSL for every common search pattern.
+The summary is in `SKILL.md` (Section Build a search feature). This file owns the recipes -- copy-paste DSL for every common search pattern.
 
 ## Index design 101
 
@@ -57,7 +57,7 @@ Key choices:
 - Multi-fields `"title": {"type":"text", "fields": {"keyword": {"type":"keyword"}}}` to support both
 - `search_as_you_type` for autocomplete
 - `scaled_float` for currency (better than `float` for known precision)
-- Avoid `nested` unless you actually need it — it's expensive
+- Avoid `nested` unless you actually need it -- it's expensive
 
 ## Full-text search
 
@@ -87,11 +87,11 @@ GET my-app/_search
 
 `type` options:
 
-- `best_fields` (default) — score = highest single-field score (good for unique-content queries)
-- `most_fields` — score = sum of all matching fields (good when same content in multiple fields)
-- `cross_fields` — treats fields as one big field (good for entity searches like "first_name last_name")
-- `phrase` — must match as phrase
-- `phrase_prefix` — phrase + last token can be a prefix
+- `best_fields` (default) -- score = highest single-field score (good for unique-content queries)
+- `most_fields` -- score = sum of all matching fields (good when same content in multiple fields)
+- `cross_fields` -- treats fields as one big field (good for entity searches like "first_name last_name")
+- `phrase` -- must match as phrase
+- `phrase_prefix` -- phrase + last token can be a prefix
 
 ### Boolean (combine queries)
 
@@ -109,7 +109,7 @@ GET my-app/_search
 }
 ```
 
-`filter` doesn't affect score and is cached — use for non-relevance constraints (in-stock, price range, category).
+`filter` doesn't affect score and is cached -- use for non-relevance constraints (in-stock, price range, category).
 
 ### Phrase queries
 
@@ -258,7 +258,7 @@ For non-native scripts where prefix matters character-by-character.
 }
 ```
 
-`fuzziness: AUTO` (recommended): 0 edits for ≤2 char terms, 1 edit for 3–5 chars, 2 edits for ≥6 chars.
+`fuzziness: AUTO` (recommended): 0 edits for <=2 char terms, 1 edit for 3-5 chars, 2 edits for >=6 chars.
 
 ## "More like this" / similar items
 
@@ -416,11 +416,11 @@ Define in mapping `analysis.filter.synonyms_filter` and apply analyzer to text f
 }
 ```
 
-**Recommendation**: Start with search-time synonyms — easier to update without reindexing.
+**Recommendation**: Start with search-time synonyms -- easier to update without reindexing.
 
 ## Boost recent items in relevance
 
-Use `function_score` with `gauss` decay (above) — natural log decay over time.
+Use `function_score` with `gauss` decay (above) -- natural log decay over time.
 
 ## Geo search
 
@@ -442,11 +442,11 @@ Use `function_score` with `gauss` decay (above) — natural log decay over time.
 
 Field type: `geo_point` or `geo_shape`.
 
-## Solr → OpenSearch query translation reference
+## Solr -> OpenSearch query translation reference
 
 | Solr | OpenSearch DSL |
 |---|---|
-| `q=headphones` | `{"multi_match": {"query": "headphones", "fields": ["title", "description"]}}` (no `_all` in OpenSearch — list fields explicitly) |
+| `q=headphones` | `{"multi_match": {"query": "headphones", "fields": ["title", "description"]}}` (no `_all` in OpenSearch -- list fields explicitly) |
 | `q=title:headphones` | `{"match": {"title": "headphones"}}` |
 | `q.op=AND` | `"default_operator": "AND"` on `query_string` OR `"operator": "AND"` on `match` |
 | `qf=title^3 description` (eDisMax) | `multi_match` `type: best_fields` with `fields: ["title^3", "description"]` |
@@ -465,23 +465,23 @@ Field type: `geo_point` or `geo_shape`.
 
 ## Common gotchas
 
-1. **Dynamic mapping** — first doc creates field types. A field like `"id": "12345"` becomes `text` (not `keyword`) and `text` can't be used for sort/facet without `fielddata: true` (OOM-prone). **Always pre-define mappings.**
+1. **Dynamic mapping** -- first doc creates field types. A field like `"id": "12345"` becomes `text` (not `keyword`) and `text` can't be used for sort/facet without `fielddata: true` (OOM-prone). **Always pre-define mappings.**
 2. **Cannot change field type** without reindex. Add new field, dual-write, switch reads, drop old.
-3. **`text` vs `keyword`** — text is analyzed (lowercased, tokenized, stemmed). Keyword is stored as-is. For an ID field that should be exact-match, use `keyword`.
-4. **`refresh_interval`** is 1s default. New documents not searchable for up to 1s. Force with `?refresh=true` (slow — use sparingly).
+3. **`text` vs `keyword`** -- text is analyzed (lowercased, tokenized, stemmed). Keyword is stored as-is. For an ID field that should be exact-match, use `keyword`.
+4. **`refresh_interval`** is 1s default. New documents not searchable for up to 1s. Force with `?refresh=true` (slow -- use sparingly).
 5. **`_id` is automatic by default** (random UUID). Set explicit `_id` in `_bulk` to ensure idempotent writes.
 6. **`max_result_window`** defaults to 10,000. To page beyond, use `search_after` or `point_in_time`. Don't blindly raise the setting.
 7. **Aggregations on `text` fields require `fielddata: true`** (OOM risk). Use `keyword` subfields for aggs/sort.
-8. **`null` ≠ missing** — explicitly handle null with `"null_value"` in mapping or use `exists` query.
+8. **`null` != missing** -- explicitly handle null with `"null_value"` in mapping or use `exists` query.
 9. **Reserved field names** like `_id`, `_source`, `_index`, `_doc`. Don't try to redefine them.
 10. **`copy_to`** is the OpenSearch native equivalent of Solr `copyField`. Don't replicate via external pipeline.
 
 ## Performance tuning for queries
 
-- **Cache `filter` clauses** — they're cached by default, faster than `must`.
-- **`doc_values: true`** is default for keyword/numeric/date — required for sort/agg.
+- **Cache `filter` clauses** -- they're cached by default, faster than `must`.
+- **`doc_values: true`** is default for keyword/numeric/date -- required for sort/agg.
 - **Use `_source` filtering** to return only needed fields: `"_source": ["title", "id"]`.
-- **Avoid `term` on analyzed `text` fields** — use `match` instead.
+- **Avoid `term` on analyzed `text` fields** -- use `match` instead.
 - **Avoid `keyword` mapping for very high-cardinality string fields** if you don't need exact match (slower aggs).
 - **Use `index: false`** on fields you store but never search.
 - **Profile slow queries** with the `_search?profile=true` flag.

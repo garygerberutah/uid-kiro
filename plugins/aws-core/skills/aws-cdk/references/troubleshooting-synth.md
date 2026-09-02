@@ -15,7 +15,7 @@
 
 ## Overview
 
-This reference covers errors that occur during `cdk synth` — before any CloudFormation deployment begins. These failures prevent the cloud assembly from being produced. Each section maps a specific error class to its root cause and fix.
+This reference covers errors that occur during `cdk synth` -- before any CloudFormation deployment begins. These failures prevent the cloud assembly from being produced. Each section maps a specific error class to its root cause and fix.
 
 ---
 
@@ -23,15 +23,15 @@ This reference covers errors that occur during `cdk synth` — before any CloudF
 
 `cdk synth` fails with `Cannot find module` (TS) or `ModuleNotFoundError` (Python) before producing a template. The error occurs at **synth time**, not deploy time.
 
-> For `Cannot find module '@aws-cdk/aws-*'` (v1→v2 migration) → see [v1-to-v2-migration](v1-to-v2-migration.md).
-> For `Cannot find module` at **Lambda runtime** → see [troubleshooting-deployment](troubleshooting-deployment.md).
+> For `Cannot find module '@aws-cdk/aws-*'` (v1->v2 migration) -> see [v1-to-v2-migration](v1-to-v2-migration.md).
+> For `Cannot find module` at **Lambda runtime** -> see [troubleshooting-deployment](troubleshooting-deployment.md).
 
-### TypeScript — diagnostic flow
+### TypeScript -- diagnostic flow
 
 **Step 1: Run `npx tsc --noEmit`.**
 
-- **tsc fails** → problem is in your TS project. Check: missing `npm ci`, wrong `tsconfig.json` paths/rootDir/typeRoots, duplicate `aws-cdk-lib` (`npm ls aws-cdk-lib`), stale `node_modules` (`rm -rf node_modules && npm ci`).
-- **tsc succeeds** → problem is in how CDK runs your app. Go to Step 2.
+- **tsc fails** -> problem is in your TS project. Check: missing `npm ci`, wrong `tsconfig.json` paths/rootDir/typeRoots, duplicate `aws-cdk-lib` (`npm ls aws-cdk-lib`), stale `node_modules` (`rm -rf node_modules && npm ci`).
+- **tsc succeeds** -> problem is in how CDK runs your app. Go to Step 2.
 
 **Step 2: Check how `cdk.json` runs your app.**
 
@@ -50,27 +50,27 @@ The `app` field in `cdk.json` determines the execution mode. The failure causes 
 | Cause | Symptom | Fix |
 |-------|---------|-----|
 | Path aliases not resolved by ts-node | `Cannot find module 'lib/MyStack'` | Switch to `tsx` (`"app": "npx tsx bin/my-app.ts"`), or register `tsconfig-paths` with ts-node (`"app": "npx ts-node -r tsconfig-paths/register --prefer-ts-exts bin/my-app.ts"`) |
-| Monorepo — wrong `node_modules` | `Cannot find module 'typescript'` | Verify hoisting: `npm ls typescript`. Point `cdk.json` at correct binary. pnpm: `shamefully-hoist=true`. |
+| Monorepo -- wrong `node_modules` | `Cannot find module 'typescript'` | Verify hoisting: `npm ls typescript`. Point `cdk.json` at correct binary. pnpm: `shamefully-hoist=true`. |
 | `npm link` / symlinked packages | `Cannot find module '@my/shared-constructs'` | Install peer deps explicitly, or `NODE_OPTIONS=--preserve-symlinks`. Long-term: publish to registry. |
 | Wrong working directory | `cdk.json` not found | `cd` to directory containing `cdk.json` |
 
-### Python — diagnostic flow
+### Python -- diagnostic flow
 
-**Step 1: Check which Python is running** — `which python` vs the interpreter in `cdk.json`.
+**Step 1: Check which Python is running** -- `which python` vs the interpreter in `cdk.json`.
 
-**Step 2: Test import** — `python -c "import aws_cdk; print(aws_cdk.__version__)"`.
+**Step 2: Test import** -- `python -c "import aws_cdk; print(aws_cdk.__version__)"`.
 
 | Cause | Symptom | Fix |
 |-------|---------|-----|
 | Virtualenv not activated | `No module named 'aws_cdk'` | `source .venv/bin/activate && pip install -r requirements.txt` |
 | Missing `pip install` | `No module named 'my_constructs'` | `pip install -r requirements.txt` |
-| CI — venv not activated | Module errors in pipeline | Activate in script, or set `"app": ".venv/bin/python app.py"` in `cdk.json` |
+| CI -- venv not activated | Module errors in pipeline | Activate in script, or set `"app": ".venv/bin/python app.py"` in `cdk.json` |
 | Poetry / Pipenv | CDK runs outside managed env | `"app": "poetry run python app.py"` or `"app": "pipenv run python app.py"` |
-| `cannot import name 'core' from 'aws_cdk'` | v1→v2 API change | Replace `from aws_cdk import core` with `import aws_cdk as cdk`. See [v1-to-v2-migration](v1-to-v2-migration.md). |
+| `cannot import name 'core' from 'aws_cdk'` | v1->v2 API change | Replace `from aws_cdk import core` with `import aws_cdk as cdk`. See [v1-to-v2-migration](v1-to-v2-migration.md). |
 
 ### Prevention
 
-- You SHOULD use `tsx` instead of `ts-node` — native path alias support, faster
+- You SHOULD use `tsx` instead of `ts-node` -- native path alias support, faster
 - You SHOULD run `npm ci` (TS) or `pip install -r requirements.txt` (Python) as the first CI step
 - You SHOULD install `aws-cdk` CLI as a pinned dev dependency and invoke via `npx cdk`
 
@@ -145,8 +145,8 @@ You SHOULD verify the path points to the file containing your `new App()` call.
 
 An Aspect or construct called `Annotations.of(node).addError()`, which causes synth to fail. This covers:
 
-- **cdk-nag errors** — security/compliance rule violations.
-- **Custom Aspect errors** — organization-wide policy checks.
+- **cdk-nag errors** -- security/compliance rule violations.
+- **Custom Aspect errors** -- organization-wide policy checks.
 - **Built-in CDK warnings promoted to errors** by the `--strict` flag.
 
 ### Diagnosis
@@ -193,13 +193,13 @@ Cannot lock cdk.out: file is locked by another process
 
 A file lock on the `cdk.out` directory prevents synth. This happens when a previous synth crashed or when multiple synth processes target the same output directory.
 
-### Fix — single build
+### Fix -- single build
 
 ```bash
 rm -rf cdk.out
 ```
 
-### Fix — parallel CI
+### Fix -- parallel CI
 
 You MUST use a unique output directory per build to avoid lock contention:
 

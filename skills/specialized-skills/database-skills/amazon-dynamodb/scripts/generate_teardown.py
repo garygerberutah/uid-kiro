@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """Emit a standalone teardown.sh from created_resources.json.
 
-The skill NEVER runs the generated teardown.sh — it is handed back to the user
+The skill NEVER runs the generated teardown.sh -- it is handed back to the user
 for review and manual invocation. The emitted script has its own safety layer:
 caller-identity check against the manifest's account, prefix guard on every
 delete, explicit --confirm requirement, --dry-run support, optional
 --delete-logs for CloudWatch log groups.
 
 Covers:
-  - DynamoDB tables (bench-only config leaves DeletionProtection off — no
+  - DynamoDB tables (bench-only config leaves DeletionProtection off -- no
     two-step disable needed).
   - Lambda function.
-  - IAM role (inline policy delete → role delete).
+  - IAM role (inline policy delete -> role delete).
   - CloudWatch log groups (optional, off by default so Lambda logs survive
     for post-mortem).
 
@@ -121,7 +121,7 @@ if [[ "$caller_account" != "$MANIFEST_ACCOUNT" ]]; then
   echo "Account mismatch:" >&2
   echo "  current caller identity: $caller_account" >&2
   echo "  manifest expected:       $MANIFEST_ACCOUNT" >&2
-  echo "Refusing to delete — wrong account." >&2
+  echo "Refusing to delete -- wrong account." >&2
   exit 2
 fi
 
@@ -161,14 +161,14 @@ for table in "${{TABLES[@]}}"; do
       fi
     done
     if aws dynamodb describe-table --table-name "$table" --region "$MANIFEST_REGION" >/dev/null 2>&1; then
-      echo " STILL PRESENT after wait — aborting" >&2
+      echo " STILL PRESENT after wait -- aborting" >&2
       exit 1
     fi
     echo " deleted"
   else
     # ResourceNotFound is tolerable (already deleted); anything else is fatal.
     if aws dynamodb describe-table --table-name "$table" --region "$MANIFEST_REGION" >/dev/null 2>&1; then
-      echo "   FAILED; table still exists — aborting" >&2
+      echo "   FAILED; table still exists -- aborting" >&2
       exit 1
     else
       echo "   already gone"
@@ -246,7 +246,7 @@ if [[ $DELETE_LOGS -eq 1 && -n "$LAMBDA_LOG_GROUP" ]]; then
 fi
 
 if [[ $DRY_RUN -eq 1 ]]; then
-  echo "Dry run complete — no resources deleted."
+  echo "Dry run complete -- no resources deleted."
 else
   echo "Teardown complete. Verify in the console that no ddb-skill-bench"
   echo "resources remain under prefix $MANIFEST_PREFIX."
@@ -325,7 +325,7 @@ def main():
     print(f"Teardown script written to: {out}")
     print()
     print("Review the script, then:")
-    print(f"  bash {out} --dry-run   # preview — calls no delete APIs")
+    print(f"  bash {out} --dry-run   # preview -- calls no delete APIs")
     print(f"  bash {out} --confirm   # delete the tables, Lambda, and IAM role")
     print(
         f"  bash {out} --confirm --delete-logs   # also delete the Lambda's "

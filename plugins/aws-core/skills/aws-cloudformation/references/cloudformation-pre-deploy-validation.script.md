@@ -6,17 +6,17 @@ Deterministic procedure for running CloudFormation's **pre-deployment validation
 
 Pre-deployment validation runs automatically and is **enabled by default** on all stack operations:
 
-- **Create Stack** and **Update Stack** operations — validation runs before resource provisioning begins. If a `FAIL`-mode check fails, the operation stops before any resource is provisioned.
-- **Change set creation** — validation runs when the change set is created, with no resources provisioned at all.
+- **Create Stack** and **Update Stack** operations -- validation runs before resource provisioning begins. If a `FAIL`-mode check fails, the operation stops before any resource is provisioned.
+- **Change set creation** -- validation runs when the change set is created, with no resources provisioned at all.
 
 Validation checks:
 
-1. **Property syntax validation** (FAIL) — Validates resource properties against AWS resource schemas (required properties, valid values, deprecated properties).
-2. **Resource name conflict validation** (FAIL) — Detects naming conflicts with existing resources in the account.
-3. **S3 bucket emptiness validation** (WARN) — Warns when deleting S3 buckets that contain objects.
-4. **Service quota limit validation** (WARN, change set creation only) — Warns when an operation would exceed an account service quota.
-5. **AWS Config Recorder conflict validation** (WARN, change set creation only) — Warns when the operation conflicts with an existing AWS Config configuration recorder.
-6. **ECR repository delete readiness validation** (WARN, change set creation only) — Warns when an ECR repository targeted for deletion is not empty or otherwise not ready for deletion.
+1. **Property syntax validation** (FAIL) -- Validates resource properties against AWS resource schemas (required properties, valid values, deprecated properties).
+2. **Resource name conflict validation** (FAIL) -- Detects naming conflicts with existing resources in the account.
+3. **S3 bucket emptiness validation** (WARN) -- Warns when deleting S3 buckets that contain objects.
+4. **Service quota limit validation** (WARN, change set creation only) -- Warns when an operation would exceed an account service quota.
+5. **AWS Config Recorder conflict validation** (WARN, change set creation only) -- Warns when the operation conflicts with an existing AWS Config configuration recorder.
+6. **ECR repository delete readiness validation** (WARN, change set creation only) -- Warns when an ECR repository targeted for deletion is not empty or otherwise not ready for deletion.
 
 Validation results are exposed through the `describe-events` API. This procedure uses `call_aws` (preferred) or the AWS CLI to invoke these APIs directly. Note: The AWS MCP server is recommended for streamlined API invocation, but all steps can be performed using the AWS CLI alone.
 
@@ -34,7 +34,7 @@ Validation results are exposed through the `describe-events` API. This procedure
   - File path to a local template
   - S3 URL of an uploaded template
   - Template content provided directly
-- **validation_path** (required): Either `CHANGE_SET` (validate without provisioning — recommended pre-flight) or `STACK_OPERATION` (validate as part of a direct create/update).
+- **validation_path** (required): Either `CHANGE_SET` (validate without provisioning -- recommended pre-flight) or `STACK_OPERATION` (validate as part of a direct create/update).
 - **change_set_type** (required when validation_path is `CHANGE_SET`): Either `CREATE` (new stack) or `UPDATE` (existing stack).
 - **region** (required): AWS region for deployment.
 - **parameters** (optional): Stack parameters as key-value pairs.
@@ -80,19 +80,19 @@ Prepare the template for the operation.
 
 **Constraints:**
 
-- If the template is small (≤ 51,200 bytes) and provided as content or a local file, You MAY pass it inline via `--template-body`
+- If the template is small (<= 51,200 bytes) and provided as content or a local file, You MAY pass it inline via `--template-body`
 - If the template exceeds 51,200 bytes, You MUST upload it to S3 and use `--template-url` because `--template-body` has a size limit
 - If the template is already at an S3 URL, You MUST use `--template-url` directly
 
 ### 4. Trigger Validation
 
-Trigger pre-deployment validation. Validation runs automatically — no opt-in is required because it is enabled by default on all stack operations.
+Trigger pre-deployment validation. Validation runs automatically -- no opt-in is required because it is enabled by default on all stack operations.
 
 **Constraints:**
 
 - You MUST NOT pass `--disable-validation` (or the `DisableValidation` API parameter) unless the user explicitly requests skipping validation, because validation is what this procedure exists to run. If the user does request it, You MUST warn that disabling validation removes the safety check that catches preventable failures before provisioning.
 
-**Path A — Change set creation (recommended pre-flight, provisions nothing):**
+**Path A -- Change set creation (recommended pre-flight, provisions nothing):**
 
 - You MUST use a unique, descriptive change set name (e.g., `pre-deploy-validation-<timestamp>`)
 - You MUST use the appropriate `--change-set-type` (`CREATE` for new stacks, `UPDATE` for existing)
@@ -109,13 +109,13 @@ Trigger pre-deployment validation. Validation runs automatically — no opt-in i
     --capabilities CAPABILITY_IAM
   ```
 
-  > **Notes:** Use `--template-url s3://...` instead of `--template-body` for templates exceeding 51,200 bytes. Include `--capabilities` only if the template creates IAM resources. When using `call_aws`, pass the template content inline in the `TemplateBody` parameter — the `file://` syntax is AWS CLI-specific and does not work with `call_aws`.
+  > **Notes:** Use `--template-url s3://...` instead of `--template-body` for templates exceeding 51,200 bytes. Include `--capabilities` only if the template creates IAM resources. When using `call_aws`, pass the template content inline in the `TemplateBody` parameter -- the `file://` syntax is AWS CLI-specific and does not work with `call_aws`.
 - You MUST capture the returned change set ARN (Id) for the next step
 - You MUST explain to the user that creating a change set does NOT modify any resources because it only plans the changes and runs validation
 - You MUST wait for change set creation to reach a terminal status (`CREATE_COMPLETE`, `FAILED`) before checking validation results. Use `describe-change-set` to poll status.
 - This path surfaces ALL validation checks, including the three `WARN`-only checks (service quota, AWS Config Recorder conflict, ECR delete readiness).
 
-**Path B — Direct create/update stack (validates as part of a real deployment):**
+**Path B -- Direct create/update stack (validates as part of a real deployment):**
 
 - You MUST obtain explicit user approval before running `create-stack` or `update-stack`, because these operations provision or modify live infrastructure once validation passes.
 - Validation runs automatically before provisioning. If a `FAIL`-mode check fails, the operation stops before any resource is provisioned.
@@ -130,7 +130,7 @@ Trigger pre-deployment validation. Validation runs automatically — no opt-in i
     --capabilities CAPABILITY_IAM
   ```
 
-  > **Note:** When using `call_aws`, pass the template content inline in the `TemplateBody` parameter — the `file://` syntax is AWS CLI-specific and does not work with `call_aws`.
+  > **Note:** When using `call_aws`, pass the template content inline in the `TemplateBody` parameter -- the `file://` syntax is AWS CLI-specific and does not work with `call_aws`.
 
 ### 5. Retrieve Validation Results via describe-events
 
@@ -141,15 +141,15 @@ Fetch validation results from the `describe-events` API.
 - You MUST use `aws cloudformation describe-events` (via `call_aws` or CLI) scoped to the operation you triggered:
   - For Path A (change set): `describe-events --change-set-name <arn> --region <region>`
   - For Path B (direct operation): `describe-events --operation-id <operation-id> --region <region>` (or `--stack-name <stack_name>` to scope by stack)
-- You MUST NOT use `describe-stack-events` because the legacy stack events API does NOT return validation results — it only surfaces resource provisioning events after execution
+- You MUST NOT use `describe-stack-events` because the legacy stack events API does NOT return validation results -- it only surfaces resource provisioning events after execution
 - You MUST filter events where `EventType` equals `VALIDATION_ERROR` because these are the validation results
 - For each validation event, You MUST extract:
-  - `ValidationName` — known values include `PROPERTY_VALIDATION`, `RESOURCE_NAME_CONFLICT`, `S3_BUCKET_EMPTINESS`, `SERVICE_QUOTA`, `CONFIG_RECORDER_CONFLICT`, `ECR_REPOSITORY_DELETE_READINESS`. CloudFormation may add new validation checks over time; handle any unknown `ValidationName` by presenting it with its `ValidationStatusReason`
-  - `ValidationStatus` — `FAILED` or `PASSED`
-  - `ValidationStatusReason` — detailed error message
-  - `ValidationPath` — property path in the template where the error occurred (may be absent for account-level checks such as service quotas)
-  - `LogicalResourceId` — the logical ID of the affected resource
-  - `ValidationFailureMode` — `FAIL` (blocks the operation) or `WARN` (allows the operation)
+  - `ValidationName` -- known values include `PROPERTY_VALIDATION`, `RESOURCE_NAME_CONFLICT`, `S3_BUCKET_EMPTINESS`, `SERVICE_QUOTA`, `CONFIG_RECORDER_CONFLICT`, `ECR_REPOSITORY_DELETE_READINESS`. CloudFormation may add new validation checks over time; handle any unknown `ValidationName` by presenting it with its `ValidationStatusReason`
+  - `ValidationStatus` -- `FAILED` or `PASSED`
+  - `ValidationStatusReason` -- detailed error message
+  - `ValidationPath` -- property path in the template where the error occurred (may be absent for account-level checks such as service quotas)
+  - `LogicalResourceId` -- the logical ID of the affected resource
+  - `ValidationFailureMode` -- `FAIL` (blocks the operation) or `WARN` (allows the operation)
 - If no `VALIDATION_ERROR` events are returned, You MUST treat the operation as having passed all validations
 
 ### 6. Present Results and Guide Remediation
@@ -159,12 +159,12 @@ Report validation results grouped by type and help the user fix issues.
 **Constraints:**
 
 - You MUST present results grouped by `ValidationName`:
-  - **Property syntax validation** (FAIL) — invalid property values or formats
-  - **Resource name conflict validation** (FAIL) — resources that conflict with existing resources
-  - **S3 emptiness validation** (WARN) — S3 buckets that must be empty before deletion
-  - **Service quota validation** (WARN) — operations that would exceed an account quota
-  - **AWS Config Recorder conflict validation** (WARN) — conflicts with an existing configuration recorder
-  - **ECR repository delete readiness validation** (WARN) — ECR repositories not ready for deletion
+  - **Property syntax validation** (FAIL) -- invalid property values or formats
+  - **Resource name conflict validation** (FAIL) -- resources that conflict with existing resources
+  - **S3 emptiness validation** (WARN) -- S3 buckets that must be empty before deletion
+  - **Service quota validation** (WARN) -- operations that would exceed an account quota
+  - **AWS Config Recorder conflict validation** (WARN) -- conflicts with an existing configuration recorder
+  - **ECR repository delete readiness validation** (WARN) -- ECR repositories not ready for deletion
 - For any `ValidationName` not listed above, You MUST still present the result with its `LogicalResourceId`, `ValidationPath`, `ValidationStatus`, and `ValidationStatusReason` so the user can evaluate it
 - For each result, You MUST include the `LogicalResourceId` and `ValidationPath` (if present) so the user can pinpoint the exact location in their template
 - For each `FAIL` result, You MUST provide the specific template fix showing the corrected property or resource
@@ -209,10 +209,10 @@ Change set "pre-deploy-validation-1713580000" created for stack "my-app-stack".
 Retrieved via: aws cloudformation describe-events --change-set-name arn:aws:cloudformation:...
 
 Validation results:
-  ✓ PROPERTY_VALIDATION: PASSED
-  ✓ RESOURCE_NAME_CONFLICT: PASSED
-  ✓ S3_BUCKET_EMPTINESS: PASSED
-  ✓ SERVICE_QUOTA: PASSED
+  [OK] PROPERTY_VALIDATION: PASSED
+  [OK] RESOURCE_NAME_CONFLICT: PASSED
+  [OK] S3_BUCKET_EMPTINESS: PASSED
+  [OK] SERVICE_QUOTA: PASSED
 
 The change set is ready to execute. Would you like to execute it now?
 ```
@@ -224,7 +224,7 @@ Change set "pre-deploy-validation-1713580000" created for stack "my-app-stack".
 
 Retrieved via: aws cloudformation describe-events --change-set-name arn:aws:cloudformation:...
 
-✗ PROPERTY_VALIDATION (FAIL):
+[FAIL] PROPERTY_VALIDATION (FAIL):
   LogicalResourceId: MyBucket
   ValidationPath: /Resources/MyBucket/Properties/NotificationConfiguration/QueueConfigurations/0
   ValidationStatusReason: required key [Event] not found
@@ -234,7 +234,7 @@ Retrieved via: aws cloudformation describe-events --change-set-name arn:aws:clou
       - Queue: !GetAtt MyQueue.Arn
         Event: s3:ObjectCreated:*   # Required property was missing
 
-✗ RESOURCE_NAME_CONFLICT (FAIL):
+[FAIL] RESOURCE_NAME_CONFLICT (FAIL):
   LogicalResourceId: MyDynamoDBTable
   ValidationPath: /Resources/MyDynamoDBTable/Properties/TableName
   ValidationStatusReason: A table named "users-table" already exists in this account/region.
@@ -242,7 +242,7 @@ Retrieved via: aws cloudformation describe-events --change-set-name arn:aws:clou
   Fix: Make the name unique per stack:
     TableName: !Sub "${AWS::StackName}-users-table"
 
-⚠ SERVICE_QUOTA (WARN):
+[WARNING] SERVICE_QUOTA (WARN):
   LogicalResourceId: MyVpc
   ValidationPath: /Resources/MyVpc
   ValidationStatusReason: This operation would exceed the VPCs-per-Region quota.

@@ -165,7 +165,7 @@ if __name__ == "__main__":
     models_file = sys.argv[1]
     raw_constraints = sys.argv[2:] if len(sys.argv) > 2 else []
 
-    # Parse constraints — accumulate multiple values per key
+    # Parse constraints -- accumulate multiple values per key
     constraints: dict[str, list[str]] = {}
     for c in raw_constraints:
         if ":" not in c:

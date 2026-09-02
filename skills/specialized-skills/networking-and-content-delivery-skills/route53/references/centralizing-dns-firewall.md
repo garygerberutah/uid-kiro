@@ -7,7 +7,7 @@ and accounts. DNS Firewall supplies the rules. There are two distinct fan-out me
 pick one: Route 53 Profiles (shared cross-account with AWS Resource Access Manager) bundle the
 rule groups with other DNS config and associate them to VPCs; AWS Firewall Manager centrally
 creates and manages DNS Firewall rule group associations across an organization's accounts and
-flags non-compliant accounts. Firewall Manager is not a layer on top of Profiles — using both for
+flags non-compliant accounts. Firewall Manager is not a layer on top of Profiles -- using both for
 the same rule groups double-associates them to the same VPCs.
 
 Does not cover authoring DNS Firewall rules for a single VPC, or general Profile configuration.
@@ -42,7 +42,7 @@ The procedure covers:
 ## Rules, and two ways to fan them out
 
 DNS Firewall supplies the rules. To apply them across a fleet you choose one of two fan-out
-mechanisms — they are alternatives, not layers.
+mechanisms -- they are alternatives, not layers.
 
 | Component | Job |
 | --- | --- |
@@ -86,7 +86,7 @@ blocks the recipient or over-grants.
 | Built-in allow-association (read-only) | Associate the shared Profile with its own VPCs | Default. The recipient only needs to apply the protection |
 | Custom managed permission with resource-association | Associate resources into the shared Profile, affecting every consumer | Only when a recipient must contribute to or modify the shared Profile |
 
-The default RAM managed permission for a shared Profile is association-only — it does not include
+The default RAM managed permission for a shared Profile is association-only -- it does not include
 `route53profiles:AssociateResourceToProfile`. Letting a recipient add resources into the shared
 Profile is not a built-in toggle; it requires creating a custom RAM managed permission that grants
 that action.
@@ -138,7 +138,7 @@ detection.
   associations.
 - **region** (required): The AWS Region for the Profile and rule groups (e.g., `us-east-1`). The
   Profile, its rule groups, and every associated VPC MUST be in this same Region. For multi-Region
-  deployments, repeat this entire procedure in each target Region — Profiles and rule groups do not
+  deployments, repeat this entire procedure in each target Region -- Profiles and rule groups do not
   replicate across Regions.
 - **share_principals** (required for cross-account): The account IDs or AWS Organizations
   organizational unit (OU) ARNs to share the Profile with.
@@ -329,7 +329,7 @@ The RAM share is missing or the recipient was granted the wrong permission. Re-c
 principals and permission level (Step 3).
 
 #### Cannot prove org-wide compliance
-No org-wide compliance mechanism is in place. Use AWS Firewall Manager — as an alternative to
+No org-wide compliance mechanism is in place. Use AWS Firewall Manager -- as an alternative to
 Profiles for fan-out, or scoped to VPCs Profiles do not cover (Step 5).
 
 #### Recipient can change shared rules unexpectedly

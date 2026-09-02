@@ -39,7 +39,7 @@ Classify the error: result writing failure (result receiver role), data access f
   - Extract `databaseName` and `tableName` from `tableReference.glue`.
   - `aws glue get-table --database-name ${database_name} --name ${table_name} --region ${region}`
   - Extract S3 bucket from `Table.StorageDescriptor.Location`
-- For non-Glue/S3 data sources (Snowflake, Redshift), the permission model differs — ask the user for the data source type and use `search_documentation` for that source's access requirements.
+- For non-Glue/S3 data sources (Snowflake, Redshift), the permission model differs -- ask the user for the data source type and use `search_documentation` for that source's access requirements.
 - You MUST NOT fix permissions before completing the full diagnostic chain.
 
 ### 3. Check IAM Role Policies
@@ -53,14 +53,14 @@ Classify the error: result writing failure (result receiver role), data access f
 - Verify trust policy allows `cleanrooms.amazonaws.com`
 - For Glue/S3-backed configured tables, data access roles need: `glue:GetDatabase`, `glue:GetTable`, `glue:GetPartitions`, `glue:BatchGetPartition`, `glue:GetSchema`, `glue:GetSchemaVersion`, `s3:GetObject`, `s3:GetBucketLocation`, `s3:ListBucket`. For other data source types, use `search_documentation` for current requirements.
 - Result receiver roles need: `s3:PutObject`, `s3:GetBucketLocation`, `s3:ListBucket`
-- For AccessDenied on a Clean Rooms API call, also verify the caller has all dependent actions — even if they have the primary permission (e.g., `cleanrooms:StartProtectedQuery`):
+- For AccessDenied on a Clean Rooms API call, also verify the caller has all dependent actions -- even if they have the primary permission (e.g., `cleanrooms:StartProtectedQuery`):
   - `StartProtectedQuery`: `cleanrooms:GetCollaborationAnalysisTemplate`, `cleanrooms:GetSchema`, `s3:GetBucketLocation`, `s3:ListBucket`, `s3:PutObject`
   - `StartProtectedJob`: `cleanrooms:GetCollaborationAnalysisTemplate`, `cleanrooms:GetSchema`
   - `CreateConfiguredTableAssociation` / `UpdateConfiguredTableAssociation`: `iam:PassRole`
   - `CreateMembership` / `UpdateMembership`: `iam:PassRole`, `s3:GetBucketLocation`; also logging actions if query logging is configured: `logs:CreateLogDelivery`, `logs:CreateLogGroup`, `logs:DeleteLogDelivery`, `logs:DescribeLogGroups`, `logs:DescribeResourcePolicies`, `logs:GetLogDelivery`, `logs:ListLogDeliveries`, `logs:PutResourcePolicy`, `logs:UpdateLogDelivery`
   - `CreateConfiguredTable`: `glue:GetDatabase`, `glue:GetDatabases`, `glue:GetTable`, `glue:GetTables`, `glue:GetPartition`, `glue:GetPartitions`, `glue:BatchGetPartition`, `glue:GetSchema`, `glue:GetSchemaVersion`
 - For `iam:PassRole` failures, verify the policy includes `iam:PassRole` with `iam:PassedToService` restricted to `cleanrooms.amazonaws.com`. Reference: [IAM troubleshooting](https://docs.aws.amazon.com/clean-rooms/latest/userguide/security_iam_troubleshoot.html)
-- Check if `AWSCleanRoomsFullAccessNoQuerying` is attached — this policy **explicitly denies** `cleanrooms:StartProtectedQuery` and `cleanrooms:UpdateProtectedQuery` and cannot be overridden by adding permissions. Reference: [AWS managed policies](https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam-awsmanpol.html)
+- Check if `AWSCleanRoomsFullAccessNoQuerying` is attached -- this policy **explicitly denies** `cleanrooms:StartProtectedQuery` and `cleanrooms:UpdateProtectedQuery` and cannot be overridden by adding permissions. Reference: [AWS managed policies](https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam-awsmanpol.html)
 - Check for explicit Deny statements that could override Allow (including `aws:PrincipalOrgID`, VPC endpoint, or IP restriction conditions)
 
 ### 4. Check S3 Bucket Policy
@@ -68,7 +68,7 @@ Classify the error: result writing failure (result receiver role), data access f
 - `aws s3api get-bucket-policy --bucket ${bucket_name}`
 - Check for explicit Allow/Deny statements for the role
 - For cross-account: bucket policy MUST explicitly allow the role ARN
-- `aws s3api get-bucket-encryption --bucket ${bucket_name}` — if `SSEAlgorithm` is `aws:kms`, extract the KMS key ARN from `KMSMasterKeyID`
+- `aws s3api get-bucket-encryption --bucket ${bucket_name}` -- if `SSEAlgorithm` is `aws:kms`, extract the KMS key ARN from `KMSMasterKeyID`
 
 ### 5. Check KMS Key Policy (if SSE-KMS)
 
@@ -83,10 +83,10 @@ Classify the error: result writing failure (result receiver role), data access f
 You MUST perform this step for Glue/S3-backed data sources if IAM and S3 policies appear correct, as multiple issues may exist simultaneously. Lake Formation settings apply account-wide to all Glue catalog access.
 
 - `aws lakeformation get-data-lake-settings --region ${region}`
-- If `CreateDatabaseDefaultPermissions` or `CreateTableDefaultPermissions` is empty, Lake Formation enforces fine-grained access — IAM Glue permissions alone are not sufficient
+- If `CreateDatabaseDefaultPermissions` or `CreateTableDefaultPermissions` is empty, Lake Formation enforces fine-grained access -- IAM Glue permissions alone are not sufficient
 - Check permissions on the specific Glue table (resolved in Step 2):
   - `aws lakeformation list-permissions --resource-type TABLE --resource '{"Table":{"DatabaseName":"${database_name}","Name":"${table_name}"}}' --region ${region}`
-  - If the table has `IAM_ALLOWED_PRINCIPALS` granted, Lake Formation is not blocking — look elsewhere
+  - If the table has `IAM_ALLOWED_PRINCIPALS` granted, Lake Formation is not blocking -- look elsewhere
   - If not, check for explicit grants to the role:
     - `aws lakeformation list-permissions --principal DataLakePrincipalIdentifier=${role_arn} --region ${region}`
     - Verify SELECT and DESCRIBE on the relevant database and table
@@ -97,8 +97,8 @@ You MUST perform this step for Glue/S3-backed data sources if IAM and S3 policie
 - Re-examine the `AssumeRolePolicyDocument` from the `aws iam get-role` output in Step 3
 - Verify the trust policy contains `"Principal": {"Service": "cleanrooms.amazonaws.com"}` and `"Action": "sts:AssumeRole"`
 - Check `Condition` block for overly restrictive keys:
-  - `aws:SourceArn` — must match the collaboration or membership ARN pattern
-  - `aws:SourceAccount` — must include the collaborating account ID(s)
+  - `aws:SourceArn` -- must match the collaboration or membership ARN pattern
+  - `aws:SourceAccount` -- must include the collaborating account ID(s)
 - For cross-account roles, verify the role's account is a member of the collaboration:
   - `aws cleanrooms list-members --collaboration-identifier ${collaboration_id} --region ${region}`
 

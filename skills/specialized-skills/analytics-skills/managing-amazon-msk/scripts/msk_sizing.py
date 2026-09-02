@@ -11,7 +11,7 @@ from typing import Dict, List, Optional
 PRICING_REGION = "us-east-1"
 
 # NOTE: Unit Convention - All throughput is in **MiB/s**, all storage is in **GiB**
-# Conversions use the binary factor 1024 (e.g., MiB/s × 3600 / 1024 → GiB/h).
+# Conversions use the binary factor 1024 (e.g., MiB/s x 3600 / 1024 -> GiB/h).
 #
 # AWS lists provisioned storage throughput in MiB/s (per the MSK docs) and
 # bills storage at "$/GB-month" where GB == GiB per the AWS Service Terms.
@@ -21,15 +21,15 @@ PRICING_REGION = "us-east-1"
 
 # NOTE: Instance Specifications
 # Standard (M5 / M7g):
-#   ebs_throughput_mbs     – maximum provisionable EBS volume throughput per broker (MiB/s);
+#   ebs_throughput_mbs     - maximum provisionable EBS volume throughput per broker (MiB/s);
 #                            also used as the documented PST cap for the instance
-#   network_throughput_mbs – NIC bandwidth available to the broker (MiB/s)
-#   rec_partitions         – recommended max partitions per broker (leaders + followers)
-#   max_partitions         – hard max partitions per broker
-#   price_per_hr           – on-demand instance price (USD/hr)
+#   network_throughput_mbs - NIC bandwidth available to the broker (MiB/s)
+#   rec_partitions         - recommended max partitions per broker (leaders + followers)
+#   max_partitions         - hard max partitions per broker
+#   price_per_hr           - on-demand instance price (USD/hr)
 #
 # Express (M7g):
-#   ingress_mbs    – max producer throughput per broker (MiB/s); used directly
+#   ingress_mbs    - max producer throughput per broker (MiB/s); used directly
 #   rec_partitions, max_partitions, price_per_hr as above
 
 INSTANCE_SPECS = {
@@ -226,7 +226,7 @@ HOURS_PER_MONTH = 730
 MAX_EBS_GB_PER_BROKER = 16384  # EBS max for MSK is 16 TiB
 
 # Default per-cluster broker quota (MSK Provisioned). Used to pick a "recommended"
-# instance per class — the cheapest size whose broker count fits within the quota.
+# instance per class -- the cheapest size whose broker count fits within the quota.
 DEFAULT_BROKER_QUOTA = 60
 
 # NOTE: Entitlement-Factor Constants
@@ -275,7 +275,7 @@ class SizingInputs:
     utilization_standard: float  # Max fraction of broker capacity to use (Standard)
     utilization_express: float  # Max fraction of broker capacity to use (Express)
     pst_per_broker_mbs: Optional[float] = (
-        None  # Provisioned storage throughput per broker (MiB/s); 250–1000
+        None  # Provisioned storage throughput per broker (MiB/s); 250-1000
     )
     use_max_partitions: bool = False  # Use hard max partition limit instead of recommended
     rack_affined_consumers: bool = True  # When False, cross-AZ cost includes consumer fetch traffic
@@ -347,7 +347,7 @@ class SizingResult:
     bottleneck_details: Dict[str, BottleneckDetail] = field(default_factory=dict)
 
 
-# ─── Helpers ───────────────────────────────────────────────────────────────────
+# --- Helpers -------------------------------------------------------------------
 
 
 def _brokers_for(demand: float, per_broker_capacity: float) -> int:
@@ -356,7 +356,7 @@ def _brokers_for(demand: float, per_broker_capacity: float) -> int:
     return math.ceil(raw / NUM_AZS) * NUM_AZS
 
 
-# ─── Sizing Logic ──────────────────────────────────────────────────────────────
+# --- Sizing Logic --------------------------------------------------------------
 
 
 def calculate_standard_sizing(
@@ -667,13 +667,13 @@ def parse_broker_classes(value: str) -> List[str]:
 def _format_summary_line(r: SizingResult) -> str:
     return (
         f"{r.instance_type}: {r.broker_count} brokers "
-        f"(bottleneck: {r.bottleneck}) → ${r.total_monthly_cost:,.2f}/mo"
+        f"(bottleneck: {r.bottleneck}) -> ${r.total_monthly_cost:,.2f}/mo"
     )
 
 
 # Cost dimensions that may be identical across every instance in a class, in which
 # case they are printed once per class instead of once per instance. Broker cost is
-# never hoisted — it scales with broker count and instance price.
+# never hoisted -- it scales with broker count and instance price.
 _SHAREABLE_COST_FIELDS = (
     ("Storage", "monthly_ebs_cost"),
     ("Tiered Storage", "monthly_ts_cost"),
@@ -865,14 +865,14 @@ def _print_recommendations(
     selected = broker_classes or list(BROKER_CLASS_GROUPS)
     classes = [cls for group in selected for cls in BROKER_CLASS_GROUPS[group]]
     recs = recommend_per_class(results, broker_quota=broker_quota)
-    print(f"\n=== Recommended pick per class (≤ {broker_quota} brokers, lowest monthly cost) ===")
+    print(f"\n=== Recommended pick per class (<= {broker_quota} brokers, lowest monthly cost) ===")
     print("  Cost breakdown for each pick is in the sizing sections above.")
     for cls in classes:
         label = _CLASS_LABELS[cls]
         rec = recs[cls]
         if rec is None:
             print(
-                f"  {label}: no instance fits within {broker_quota} brokers — request a quota increase or pick a larger size"
+                f"  {label}: no instance fits within {broker_quota} brokers -- request a quota increase or pick a larger size"
             )
         else:
             print(f"  {label}: {_format_summary_line(rec)}")

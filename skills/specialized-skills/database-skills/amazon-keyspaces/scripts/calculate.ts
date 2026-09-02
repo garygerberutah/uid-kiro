@@ -2,7 +2,7 @@
 /**
  * calculate.ts
  *
- * Keyspaces Pricing Calculator — manual inputs mode.
+ * Keyspaces Pricing Calculator -- manual inputs mode.
  * Delegates all pricing logic to PricingFormulas.ts.
  *
  * Usage:
@@ -22,7 +22,7 @@ import {
 
 const regionsMap: Record<string, string> = require('../assets/data/regions.json');
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+// --- Main ---------------------------------------------------------------------
 
 function main() {
   const args = process.argv.slice(2);

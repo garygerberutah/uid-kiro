@@ -14,13 +14,13 @@ ROLE_ARN="<iam_role_arn, string, no quotes>"
 S3_PATH="<s3_uri, string, no quotes>"
 
 # These values are interpolated straight into the SQL text. Set them yourself, or
-# validate them (allowlist the identifier, verify the s3:// URI) before use — a table
+# validate them (allowlist the identifier, verify the s3:// URI) before use -- a table
 # name or path taken from user input is a SQL-injection vector here. The Data API's
 # --parameters option binds values, but not identifiers, so it does not cover $TABLE.
 #
 # --wait-time-seconds (1-30) is long polling: the call returns as soon as the
 # statement finishes, so a short load needs no polling at all. A COPY can exceed
-# 30s, so still loop — but each iteration waits up to 30s instead of sleeping
+# 30s, so still loop -- but each iteration waits up to 30s instead of sleeping
 # blindly, which cuts calls against a TPS-limited quota.
 STMT_ID=$(aws redshift-data execute-statement \
   --workgroup-name "$WORKGROUP" --database "$DB" --wait-time-seconds 30 \
@@ -39,7 +39,7 @@ if [[ "$STATUS" != "FINISHED" ]]; then
   echo "COPY failed: $STATUS"
   aws redshift-data describe-statement --id "$STMT_ID" --query 'Error' --output text
   # Row-level diagnostics. The diagnostic SELECT is short, so one long-polled
-  # execute-statement is enough — no sleep before fetching results.
+  # execute-statement is enough -- no sleep before fetching results.
   ERR_ID=$(aws redshift-data execute-statement --workgroup-name "$WORKGROUP" --database "$DB" \
     --wait-time-seconds 30 \
     --sql "SELECT file_name, line_number, column_name, error_message FROM sys_load_error_detail ORDER BY start_time DESC LIMIT 20;" \
@@ -60,7 +60,7 @@ echo "COPY succeeded: $STMT_ID"
 import time, boto3
 
 # WaitTimeSeconds (1-30) = long polling: the call returns as soon as the statement
-# finishes instead of returning immediately and forcing you to poll. Prefer it —
+# finishes instead of returning immediately and forcing you to poll. Prefer it --
 # fewer calls against a TPS-limited quota, lower latency on short statements. It
 # does NOT replace the loop: on expiry the statement may still be running, so
 # anything that can exceed 30s still needs a bounded loop.
@@ -71,7 +71,7 @@ def execute_and_wait(sql, workgroup, database="dev", timeout_s=300):
     # Parameters option binds values, not identifiers, so a table or column name
     # taken from user input is a SQL-injection vector. Allowlist identifiers.
     # Region comes from the environment (AWS_REGION / AWS_DEFAULT_REGION) or your
-    # profile — set it there rather than pinning one here.
+    # profile -- set it there rather than pinning one here.
     client = boto3.client("redshift-data")
     # One call submits AND waits up to WAIT seconds for completion.
     desc = client.execute_statement(
@@ -103,7 +103,7 @@ def execute_and_wait(sql, workgroup, database="dev", timeout_s=300):
 
 `GetStatementResult` also accepts `WaitTimeSeconds`, but its expiry behaviour differs
 from the others: instead of reporting an in-progress status it raises
-`ResourceNotFoundException` — meaning "no results YET", not "results gone". Treating it
+`ResourceNotFoundException` -- meaning "no results YET", not "results gone". Treating it
 as a failure reports a false error on a still-running query, so catch and retry:
 
 ```python
@@ -117,16 +117,16 @@ def wait_for_result(client, stmt_id, timeout_s=300):
                 raise TimeoutError(f"{stmt_id}: no results after {timeout_s}s")
 ```
 
-- Target: **Serverless** = `WorkgroupName`, **Provisioned** = `ClusterIdentifier`; plus `Database` either way. Auth is independent of that choice — e.g. temporary credentials (add `DbUser` to connect to a cluster as a database user), Secrets Manager (`SecretArn`), or IAM Identity Center. On the CLI these are `--workgroup-name` / `--cluster-identifier`, `--database`, and `--db-user` or `--secret-arn`.
+- Target: **Serverless** = `WorkgroupName`, **Provisioned** = `ClusterIdentifier`; plus `Database` either way. Auth is independent of that choice -- e.g. temporary credentials (add `DbUser` to connect to a cluster as a database user), Secrets Manager (`SecretArn`), or IAM Identity Center. On the CLI these are `--workgroup-name` / `--cluster-identifier`, `--database`, and `--db-user` or `--secret-arn`.
   `DbUser` issues temporary credentials via `GetClusterCredentials` rather than using a
   stored password. Rotate the secret when using `SecretArn`.
 - Log the API calls: `redshift-data:*` actions land in CloudTrail, and cluster-side
   activity needs Redshift audit logging (`useractivitylog`, `connectionlog`, `userlog`)
-  enabled separately — CloudTrail alone does not record the SQL that ran.
+  enabled separately -- CloudTrail alone does not record the SQL that ran.
 - `GetStatementResult` returns a result set to anyone who can call it with the statement
   ID, so avoid selecting PII or secret columns into a result set you do not need.
   `sys_load_error_detail` exposes rejected rows in `raw_line`/`err_reason`.
-- Throttle = HTTP **400** (not 429). ExecuteStatement TPS is quota-limited — check the Data API quotas page.
+- Throttle = HTTP **400** (not 429). ExecuteStatement TPS is quota-limited -- check the Data API quotas page.
 - Calls are async by default; **`WaitTimeSeconds` (1-30) turns
   any call into a long poll** that returns when the statement finishes or the wait
   expires, whichever is first. Prefer it over blind sleeping, but keep a bounded loop
@@ -137,9 +137,9 @@ def wait_for_result(client, stmt_id, timeout_s=300):
   `DescribeStatement` return the current in-progress status, but `GetStatementResult`
   raises **`ResourceNotFoundException`** (`Query does not have result. Please check
   query status with DescribeStatement.`). That means "no results yet", NOT "results
-  gone" — catch and retry rather than reporting a failure.
+  gone" -- catch and retry rather than reporting a failure.
 - `BatchExecuteStatement` + `WaitTimeSeconds` holds until **every** sub-statement
   completes, returning the batch parent id and overall status. To wait on one
   sub-statement, long-poll `DescribeStatement`/`GetStatementResult` with that
-  sub-statement's id — it returns as soon as that one finishes, without waiting for the
+  sub-statement's id -- it returns as soon as that one finishes, without waiting for the
   rest of the batch.

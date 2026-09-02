@@ -13,7 +13,7 @@ These guidelines apply when users say "Get started with DSQL" or similar phrases
 - [Overview](#overview)
 - [Use Case](#use-case)
 - [Agent Communication Style](#agent-communication-style)
-- [Get Started with DSQL (Interactive Guide)](#get-started-with-dsql-interactive-guide) — 10-step linear walkthrough
+- [Get Started with DSQL (Interactive Guide)](#get-started-with-dsql-interactive-guide) -- 10-step linear walkthrough
 - [DSQL Best Practices](#dsql-best-practices)
 - [Additional Resources](#additional-resources)
 
@@ -179,9 +179,9 @@ their coding assistant?
 
 If so, install the [AWS MCP Server](https://docs.aws.amazon.com/aws-mcp/latest/userguide/getting-started-aws-mcp-server.html) per the AWS docs. It provides:
 
-- `aws___search_documentation` / `aws___read_documentation` / `aws___recommend` — DSQL docs lookup
-- `aws___call_aws` — authenticated AWS API calls (for `dsql:` actions like cluster management)
-- `aws___run_script` — sandboxed Python with AWS API access
+- `aws___search_documentation` / `aws___read_documentation` / `aws___recommend` -- DSQL docs lookup
+- `aws___call_aws` -- authenticated AWS API calls (for `dsql:` actions like cluster management)
+- `aws___run_script` -- sandboxed Python with AWS API access
 
 A custom DSQL-specific MCP is **optional**. If the user has one configured already, it can stay
 alongside the AWS MCP Server. For ad-hoc DSQL queries, this skill PREFERS direct `psql` via
@@ -189,7 +189,7 @@ alongside the AWS MCP Server. For ad-hoc DSQL queries, this skill PREFERS direct
 
 ### Step 5: Test Connection
 
-> **⚠️ Security Note:** The admin connection (`generate-db-connect-admin-auth-token` + `admin` user) should **only** be used for the initial setup steps below (creating roles, granting permissions). Once scoped roles are established in Step 9, all subsequent operations should use the scoped role with `generate-db-connect-auth-token`. Consider revoking `dsql:DbConnectAdmin` from the setup IAM role after scoped roles are in place.
+> **[WARNING] Security Note:** The admin connection (`generate-db-connect-admin-auth-token` + `admin` user) should **only** be used for the initial setup steps below (creating roles, granting permissions). Once scoped roles are established in Step 9, all subsequent operations should use the scoped role with `generate-db-connect-auth-token`. Consider revoking `dsql:DbConnectAdmin` from the setup IAM role after scoped roles are in place.
 
 **Generate authentication token and connect:**
 
@@ -387,7 +387,7 @@ Let them know you're ready to help with more:
 2. **Distributed:** Active-active writes across multiple regions
 3. **Strong Consistency:** Immediate read-your-writes across all regions
 4. **IAM Authentication:** No password management, automatic token rotation
-5. **PostgreSQL Compatible:** Supports many [database drivers, ORMs, and adapters](./auth/connectivity-tools.md) — see the [AWS DSQL connectivity tools page](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/aws-sdks.html) for the current list.
+5. **PostgreSQL Compatible:** Supports many [database drivers, ORMs, and adapters](./auth/connectivity-tools.md) -- see the [AWS DSQL connectivity tools page](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/aws-sdks.html) for the current list.
 
 **For detailed patterns, see [`./development-guide.md`](./development-guide.md)**
 

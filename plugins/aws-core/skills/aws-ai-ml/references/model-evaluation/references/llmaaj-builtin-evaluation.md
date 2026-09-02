@@ -14,13 +14,13 @@ Based on the user's task and data, recommend specific metrics with reasoning:
 >
 > Does this look good, or do you want to consider other metrics?"
 
-⏸ **Wait for user to confirm.**
+[PAUSE] **Wait for user to confirm.**
 
 Tips:
 
 - Start with the common combinations from the metrics file as a baseline
 - Adjust based on what you know about the user's task and data
-- If the user pushes back, understand why and adjust — don't just agree
+- If the user pushes back, understand why and adjust -- don't just agree
 
 ## LLM-as-Judge Built-in Metrics
 
@@ -53,7 +53,7 @@ In code, these metrics are specified as `Builtin.Correctness`, `Builtin.Complete
 
 ## Common Metric Combinations
 
-- **QA/Math tasks** → Correctness, Completeness, Faithfulness, Relevance
-- **Summarization** → Completeness, Coherence, Relevance
-- **General assistance** → Helpfulness, Relevance, FollowingInstructions
-- **Safety evaluation** → Harmfulness, Stereotyping, Refusal
+- **QA/Math tasks** -> Correctness, Completeness, Faithfulness, Relevance
+- **Summarization** -> Completeness, Coherence, Relevance
+- **General assistance** -> Helpfulness, Relevance, FollowingInstructions
+- **Safety evaluation** -> Harmfulness, Stereotyping, Refusal

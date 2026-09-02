@@ -90,7 +90,7 @@ PUBLICLY_ACCESSIBLE=$(aws rds describe-db-instances \
     --query 'DBInstances[0].PubliclyAccessible' --output text)
 
 if [ "${PUBLICLY_ACCESSIBLE}" = "True" ]; then
-    echo "WARNING: Instance is publicly accessible — recommended to disable this"
+    echo "WARNING: Instance is publicly accessible -- recommended to disable this"
 else
     echo "PASS: Instance is NOT publicly accessible (good)"
 fi

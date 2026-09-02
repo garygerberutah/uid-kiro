@@ -5,7 +5,7 @@ section-by-section structure with the right schema/query columns) see
 solr-report-template.md (Solr) and elasticsearch-report-template.md (ES / OS).
 Use whichever matches the source; this master is the shared skeleton they share.
 -->
-# Migration Assessment Report — {{ fingerprint.source_engine }} {{ fingerprint.version | default:'(version unknown)' }} → Amazon OpenSearch
+# Migration Assessment Report -- {{ fingerprint.source_engine }} {{ fingerprint.version | default:'(version unknown)' }} -> Amazon OpenSearch
 
 **Date**: {{ date }}  
 **Skill**: amazon-opensearch-service v{{ skill_version }}  
@@ -27,7 +27,7 @@ This assessment evaluates a {{ fingerprint.source_engine }} workload for migrati
 - **Sizing**: see Sizing section below; plug values into <https://calculator.aws> for monthly cost
 - **Confidence**: see Risks section below
 
-A green tier (≥80) means you SHOULD proceed with the planned migration; yellow tier (60–79) means you SHOULD run a PoC + spike on the lowest-scoring dimension; red tier (<60) means you MUST NOT commit until the risk-blocker findings are reduced because the readiness score is below the safe-migration threshold.
+A green tier (>=80) means you SHOULD proceed with the planned migration; yellow tier (60-79) means you SHOULD run a PoC + spike on the lowest-scoring dimension; red tier (<60) means you MUST NOT commit until the risk-blocker findings are reduced because the readiness score is below the safe-migration threshold.
 
 ---
 
@@ -75,9 +75,9 @@ A green tier (≥80) means you SHOULD proceed with the planned migration; yellow
 
 **Recommended deployment**: {{ migration_path.decision_inputs.target | default:'managed' }}
 
-{% if sizing.compute.data_node_instance %}- Compute: {{ sizing.compute.data_node_count }}× {{ sizing.compute.data_node_instance }}
+{% if sizing.compute.data_node_instance %}- Compute: {{ sizing.compute.data_node_count }}x {{ sizing.compute.data_node_instance }}
 
-- Cluster managers: {{ sizing.compute.cluster_manager_count }}× {{ sizing.compute.cluster_manager_instance }}
+- Cluster managers: {{ sizing.compute.cluster_manager_count }}x {{ sizing.compute.cluster_manager_instance }}
 - Storage: {{ sizing.storage.gb_per_node }} GB per node ({{ sizing.storage.type }})
 - Region: {{ sizing.region }}
 {% endif %}{% if sizing.compute.indexing_ocu_min %}- Indexing OCUs (minimum): {{ sizing.compute.indexing_ocu_min }}
@@ -114,9 +114,9 @@ For full per-component strategy tables (Historical Data Migration / Live Traffic
 
 ---
 
-## Sizing — for the AWS Pricing Calculator
+## Sizing -- for the AWS Pricing Calculator
 
-Region: **{{ sizing.region | default:'us-east-1' }}** · Report date: **{{ date }}**
+Region: **{{ sizing.region | default:'us-east-1' }}** / Report date: **{{ date }}**
 
 ```json
 {{ sizing | json }}
@@ -130,7 +130,7 @@ This skill produces sizing inputs only. You MUST plug them into the **AWS Pricin
 
 ## Readiness
 
-**Overall score**: **{{ readiness.overall_score }}/100** — Tier: **{{ readiness.tier }}**
+**Overall score**: **{{ readiness.overall_score }}/100** -- Tier: **{{ readiness.tier }}**
 
 ### Per-dimension breakdown
 
@@ -146,8 +146,8 @@ This skill produces sizing inputs only. You MUST plug them into the **AWS Pricin
 
 ### Tier guidance
 
-- **GREEN (≥80)**: You MUST proceed and surface top items to flag (split across Migration specifics and Risks/blockers).
-- **YELLOW (60–79)**: You MUST run a PoC + spike on the weakest dimension.
+- **GREEN (>=80)**: You MUST proceed and surface top items to flag (split across Migration specifics and Risks/blockers).
+- **YELLOW (60-79)**: You MUST run a PoC + spike on the weakest dimension.
 - **RED (<60)**: You MUST NOT commit because the readiness score is below the safe-migration threshold. Revisit the weakest dimension first.
 
 ---
@@ -160,7 +160,7 @@ For the full per-finding register use the engine-specific gap register: [`solr-g
 
 ### Migration specifics
 
-Items the migration plan already handles via a documented remediation. The auto-seeded rows below have a `Workaround` field by definition — every row here is a migration specific. Frame these as *"this is how the migration handles X"*.
+Items the migration plan already handles via a documented remediation. The auto-seeded rows below have a `Workaround` field by definition -- every row here is a migration specific. Frame these as *"this is how the migration handles X"*.
 
 ```markdown
 | ID | Severity | Description | Remediation (handled by the path) |
@@ -171,7 +171,7 @@ Items the migration plan already handles via a documented remediation. The auto-
 {% endif %}{% endif %}{% if fingerprint.source_engine == 'elasticsearch' %}{% if fingerprint.summary.ilm_used %}| ES_ILM | HIGH | ES Index Lifecycle Management (ILM); policy JSON does not import as ISM | Rewrite policies as ISM and re-attach (see source-elasticsearch.md) |
 {% endif %}{% if fingerprint.summary.watcher_used %}| ES_WATCHER | HIGH | X-Pack Watcher has no direct equivalent | Rebuild as OpenSearch Alerting monitors |
 {% endif %}{% if fingerprint.summary.runtime_fields_used %}| ES_RUNTIME_FIELDS | HIGH | ES runtime (schema-on-read) fields have no OpenSearch equivalent | Pre-compute at ingest or use scripted_field; reindex |
-{% endif %}{% if fingerprint.summary.source_disabled %}| ES_SOURCE_FALSE | HIGH | `_source: {enabled:false}` index — Migration Assistant for Amazon OpenSearch Service Historical Data Migration recovers documents (nugget #22) | Use Migration Assistant for Amazon OpenSearch Service Historical Data Migration; re-enable `_source` on target |
+{% endif %}{% if fingerprint.summary.source_disabled %}| ES_SOURCE_FALSE | HIGH | `_source: {enabled:false}` index -- Migration Assistant for Amazon OpenSearch Service Historical Data Migration recovers documents (nugget #22) | Use Migration Assistant for Amazon OpenSearch Service Historical Data Migration; re-enable `_source` on target |
 {% endif %}{% endif %}| *Add per-finding rows here* | | | |
 ```
 
@@ -182,16 +182,16 @@ Items that genuinely constrain the migration: no known fix, capacity-plan implic
 ```markdown
 | ID | Severity | Description | What's at stake |
 |---|---|---|---|
-{% if fingerprint.source_engine == 'solr' and fingerprint.summary.custom_lib_count %}| SOLR_CUSTOM_PLUGIN | HIGH/BLOCKING | Custom plugin JARs ({{ fingerprint.summary.custom_lib_count }} `<lib>` directives) must port to the OpenSearch plugin API | Not supported on Serverless NextGen — constrains target choice; needs a plugin port plan or RFC |
-{% endif %}{% if fingerprint.source_engine == 'elasticsearch' and fingerprint.summary.post_fork %}| ES_POST_FORK | HIGH | Source is ES ≥ 7.11 (ELv2/SSPL) — Snapshot/Restore to AOS is NOT supported (nugget #21) | Tool-choice lockout: must use Migration Assistant for Amazon OpenSearch Service Historical Data Migration (any volume) or `_reindex` from remote; flag legal review |
+{% if fingerprint.source_engine == 'solr' and fingerprint.summary.custom_lib_count %}| SOLR_CUSTOM_PLUGIN | HIGH/BLOCKING | Custom plugin JARs ({{ fingerprint.summary.custom_lib_count }} `<lib>` directives) must port to the OpenSearch plugin API | Not supported on Serverless NextGen -- constrains target choice; needs a plugin port plan or RFC |
+{% endif %}{% if fingerprint.source_engine == 'elasticsearch' and fingerprint.summary.post_fork %}| ES_POST_FORK | HIGH | Source is ES >= 7.11 (ELv2/SSPL) -- Snapshot/Restore to AOS is NOT supported (nugget #21) | Tool-choice lockout: must use Migration Assistant for Amazon OpenSearch Service Historical Data Migration (any volume) or `_reindex` from remote; flag legal review |
 {% endif %}| *Add per-finding rows here* | | | |
 ```
 
 ### What I assumed (defaults applied for UNKNOWN inputs)
 
-- Pricing: not estimated — the customer plugs sizing into <https://calculator.aws> for an authoritative figure
+- Pricing: not estimated -- the customer plugs sizing into <https://calculator.aws> for an authoritative figure
 - Default replicas: 1 (per [`assumptions.md`](../references/assumptions.md))
-- Default `refresh_interval`: 30s (not 1s — Skill IP: operational guidance for prod, verify against `bp.html` in [`knowledge-retrieval.md`](../references/assessment-knowledge-retrieval.md))
+- Default `refresh_interval`: 30s (not 1s -- Skill IP: operational guidance for prod, verify against `bp.html` in [`knowledge-retrieval.md`](../references/assessment-knowledge-retrieval.md))
 - Engineering hours estimate: Skill IP, derive from readiness tier
 - Defaulted to managed Multi-AZ-with-Standby topology unless Serverless NextGen was clearly indicated
 - For Migration Assistant for Amazon OpenSearch Service cost projections, follow the AWS Solutions cost guide cited in [`knowledge-retrieval.md`](../references/assessment-knowledge-retrieval.md) (Migration Assistant for Amazon OpenSearch Service section)
@@ -200,13 +200,13 @@ Items that genuinely constrain the migration: no known fix, capacity-plan implic
 
 ## Citations
 
-The single canonical provenance record for this assessment (resolved in the Step 8 batched pass — no inline per-claim citations needed). For the canonical retrieval recipe (every URL the skill ever cites, topic → tool → URL, with browser/CLI fallbacks when the AWS MCP server is not available), see [`knowledge-retrieval.md`](../references/assessment-knowledge-retrieval.md). You MUST list, with retrieval timestamps, the version-volatile claims you actually verified — typically including:
+The single canonical provenance record for this assessment (resolved in the Step 8 batched pass -- no inline per-claim citations needed). For the canonical retrieval recipe (every URL the skill ever cites, topic -> tool -> URL, with browser/CLI fallbacks when the AWS MCP server is not available), see [`knowledge-retrieval.md`](../references/assessment-knowledge-retrieval.md). You MUST list, with retrieval timestamps, the version-volatile claims you actually verified -- typically including:
 
 - The specific best-practice page used for the sizing math (Amazon OpenSearch Service (managed) section)
 - The AWS upgrade-path doc for any upgrade-path claim (Amazon OpenSearch Service (managed) section)
 - The Migration Assistant for Amazon OpenSearch Service doc (AWS) and project doc when Migration Assistant for Amazon OpenSearch Service is the recommendation (Migration Assistant for Amazon OpenSearch Service section)
 - The Serverless NextGen comparison and general reference docs for any Serverless NextGen claim (Amazon OpenSearch Serverless NextGen section)
-- The AWS Pricing Calculator URL — <https://calculator.aws> — for the cost handoff
+- The AWS Pricing Calculator URL -- <https://calculator.aws> -- for the cost handoff
 
 ---
 

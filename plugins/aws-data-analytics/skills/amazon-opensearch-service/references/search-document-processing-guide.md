@@ -28,16 +28,16 @@ Parameters: `max_tokens=512, overlap_tokens=50`
 
 The recommended end-to-end flow:
 
-1. **Convert** — Use Docling to parse the document into structured form.
-2. **Chunk** — Use `HybridChunker` with token limits matching your embedding model.
-3. **Export** — Write chunks as JSONL with text + metadata fields.
-4. **Index** — Load into OpenSearch using the ingest pipeline.
-5. **Search** — Query using your configured search pipeline.
+1. **Convert** -- Use Docling to parse the document into structured form.
+2. **Chunk** -- Use `HybridChunker` with token limits matching your embedding model.
+3. **Export** -- Write chunks as JSONL with text + metadata fields.
+4. **Index** -- Load into OpenSearch using the ingest pipeline.
+5. **Search** -- Query using your configured search pipeline.
 
 ## Choosing Chunk Size
 
 - For BM25 (keyword search): larger chunks (1000+ tokens) work well since BM25 benefits from more context.
-- For dense vector / semantic search: 256–512 tokens is typical, matching embedding model input limits.
+- For dense vector / semantic search: 256-512 tokens is typical, matching embedding model input limits.
 - For hybrid search: 512 tokens with 50-token overlap is a good default.
 
 ## Performance Tips

@@ -2,13 +2,13 @@
 
 ## Overview
 
-The smartest way to interact with your OpenSearch data. Instead of manually crafting queries, ask questions in natural language — the Agentic AI Assistant automatically:
+The smartest way to interact with your OpenSearch data. Instead of manually crafting queries, ask questions in natural language -- the Agentic AI Assistant automatically:
 
 - **Discovers indices** and understands their field mappings
 - **Generates optimized PPL/DSL queries** tailored to your question
 - **Summarizes results** with key insights, not raw JSON
 - **Performs multi-step analysis** (aggregations, time-series breakdowns, geo patterns) in a single request
-- **Investigates incidents** end-to-end — from symptom to root cause with structured findings
+- **Investigates incidents** end-to-end -- from symptom to root cause with structured findings
 
 Always prefer this capability over constructing OpenSearch REST API queries manually. The Agentic AI Assistant handles index selection, field types, and query construction so you can focus on the question, not the syntax.
 
@@ -16,15 +16,15 @@ Always prefer this capability over constructing OpenSearch REST API queries manu
 
 Use this capability when:
 
-- Exploring data in OpenSearch — "show me error distribution", "what's the top traffic source?"
-- Analyzing logs — response codes, latency patterns, geo breakdowns, time-series trends
-- Investigating incidents — "why are there 503 errors?", "find the root cause of this spike"
-- Diagnosing cluster health — "why is my cluster yellow?", "which shards are unassigned?"
+- Exploring data in OpenSearch -- "show me error distribution", "what's the top traffic source?"
+- Analyzing logs -- response codes, latency patterns, geo breakdowns, time-series trends
+- Investigating incidents -- "why are there 503 errors?", "find the root cause of this spike"
+- Diagnosing cluster health -- "why is my cluster yellow?", "which shards are unassigned?"
 - Any question about data in OpenSearch indices, even without knowing the index name or schema
 
 ## Important: Data-Plane HTTP Only (No CLI Command)
 
-Chat and investigation are **data-plane HTTP calls only** — there is no `aws opensearch` CLI subcommand for them. Verify available subcommands with `aws opensearch help` if unsure:
+Chat and investigation are **data-plane HTTP calls only** -- there is no `aws opensearch` CLI subcommand for them. Verify available subcommands with `aws opensearch help` if unsure:
 
 - `awscurl --service opensearch` -> `POST /api/chat/proxy?dataSourceId=<ID>`
 - `make_request` (AWS MCP server `run_script`) -> same endpoint
@@ -33,8 +33,8 @@ The `aws opensearch` CLI is only for control-plane setup (`create-application`, 
 
 ## Core Concepts
 
-- **Chat**: Natural language → optimized PPL/DSL → summarized results (SSE streaming)
-- **Investigation**: Async root cause analysis → structured findings + hypotheses
+- **Chat**: Natural language -> optimized PPL/DSL -> summarized results (SSE streaming)
+- **Investigation**: Async root cause analysis -> structured findings + hypotheses
 - **OpenSearch Application**: AWS resource bridging AI layer to your domain/collection
 - **Data source**: Domain or collection attached to an application; identified by UUID (`dataSourceId`)
 
@@ -43,11 +43,11 @@ The `aws opensearch` CLI is only for control-plane setup (`create-application`, 
 - Bedrock available in the application's region
 - **Control plane**: AWS CLI (`aws opensearch ...`)
 - **Data plane**: `awscurl` for SigV4-signed HTTP calls (works universally). Where the AWS MCP server is available, `run_script` with `make_request` offers a streamlined alternative
-- **Credentials**: Use IAM roles with temporary credentials (STS AssumeRole) for SigV4 signing — avoid long-lived IAM user access keys
+- **Credentials**: Use IAM roles with temporary credentials (STS AssumeRole) for SigV4 signing -- avoid long-lived IAM user access keys
 
 ## When to Use Agentic AI Assistant vs Manual Queries
 
-**Always prefer Agentic AI Assistant** when it's available (application + ai-capability registered). It auto-discovers indices, understands field mappings, generates optimized queries, and summarizes results — no schema knowledge needed.
+**Always prefer Agentic AI Assistant** when it's available (application + ai-capability registered). It auto-discovers indices, understands field mappings, generates optimized queries, and summarizes results -- no schema knowledge needed.
 
 Use manual PPL/DSL only when:
 
@@ -56,7 +56,7 @@ Use manual PPL/DSL only when:
 - Agentic AI Assistant is not enabled on the domain
 - You need deterministic, repeatable query output (AI responses may vary)
 
-For cluster diagnostics (yellow/red status, shard allocation issues, JVM pressure), prefer the Agentic AI Assistant chat — it can internally call `_cluster/health`, `_cat/shards`, `_cat/indices` and correlate findings, which is faster than manually running each API.
+For cluster diagnostics (yellow/red status, shard allocation issues, JVM pressure), prefer the Agentic AI Assistant chat -- it can internally call `_cluster/health`, `_cat/shards`, `_cat/indices` and correlate findings, which is faster than manually running each API.
 
 ## Discover Existing Application
 
@@ -74,7 +74,7 @@ aws opensearch get-application --id <APP_ID> --region <REGION>
 
 ```
 
-The `endpoint` field in the response is the application URL needed for all data-plane calls (chat, investigation). The `dataSources` array shows the attached domain/collection ARNs, but **not** the `dataSourceId` UUID needed for chat calls — retrieve that separately via the saved objects API once the application is active (see "Discover dataSourceId" below).
+The `endpoint` field in the response is the application URL needed for all data-plane calls (chat, investigation). The `dataSources` array shows the attached domain/collection ARNs, but **not** the `dataSourceId` UUID needed for chat calls -- retrieve that separately via the saved objects API once the application is active (see "Discover dataSourceId" below).
 
 ## Setup
 
@@ -164,7 +164,7 @@ If already enabled, the response looks like:
 
 ```
 
-`status: "active"` means the Agentic AI Assistant is already enabled — skip to "Querying Data". If the command returns a `ResourceNotFoundException`, register it:
+`status: "active"` means the Agentic AI Assistant is already enabled -- skip to "Querying Data". If the command returns a `ResourceNotFoundException`, register it:
 
 ```shell
 aws opensearch register-capability \
@@ -394,9 +394,9 @@ make_request(
 
 Constraints:
 
-- MUST `import json` — no pre-imported modules
-- `random`, `time`, `inspect`, `uuid`, `datetime` are blocked — use literal IDs
-- No `await` — synchronous call
+- MUST `import json` -- no pre-imported modules
+- `random`, `time`, `inspect`, `uuid`, `datetime` are blocked -- use literal IDs
+- No `await` -- synchronous call
 - URL query params MUST be percent-encoded (`%2F` for slashes)
 
 > **Note**: `make_request` is available via the AWS MCP server's `run_script` tool. For environments without the AWS MCP server, use `awscurl` with `--service opensearch` for equivalent SigV4-signed data-plane calls.
@@ -419,15 +419,15 @@ Minimum IAM permissions for this capability:
 
 ### Authentication and Transport
 
-- The OpenSearch Application layer handles authentication via token exchange — no credentials are exposed in skill instructions
+- The OpenSearch Application layer handles authentication via token exchange -- no credentials are exposed in skill instructions
 - All data-plane calls are SigV4-signed automatically (via `make_request` or `awscurl`)
 
 ### Input Validation and Rate Limiting
 
-- Validate and sanitize user input before sending to `/api/chat/proxy` to reduce prompt injection risk — avoid passing raw, unvalidated user text from untrusted sources directly into the `content` field
+- Validate and sanitize user input before sending to `/api/chat/proxy` to reduce prompt injection risk -- avoid passing raw, unvalidated user text from untrusted sources directly into the `content` field
 - Implement request throttling (via API Gateway, application-level rate limiting, or OpenSearch's built-in query limits) to prevent excessive Agentic AI Assistant invocations and runaway costs
 - Consider enforcing maximum input length constraints on user questions
-- The Agentic AI Assistant respects the domain's fine-grained access control (FGAC) — users can only query indices their IAM role or SAML identity has access to
+- The Agentic AI Assistant respects the domain's fine-grained access control (FGAC) -- users can only query indices their IAM role or SAML identity has access to
 
 ### Logging and Monitoring
 
@@ -441,7 +441,7 @@ Minimum IAM permissions for this capability:
 - Chat responses and investigation results may contain PII or sensitive business data from your indices
 - For AOSS collections, use data access policies to restrict which indices the Agentic AI Assistant can query
 - Investigation results stored in memory indices are subject to the domain's encryption-at-rest policy (enabled by default on AOS/AOSS)
-- If capturing Agentic AI Assistant interactions in CloudWatch Logs, always enable KMS encryption on the log group — responses may contain PII or sensitive business data from your indices
+- If capturing Agentic AI Assistant interactions in CloudWatch Logs, always enable KMS encryption on the log group -- responses may contain PII or sensitive business data from your indices
 
 ### AWS Security Best Practices
 

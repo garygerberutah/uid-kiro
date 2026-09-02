@@ -312,7 +312,7 @@ class CreatePDFReport {
     private addEstimateHeader(label: string, index: number, total: number): void {
         this.doc.setFontSize(16);
         this.doc.setFont('helvetica', 'bold');
-        this.doc.text(`${label} — estimate ${index} of ${total}`, this.xPosition, this.yPosition);
+        this.doc.text(`${label} -- estimate ${index} of ${total}`, this.xPosition, this.yPosition);
         this.yPosition += 12;
     }
 
@@ -401,11 +401,11 @@ class CreatePDFReport {
         this.yPosition += 5;
 
         const keyDetails =
-            `        • Total Datacenters: ${datacenters.length}
-        • Total Keyspaces: ${totalKeyspaces}
-        • Total Live Storage: ${Math.round(totalStorageGB)} GB
-        • Total Write Operations: ${Math.round(totalWritesPerSecond)} per second
-        • Total Read Operations: ${Math.round(totalReadsPerSecond)} per second`;
+            `        * Total Datacenters: ${datacenters.length}
+        * Total Keyspaces: ${totalKeyspaces}
+        * Total Live Storage: ${Math.round(totalStorageGB)} GB
+        * Total Write Operations: ${Math.round(totalWritesPerSecond)} per second
+        * Total Read Operations: ${Math.round(totalReadsPerSecond)} per second`;
 
         this.addSubSection("Cassandra cluster:", keyDetails, {
             addPageAfter: false
@@ -414,15 +414,15 @@ class CreatePDFReport {
         this.yPosition += 5;
 
         let infrastructureContent =
-            `        • Instance Cost: ${formatCurrency(instanceCost || 0)}
-        • Storage Cost: ${formatCurrency(storageCost || 0)}
-        • Backup Cost: ${formatCurrency(backupCost || 0)}
-        • Network Cost: ${formatCurrency(networkCost || 0)}
-        • License Cost: ${formatCurrency(licenseCost || 0)}
-        • Operations Cost: ${formatCurrency(operationsCost || 0)}
+            `        * Instance Cost: ${formatCurrency(instanceCost || 0)}
+        * Storage Cost: ${formatCurrency(storageCost || 0)}
+        * Backup Cost: ${formatCurrency(backupCost || 0)}
+        * Network Cost: ${formatCurrency(networkCost || 0)}
+        * License Cost: ${formatCurrency(licenseCost || 0)}
+        * Operations Cost: ${formatCurrency(operationsCost || 0)}
         -----------------------------------------------------------
-        • Total MonthlyCost: ${formatCurrency(totalCassandraTCO)}
-        • Total Annual Cost: ${formatCurrency(totalCassandraTCO * 12)}`;
+        * Total MonthlyCost: ${formatCurrency(totalCassandraTCO)}
+        * Total Annual Cost: ${formatCurrency(totalCassandraTCO * 12)}`;
 
         if (totalCassandraTCO === 0) {
             infrastructureContent = `TCO data was not provided. Check file and upload section to add the total cost of ownership details.`;
@@ -435,11 +435,11 @@ class CreatePDFReport {
         this.yPosition += 5;
 
         const keyspacesPricingContent =
-            `        • Monthly Provisioned Capacity: ${formatCurrency(pricing.total_monthly_provisioned_cost)} / Savings Plan: ${formatCurrency(pricing.total_monthly_provisioned_cost_savings)}
-        • Annual Provisioned Cost: ${formatCurrency(pricing.total_monthly_provisioned_cost * 12)} / Savings Plan: ${formatCurrency(pricing.total_monthly_provisioned_cost_savings * 12)}
+            `        * Monthly Provisioned Capacity: ${formatCurrency(pricing.total_monthly_provisioned_cost)} / Savings Plan: ${formatCurrency(pricing.total_monthly_provisioned_cost_savings)}
+        * Annual Provisioned Cost: ${formatCurrency(pricing.total_monthly_provisioned_cost * 12)} / Savings Plan: ${formatCurrency(pricing.total_monthly_provisioned_cost_savings * 12)}
         -----------------------------------------------------------
-        • Monthly On-Demand Capacity: ${formatCurrency(pricing.total_monthly_on_demand_cost)} / Savings Plan: ${formatCurrency(pricing.total_monthly_on_demand_cost_savings)}
-        • Annual On-Demand Cost: ${formatCurrency(pricing.total_monthly_on_demand_cost * 12)} / Savings Plan: ${formatCurrency(pricing.total_monthly_on_demand_cost_savings * 12)}
+        * Monthly On-Demand Capacity: ${formatCurrency(pricing.total_monthly_on_demand_cost)} / Savings Plan: ${formatCurrency(pricing.total_monthly_on_demand_cost_savings)}
+        * Annual On-Demand Cost: ${formatCurrency(pricing.total_monthly_on_demand_cost * 12)} / Savings Plan: ${formatCurrency(pricing.total_monthly_on_demand_cost_savings * 12)}
        
 
 
@@ -455,9 +455,9 @@ class CreatePDFReport {
         const content =
 `Amazon Keyspaces (for Apache Cassandra) is a serverless, fully managed database service that enables you to run Cassandra workloads at scale on AWS without refactoring your applications.
 
-Many customers face challenges operating and scaling self-managed Cassandra clusters — including the complexity of managing infrastructure, tuning performance, handling repairs and upgrades, and meeting demanding availability and compliance requirements.
+Many customers face challenges operating and scaling self-managed Cassandra clusters -- including the complexity of managing infrastructure, tuning performance, handling repairs and upgrades, and meeting demanding availability and compliance requirements.
 
-These challenges can be addressed with a solution that provides serverless infrastructure, elastic scalability, built-in security, and automated operations — all without the need to manage nodes, clusters, or software maintenance tasks.
+These challenges can be addressed with a solution that provides serverless infrastructure, elastic scalability, built-in security, and automated operations -- all without the need to manage nodes, clusters, or software maintenance tasks.
 
 Amazon Keyspaces uniquely delivers these capabilities through its purpose-built, serverless architecture, seamless integration with AWS security and observability tools, and pay-as-you-go pricing model.
 
@@ -693,11 +693,11 @@ With 99.999% availability SLA, the ability to double capacity in under 30 minute
 
         this.doc.setFontSize(10);
         this.doc.setFont('helvetica', 'normal');
-        this.doc.text('• Provisioned estimate includes 70% target utilization for auto-scaling', 20, this.yPosition);
+        this.doc.text('* Provisioned estimate includes 70% target utilization for auto-scaling', 20, this.yPosition);
         this.yPosition += 8;
-        this.doc.text('• Costs are calculated based on usage patterns from your Cassandra cluster data', 20, this.yPosition);
+        this.doc.text('* Costs are calculated based on usage patterns from your Cassandra cluster data', 20, this.yPosition);
         this.yPosition += 8;
-        this.doc.text('• Pricing uses Amazon Keyspaces rates for the selected regions', 20, this.yPosition);
+        this.doc.text('* Pricing uses Amazon Keyspaces rates for the selected regions', 20, this.yPosition);
         this.yPosition += 16;
     }
 
@@ -741,8 +741,8 @@ With 99.999% availability SLA, the ability to double capacity in under 30 minute
         // Keyspace-level issues: functions and aggregates
         if (compatibilityData.functions > 0 || compatibilityData.aggregates > 0) {
             const keyspaceLevelContent =
-                `        • User-Defined Functions (UDFs): ${compatibilityData.functions}
-        • User-Defined Aggregates (UDAs): ${compatibilityData.aggregates}
+                `        * User-Defined Functions (UDFs): ${compatibilityData.functions}
+        * User-Defined Aggregates (UDAs): ${compatibilityData.aggregates}
 
         UDFs and UDAs are not supported in Amazon Keyspaces. Application logic that depends on server-side functions or aggregates must be moved to the client side.`;
 
@@ -756,8 +756,8 @@ With 99.999% availability SLA, the ability to double capacity in under 30 minute
         // Query-pattern issues from prepared statements (optional)
         if (queryPatterns && (lwtCount > 0 || aggCount > 0)) {
             const queryPatternsContent =
-                `        • Lightweight Transactions in UNLOGGED BATCH: ${lwtCount}
-        • Aggregation queries (COUNT/MIN/MAX/SUM/AVG): ${aggCount}
+                `        * Lightweight Transactions in UNLOGGED BATCH: ${lwtCount}
+        * Aggregation queries (COUNT/MIN/MAX/SUM/AVG): ${aggCount}
 
         Amazon Keyspaces does not support LWT inside UNLOGGED BATCH or server-side aggregation functions. These query patterns must be rewritten on the client side. The offending prepared statements are listed below.`;
 
@@ -783,7 +783,7 @@ With 99.999% availability SLA, the ability to double capacity in under 30 minute
                 const rows = issues.map((issue) => {
                     const normalized = issue.query_string.replace(/\s+/g, ' ').trim();
                     const truncated = normalized.length > 400
-                        ? `${normalized.slice(0, 400)}…`
+                        ? `${normalized.slice(0, 400)}...`
                         : normalized;
                     return [issue.prepared_id ?? '-', truncated];
                 });
@@ -858,9 +858,9 @@ With 99.999% availability SLA, the ability to double capacity in under 30 minute
             this.yPosition = (this.doc.lastAutoTable.finalY ?? this.yPosition) + 10;
 
             const tableLevelNote =
-                `        • Secondary Indexes: Amazon Keyspaces does not support secondary indexes. Consider restructuring queries or using separate tables.
-        • Triggers: Triggers are not supported. Use AWS Lambda with Amazon Keyspaces Streams or application-level logic instead.
-        • Materialized Views: Not supported. Create separate tables and manage denormalization in the application layer.`;
+                `        * Secondary Indexes: Amazon Keyspaces does not support secondary indexes. Consider restructuring queries or using separate tables.
+        * Triggers: Triggers are not supported. Use AWS Lambda with Amazon Keyspaces Streams or application-level logic instead.
+        * Materialized Views: Not supported. Create separate tables and manage denormalization in the application layer.`;
 
             this.addSubSection('', tableLevelNote, { addPageAfter: false });
 

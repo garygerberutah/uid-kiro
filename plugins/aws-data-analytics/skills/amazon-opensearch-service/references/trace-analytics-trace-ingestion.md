@@ -3,10 +3,10 @@
 ## Architecture
 
 ```
-ADOT Collector / X-Ray → OSI Pipeline → AOS/AOSS (otel-v1-apm-span-*)
+ADOT Collector / X-Ray -> OSI Pipeline -> AOS/AOSS (otel-v1-apm-span-*)
 ```
 
-## Option 1: ADOT Collector → OSI Pipeline → AOS
+## Option 1: ADOT Collector -> OSI Pipeline -> AOS
 
 ### Step 1: Create OSI Pipeline for Traces
 
@@ -16,7 +16,7 @@ aws osis create-pipeline --pipeline-name trace-pipeline \
   --pipeline-configuration-body file://trace-pipeline.yaml
 ```
 
-> **Tip — pipeline logging for debugging.** Trace data may carry sensitive application content (request parameters, user identifiers, span attributes), so create the log group **with KMS encryption first**, then attach it:
+> **Tip -- pipeline logging for debugging.** Trace data may carry sensitive application content (request parameters, user identifiers, span attributes), so create the log group **with KMS encryption first**, then attach it:
 >
 > ```bash
 > # 1. Create the log group with a customer-managed KMS key
@@ -74,7 +74,7 @@ extensions:
     service: "osis"
 ```
 
-## Option 2: Application Signals → AOS
+## Option 2: Application Signals -> AOS
 
 Application Signals automatically instruments applications and sends traces to X-Ray. To route these to AOS:
 

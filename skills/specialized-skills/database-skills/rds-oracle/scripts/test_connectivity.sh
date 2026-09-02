@@ -56,7 +56,7 @@ if echo "${ENDPOINT}" | grep -q "rds.amazonaws.com"; then
 else
     echo "WARN: Endpoint does not match standard RDS format"
     echo "  Expected: <instance>.xxxxxxxxxxxx.<region>.rds.amazonaws.com"
-    echo "  This may be a Route 53 CNAME or CMAN endpoint — that's OK"
+    echo "  This may be a Route 53 CNAME or CMAN endpoint -- that's OK"
 fi
 echo ""
 

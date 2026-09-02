@@ -1,4 +1,4 @@
-# RDS PostgreSQL — Query Load Analysis & Explain Plan Review
+# RDS PostgreSQL -- Query Load Analysis & Explain Plan Review
 
 ## Step 1: Get Top 5 Queries by Load
 
@@ -21,7 +21,7 @@ For data-modifying queries, wrap in a transaction and rollback.
 
 ## Step 3: Flag Upgrade-Impacting Patterns
 
-### 🔴 Critical
+### [RED] Critical
 
 | Pattern | Versions | Action |
 |---|---|---|
@@ -29,7 +29,7 @@ For data-modifying queries, wrap in a transaction and rollback.
 | `HashAggregate` with `Batches > 1` | PG 15+ | Memory accounting different. Adjust `work_mem`. |
 | JIT on short queries | PG 14+ | JIT overhead causes latency spikes. Adjust `jit_above_cost` thresholds. |
 
-### 🟡 Warning
+### [YELLOW] Warning
 
 | Pattern | Versions | Action |
 |---|---|---|
@@ -37,7 +37,7 @@ For data-modifying queries, wrap in a transaction and rollback.
 | Parallel scan threshold changes | PG 14-16 | Plans may gain/lose parallelism. Compare on test instance. |
 | Merge Join on large tables | PG 16+ | Improved costing may change join strategy. Benchmark. |
 
-### 🟢 Clean
+### [GREEN] Clean
 
 | Pattern | Notes |
 |---|---|

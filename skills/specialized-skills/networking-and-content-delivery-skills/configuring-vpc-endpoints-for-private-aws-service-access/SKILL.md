@@ -33,4 +33,4 @@ Verify security group rules allow HTTPS traffic (port 443) and route tables are 
 
 ### Policy restrictions
 
-Review endpoint policies — default policies allow all access, but custom policies may be restrictive.
+Review endpoint policies -- default policies allow all access, but custom policies may be restrictive.

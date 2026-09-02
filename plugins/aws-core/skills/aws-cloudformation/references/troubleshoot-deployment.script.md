@@ -67,20 +67,20 @@ Compare the failure message against known patterns to propose a diagnosis.
 **Constraints:**
 
 - You MUST evaluate each failure message against these common patterns:
-  - `is not authorized to perform` → IAM permission gap
-  - `already exists` → resource name conflict
-  - `Invalid` / `does not match pattern` → property validation failure
-  - `Rate exceeded` / `Throttling` → API throttling
-  - `timed out` → resource creation took too long; possibly quota or dependency issue
-  - `DELETE_FAILED` with `is not empty` → stateful resource has data
-  - `Requested resource not found` → referenced resource (AMI, KMS key, IAM role) does not exist in this region/account
-  - `cannot be deleted` → resource has deletion protection enabled or is in use by another resource/service
+  - `is not authorized to perform` -> IAM permission gap
+  - `already exists` -> resource name conflict
+  - `Invalid` / `does not match pattern` -> property validation failure
+  - `Rate exceeded` / `Throttling` -> API throttling
+  - `timed out` -> resource creation took too long; possibly quota or dependency issue
+  - `DELETE_FAILED` with `is not empty` -> stateful resource has data
+  - `Requested resource not found` -> referenced resource (AMI, KMS key, IAM role) does not exist in this region/account
+  - `cannot be deleted` -> resource has deletion protection enabled or is in use by another resource/service
 - If the message matches none of the above, You SHOULD categorize it as "service-specific" and inspect `ResourceType` to consult the relevant service's documentation
 - You SHOULD identify the FIRST failed event as the root cause candidate, because later failures are typically cascading
 
 ### 5. Correlate CloudTrail (Optional but Recommended)
 
-Pull CloudTrail events in a ±60 second window around the first failure to find the underlying AWS API error.
+Pull CloudTrail events in a +/-60 second window around the first failure to find the underlying AWS API error.
 
 **Constraints:**
 
@@ -93,7 +93,7 @@ Pull CloudTrail events in a ±60 second window around the first failure to find 
 - You SHOULD provide a CloudTrail console deeplink scoped to the failure window so the user can browse additional context:
   - Format: `https://console.aws.amazon.com/cloudtrailv2/home?region=<region>#/events?StartTime=<start>&EndTime=<end>&ReadOnly=false`
   - Note: Console domain varies by partition (e.g., `console.amazonaws.cn` for China regions, `console.amazonaws-us-gov.com` for GovCloud)
-- If no matching CloudTrail events are found, You MUST note this and continue — not all failures produce CloudTrail-visible errors
+- If no matching CloudTrail events are found, You MUST note this and continue -- not all failures produce CloudTrail-visible errors
 
 ### 6. Present Root Cause and Fix
 
@@ -117,7 +117,7 @@ Guide the user toward recovery.
 
 **Constraints:**
 
-- If the fix is template-level, You SHOULD recommend running a pre-deployment validation pipeline (cfn-lint → cfn-guard → change set validation) on the corrected template before redeploying, because re-deploying a broken template reruns the failure cycle
+- If the fix is template-level, You SHOULD recommend running a pre-deployment validation pipeline (cfn-lint -> cfn-guard -> change set validation) on the corrected template before redeploying, because re-deploying a broken template reruns the failure cycle
 - If the fix is environment-level, You MUST NOT recommend redeploying until the environment issue is confirmed resolved
 - If the stack is in `UPDATE_ROLLBACK_FAILED`, You MUST warn before recommending `continue-update-rollback` that it is a one-way operation and resources listed in `--resources-to-skip` will desynchronize from the template
 - If the stack is `DELETE_FAILED`, You SHOULD recommend inspecting the specific resource(s) blocking deletion before re-issuing delete
@@ -138,7 +138,7 @@ Root cause (environment-level):
   to perform: dynamodb:CreateTable on resource: arn:aws:dynamodb:us-east-1:...
 
 CloudTrail evidence:
-  2026-04-21T14:23:05Z — CreateTable — AccessDenied
+  2026-04-21T14:23:05Z -- CreateTable -- AccessDenied
   Deeplink: https://console.aws.amazon.com/cloudtrailv2/...
 
 Fix (no template change needed):

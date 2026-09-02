@@ -32,18 +32,18 @@ python -m pip hash wheels/*
 Do this before running the connector command. **Never paste these into a chat,
 an agent prompt, or a command flag.**
 
-**Coinbase CDP** — <https://portal.cdp.coinbase.com/>
+**Coinbase CDP** -- <https://portal.cdp.coinbase.com/>
 
 1. Create or open a CDP project
-2. Create an API key — note the **API Key ID** and **API Key Secret**
+2. Create an API key -- note the **API Key ID** and **API Key Secret**
 3. Generate a **Wallet Secret** (used for signing operations)
-4. Project → Wallet → Embedded Wallets → Policies → **enable Delegated signing** (required)
+4. Project -> Wallet -> Embedded Wallets -> Policies -> **enable Delegated signing** (required)
 
-**Stripe Privy** — <https://dashboard.privy.io/>
+**Stripe Privy** -- <https://dashboard.privy.io/>
 
 1. Create a **dedicated** Privy app for AgentCore (do not reuse an existing app)
 2. Copy the **App ID** and **App Secret**
-3. Wallet Infrastructure → Authorization → New Key → generate a P-256 key pair
+3. Wallet Infrastructure -> Authorization -> New Key -> generate a P-256 key pair
 4. Strip the `wallet-auth:` prefix from the private key; keep the raw base64 (starts `MIGHAgEA...`)
 5. Note the **Authorization ID**
 
@@ -57,10 +57,10 @@ Use the bare command so the whole setup stays in the interactive terminal:
 agentcore add payment-manager
 ```
 
-Names: start with a letter, alphanumeric plus underscores, ≤48 characters.
+Names: start with a letter, alphanumeric plus underscores, <=48 characters.
 
 Optionally tag the project so the service can distinguish skill-onboarded
-resources — add to the top-level `tags` object in `agentcore/agentcore.json`,
+resources -- add to the top-level `tags` object in `agentcore/agentcore.json`,
 keeping existing entries:
 
 ```json
@@ -77,7 +77,7 @@ agentcore add payment-connector
 ```
 
 Passing `--manager`, `--name`, or `--provider` switches the CLI to
-non-interactive mode and then *requires every secret as a flag* — it will not
+non-interactive mode and then *requires every secret as a flag* -- it will not
 fall back to prompting. Use the bare command.
 
 The CLI writes provider secrets in **plaintext** to `agentcore/.env.local` and
@@ -131,12 +131,12 @@ This separation keeps payment management and execution in different trusted role
 | Step | Command | Role |
 |---|---|---|
 | 1 | `agentcore add payment-manager` / `payment-connector` / `deploy` | **ControlPlaneRole** |
-| 2 | `agents_pay_admin.py init-config` | none — writes a local file only |
+| 2 | `agents_pay_admin.py init-config` | none -- writes a local file only |
 | 3 | `agents_pay_admin.py create-instrument` | **ManagementRole** |
 | 4 | `agents_pay_admin.py new-session` | **ManagementRole** |
 | 6 | the agent calling `x402_fetch` | **ProcessPaymentRole** |
 
-### ManagementRole — for the human running the admin CLI
+### ManagementRole -- for the human running the admin CLI
 
 Note the explicit `Deny`. It is not decoration: it is what stops this role from
 being usable to both mint budget and spend it.
@@ -173,7 +173,7 @@ being usable to both mint budget and spend it.
 }
 ```
 
-### ProcessPaymentRole — for the agent runtime
+### ProcessPaymentRole -- for the agent runtime
 
 `ProcessPayment` plus reads. **No session-write actions.**
 
@@ -259,7 +259,7 @@ known merchant set; omitted, it may fetch any public HTTPS site.
 ## 7. Create the per-user instrument
 
 One wallet for this installation. The payer identity is read from the config, where
-`init-config` generated it — this skill is single-tenant, so there is nothing to
+`init-config` generated it -- this skill is single-tenant, so there is nothing to
 invent or keep in sync:
 
 ```bash
@@ -283,10 +283,10 @@ One-time per wallet, and **do this before creating a session.**
 Both steps attach to the *wallet*, not to a session: `create_payment_session` takes
 only a user, an expiry, and a budget. Sessions are time-bounded (60 minutes by
 default), so minting one first and then going off to complete a browser flow and a
-faucet transfer simply burns the clock — the budget can expire before the agent has
+faucet transfer simply burns the clock -- the budget can expire before the agent has
 spent anything.
 
-**Delegation** — authorize the agent to spend from the wallet:
+**Delegation** -- authorize the agent to spend from the wallet:
 
 - *Coinbase CDP*: the end user visits the `redirectUrl`, signs in, grants
   permission to the wallet address
@@ -294,7 +294,7 @@ spent anything.
   (<https://github.com/privy-io/aws-agentcore-sdk>), sign in with the end user's
   email, approve delegation
 
-**Funding** — send testnet USDC to the wallet address via
+**Funding** -- send testnet USDC to the wallet address via
 <https://faucet.circle.com/> (Base Sepolia). Fund only what the agent may
 plausibly spend: wallet balance is the backstop if every other control fails.
 
@@ -311,15 +311,15 @@ python3 scripts/agents_pay_admin.py preflight
 python3 scripts/test_x402_policy.py
 ```
 
-Keep sessions short (≤60 minutes) and budgets small. When the budget is spent, a
-human runs `new-session` again — the agent cannot.
+Keep sessions short (<=60 minutes) and budgets small. When the budget is spent, a
+human runs `new-session` again -- the agent cannot.
 
 ## Networks
 
 Two distinct concepts, and mixing them up is a common setup failure:
 
-- **network family** — used when creating the instrument (`--network-family`)
-- **chain** — the CAIP-2 identifier that appears in x402 challenges and in this
+- **network family** -- used when creating the instrument (`--network-family`)
+- **chain** -- the CAIP-2 identifier that appears in x402 challenges and in this
   skill's `allowed_networks`
 
 **Families (instrument creation):**
@@ -339,7 +339,7 @@ Two distinct concepts, and mixing them up is a common setup failure:
 | Solana | `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp` | `SOLANA` | Mainnet | Coinbase, Stripe |
 | Solana Devnet | `solana-devnet` | `SOLANA_DEVNET` | **Testnet** | Stripe |
 
-Start on **Base Sepolia** (family `ETHEREUM`, chain `eip155:84532`) — free testnet
+Start on **Base Sepolia** (family `ETHEREUM`, chain `eip155:84532`) -- free testnet
 USDC from <https://faucet.circle.com/>. `init-config` only knows the USDC contract for
 the Base chains; adding another chain means adding its exact contract to `KNOWN_USDC`
 in the admin CLI, deliberately, rather than passing an address in.
@@ -347,7 +347,7 @@ in the admin CLI, deliberately, rather than passing an address in.
 ## Operational monitoring
 
 - Confirm CloudTrail records `bedrock-agentcore` calls, especially `ProcessPayment`
-- Alarm on `CreatePaymentSession` by the runtime principal — it should be
+- Alarm on `CreatePaymentSession` by the runtime principal -- it should be
   impossible, so any occurrence means the IAM split has regressed
 - Alarm on repeated `ProcessPayment` failures as an abuse signal
 - Review `show-config` output whenever payments start refusing unexpectedly

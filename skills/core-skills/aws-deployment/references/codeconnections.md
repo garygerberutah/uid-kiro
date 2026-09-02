@@ -47,7 +47,7 @@ aws codeconnections get-connection --connection-arn CONNECTION_ARN \
 
 ## The PENDING State Trap
 
-Connections created via CLI/CloudFormation/CDK are **always** `PENDING`. There is NO API to complete authorization — the console OAuth handshake is mandatory.
+Connections created via CLI/CloudFormation/CDK are **always** `PENDING`. There is NO API to complete authorization -- the console OAuth handshake is mandatory.
 
 A PENDING connection:
 
@@ -59,25 +59,25 @@ A PENDING connection:
 
 ### GitHub / GitHub Enterprise
 
-1. AWS Console → **Developer Tools > Settings > Connections**
-2. Select PENDING connection → **Update pending connection**
+1. AWS Console -> **Developer Tools > Settings > Connections**
+2. Select PENDING connection -> **Update pending connection**
 3. **Install a new app** (or select existing GitHub App)
-4. Browser redirects to GitHub — sign in as **organization owner**
-5. Select org, choose repos → **Install**
-6. Back in AWS Console → **Connect**
+4. Browser redirects to GitHub -- sign in as **organization owner**
+5. Select org, choose repos -> **Install**
+6. Back in AWS Console -> **Connect**
 
 **Pitfall**: Non-owner members get cookie errors or blank pages. GitHub App installation REQUIRES org owner role.
 
 ### GitLab.com / GitLab Self-Managed
 
-1. AWS Console → **Developer Tools > Settings > Connections**
-2. Select PENDING connection → **Update pending connection**
-3. Redirects to GitLab → authorize the AWS application
+1. AWS Console -> **Developer Tools > Settings > Connections**
+2. Select PENDING connection -> **Update pending connection**
+3. Redirects to GitLab -> authorize the AWS application
 4. **Connect** to finalize
 
 ### Bitbucket Cloud
 
-Same flow as GitLab: Console → select connection → redirect → authorize → Connect.
+Same flow as GitLab: Console -> select connection -> redirect -> authorize -> Connect.
 
 ### Verify
 
@@ -101,7 +101,7 @@ aws codeconnections create-host \
 
 `--vpc-configuration` required when endpoint is not publicly accessible. `TlsCertificate` accepts PEM-encoded CA cert (base64).
 
-Host creation is async — check status:
+Host creation is async -- check status:
 
 ```bash
 aws codeconnections get-host --host-arn HOST_ARN --query "Status" --output text
@@ -110,7 +110,7 @@ aws codeconnections get-host --host-arn HOST_ARN --query "Status" --output text
 
 ## Connection Sharing
 
-A single connection serves unlimited pipelines within the same account and region. Create one connection per provider per account — do not create one per pipeline.
+A single connection serves unlimited pipelines within the same account and region. Create one connection per provider per account -- do not create one per pipeline.
 
 Cross-account: share connections using AWS Resource Access Manager (RAM). See [sharing connections](https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-share.html). Without RAM, each account needs its own connection.
 
@@ -161,11 +161,11 @@ For CodeBuild roles using `CODEBUILD_CLONE_REF`: add `codeconnections:UseConnect
 
 ## Security
 
-- MUST scope UseConnection with condition keys (FullRepositoryId, ProviderAction) — without them, any repo accessible to the connection is exposed
+- MUST scope UseConnection with condition keys (FullRepositoryId, ProviderAction) -- without them, any repo accessible to the connection is exposed
 - Scope Resource to specific connection ARNs in production
 - Enable CloudTrail for `codeconnections:*` API auditing
 - Revoke connections when personnel with OAuth access leave the organization
-- Connections store OAuth tokens managed by AWS — prefer connections over manual PATs which cannot be auto-rotated
+- Connections store OAuth tokens managed by AWS -- prefer connections over manual PATs which cannot be auto-rotated
 
 ## Related
 

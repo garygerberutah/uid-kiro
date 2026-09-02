@@ -1,6 +1,6 @@
 # Example Queries Against Published `SYS_*` System Tables
 
-Loaded on demand from `querying-aws-redshift` SKILL.md. Timing columns are **microseconds** — divide by 1,000,000 for seconds. Confirm the namespace from the status API before substituting it below; never hand-construct it.
+Loaded on demand from `querying-aws-redshift` SKILL.md. Timing columns are **microseconds** -- divide by 1,000,000 for seconds. Confirm the namespace from the status API before substituting it below; never hand-construct it.
 
 ## Top 10 longest-running queries in the last 7 days (Athena)
 

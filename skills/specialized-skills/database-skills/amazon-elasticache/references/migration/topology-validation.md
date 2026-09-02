@@ -122,7 +122,7 @@ aws ec2 describe-subnets \
 
 ### Shard Count Compatibility
 
-For online migration (`start-migration`), the number of shards in the source and target **must** match. This is a hard prerequisite — online migration will fail if shard counts differ. Verify shard counts match before starting migration.
+For online migration (`start-migration`), the number of shards in the source and target **must** match. This is a hard prerequisite -- online migration will fail if shard counts differ. Verify shard counts match before starting migration.
 
 ```bash
 # Check shard count on source (self-managed Redis cluster-mode enabled)

@@ -5,7 +5,7 @@ Graduate-level "Google-proof" questions in biology, physics, and chemistry (hard
 **Use this for:** Scientific reasoning, technical analysis in natural sciences.
 
 **Source:** Artificial Analysis (artificialanalysis.ai).
-"—" = no data — infer from similar models in the same family, but tell the user you're inferring.
+"--" = no data -- infer from similar models in the same family, but tell the user you're inferring.
 
 |   # | Model                                  | Family      | Score |
 |-----|----------------------------------------|-------------|-------|
@@ -39,6 +39,6 @@ Graduate-level "Google-proof" questions in biology, physics, and chemistry (hard
 |  28 | Qwen3 0.6B (mode: reasoning)           | Qwen        | 23.9% |
 |  29 | Llama 3.2 1B Instruct                  | Meta Llama  | 19.6% |
 |  30 | DeepSeek R1 Distill Qwen 1.5B          | DeepSeek    |  9.8% |
-|   — | Qwen2.5 14B Instruct                   | Qwen        |     — |
-|   — | Qwen2.5 7B Instruct                    | Qwen        |     — |
-|   — | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     — |
+|   -- | Qwen2.5 14B Instruct                   | Qwen        |     -- |
+|   -- | Qwen2.5 7B Instruct                    | Qwen        |     -- |
+|   -- | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     -- |

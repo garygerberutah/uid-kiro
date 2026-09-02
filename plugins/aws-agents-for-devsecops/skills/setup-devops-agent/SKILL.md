@@ -3,7 +3,7 @@ name: setup-devops-agent
 description: Setup and diagnostics for the AWS DevOps Agent MCP connection. Triggers when aws-devops-agent is missing from .mcp.json, when the connection is broken, or when the user says "set up devops agent" / "configure agent". Does NOT trigger if the MCP is already connected and working.
 ---
 
-# AWS DevOps Agent — Claude Setup
+# AWS DevOps Agent -- Claude Setup
 
 The instructions below are specifically for setting up the AWS DevOps Agent plugin for Claude applications. For other clients, use this as a reference, but adjust the instructions based on the client's specific requirements.
 
@@ -27,9 +27,9 @@ If the user does not want to change their auth configuration, then you are DONE 
 
 Then:
 
-- If `aws-devops-agent` key exists AND the server is connected (tools are available, see "Step 3: Verify connectivity") → Inform the user: "DevOps Agent is already configured and connected."; If Bearer Token is used in the MCP config, suggest that you can alternatively setup the plugin to use SigV4 credentials for the AWS DevOps Agent (multiple agent spaces, admin tooling). If SigV4 credentials are used in the MCP config, suggest that you can alternatively setup the plugin to use Bearer Token credentials for the AWS DevOps Agent (single agent space).
-- If `aws-devops-agent` key exists but is failing → continue to "Step 1: Diagnose current state"
-- If `aws-devops-agent` key does NOT exist → continue to "Step 1: Diagnose current state"
+- If `aws-devops-agent` key exists AND the server is connected (tools are available, see "Step 3: Verify connectivity") -> Inform the user: "DevOps Agent is already configured and connected."; If Bearer Token is used in the MCP config, suggest that you can alternatively setup the plugin to use SigV4 credentials for the AWS DevOps Agent (multiple agent spaces, admin tooling). If SigV4 credentials are used in the MCP config, suggest that you can alternatively setup the plugin to use Bearer Token credentials for the AWS DevOps Agent (single agent space).
+- If `aws-devops-agent` key exists but is failing -> continue to "Step 1: Diagnose current state"
+- If `aws-devops-agent` key does NOT exist -> continue to "Step 1: Diagnose current state"
 
 ---
 
@@ -58,7 +58,7 @@ Determine:
 
 ## Step 2: Decide auth path
 
-After diagnostics, ALWAYS ask the user which path they want — even if only one is available. Present what you found and let them choose.
+After diagnostics, ALWAYS ask the user which path they want -- even if only one is available. Present what you found and let them choose.
 
 The user may want to use bearer token if they only have access to the operator app for an agent space.
 
@@ -136,7 +136,7 @@ Before writing, confirm with the user:
 
 > "I've verified connectivity. I'll now add the **[Bearer token / SigV4]** MCP server to the plugin's `.mcp.json`. Proceed?"
 
-Only write after the user confirms. Write ONE server entry — never both. Install the MCP config in `${CLAUDE_PLUGIN_ROOT}/.mcp.json`. You can also offer to install the MCP server at the workspace level. The installation options are:
+Only write after the user confirms. Write ONE server entry -- never both. Install the MCP config in `${CLAUDE_PLUGIN_ROOT}/.mcp.json`. You can also offer to install the MCP server at the workspace level. The installation options are:
 
 - Plugin scoped: `${CLAUDE_PLUGIN_ROOT}/.mcp.json` (default)
 - Project-scoped: .mcp.json (in your project directory, version-controlled)
@@ -214,7 +214,7 @@ After successful SigV4 setup, discover and configure AgentSpace routing:
 3. If multiple spaces exist, write a routing guide to `.claude/aws-agents-for-devsecops.md`:
 
 ```markdown
-# AWS DevOps Agent — Routing Guide
+# AWS DevOps Agent -- Routing Guide
 
 | Space | Agent Space ID | Purpose |
 |-------|----------------|---------|
@@ -238,7 +238,7 @@ need to prompt the user to run it. Also mention that after restarting the MCP se
 ## Bearer token guidance (for users who need to create one)
 
 1. Open the AWS DevOps Agent **Operator Web App** for your AgentSpace
-2. Navigate to **Settings → Access tokens → Generate token**
+2. Navigate to **Settings -> Access tokens -> Generate token**
 3. Create a token with Permissions: **`Operate`**
 4. Set environment variables:
 
@@ -250,7 +250,7 @@ need to prompt the user to run it. Also mention that after restarting the MCP se
    Available regions: https://docs.aws.amazon.com/devopsagent/latest/userguide/about-aws-devops-agent-supported-regions.html
 5. Restart Claude Code (it reads env vars from the shell that launched it)
 
-> **Important:** Without `Operate` permissions, the `chat` and `investigate` tools will be completely invisible — not just fail, but absent from the tool list.
+> **Important:** Without `Operate` permissions, the `chat` and `investigate` tools will be completely invisible -- not just fail, but absent from the tool list.
 
 ---
 

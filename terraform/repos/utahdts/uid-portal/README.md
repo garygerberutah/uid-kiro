@@ -86,7 +86,7 @@ This is fail-closed for plans made from these roots, not an AWS account mutex.
 The immediate pre-apply recheck narrows the approval-window race, but a
 concurrent administrator or other automation can still call `CreateApi` after
 the check. Restrict creation to the protected deployment role/path and enforce
-the application tag with IAM/SCP controls for the account-wide “ever” rule.
+the application tag with IAM/SCP controls for the account-wide "ever" rule.
 The two S3 backends cannot be locked as one transaction, so serialize dev/AT
 deploy paths and prohibit out-of-band state writes as part of that boundary.
 
@@ -134,7 +134,7 @@ aws/terraform/repos/utahdts/uid-portal/scripts/full-build-tf-at.sh --plan \
 
 `--delete-recreate` maps to Terraform `-replace` within the complete graph; it
 is not a raw delete and Terraform decides safe dependency ordering.
-`--allow-delete` does not target anything—it acknowledges one delete-only
+`--allow-delete` does not target anything--it acknowledges one delete-only
 change already required by checked-in configuration. Every replacement and
 delete must be selected individually or the plan is rejected. Durable
 application resources (the gateway, domains/mappings, logs, queues, topics and

@@ -157,7 +157,7 @@ and surfaces the console link.
   aws cloudfront get-distribution-config --id {distribution_id}
   # set Restrictions.GeoRestriction in the returned DistributionConfig, then put it back.
   # RestrictionType is an AWS API enum; its only allowed values are "whitelist" (allowlist),
-  # "blacklist" (denylist), and "none" — use the API's exact token here for the allowlist case:
+  # "blacklist" (denylist), and "none" -- use the API's exact token here for the allowlist case:
   aws cloudfront update-distribution --id {distribution_id} --if-match {etag} \
     --distribution-config '{"CallerReference":"...","Restrictions":{"GeoRestriction":{"RestrictionType":"whitelist","Quantity":1,"Items":["US"]}}, ...rest of the unchanged config...}'
   ```
@@ -173,15 +173,15 @@ and surfaces the console link.
 
 - For token, you MUST write a CloudFront function on viewer-request that validates the token, then
   publish and associate it.
-- ⚠️ You MUST implement real signature verification before publishing. A function that only checks
-  token presence and length does not verify authenticity — any arbitrary string passes, which is a
+- [WARNING] You MUST implement real signature verification before publishing. A function that only checks
+  token presence and length does not verify authenticity -- any arbitrary string passes, which is a
   false sense of security. The validation logic below is described as steps, not as runnable code, so
   it is not deployed as-is: the function MUST (a) read the bearer token from the `authorization`
   header, (b) reject a missing or over-length token with a 401, and (c) **verify the token's
   signature** (for example, validate the JWT signature with `crypto.subtle` in a CloudFront Functions
   runtime that supports it) before returning `event.request`. Author the function code to do all three.
 - Create the function with your authored, signature-verifying code (replace `{function_code}` with
-  it), and set `Runtime` to the current CloudFront Functions runtime that supports your code — do not
+  it), and set `Runtime` to the current CloudFront Functions runtime that supports your code -- do not
   hardcode a runtime string that ages; check the available runtimes in the CloudFront Developer Guide
   (CloudFront Functions) and select the latest supported one for `{runtime}`:
 
@@ -201,7 +201,7 @@ and surfaces the console link.
   Content-Security-Policy, X-Frame-Options, X-Content-Type-Options) to complement these access
   controls, since they defend against different browser-based attacks (clickjacking, MIME sniffing,
   protocol downgrade). The AWS managed `SecurityHeadersPolicy` is a starting point. Look up its
-  current id by name (do not hardcode a UUID — managed policy ids can change), fetch the current
+  current id by name (do not hardcode a UUID -- managed policy ids can change), fetch the current
   config and ETag, set the behavior's `ResponseHeadersPolicyId`, then pass the full modified config
   back as an inline JSON string (use an inline JSON string, not a `file://` reference, for
   portability across execution environments):

@@ -142,7 +142,7 @@ changes itself.
   distribution, an Application Load Balancer, a Global Accelerator accelerator).
 - **threat** (required): What they are protecting against (layer 3/4 volumetric, layer 7 HTTP flood,
   or both).
-- **needs** (required): Whether any Advanced-only outcome is wanted — cost-protection credits, SRT
+- **needs** (required): Whether any Advanced-only outcome is wanted -- cost-protection credits, SRT
   help, automatic application layer mitigation, health-based detection, or attack reporting.
 
 **Constraints for parameter acquisition:**
@@ -199,7 +199,7 @@ changes itself.
 Your need is layer 7 HTTP flood protection on CloudFront, with no requirement for cost-protection
 credits, SRT help, automatic mitigation, health-based detection, or attack reporting.
 Shield Standard (free, always on) already covers layer 3/4. For the HTTP flood, AWS WAF rate-based
-rules plus the Anti-DDoS managed rule group cover it as a standard WAF cost — no Shield Advanced
+rules plus the Anti-DDoS managed rule group cover it as a standard WAF cost -- no Shield Advanced
 subscription required.
 Recommendation: stay on Shield Standard and use AWS WAF. Routing you to the waf skill for the
 rate-based rule and the Anti-DDoS managed rule group.

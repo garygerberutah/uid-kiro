@@ -20,14 +20,14 @@ Before starting discovery, check if a `*_use_case_spec.md` file already exists i
 
 Check the plan (`PLAN.md`) or conversation context to determine whether the user wants to:
 
-- **Fine-tune a model** → read `references/spec-for-finetuning.md` and follow it.
-- **Deploy a base model** → read `references/spec-for-deployment.md` and follow it.
+- **Fine-tune a model** -> read `references/spec-for-finetuning.md` and follow it.
+- **Deploy a base model** -> read `references/spec-for-deployment.md` and follow it.
 
 If the intent is already clear from the plan (e.g., the plan includes finetuning steps vs. only model-selection + model-deployment), use that. If ambiguous and not already resolved by the planning skill, ask:
 
 > "Are you looking to fine-tune a model for your use case, or deploy a base model as-is?"
 
-⏸ Wait for user response.
+[PAUSE] Wait for user response.
 
 ## Edit Protocol
 
@@ -36,5 +36,5 @@ If the intent is already clear from the plan (e.g., the plan includes finetuning
 
 ## References
 
-- `references/spec-for-finetuning.md` — Discovery and spec generation workflow for fine-tuning
-- `references/spec-for-deployment.md` — Discovery and spec generation workflow for base model deployment
+- `references/spec-for-finetuning.md` -- Discovery and spec generation workflow for fine-tuning
+- `references/spec-for-deployment.md` -- Discovery and spec generation workflow for base model deployment

@@ -20,7 +20,7 @@ aws ecr create-repository \
 
 The operator SHOULD set:
 
-- `scanOnPush=true` to automatically scan images for vulnerabilities on push (or configure scanning at the registry level — see [Image Scanning](#image-scanning)).
+- `scanOnPush=true` to automatically scan images for vulnerabilities on push (or configure scanning at the registry level -- see [Image Scanning](#image-scanning)).
 - `image-tag-mutability IMMUTABLE` to prevent tag overwriting. This ensures a given tag always refers to the same image digest. Use `IMMUTABLE_WITH_EXCLUSION` with `--image-tag-mutability-exclusion-filters` if specific tags (e.g., `latest`) must remain mutable.
 
 ## Authenticate and Push Images
@@ -105,7 +105,7 @@ See the [relevant documentation](https://docs.aws.amazon.com/AmazonECR/latest/us
 
 Note: `sinceImagePulled` cannot expire images. When a user wants to clean up images based on
 last-pull time, be aware that the `sinceImagePulled` count type only works with the
-`transition` action (to the `archive` storage class) — it cannot be used with `expire`.
+`transition` action (to the `archive` storage class) -- it cannot be used with `expire`.
 To actually delete images by pull activity, use two rules: first `transition` them to
 archive with `sinceImagePulled`, then `expire` them with `sinceImageTransitioned`. Archived
 images must stay in archive for a minimum of 90 days before they can be deleted. Never
@@ -115,7 +115,7 @@ produce a policy that pairs `sinceImagePulled` with an `expire` action.
 
 - **Encryption at rest**: Use `KMS` via `--encryption-configuration` when you need key-level audit trail (KMS logs `GenerateDataKey`, `Decrypt` calls in CloudTrail) and customer-managed key rotation. `AES256` (S3-managed keys) is the default. All ECR API calls are logged by CloudTrail regardless of encryption type.
 - **Image tag immutability**: Set `IMMUTABLE` to prevent tag overwriting attacks (supply chain security). Use `IMMUTABLE_WITH_EXCLUSION` only when specific tags must remain mutable.
-- **Least-privilege IAM**: Scope ECR permissions to specific repository ARNs. Separate push (CI/CD) from pull (execution role) permissions. `ecr:GetAuthorizationToken` requires `Resource: "*"` — it cannot be scoped to a repository.
+- **Least-privilege IAM**: Scope ECR permissions to specific repository ARNs. Separate push (CI/CD) from pull (execution role) permissions. `ecr:GetAuthorizationToken` requires `Resource: "*"` -- it cannot be scoped to a repository.
 - **Cross-account access**: Use `aws:PrincipalOrgID` conditions in repository policies. Grant only `ecr:BatchGetImage` and `ecr:GetDownloadUrlForLayer` for pull-only access. Prefer specific role ARNs over `:root` principals.
 - **Logging and monitoring**: ECR API calls are logged by CloudTrail. Set CloudWatch alarms on ECR API usage metrics to detect unusual pull patterns or approaching quota limits. See [ECR usage metrics](https://docs.aws.amazon.com/AmazonECR/latest/userguide/monitoring-usage.html).
 - **Lifecycle policies**: Expire untagged and old images to reduce attack surface from unpatched images.

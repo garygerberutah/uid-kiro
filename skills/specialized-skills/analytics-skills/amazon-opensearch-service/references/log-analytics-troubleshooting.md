@@ -20,7 +20,7 @@
 
 ## Debugging PPL Queries
 
-1. Start simple: `source = <index> | head 5` — verify access
-2. Check field names: `GET /<index>/_mapping` — confirm exact field paths
+1. Start simple: `source = <index> | head 5` -- verify access
+2. Check field names: `GET /<index>/_mapping` -- confirm exact field paths
 3. Narrow time range first, then add filters
-4. If `patterns` returns nothing: ensure there are enough documents (needs ≥10 for pattern detection)
+4. If `patterns` returns nothing: ensure there are enough documents (needs >=10 for pattern detection)

@@ -146,7 +146,7 @@ This creates 10 parallel queries:
 **Best practices:**
 
 - Use a numeric column with even distribution
-- Set `numPartitions` = number of workers × cores per worker
+- Set `numPartitions` = number of workers x cores per worker
 - Choose `lowerBound` and `upperBound` based on actual data range
 
 ### Deduplication Logic
@@ -247,7 +247,7 @@ Enable Spark UI for detailed execution metrics:
 }
 ```
 
-Access via Glue console → Job runs → View Spark UI
+Access via Glue console -> Job runs -> View Spark UI
 
 Use Spark UI to:
 

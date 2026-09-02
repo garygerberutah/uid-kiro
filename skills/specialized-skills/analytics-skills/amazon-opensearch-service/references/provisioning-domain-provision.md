@@ -1,4 +1,4 @@
-# Amazon OpenSearch Service Domain — Provision
+# Amazon OpenSearch Service Domain -- Provision
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ aws opensearch create-domain \
   --domain-endpoint-options EnforceHTTPS=true
 ```
 
-**For production:** use a current-generation Graviton instance — `r7g.large.search` (or larger per `references/sizing.md`) — with 3+ data nodes and 3 dedicated cluster managers (the AWS API still uses "DedicatedMaster" in CLI/SDK; prose: "cluster managers"). `r6g` is previous-generation and only used with explicit compatibility justification.
+**For production:** use a current-generation Graviton instance -- `r7g.large.search` (or larger per `references/sizing.md`) -- with 3+ data nodes and 3 dedicated cluster managers (the AWS API still uses "DedicatedMaster" in CLI/SDK; prose: "cluster managers"). `r6g` is previous-generation and only used with explicit compatibility justification.
 
 ## Step 3: Enable Fine-Grained Access Control
 

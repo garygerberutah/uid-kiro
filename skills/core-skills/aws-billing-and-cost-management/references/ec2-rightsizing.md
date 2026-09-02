@@ -13,7 +13,7 @@ Opt in first: `aws compute-optimizer update-enrollment-status --status Active`
 
 **Instance Store:** Disk read/write bytes/sec, disk read/write ops/sec
 
-Memory metrics are critical — without them, instances with low memory may appear optimized. Memory metrics enable up to 4x more savings opportunities. Recommend CloudWatch agent installation.
+Memory metrics are critical -- without them, instances with low memory may appear optimized. Memory metrics enable up to 4x more savings opportunities. Recommend CloudWatch agent installation.
 
 ## Finding Classifications
 
@@ -42,10 +42,10 @@ Uses P99.5 percentile by default (excludes top 0.5% outliers). Default 20% CPU/m
 
 | Level | Example |
 |-------|---------|
-| Very Low | Same family size change (c5.large → c5.xlarge) |
-| Low | Generation change (m5.xlarge → m6i.xlarge) |
-| Medium | Family change (c5.xlarge → m5.xlarge) |
-| High | Architecture change (x86 → Graviton/arm64) |
+| Very Low | Same family size change (c5.large -> c5.xlarge) |
+| Low | Generation change (m5.xlarge -> m6i.xlarge) |
+| Medium | Family change (c5.xlarge -> m5.xlarge) |
+| High | Architecture change (x86 -> Graviton/arm64) |
 
 ## Performance Risk Scale
 0-1: Very Low | >1-2: Low | >2-3: Medium | >3-4: High
@@ -83,6 +83,6 @@ When presenting a right-sizing recommendation to the user, include:
 1. Current instance type and specs (vCPUs, memory)
 2. Which metrics triggered the finding (with actual values)
 3. Recommended instance type and specs
-4. Monthly savings ($ and %) — calculate with a script, NEVER manually
-5. Migration effort level and any platform differences (Xen→Nitro, x86→arm64)
+4. Monthly savings ($ and %) -- calculate with a script, NEVER manually
+5. Migration effort level and any platform differences (Xen->Nitro, x86->arm64)
 6. Whether memory metrics were available (if not, recommend CloudWatch agent)

@@ -111,8 +111,8 @@ CodePipeline supports multiple deploy providers beyond CodeDeploy:
 
 **Pitfalls:**
 
-- PARALLEL loses rollback capability and source revision tracking — do not use for prod pipelines requiring rollback
-- Changing mode discards queued executions — stop pipeline first
+- PARALLEL loses rollback capability and source revision tracking -- do not use for prod pipelines requiring rollback
+- Changing mode discards queued executions -- stop pipeline first
 - QUEUED rejects execution 51 (not queued silently)
 
 ## Triggers with Git Filtering
@@ -171,7 +171,7 @@ CodePipeline supports multiple deploy providers beyond CodeDeploy:
 | Triggers per pipeline | 50 |
 | Filters per trigger | 3 |
 | Glob patterns per includes/excludes | 8 each |
-| **File path evaluation limit** | **100 files** — commits exceeding this skip path filtering entirely |
+| **File path evaluation limit** | **100 files** -- commits exceeding this skip path filtering entirely |
 
 ## Pipeline Variables
 
@@ -208,7 +208,7 @@ Add `"namespace": "BuildVars"` to an action to expose its outputs.
 | Lambda | FunctionOutput (custom JSON) |
 | Manual Approval | ApprovalStatus, ApprovalSummary, CustomData |
 
-Reference: `#{Namespace.VariableName}` — e.g., `#{SourceVariables.CommitId}`
+Reference: `#{Namespace.VariableName}` -- e.g., `#{SourceVariables.CommitId}`
 
 ### Variable Limits
 
@@ -225,7 +225,7 @@ Requires ALL THREE configured together:
 
 ### Step 1: Customer-Managed KMS Key (Source Account)
 
-MUST use key ID or full ARN — aliases do not resolve cross-account.
+MUST use key ID or full ARN -- aliases do not resolve cross-account.
 
 Key policy grants target account:
 

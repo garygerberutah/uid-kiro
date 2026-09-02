@@ -1,6 +1,6 @@
 # Aurora Commitment Pricing Workflow
 
-Estimate monthly cost savings from Aurora Reserved Instances (RI) and Database Savings Plans (DSP) for one cluster, a fleet, or user-supplied workloads (including Aurora serverless). Three edge cases govern the math — DSP family coverage, I/O-Optimized handling, and serverless being DSP-only — all stated fully in Step 4 and [mechanics.md](commitment-pricing-mechanics.md). Purchases are blocked — see SKILL.md Safety guidance. Execute commands via the AWS MCP server when connected (sandboxed, audited); else use the AWS CLI or shell.
+Estimate monthly cost savings from Aurora Reserved Instances (RI) and Database Savings Plans (DSP) for one cluster, a fleet, or user-supplied workloads (including Aurora serverless). Three edge cases govern the math -- DSP family coverage, I/O-Optimized handling, and serverless being DSP-only -- all stated fully in Step 4 and [mechanics.md](commitment-pricing-mechanics.md). Purchases are blocked -- see SKILL.md Safety guidance. Execute commands via the AWS MCP server when connected (sandboxed, audited); else use the AWS CLI or shell.
 
 ## When This Applies
 
@@ -8,7 +8,7 @@ User mentions: Reserved Instance, RI, Savings Plan, DSP, commitment pricing, No/
 
 ## Critical edge case: cluster has no DB instances (`skipped: true`)
 
-**Before running ANY analysis on a specific cluster, check whether it has DB instances attached.** If `aws rds describe-db-clusters --db-cluster-identifier <id>` returns an empty `DBClusterMembers: []` array, OR the analyzer returns `skipped: true`, the cluster EXISTS but has no compute — you CANNOT run a commitment-pricing analysis on it.
+**Before running ANY analysis on a specific cluster, check whether it has DB instances attached.** If `aws rds describe-db-clusters --db-cluster-identifier <id>` returns an empty `DBClusterMembers: []` array, OR the analyzer returns `skipped: true`, the cluster EXISTS but has no compute -- you CANNOT run a commitment-pricing analysis on it.
 
 See **[skipped-cluster.md](commitment-pricing-skipped-cluster.md)** for the cluster-name heuristic (treat `empty` / `no-instances` / `limitless` identifiers as skipped), the causes (paused, mid-migration, Aurora Limitless), the **required response template**, and the **MUST NOT** guardrails.
 
@@ -20,17 +20,17 @@ Modes:
 
 - **Live single-cluster**: cluster identifier, region.
 - **Live fleet**: region.
-- **Offline — provisioned**: instance type, number of instances, region, optional `--io-optimized` flag.
-- **Offline — Aurora serverless**: average ACU (steady baseline), region, optional `--io-optimized` flag.
+- **Offline -- provisioned**: instance type, number of instances, region, optional `--io-optimized` flag.
+- **Offline -- Aurora serverless**: average ACU (steady baseline), region, optional `--io-optimized` flag.
 
 **Constraints for parameter acquisition:**
 
 - You MUST ask for all required parameters upfront in a single prompt
-- You MUST detect Aurora serverless clusters in live mode and warn the user — only DSP applies; RIs do not
-- You MUST warn that Database Savings Plans bill the committed hourly rate continuously, including during auto-pause periods — the user pays the committed rate even when the cluster is scaled to zero ACU
+- You MUST detect Aurora serverless clusters in live mode and warn the user -- only DSP applies; RIs do not
+- You MUST warn that Database Savings Plans bill the committed hourly rate continuously, including during auto-pause periods -- the user pays the committed rate even when the cluster is scaled to zero ACU
 - You MUST recommend sizing the DSP commitment at or below average ACU usage to avoid overpaying during low-usage or auto-pause periods
 - You MUST confirm captured parameters before running the analyzer
-- You SHOULD ask about the user's confidence horizon (1 vs 3 years) — it shapes the recommendation
+- You SHOULD ask about the user's confidence horizon (1 vs 3 years) -- it shapes the recommendation
 
 ### 2. Run the Analyzer
 
@@ -58,7 +58,7 @@ python scripts/commitment_pricing_analyzer.py offline \
 
 ### 3. Handle Skipped Clusters
 
-The analyzer returns `skipped: true` for clusters with no DB instances (last writer/reader deleted, or Aurora Limitless) — no compute to commit to. An auto-paused scale-to-zero serverless instance still appears in the cluster and is analyzable; it is not an empty cluster.
+The analyzer returns `skipped: true` for clusters with no DB instances (last writer/reader deleted, or Aurora Limitless) -- no compute to commit to. An auto-paused scale-to-zero serverless instance still appears in the cluster and is analyzable; it is not an empty cluster.
 
 **Constraints:**
 
@@ -70,9 +70,9 @@ The analyzer returns `skipped: true` for clusters with no DB instances (last wri
 
 **Constraints:**
 
-- You MUST surface the script's `notes` array to the user — these are the most common misconceptions
+- You MUST surface the script's `notes` array to the user -- these are the most common misconceptions
 - You MUST NOT claim DSP savings for an instance family the analyzer marks as ineligible (r6g, r5, and older) because DSP only covers latest-gen families
-- You MUST explain the I/O-Optimized RI vs DSP math honestly — **both RI and DSP cover the full I/O-Optimized instance-hour price (base + 30% premium).** With RIs, an I/O-Optimized instance consumes ~1.3x the normalized RI units of the equivalent Standard instance, so you buy ~30% more RI units (size flexibility rounds fractions) to fully cover it — no portion is forced to on-demand. **DSP covers I/O-Optimized automatically and is family-agnostic**, so it needs no extra-unit calculation. That operational simplicity — not a coverage gap in RIs — is why DSP is often the easier commitment vehicle for I/O-Optimized fleets.
+- You MUST explain the I/O-Optimized RI vs DSP math honestly -- **both RI and DSP cover the full I/O-Optimized instance-hour price (base + 30% premium).** With RIs, an I/O-Optimized instance consumes ~1.3x the normalized RI units of the equivalent Standard instance, so you buy ~30% more RI units (size flexibility rounds fractions) to fully cover it -- no portion is forced to on-demand. **DSP covers I/O-Optimized automatically and is family-agnostic**, so it needs no extra-unit calculation. That operational simplicity -- not a coverage gap in RIs -- is why DSP is often the easier commitment vehicle for I/O-Optimized fleets.
 
 ### 5. Present Results
 
@@ -87,9 +87,9 @@ Every comparison MUST include:
 **Constraints:**
 
 - You MUST cite both dollar and percentage savings for each option
-- You MUST show upfront payment when non-zero — it is a material cash-flow consideration
+- You MUST show upfront payment when non-zero -- it is a material cash-flow consideration
 - You MUST NOT run any purchase API because this workflow estimates, not commits
-- You MAY reference the AWS console path for users who want to proceed (RDS → Reserved Instances, or Billing → Savings Plans)
+- You MAY reference the AWS console path for users who want to proceed (RDS -> Reserved Instances, or Billing -> Savings Plans)
 
 ### 6. Scenario Guidance
 
@@ -102,14 +102,14 @@ For workload-pattern questions (steady vs variable, fleet mix, migration horizon
 
 ## Troubleshooting
 
-See [worked-examples.md §Troubleshooting](commitment-pricing-worked-examples.md#troubleshooting) for common failure modes: cluster-not-found, empty offerings, 3-year DSP requests, DSP-ineligible families, over-baseline commits, and max-capacity=0 auto-pause warnings.
+See [worked-examples.md Section Troubleshooting](commitment-pricing-worked-examples.md#troubleshooting) for common failure modes: cluster-not-found, empty offerings, 3-year DSP requests, DSP-ineligible families, over-baseline commits, and max-capacity=0 auto-pause warnings.
 
 ## Deep-Dive References
 
 Run the analyzer when shell is available; otherwise compute inline using the references below.
 
-- [skipped-cluster.md](commitment-pricing-skipped-cluster.md) — no-compute heuristic, required response template, MUST NOT guardrails.
-- [mechanics.md](commitment-pricing-mechanics.md) — DSP-vs-RI family coverage table, Aurora us-east-1 discount-rate table, savings formula, serverless + DSP gotchas. Offline rates: [../serverless-advisory/formulas-and-examples.md §Provisioned compute pricing](serverless-advisory-formulas-and-examples.md#provisioned-compute-pricing-table-on-demand-us-east-1-aurora-postgresql).
-- [worked-examples.md](commitment-pricing-worked-examples.md) — three agent response patterns plus Troubleshooting.
-- [basics.md](commitment-pricing-basics.md) — RI vs DSP mechanics, size flexibility, payment options, coverage limits.
-- [scenarios.md](commitment-pricing-scenarios.md) — workload-pattern scenarios plus a decision tree.
+- [skipped-cluster.md](commitment-pricing-skipped-cluster.md) -- no-compute heuristic, required response template, MUST NOT guardrails.
+- [mechanics.md](commitment-pricing-mechanics.md) -- DSP-vs-RI family coverage table, Aurora us-east-1 discount-rate table, savings formula, serverless + DSP gotchas. Offline rates: [../serverless-advisory/formulas-and-examples.md Section Provisioned compute pricing](serverless-advisory-formulas-and-examples.md#provisioned-compute-pricing-table-on-demand-us-east-1-aurora-postgresql).
+- [worked-examples.md](commitment-pricing-worked-examples.md) -- three agent response patterns plus Troubleshooting.
+- [basics.md](commitment-pricing-basics.md) -- RI vs DSP mechanics, size flexibility, payment options, coverage limits.
+- [scenarios.md](commitment-pricing-scenarios.md) -- workload-pattern scenarios plus a decision tree.

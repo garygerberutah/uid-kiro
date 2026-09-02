@@ -23,7 +23,7 @@ Works from both standalone and delegated administrator accounts.
 
    Verify each expected region has a data lake with `createStatus` = COMPLETED.
 
-   **Security check:** Verify data lake has KMS encryption configured — check `encryptionConfiguration.kmsKeyId` in the `list-data-lakes` output.
+   **Security check:** Verify data lake has KMS encryption configured -- check `encryptionConfiguration.kmsKeyId` in the `list-data-lakes` output.
 
 2. Check configured AWS sources:
 
@@ -115,7 +115,7 @@ Works from both standalone and delegated administrator accounts.
 
 - MUST NOT modify Security Lake configuration
 - MUST NOT query data stored in Security Lake
-- SHOULD handle AccessDeniedException — indicate caller may not be delegated admin
+- SHOULD handle AccessDeniedException -- indicate caller may not be delegated admin
 
 ## Troubleshooting
 
@@ -125,7 +125,7 @@ Works from both standalone and delegated administrator accounts.
 | AccessDeniedException | Caller is not the Security Lake delegated admin or not enabled. Note: may have empty error body |
 | UnauthorizedException | Same as above |
 | get-data-lake-organization-configuration fails | Organization features may not be enabled |
-| Sources show FAILED status | Note in report — may indicate IAM or SLR issues |
+| Sources show FAILED status | Note in report -- may indicate IAM or SLR issues |
 
 ## Output Sensitivity
 

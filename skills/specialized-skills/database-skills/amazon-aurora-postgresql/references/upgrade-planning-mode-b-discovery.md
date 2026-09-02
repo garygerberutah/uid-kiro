@@ -1,24 +1,24 @@
-# Mode B — Discovery (Tasks 1–4)
+# Mode B -- Discovery (Tasks 1-4)
 
-Cluster-specific workflow. Run these with live AWS calls after the user names a cluster. Continue to [lts-recommendation.md](upgrade-planning-lts-recommendation.md) (Task 5) and [mode-b-prechecks-checklists.md](upgrade-planning-mode-b-prechecks-checklists.md) (Tasks 6–8).
+Cluster-specific workflow. Run these with live AWS calls after the user names a cluster. Continue to [lts-recommendation.md](upgrade-planning-lts-recommendation.md) (Task 5) and [mode-b-prechecks-checklists.md](upgrade-planning-mode-b-prechecks-checklists.md) (Tasks 6-8).
 
 ## 1. Check Permissions
 
 **Constraints:**
 
 - You MUST confirm AWS credentials allow `rds:DescribeDBClusters`, `rds:DescribeDBEngineVersions`, and `rds:DescribeDBInstances` before starting
-- You MUST pause if credentials are missing — tasks 3–6 require live AWS access
+- You MUST pause if credentials are missing -- tasks 3-6 require live AWS access
 - You MAY proceed with checklist-only tasks (7) without AWS access
 
 ## 1a. No Fabrication When Live AWS is Unreachable
 
-If credentials are missing, the cluster isn't found, or any `describe-*` call fails, you MUST report the exact failure to the user and stop that step. There is no "demonstration mode" for this workflow — fabricating example `describe-db-clusters` or `describe-db-engine-versions` output and then recommending targets derived from it produces a plausible-looking answer with no factual basis, and users have acted on those fabricated answers.
+If credentials are missing, the cluster isn't found, or any `describe-*` call fails, you MUST report the exact failure to the user and stop that step. There is no "demonstration mode" for this workflow -- fabricating example `describe-db-clusters` or `describe-db-engine-versions` output and then recommending targets derived from it produces a plausible-looking answer with no factual basis, and users have acted on those fabricated answers.
 
 **Constraints:**
 
 - You MUST NOT invent values for `EngineVersion`, `Engine`, `DBClusterParameterGroup`, `ValidUpgradeTarget`, instance class, `Status`, or any other field that a `describe-*` call would return, because the user will reasonably assume those values came from their cluster
 - You MUST NOT describe such invented output as "expected output shape" or "representative" and then use it as the basis for a recommendation, because that is the exact pattern that misled users in past runs
-- You MUST NOT claim in a completion summary that you "used `describe-db-engine-versions` as source of truth" when you did not execute it — self-reporting contradicting the transcript is worse than the original fabrication
+- You MUST NOT claim in a completion summary that you "used `describe-db-engine-versions` as source of truth" when you did not execute it -- self-reporting contradicting the transcript is worse than the original fabrication
 - When the cluster cannot be queried, you MUST either (a) show the exact commands the user should run and ask them to paste the JSON output, or (b) ask the user to supply the current engine + version so you can advise on upgrade paths from general knowledge, clearly labeled as non-authoritative
 - You MAY present LTS/latest trade-offs and checklists (tasks 5, 8) from general knowledge even without live data, because those are genuinely version-independent guidance
 - You MUST NOT present a specific target version (e.g., "upgrade to 16.4") as a recommendation unless `describe-db-engine-versions` actually returned it, because valid targets depend on the current version and change over time
@@ -33,7 +33,7 @@ Optional: **target version** (string, e.g. `16.4`; omit to see all options), **c
 
 - You MUST ask for cluster identifier and region upfront in a single prompt
 - You MUST confirm the captured values before running discovery
-- You SHOULD offer the four connection methods as choices when ready for prechecks — do not pick for them
+- You SHOULD offer the four connection methods as choices when ready for prechecks -- do not pick for them
 
 ## 3. Identify the Cluster
 

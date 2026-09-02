@@ -197,7 +197,7 @@ and confirms logs flow, then surfaces the console link.
 ```
 Enabled logging for web ACL example-webacl to aws-waf-logs-example, redacting authorization and cookie.
 Confirmed log records are arriving and request sampling is on.
-Logging is ready — Count-mode tuning now has data to read.
+Logging is ready -- Count-mode tuning now has data to read.
 Open the web ACL Logging and metrics tab to confirm:
 https://us-east-1.console.aws.amazon.com/wafv2/homev2/web-acls?region=us-east-1
 ```

@@ -14,12 +14,12 @@ AWS transitioned from time-based to credit-based free tier on July 15, 2025:
 
 ## Recommended Workflow
 
-1. First: `aws freetier get-account-plan-state` — determine account type and eligibility
-2. Then: `aws freetier get-free-tier-usage` — check current usage for active services
+1. First: `aws freetier get-account-plan-state` -- determine account type and eligibility
+2. Then: `aws freetier get-free-tier-usage` -- check current usage for active services
 
 ## Critical Rules
 
-- NEVER cite specific free tier limits from training data — offers changed July 15, 2025 and vary by account type
+- NEVER cite specific free tier limits from training data -- offers changed July 15, 2025 and vary by account type
 - `getFreeTierUsage` only returns services with usage > 0. Missing service means either no free tier offer exists OR customer hasn't used it yet.
 - For questions about available offers before using a service, direct to https://aws.amazon.com/free/
 - Legacy accounts: former 12-month services stop appearing after their period expires

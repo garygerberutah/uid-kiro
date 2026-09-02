@@ -7,7 +7,7 @@
 # Compiles the Java source (if needed), collects all parameters interactively
 # or via flags, then runs the TCPIP and/or SSL connection path(s).
 #
-# SSL uses a region-specific PEM certificate from AWS — no KeyStore or keytool.
+# SSL uses a region-specific PEM certificate from AWS -- no KeyStore or keytool.
 # Reference:
 #   https://aws.amazon.com/blogs/database/
 #   create-an-ssl-connection-to-amazon-rds-for-db2-in-java-without-keystore-or-keytool/
@@ -30,7 +30,7 @@
 #   --help           Show this help
 #
 # Examples:
-#   # Interactive — prompts for everything missing:
+#   # Interactive -- prompts for everything missing:
 #   ./run_db2_kerberos.sh
 #
 #   # TCPIP only:
@@ -53,7 +53,7 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# User-configurable variables — edit these before running, or override via
+# User-configurable variables -- edit these before running, or override via
 # command-line flags.
 # ---------------------------------------------------------------------------
 PORT_TCPIP="50000"   # Plain TCPIP port          (-P flag)
@@ -139,16 +139,16 @@ prompt_required() {
     fi
 }
 
-section "Db2 Kerberos Connection — Parameter Collection"
+section "Db2 Kerberos Connection -- Parameter Collection"
 
 prompt_required HOST     "Db2 server hostname or IP"
 prompt_required DATABASE "Db2 database name"
 
 if [[ -z "$MODE" ]]; then
     echo "Connection mode options:"
-    echo "  1) TCPIP  — plain TCP (no encryption)"
-    echo "  2) SSL    — TLS encrypted, PEM certificate (no KeyStore/keytool)"
-    echo "  3) BOTH   — run TCPIP first, then SSL"
+    echo "  1) TCPIP  -- plain TCP (no encryption)"
+    echo "  2) SSL    -- TLS encrypted, PEM certificate (no KeyStore/keytool)"
+    echo "  3) BOTH   -- run TCPIP first, then SSL"
     read -rp "Choose mode [1/2/3, default=3]: " mode_choice
     case "${mode_choice:-3}" in
         1) MODE="TCPIP" ;;
@@ -199,7 +199,7 @@ if command -v klist &>/dev/null; then
         warn "No valid Kerberos ticket found. Run 'kinit' before connecting."
     fi
 else
-    warn "klist not found — cannot verify Kerberos ticket."
+    warn "klist not found -- cannot verify Kerberos ticket."
 fi
 
 # ---------------------------------------------------------------------------

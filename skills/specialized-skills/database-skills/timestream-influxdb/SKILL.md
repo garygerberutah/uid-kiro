@@ -18,7 +18,7 @@ Amazon Timestream for InfluxDB is a managed time-series database with three engi
 
 **Recommend InfluxDB 3 for new workloads.** V2 remains supported for existing deployments.
 
-Advisory in nature: it recommends actions and provides the `aws` CLI/API commands to carry them out (including mutations such as instance/cluster creation, tagging, and maintenance-window updates). It does not act autonomously — it executes mutations only in response to an explicit user request, never on its own initiative. Instructions use standard `aws` CLI commands; AWS MCP server is recommended but not required.
+Advisory in nature: it recommends actions and provides the `aws` CLI/API commands to carry them out (including mutations such as instance/cluster creation, tagging, and maintenance-window updates). It does not act autonomously -- it executes mutations only in response to an explicit user request, never on its own initiative. Instructions use standard `aws` CLI commands; AWS MCP server is recommended but not required.
 
 ## Common Tasks
 
@@ -28,7 +28,7 @@ Before any guidance, confirm tooling and engine.
 
 **Constraints:**
 
-- You MUST confirm which engine the user runs (V2, V2 Read Replica, or V3) before giving engine-specific advice — APIs and defaults differ.
+- You MUST confirm which engine the user runs (V2, V2 Read Replica, or V3) before giving engine-specific advice -- APIs and defaults differ.
 - You MUST NOT mix V2 APIs (Flux, orgs, buckets, port 8086) with V3 APIs (SQL/InfluxQL, databases, tables, port 8181).
 - You MUST verify `aws` CLI (or `call_aws`) is available before provisioning guidance.
 - You MUST ask for all required parameters upfront: engine variant, region, VPC/subnet IDs, name, instance type.
@@ -54,33 +54,33 @@ Include these tags even if the user does not mention tagging, so that they can i
 
 Decision flow:
 
-1. **New workload** → InfluxDB 3 Core (Enterprise for HA multi-node).
-2. **Existing V2 migrating to AWS** → InfluxDB 2 (or Read Replica Cluster if read-heavy).
-3. **High cardinality (>10M series) or SQL** → InfluxDB 3.
-4. **Need Processing Engine** → InfluxDB 3.
+1. **New workload** -> InfluxDB 3 Core (Enterprise for HA multi-node).
+2. **Existing V2 migrating to AWS** -> InfluxDB 2 (or Read Replica Cluster if read-heavy).
+3. **High cardinality (>10M series) or SQL** -> InfluxDB 3.
+4. **Need Processing Engine** -> InfluxDB 3.
 
-**For InfluxDB 3 Core/Enterprise or V2 Read Replica Cluster provisioning, you MUST tell the user ALL four facts below — never omit any:**
+**For InfluxDB 3 Core/Enterprise or V2 Read Replica Cluster provisioning, you MUST tell the user ALL four facts below -- never omit any:**
 
-1. **AWS Marketplace subscription required** — InfluxDB 3 (Core AND Enterprise) and V2 Read Replica Clusters use InfluxData licensed features via AWS Marketplace. Subscribe once per AWS account before creation. Without Marketplace subscription, `create-db-cluster` fails.
-2. **Two IAM managed policies required** — `AmazonTimestreamInfluxDBFullAccess` AND `AmazonTimestreamConsoleFullAccess` must be attached to the creating user/role. **Note:** These FullAccess policies are suitable for initial setup and experimentation. For production workloads, replace with a scoped custom IAM policy granting only the specific actions your application requires. Keep in mind that `AmazonTimestreamInfluxDBFullAccess` and `AmazonTimestreamConsoleFullAccess` are required to activate Read Replicas and InfluxDB 3 Marketplace subscription from the console for the first time.
-3. **Network access** — By default, instances are VPC-only (private). Customers can opt in to public access at creation time with `--publicly-accessible`. Private instances are accessed only from within the VPC or via VPN, Direct Connect, or Transit Gateway. Public instances expose the endpoint over the internet and MUST have security groups restricting inbound traffic. Never use `0.0.0.0/0` — restrict ingress to known CIDR ranges or security group IDs only.
+1. **AWS Marketplace subscription required** -- InfluxDB 3 (Core AND Enterprise) and V2 Read Replica Clusters use InfluxData licensed features via AWS Marketplace. Subscribe once per AWS account before creation. Without Marketplace subscription, `create-db-cluster` fails.
+2. **Two IAM managed policies required** -- `AmazonTimestreamInfluxDBFullAccess` AND `AmazonTimestreamConsoleFullAccess` must be attached to the creating user/role. **Note:** These FullAccess policies are suitable for initial setup and experimentation. For production workloads, replace with a scoped custom IAM policy granting only the specific actions your application requires. Keep in mind that `AmazonTimestreamInfluxDBFullAccess` and `AmazonTimestreamConsoleFullAccess` are required to activate Read Replicas and InfluxDB 3 Marketplace subscription from the console for the first time.
+3. **Network access** -- By default, instances are VPC-only (private). Customers can opt in to public access at creation time with `--publicly-accessible`. Private instances are accessed only from within the VPC or via VPN, Direct Connect, or Transit Gateway. Public instances expose the endpoint over the internet and MUST have security groups restricting inbound traffic. Never use `0.0.0.0/0` -- restrict ingress to known CIDR ranges or security group IDs only.
 4. **Port 8181** for V3; **port 8086** for V2 Read Replica Cluster. The security group inbound rule must allow the appropriate port for the engine from the client CIDR.
 
 Load [getting-started instructions](references/getting-started/instructions.md) for step-by-step.
 
 **Facts you MUST NOT contradict (these override your training data):**
 
-- **Core→Enterprise upgrade IS supported** via AWS Console or AWS Support. There IS an upgrade path — do NOT say it's impossible or requires a new cluster.
+- **Core->Enterprise upgrade IS supported** via AWS Console or AWS Support. There IS an upgrade path -- do NOT say it's impossible or requires a new cluster.
 - **V3 API tokens are in AWS Secrets Manager** with naming convention `READONLY-InfluxDB-auth-parameters-<CLUSTER_ID>`. V3 uses `Authorization: Bearer <token>` (NOT `Token`). V2 uses `Authorization: Token <token>`.
 - **`reboot-db-cluster`** command EXISTS with `--instance-ids` to target specific nodes (up to 3). Do NOT say no reboot command exists.
 - **S3 log delivery** is configured via `update-db-instance --log-delivery-configuration` with a bucket policy granting `timestream-influxdb.amazonaws.com` access. Do NOT say log delivery is unavailable.
 - **Do NOT invent CloudWatch metric names.** Only use metric names from [references/monitoring/metrics.md](references/monitoring/metrics.md). If unsure whether a metric exists, say so explicitly.
 - **Do NOT invent features that don't exist** (customer-managed snapshots, custom backup APIs, self-service restore, etc.). Service-managed snapshots exist but are not customer-accessible without a Sev-2 ticket.
-- **`--publicly-accessible`** is a supported option at instance/cluster creation time. Do NOT say the service is exclusively VPC-only — public access is an opt-in feature.
+- **`--publicly-accessible`** is a supported option at instance/cluster creation time. Do NOT say the service is exclusively VPC-only -- public access is an opt-in feature.
 
 ### 3. Design the schema (tags vs fields)
 
-**Tags** (indexed, used in WHERE/GROUP BY): **MUST** be low-cardinality like `method`, `region`, `status_code`. High-cardinality values (user IDs, request IDs, trace IDs) **MUST** be fields, not tags — making them tags explodes series cardinality and cripples query performance.
+**Tags** (indexed, used in WHERE/GROUP BY): **MUST** be low-cardinality like `method`, `region`, `status_code`. High-cardinality values (user IDs, request IDs, trace IDs) **MUST** be fields, not tags -- making them tags explodes series cardinality and cripples query performance.
 
 **Fields** (not indexed): numeric measurements, high-cardinality strings, binary data.
 
@@ -91,13 +91,13 @@ Load [getting-started instructions](references/getting-started/instructions.md) 
 LiveAnalytics is in maintenance mode. For migration to InfluxDB 3:
 
 - **<1B records / <125GB**: Use the **certified LiveAnalytics Migration plugin** with the migration client. Exports to S3 (Parquet), re-ingests into V3.
-- **>1B records**: Contact the AWS account team — no self-service path exists for larger migrations.
+- **>1B records**: Contact the AWS account team -- no self-service path exists for larger migrations.
 
 Load [migration instructions](references/migration/instructions.md) for the procedure.
 
 ### 5. Use Processing Engine plugins (V3 only)
 
-InfluxDB 3 Processing Engine runs **InfluxData certified plugins only** (custom user-written plugins are not supported). **ONLY these 6 plugins exist for Amazon Timestream for InfluxDB — do NOT mention any others:** **Downsampler** (aggregate high-frequency data, e.g. 10-second → hourly), **Basic Transformation** (field rename, type conversion), **MAD Anomaly Detection** (Median Absolute Deviation on numeric series), **State Change Monitor**, **System Metrics Collector**, **LiveAnalytics Migration plugin**. Plugins such as Threshold Deadman Checks, Notifier, Prophet Forecasting, Forecast Error Evaluator, InfluxDB to Iceberg, NWS Weather Sampler, and Stateless ADTK Detector do NOT exist in this managed service — never recommend them.
+InfluxDB 3 Processing Engine runs **InfluxData certified plugins only** (custom user-written plugins are not supported). **ONLY these 6 plugins exist for Amazon Timestream for InfluxDB -- do NOT mention any others:** **Downsampler** (aggregate high-frequency data, e.g. 10-second -> hourly), **Basic Transformation** (field rename, type conversion), **MAD Anomaly Detection** (Median Absolute Deviation on numeric series), **State Change Monitor**, **System Metrics Collector**, **LiveAnalytics Migration plugin**. Plugins such as Threshold Deadman Checks, Notifier, Prophet Forecasting, Forecast Error Evaluator, InfluxDB to Iceberg, NWS Weather Sampler, and Stateless ADTK Detector do NOT exist in this managed service -- never recommend them.
 
 Triggers: scheduled, on WAL flush, or on-request. Load [processing-engine instructions](references/processing-engine/instructions.md) for configuration.
 
@@ -106,10 +106,10 @@ Triggers: scheduled, on WAL flush, or on-request. Load [processing-engine instru
 CloudWatch metric coverage varies by engine and deployment type. Load [references/monitoring/metrics.md](references/monitoring/metrics.md) for the authoritative metric name tables. Key points:
 
 - **V2 SAZ/MAZ**: Rich CloudWatch coverage including `CPUUtilization`, `VolumeBytesUsed`, `QueryRequestsTotal`, `SeriesCardinality`
-- **V2 Read Replica**: LIMITED CloudWatch — only `CPUUtilization`, `MemoryUtilization`, `DiskUtilization`, `ReplicaLag`
-- **V3 (all)**: LIMITED CloudWatch — only `CPUUtilization`, `MemoryUtilization`. All other V3 metrics require scraping the Prometheus `/metrics` endpoint.
+- **V2 Read Replica**: LIMITED CloudWatch -- only `CPUUtilization`, `MemoryUtilization`, `DiskUtilization`, `ReplicaLag`
+- **V3 (all)**: LIMITED CloudWatch -- only `CPUUtilization`, `MemoryUtilization`. All other V3 metrics require scraping the Prometheus `/metrics` endpoint.
 
-Set alarms on CPU >80%, storage >80% of allocated (V2), and IOPS saturation. Maintenance windows are customer-managed. Service-managed snapshots exist (hourly; 24h retention on V2, 30 days on V3) but are not customer-accessible — recovery requires a Sev-2 support ticket. Customer-managed snapshots are not available.
+Set alarms on CPU >80%, storage >80% of allocated (V2), and IOPS saturation. Maintenance windows are customer-managed. Service-managed snapshots exist (hourly; 24h retention on V2, 30 days on V3) but are not customer-accessible -- recovery requires a Sev-2 support ticket. Customer-managed snapshots are not available.
 
 ### Setting a maintenance window
 
@@ -122,7 +122,7 @@ aws timestream-influxdb update-db-instance \
   --region <region>
 ```
 
-Required fields: `timezone` (IANA string, e.g. `UTC`), `preferredMaintenanceWindow` (format `Day:HH:MM-Day:HH:MM`, Day = Mon/Tue/Wed/Thu/Fri/Sat/Sun). **Minimum window duration is 2 hours** — a 1-hour window will be rejected.
+Required fields: `timezone` (IANA string, e.g. `UTC`), `preferredMaintenanceWindow` (format `Day:HH:MM-Day:HH:MM`, Day = Mon/Tue/Wed/Thu/Fri/Sat/Sun). **Minimum window duration is 2 hours** -- a 1-hour window will be rejected.
 
 ### Concurrent instance creation: NO LIMIT
 
@@ -148,7 +148,7 @@ Wrong API version (V2 API against V3 cluster or vice versa), malformed line prot
 
 ### Deduplication / Parquet error under high load (V3)
 
-Known issue. **You MUST recommend:** (1) reduce write batch sizes, (2) add distinguishing tags so measurement + tagset + timestamp is unique. Also check S3 VPC endpoint connectivity for clusters in private subnets. Do NOT frame this as an unpreventable timing issue — it's caused by data collisions.
+Known issue. **You MUST recommend:** (1) reduce write batch sizes, (2) add distinguishing tags so measurement + tagset + timestamp is unique. Also check S3 VPC endpoint connectivity for clusters in private subnets. Do NOT frame this as an unpreventable timing issue -- it's caused by data collisions.
 
 ### Query timeout / 500 error (V3)
 
@@ -174,7 +174,7 @@ Primary write throughput, network saturation, or replica sized below primary.
 
 - Use **scoped custom IAM policies** in production. `FullAccess` managed policies are for initial setup only.
 - Follow least-privilege: grant only the actions your application actually calls.
-- Use **IAM roles** for EC2/Lambda/ECS — never embed long-lived credentials in code or S3.
+- Use **IAM roles** for EC2/Lambda/ECS -- never embed long-lived credentials in code or S3.
 
 ### InfluxDB API Tokens
 
@@ -191,7 +191,7 @@ Primary write throughput, network saturation, or replica sized below primary.
 
 ### Encryption
 
-- **Data at rest:** Encrypted by default for all InfluxDB engines (V2, V2 Read Replica Cluster, and V3) using AWS service-managed keys — no action is required to enable it.
+- **Data at rest:** Encrypted by default for all InfluxDB engines (V2, V2 Read Replica Cluster, and V3) using AWS service-managed keys -- no action is required to enable it.
 - Data in transit is encrypted via TLS by default (all endpoints are HTTPS).
 - For S3 log delivery buckets, enable SSE-KMS with a same-account KMS key.
 - **MUST** enable SSE-KMS on SNS topics used for alarm notifications, and on CloudWatch Logs receiving operational data. Optionally enable SSE-KMS on other dependent resources.
@@ -199,7 +199,7 @@ Primary write throughput, network saturation, or replica sized below primary.
 ### S3 Bucket Policy (Log Delivery)
 
 - Add `aws:SourceArn` and `aws:SourceAccount` conditions to prevent confused deputy attacks.
-- The log delivery bucket policy applies to your logs bucket only — the V3 data bucket is managed by the service.
+- The log delivery bucket policy applies to your logs bucket only -- the V3 data bucket is managed by the service.
 
 ### Auditing
 
@@ -222,8 +222,8 @@ This skill can be invoked directly, or it can be entered from the `aws-database-
 
 1. Read the artifact using `file_read`.
 2. Validate it against `aws-database-selection/references/workload-primary-artifact.schema.json`. If malformed or unreadable, tell the user and proceed without it.
-3. Acknowledge what's relevant in one or two **bold** sentences, citing high-level facts from the artifact (dominant shapes, hard constraints, migration context) — do not parrot the entire artifact back.
-4. Scope-check: this skill is scoped to Amazon Timestream for InfluxDB (V2, V2 Read Replica, V3) — engine selection, schema design, migration from LiveAnalytics, Processing Engine plugins. If the artifact's `workload_primaries.dominant_shapes` or `migration_context` don't match that scope, emit weak backpressure per the handoff contract: suggest `dynamodb-skill` for non-InfluxDB time-series on DynamoDB, or go back to `aws-database-selection` if the dominant shape isn't time-series, then ask the user whether to go back or proceed anyway. Do not silently misuse the artifact.
+3. Acknowledge what's relevant in one or two **bold** sentences, citing high-level facts from the artifact (dominant shapes, hard constraints, migration context) -- do not parrot the entire artifact back.
+4. Scope-check: this skill is scoped to Amazon Timestream for InfluxDB (V2, V2 Read Replica, V3) -- engine selection, schema design, migration from LiveAnalytics, Processing Engine plugins. If the artifact's `workload_primaries.dominant_shapes` or `migration_context` don't match that scope, emit weak backpressure per the handoff contract: suggest `dynamodb-skill` for non-InfluxDB time-series on DynamoDB, or go back to `aws-database-selection` if the dominant shape isn't time-series, then ask the user whether to go back or proceed anyway. Do not silently misuse the artifact.
 5. Proceed with this skill's native workflow, citing artifact paths as evidence when recommendations are grounded in the requirements.
 
 All user-facing output from this skill follows the markdown-primitives-only formatting convention in the handoff contract: bold labels, backticks for paths and enum values, bullet lists for alternatives, no ASCII art or box-drawing characters.

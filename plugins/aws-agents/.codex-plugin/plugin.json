@@ -55,7 +55,7 @@
   "interface": {
     "displayName": "AI Agents on AWS",
     "shortDescription": "Build, deploy, and operate AI agents on AWS.",
-    "longDescription": "Complete developer workflow for building AI agents on AWS — scaffolding with Amazon Bedrock AgentCore (Strands, LangGraph), tool integration via Gateway and MCP, multi-agent and A2A orchestration, memory, Cedar policies, evaluation and observability, debugging traces and logs, VPC networking, and production hardening (inbound auth, IAM scoping, rate limiting, cold-start tuning).",
+    "longDescription": "Complete developer workflow for building AI agents on AWS -- scaffolding with Amazon Bedrock AgentCore (Strands, LangGraph), tool integration via Gateway and MCP, multi-agent and A2A orchestration, memory, Cedar policies, evaluation and observability, debugging traces and logs, VPC networking, and production hardening (inbound auth, IAM scoping, rate limiting, cold-start tuning).",
     "defaultPrompt": [
       "How do I build an agent on AWS?",
       "Deploy my agent to AgentCore.",

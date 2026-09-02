@@ -1,4 +1,4 @@
-# RDS for Db2 — High Availability and Disaster Recovery Reference
+# RDS for Db2 -- High Availability and Disaster Recovery Reference
 
 Source blog: https://aws.amazon.com/blogs/database/configure-amazon-rds-for-db2-standby-replicas-for-high-availability-and-faster-disaster-recovery/
 
@@ -8,8 +8,8 @@ Source blog: https://aws.amazon.com/blogs/database/configure-amazon-rds-for-db2-
 
 - Synchronous block-level replication to a standby in a different AZ within the same Region
 - Automatic failover in ~60 seconds if primary fails
-- CNAME endpoint automatically redirects to promoted standby — same endpoint, reconnect required
-- RPO: 0 | RTO: 1–2 minutes
+- CNAME endpoint automatically redirects to promoted standby -- same endpoint, reconnect required
+- RPO: 0 | RTO: 1-2 minutes
 - Enable at creation or via modify:
 
 ```bash
@@ -23,10 +23,10 @@ aws rds modify-db-instance \
 
 ## Standby Replica (cross-region DR)
 
-Uses IBM Db2 HADR in **SUPERASYNC** mode. Asynchronous replication — some data loss possible.
+Uses IBM Db2 HADR in **SUPERASYNC** mode. Asynchronous replication -- some data loss possible.
 
 - Up to 3 standby replicas per primary (same or different Region)
-- Cannot serve reads while in standby mode — promote to standalone for read/write
+- Cannot serve reads while in standby mode -- promote to standalone for read/write
 - License: only 2 vCPUs per replica regardless of instance size
 - Supports Db2 11.5 (both AE and SE, BYOL and Marketplace)
 
@@ -34,7 +34,7 @@ Uses IBM Db2 HADR in **SUPERASYNC** mode. Asynchronous replication — some data
 
 | Feature | RPO | RTO |
 |---|---|---|
-| Multi-AZ | 0 | 1–2 min |
+| Multi-AZ | 0 | 1-2 min |
 | Standby replica (in-region or cross-region) | Seconds | Minutes |
 | PiTR (in-region) | ~5 min | Hours |
 | PiTR (cross-region) | ~25 min | Hours |
@@ -50,7 +50,7 @@ Uses IBM Db2 HADR in **SUPERASYNC** mode. Asynchronous replication — some data
 
 ### Create standby replica (console)
 
-RDS Console → Databases → select instance → Actions → Create replica → Replica mode: Standby → choose region
+RDS Console -> Databases -> select instance -> Actions -> Create replica -> Replica mode: Standby -> choose region
 
 ### Create standby replica (CLI)
 
@@ -67,7 +67,7 @@ aws rds create-db-instance-read-replica \
 ### Promote standby replica
 
 ```bash
-# Console: Databases → select replica → Actions → Promote
+# Console: Databases -> select replica -> Actions -> Promote
 aws rds promote-read-replica \
   --db-instance-identifier <replica-name> \
   --region <dr-region>
@@ -102,7 +102,7 @@ Set a CloudWatch alarm when ReplicaLag exceeds your RTO threshold.
 - Local users are replicated to replicas; master user is NOT replicated (can be modified on replica)
 - Database configurations ARE replicated
 - NOT replicated: storage access aliases, non-inline LOBs, external stored procedure binaries
-- LOAD command runs in non-recoverable mode — data loaded via LOAD is NOT replicated
+- LOAD command runs in non-recoverable mode -- data loaded via LOAD is NOT replicated
 - When replica is created, `BLOCKNONLOGGED` and `LOGINDEXBUILD` are set to YES on primary automatically
 
 ### Delete standby replica
@@ -143,10 +143,10 @@ aws rds describe-db-instances \
 
 Use Amazon Route 53 ARC (Application Recovery Controller) to automate traffic routing without changing application endpoints. See: https://aws.amazon.com/blogs/database/configure-amazon-rds-for-db2-standby-replicas-for-high-availability-and-faster-disaster-recovery/
 
-For the full application-tier colocation pattern — an Auto Scaling group spanning both AZs behind an ALB, EventBridge `failover`-event alerting, and connecting via the RDS endpoint rather than IPs — see `colocation.md`.
+For the full application-tier colocation pattern -- an Auto Scaling group spanning both AZs behind an ALB, EventBridge `failover`-event alerting, and connecting via the RDS endpoint rather than IPs -- see `colocation.md`.
 
 ---
 
 ## Read Replica
 
-RDS for Db2 supports read replicas as a separate feature. Read replicas allow read-only workloads to be offloaded from the primary instance. Standby replicas (DR replicas in mounted/HADR mode) cannot serve reads while in standby mode — they must be promoted to a standalone instance for read/write operations.
+RDS for Db2 supports read replicas as a separate feature. Read replicas allow read-only workloads to be offloaded from the primary instance. Standby replicas (DR replicas in mounted/HADR mode) cannot serve reads while in standby mode -- they must be promoted to a standalone instance for read/write operations.

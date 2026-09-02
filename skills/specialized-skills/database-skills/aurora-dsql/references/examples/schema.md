@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS orders (
 
 ## Schema Design: Index Creation
 
-MUST use `CREATE INDEX ASYNC` (defaults: max 24 indexes per table, 8 columns per index — verify via the AWS MCP Server's `aws___search_documentation` if available, or the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/): `aurora dsql index limits`). Source: Adapted from the Liquibase migration sample listed at the [Aurora DSQL connectivity tools page](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/aws-sdks.html)
+MUST use `CREATE INDEX ASYNC` (defaults: max 24 indexes per table, 8 columns per index -- verify via the AWS MCP Server's `aws___search_documentation` if available, or the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/): `aurora dsql index limits`). Source: Adapted from the Liquibase migration sample listed at the [Aurora DSQL connectivity tools page](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/aws-sdks.html)
 
 ```sql
 CREATE INDEX ASYNC idx_owner_city ON owner(city);

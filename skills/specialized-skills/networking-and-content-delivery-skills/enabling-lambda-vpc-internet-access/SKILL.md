@@ -27,7 +27,7 @@ Check that security group outbound rules allow the necessary ports and that both
 
 ### Network changes not taking effect
 
-VPC networking changes can take 1–2 minutes to propagate. Wait before testing after creating a NAT Gateway or updating route tables.
+VPC networking changes can take 1-2 minutes to propagate. Wait before testing after creating a NAT Gateway or updating route tables.
 
 ### Route table association issues
 

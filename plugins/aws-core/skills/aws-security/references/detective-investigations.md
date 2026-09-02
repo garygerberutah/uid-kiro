@@ -59,7 +59,7 @@ Works from both standalone and delegated administrator accounts.
    aws detective list-indicators --graph-arn <graph-arn> --investigation-id <id>
    ```
 
-3. Group indicators by whatever `IndicatorType` values the API returns. Do not validate against a fixed list — report all types present in the response.
+3. Group indicators by whatever `IndicatorType` values the API returns. Do not validate against a fixed list -- report all types present in the response.
 
    For reference on indicator types, see: https://docs.aws.amazon.com/detective/latest/userguide/investigations-report-understand.html
 
@@ -90,7 +90,7 @@ Works from both standalone and delegated administrator accounts.
 | GraphArn not known | Use `list-graphs` to discover available graphs |
 | Empty investigation list | Confirm Detective is enabled and has processed data |
 | AccessDeniedException | Verify caller is Detective administrator |
-| FAILED investigations | Note in summary — may indicate entity resolution issues |
+| FAILED investigations | Note in summary -- may indicate entity resolution issues |
 
 ## Output Sensitivity
 

@@ -9,12 +9,12 @@
 # Why this exists: the skill's Python scripts already locate their own siblings
 # via __file__, so a caller only needs the skill ROOT once. Hosts install
 # skills in different places (~/.claude, ~/.kiro, ~/.codex, ~/.cursor, a repo
-# checkout, …), so a single hardcoded path is wrong. This script searches a
+# checkout, ...), so a single hardcoded path is wrong. This script searches a
 # host-neutral candidate list and VERIFIES each hit against a sentinel set of
 # files unique to this skill, so it never silently returns the wrong directory.
 #
 # Resolution order (first verified match wins):
-#   1. $DDB_SKILL_DIR                         (explicit override — most reliable)
+#   1. $DDB_SKILL_DIR                         (explicit override -- most reliable)
 #   2. the directory this script lives in's parent (when run by path)
 #   3. $1, if passed                          (a hint the caller supplies)
 #   4. a bounded search under common host roots + the current project

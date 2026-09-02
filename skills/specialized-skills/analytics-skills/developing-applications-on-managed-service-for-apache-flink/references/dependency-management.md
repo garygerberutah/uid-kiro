@@ -114,7 +114,7 @@ The example below defaults to Flink 2.2 properties (recommended for new applicat
             <scope>provided</scope>
         </dependency>
 
-        <!-- Flink Table Runtime — required when application code references
+        <!-- Flink Table Runtime -- required when application code references
              internal Table Runtime types (InternalTypeInfo, RowDataSerializer,
              internal RowData converters). Commonly needed by Iceberg sinks
              that emit/consume RowData on a side output. Provided by MSF at

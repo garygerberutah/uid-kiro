@@ -1,13 +1,13 @@
 ---
 name: aws-security
-description: "Covers AWS security services and workflows — Security Hub V2 (OCSF) findings, connectors, aggregators, automation rules, and security posture summaries; Security Hub CSPM (V1/ASFF) controls and compliance standards; GuardDuty threat findings; Inspector vulnerability findings; Macie sensitive data findings; Detective investigation; and Security Lake configuration and data aggregation. Applicable when questions involve security posture, Exposure findings, CSPM failed controls, threat findings, vulnerability findings, sensitive data findings, automation rules, or cross-service security configuration across AWS environments. Procedures use standard AWS CLI syntax and work with or without the AWS MCP server."
+description: "Covers AWS security services and workflows -- Security Hub V2 (OCSF) findings, connectors, aggregators, automation rules, and security posture summaries; Security Hub CSPM (V1/ASFF) controls and compliance standards; GuardDuty threat findings; Inspector vulnerability findings; Macie sensitive data findings; Detective investigation; and Security Lake configuration and data aggregation. Applicable when questions involve security posture, Exposure findings, CSPM failed controls, threat findings, vulnerability findings, sensitive data findings, automation rules, or cross-service security configuration across AWS environments. Procedures use standard AWS CLI syntax and work with or without the AWS MCP server."
 metadata:
   version: "1"
 ---
 
 # AWS Security
 
-**STOP — Do not answer from general knowledge.** Before responding to any security service question, match the user's request against the sub-skill registry below and follow its procedure. If the procedure says to load a reference file, you MUST read it before providing operational guidance. Never skip the routing step.
+**STOP -- Do not answer from general knowledge.** Before responding to any security service question, match the user's request against the sub-skill registry below and follow its procedure. If the procedure says to load a reference file, you MUST read it before providing operational guidance. Never skip the routing step.
 
 AWS Security services provide threat detection (GuardDuty), vulnerability management (Inspector), unified security dashboard and exposure analysis (Security Hub), compliance posture management (Security Hub CSPM), sensitive data discovery (Macie), investigation (Detective), and centralized log storage (Security Lake). Each service has dedicated reference procedures for configuration review and findings/investigation summarization.
 
@@ -17,7 +17,7 @@ See `references/services-overview.md` for service relationships, data formats, a
 
 ## Global rules
 
-1. **Read-only APIs only.** This skill and all its references use exclusively non-mutating APIs. NEVER reference, recommend, or invoke any API that creates, modifies, deletes, enables, disables, or otherwise mutates resource state or configuration — not even in prose recommendations. See service reference files for the complete allowed API list.
+1. **Read-only APIs only.** This skill and all its references use exclusively non-mutating APIs. NEVER reference, recommend, or invoke any API that creates, modifies, deletes, enables, disables, or otherwise mutates resource state or configuration -- not even in prose recommendations. See service reference files for the complete allowed API list.
 
 2. **No severity judgements on configuration state.** Present what is and is not configured factually. Do not assign severity labels, gap assessments, or editorial framing (e.g., "critical gap", "security issue") to configuration state.
 
@@ -37,13 +37,13 @@ See `references/services-overview.md` for service relationships, data formats, a
 
 ## How this skill works
 
-1. **Find the sub-skill** — Match the user's request against the sub-skill registry below. Match on meaning, not exact wording. If ambiguous, ask: "Are you checking configuration, or do you need a findings summary?"
+1. **Find the sub-skill** -- Match the user's request against the sub-skill registry below. Match on meaning, not exact wording. If ambiguous, ask: "Are you checking configuration, or do you need a findings summary?"
 
-2. **If a sub-skill matches** — read `references/{sub-skill-id}.md` and follow its procedure.
+2. **If a sub-skill matches** -- read `references/{sub-skill-id}.md` and follow its procedure.
 
-3. **If no sub-skill matches** — answer from the service reference files listed below. Load `references/services-overview.md` for cross-service context, or the relevant service reference file (e.g., `references/guardduty.md`) for API scope and severity scoring questions.
+3. **If no sub-skill matches** -- answer from the service reference files listed below. Load `references/services-overview.md` for cross-service context, or the relevant service reference file (e.g., `references/guardduty.md`) for API scope and severity scoring questions.
 
-4. **Cross-service overview** — When the user asks about overall security posture across multiple services, start with `references/services-overview.md`, then route to relevant sub-skills.
+4. **Cross-service overview** -- When the user asks about overall security posture across multiple services, start with `references/services-overview.md`, then route to relevant sub-skills.
 
 ## Sub-skill registry
 
@@ -83,7 +83,7 @@ See `references/services-overview.md` for service relationships, data formats, a
 
 ## Service reference
 
-Load service reference files on demand — only when the current turn requires context about service capabilities, API scope, or severity scoring.
+Load service reference files on demand -- only when the current turn requires context about service capabilities, API scope, or severity scoring.
 
 | Reference | Content | When to Load |
 |-------|---------|-------------|

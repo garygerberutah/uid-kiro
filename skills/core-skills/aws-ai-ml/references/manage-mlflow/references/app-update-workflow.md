@@ -2,7 +2,7 @@
 
 Guides safe updates to an existing MLflow app's configuration.
 
-> **IMPORTANT:** Use only `sagemaker:UpdateMlflowApp`. Do NOT use `UpdateMlflowTrackingServer` (legacy) — that API is deprecated.
+> **IMPORTANT:** Use only `sagemaker:UpdateMlflowApp`. Do NOT use `UpdateMlflowTrackingServer` (legacy) -- that API is deprecated.
 
 ## Step 1: Identify Target App
 
@@ -13,7 +13,7 @@ Guides safe updates to an existing MLflow app's configuration.
 
 Use `aws-mcp` to call `sagemaker:DescribeMlflowApp` with the app ARN. Present the updatable fields with their current values.
 
-Use `aws-mcp` to discover which fields are updatable on the `UpdateMlflowApp` API at runtime — do not hardcode a static field list.
+Use `aws-mcp` to discover which fields are updatable on the `UpdateMlflowApp` API at runtime -- do not hardcode a static field list.
 
 Ask: "Which field would you like to update?"
 

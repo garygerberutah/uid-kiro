@@ -1,20 +1,20 @@
 # Concurrency Safety for LMI
 
-LMI runs multiple invocations concurrently in the same execution environment. The concurrency model differs by runtime — some require thread safety, others provide process isolation.
+LMI runs multiple invocations concurrently in the same execution environment. The concurrency model differs by runtime -- some require thread safety, others provide process isolation.
 
 ## Code Review Checklist
 
 When reviewing a function for LMI readiness, check each item:
 
-- [ ] No shared `/tmp` paths (use request ID in filenames, clean up after — shared across ALL runtimes)
+- [ ] No shared `/tmp` paths (use request ID in filenames, clean up after -- shared across ALL runtimes)
 - [ ] Database connections use pools (initialized outside handler, not per-invocation)
-- [ ] SDK clients outside handler (module-level singletons are fine — they are thread-safe)
+- [ ] SDK clients outside handler (module-level singletons are fine -- they are thread-safe)
 - [ ] Logging includes request ID (for tracing concurrent requests)
 - [ ] **Node.js/Java/.NET only:** No global/static mutable variables (use immutable or request-local state)
 - [ ] **Node.js/Java/.NET only:** Thread-safe libraries only (check DB drivers, HTTP clients, caching libs)
 - [ ] **Node.js/Java/.NET only:** No request state in global scope (use AsyncLocalStorage, ThreadLocal, `AsyncLocal<T>`)
 - [ ] **Node.js/Java/.NET only:** No environment variable mutation during requests
-- [ ] **Python only:** Memory budget accounts for per-process multiplication (memory × concurrency)
+- [ ] **Python only:** Memory budget accounts for per-process multiplication (memory x concurrency)
 
 ## Runtime-Specific Guidance
 
@@ -24,9 +24,9 @@ Python uses **multiple independent processes**, each with its own interpreter an
 
 **Key concerns:**
 
-- Memory consumption: total footprint ≈ per-process memory × concurrency. A 200 MB function with 16 concurrent processes can consume 3+ GB.
-- `/tmp` filesystem is shared across all processes — use `context.aws_request_id` in filenames
-- Each process needs its own connection pool — size pools per-process, not globally
+- Memory consumption: total footprint ~ per-process memory x concurrency. A 200 MB function with 16 concurrent processes can consume 3+ GB.
+- `/tmp` filesystem is shared across all processes -- use `context.aws_request_id` in filenames
+- Each process needs its own connection pool -- size pools per-process, not globally
 - Prefer 4:1 or 8:1 memory-to-vCPU ratio to accommodate memory multiplication
 - Monitor `MemoryUtilization` metric and adjust ratio if needed
 
@@ -48,7 +48,7 @@ The `await` keyword yields control to the event loop, which may execute another 
 - Keep mutable state within handler local scope
 - Initialize SDK clients and DB pools at module level (they are thread-safe)
 - Avoid module-level mutable state (`let count = 0` is a race condition)
-- Callback-based handlers are NOT supported on Node.js 22 — use async handlers
+- Callback-based handlers are NOT supported on Node.js 22 -- use async handlers
 
 ### Java (OS Threads)
 
@@ -72,7 +72,7 @@ Uses a single process with .NET Tasks (same model as ASP.NET Core). The handler 
 - Inject scoped services via DI container
 - Initialize `HttpClient` and SDK clients as singletons
 - Use `ConcurrentDictionary<TKey, TValue>` and `SemaphoreSlim` for thread-safe access
-- Invocation timeouts are NOT enforced by the runtime — use `ILambdaContext.RemainingTime`
+- Invocation timeouts are NOT enforced by the runtime -- use `ILambdaContext.RemainingTime`
 
 ## Common Anti-Patterns
 
@@ -84,7 +84,7 @@ Uses a single process with .NET Tasks (same model as ASP.NET Core). The handler 
 | Mutable module-level state | Node.js, Java, .NET | Race condition / state corruption | Request-local scope or concurrent collections |
 | Setting env vars during request | Node.js, Java, .NET | Race condition | Pass state via parameters |
 | Assuming sequential execution | Node.js, Java, .NET | State corruption | Each invocation must be self-contained |
-| Ignoring memory multiplication | Python | OOM at high concurrency | Account for per-process × concurrency |
+| Ignoring memory multiplication | Python | OOM at high concurrency | Account for per-process x concurrency |
 
 ## Powertools for AWS Lambda Compatibility
 

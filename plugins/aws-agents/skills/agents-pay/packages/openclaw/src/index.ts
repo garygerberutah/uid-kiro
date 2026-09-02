@@ -36,7 +36,7 @@ export const MAX_RETURNED_BODY_BYTES = 10240;
  *
  * Default/absent `config.returnBody` preserves the original behavior exactly:
  * metadata + hash only, never the paid body. Opt-in (`returnBody: true`)
- * additionally returns the body (capped, marked untrusted) — see
+ * additionally returns the body (capped, marked untrusted) -- see
  * references/security-model.md ("Publisher content isolation"): unsanitized
  * paid content may carry prompt injection.
  */

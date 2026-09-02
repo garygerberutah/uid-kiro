@@ -1,6 +1,6 @@
 # policy
 
-Control what your AgentCore agent can do — restrict tool calls, enforce business rules, and protect sensitive operations.
+Control what your AgentCore agent can do -- restrict tool calls, enforce business rules, and protect sensitive operations.
 
 ## When to use
 
@@ -15,7 +15,7 @@ Control what your AgentCore agent can do — restrict tool calls, enforce busine
 `$ARGUMENTS` is optional:
 
 ```
-/policy                     # interactive — asks what you want to restrict
+/policy                     # interactive -- asks what you want to restrict
 /policy generate            # generate Cedar from natural language
 /policy debug               # diagnose why a policy is allowing/denying
 /policy emergency           # generate an emergency shutdown policy
@@ -23,15 +23,15 @@ Control what your AgentCore agent can do — restrict tool calls, enforce busine
 
 ## How AgentCore policy works
 
-AgentCore Policy enforces Cedar-based authorization rules at the **gateway boundary** — before any tool call reaches its target. Every tool call is evaluated against your policies in real time.
+AgentCore Policy enforces Cedar-based authorization rules at the **gateway boundary** -- before any tool call reaches its target. Every tool call is evaluated against your policies in real time.
 
-**Default behavior:** Without a policy engine attached to your gateway, all tool calls are allowed. Once you attach a policy engine, the default is **deny** — you must write explicit `permit` policies for everything you want to allow.
+**Default behavior:** Without a policy engine attached to your gateway, all tool calls are allowed. Once you attach a policy engine, the default is **deny** -- you must write explicit `permit` policies for everything you want to allow.
 
 **Key concepts:**
 
-- **Policy engine** — the container for your policies, attached to a gateway
-- **Policy** — a Cedar rule that permits or forbids specific actions
-- **`forbid` overrides `permit`** — if any forbid policy matches, the action is denied regardless of permit policies
+- **Policy engine** -- the container for your policies, attached to a gateway
+- **Policy** -- a Cedar rule that permits or forbids specific actions
+- **`forbid` overrides `permit`** -- if any forbid policy matches, the action is denied regardless of permit policies
 
 ---
 
@@ -53,7 +53,7 @@ Ask (or infer from `$ARGUMENTS`):
 > 1. Restrict a tool based on input values (e.g., amount < $500)
 > 2. Role-based access (only certain users can call certain tools)
 > 3. Block a specific tool entirely
-> 4. Emergency shutdown — disable all tools immediately
+> 4. Emergency shutdown -- disable all tools immediately
 > 5. Debug why a policy is allowing or denying unexpectedly"
 
 ---
@@ -70,7 +70,7 @@ agentcore add policy-engine \
   --attach-mode LOG_ONLY
 ```
 
-**Start with `LOG_ONLY` mode** — policies are evaluated and logged but not enforced. This lets you verify your policies work correctly before enabling enforcement.
+**Start with `LOG_ONLY` mode** -- policies are evaluated and logged but not enforced. This lets you verify your policies work correctly before enabling enforcement.
 
 Switch to `ENFORCE` when ready:
 
@@ -105,13 +105,13 @@ agentcore deploy -y
 > 2. Get the gateway ARN: `agentcore status --type gateway --json`
 > 3. Add the policy with the real ARN, then deploy again
 >
-> The `-g` / `--generate` flag also requires a deployed gateway — it calls an AWS API
+> The `-g` / `--generate` flag also requires a deployed gateway -- it calls an AWS API
 > that needs the gateway ARN to convert natural language into Cedar. If you run
 > `-g` before deploying the gateway, it will fail.
 
 ### Option 1: Natural language generation (easiest)
 
-**Requires the gateway to be deployed first** — the CLI calls an API that needs the gateway ARN.
+**Requires the gateway to be deployed first** -- the CLI calls an API that needs the gateway ARN.
 
 ```bash
 # Deploy the gateway first
@@ -127,7 +127,7 @@ agentcore add policy \
 
 The CLI generates Cedar from your description, resolves the gateway ARN automatically, and validates the result. Review the generated policy before deploying.
 
-**Policy name rules:** letters, numbers, underscores only — **no hyphens**. `refund-policy` fails; `refund_policy` works.
+**Policy name rules:** letters, numbers, underscores only -- **no hyphens**. `refund-policy` fails; `refund_policy` works.
 
 ### Option 2: Write Cedar directly
 
@@ -146,7 +146,7 @@ agentcore add policy \
 
 ### Cedar syntax reference
 
-**Action name format:** `AgentCore::Action::"TargetName___tool_name"` — three underscores between target name and tool name. This is the most common Cedar mistake.
+**Action name format:** `AgentCore::Action::"TargetName___tool_name"` -- three underscores between target name and tool name. This is the most common Cedar mistake.
 
 ```cedar
 // TargetName is the gateway target name (from agentcore add gateway-target --name)
@@ -158,8 +158,8 @@ AgentCore::Action::"RefundTarget___process_refund"
 
 **Principal types:**
 
-- `AgentCore::OAuthUser` — authenticated user via OAuth/JWT
-- `AgentCore::IamEntity` — IAM-authenticated caller (when gateway uses AWS_IAM auth). The `id` attribute contains the full IAM ARN.
+- `AgentCore::OAuthUser` -- authenticated user via OAuth/JWT
+- `AgentCore::IamEntity` -- IAM-authenticated caller (when gateway uses AWS_IAM auth). The `id` attribute contains the full IAM ARN.
 
 **Resource format:**
 
@@ -223,7 +223,7 @@ forbid(
 );
 ```
 
-**Emergency shutdown — disable all tools:**
+**Emergency shutdown -- disable all tools:**
 
 ```cedar
 forbid(principal, action, resource);
@@ -248,10 +248,10 @@ unless {
 **Always use `hasTag()` before `getTag()`:**
 
 ```cedar
-// ❌ Wrong — throws error if tag doesn't exist
+// [NO] Wrong -- throws error if tag doesn't exist
 when { principal.getTag("role") == "admin" }
 
-// ✅ Correct — check existence first
+// [YES] Correct -- check existence first
 when {
   principal.hasTag("role") &&
   principal.getTag("role") == "admin"
@@ -308,7 +308,7 @@ agentcore deploy -y
 
 **"Access denied" on a tool call you expect to allow:**
 
-1. Check that a `permit` policy exists for this action — remember, default is deny
+1. Check that a `permit` policy exists for this action -- remember, default is deny
 2. Verify the action name format: `TargetName___tool_name` (three underscores)
 3. Verify the resource ARN matches your gateway's actual ARN
 4. Check that `hasTag()` is used before `getTag()` in conditions
@@ -324,7 +324,7 @@ agentcore status --type policy-engine
 You attached a policy engine but haven't written any `permit` policies yet. The default is deny. Write at least one `permit` policy for the actions you want to allow.
 
 **Policy name validation error:**
-Policy names must match `^[A-Za-z][A-Za-z0-9_]*$` — letters, numbers, underscores only, starts with a letter. No hyphens.
+Policy names must match `^[A-Za-z][A-Za-z0-9_]*$` -- letters, numbers, underscores only, starts with a letter. No hyphens.
 
 ---
 

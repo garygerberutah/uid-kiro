@@ -4,7 +4,7 @@
 
 This guide covers building Apache Iceberg applications with Apache Flink on Amazon Managed Service for Apache Flink (MSF): table format selection, write APIs (append, upsert, dynamic, multi-table), distribution modes, read patterns, partitioning strategy, and DDL.
 
-**Mandatory companion file — load before answering catalog or maintenance questions:** [iceberg-tuning-and-operations.md](iceberg-tuning-and-operations.md).
+**Mandatory companion file -- load before answering catalog or maintenance questions:** [iceberg-tuning-and-operations.md](iceberg-tuning-and-operations.md).
 
 If the user asks about these topics, You MUST also load iceberg-tuning-and-operations.md:
 
@@ -16,7 +16,7 @@ If the user asks about these topics, You MUST also load iceberg-tuning-and-opera
 * Iceberg + Flink dependencies / Maven setup
 * Iceberg anti-patterns and monitoring
 
-This file (iceberg-connector-guide.md) does NOT contain the catalog decision matrix or maintenance approaches — those live exclusively in iceberg-tuning-and-operations.md. Answering a catalog or maintenance question from this file alone WILL miss required content.
+This file (iceberg-connector-guide.md) does NOT contain the catalog decision matrix or maintenance approaches -- those live exclusively in iceberg-tuning-and-operations.md. Answering a catalog or maintenance question from this file alone WILL miss required content.
 
 Iceberg version guidance: Use Iceberg 1.10+ for Flink 1.20, which includes IcebergSink (SinkV2), the TableMaintenance streaming API, delete vectors, and the Dynamic Iceberg Sink. For Flink 2.2, use the corresponding Iceberg release that supports the `iceberg-flink-runtime-2.0` artifact.
 
@@ -115,7 +115,7 @@ IcebergSink.forRowData(rowDataStream)
 * Primary key / equality fields must be defined
 * Partition columns must be included in equality fields for HASH distribution
 * OVERWRITE and UPSERT are mutually exclusive
-* Upsert generates equality delete files which accumulate and degrade read performance — compaction is essential
+* Upsert generates equality delete files which accumulate and degrade read performance -- compaction is essential
 * **HASH distribution is required for correctness with upsert.** Without it (distribution mode NONE), Flink uses rebalance to distribute records across writer tasks. If multiple updates to the same key land on different writer tasks within the same checkpoint, the delete file written by one task cannot find the insert written by another, causing duplicate rows. HASH distribution ensures all records for the same equality fields go to the same writer task. This is a correctness requirement, not just a performance optimization.
 
 ### Upsert Mode (SQL)
@@ -223,7 +223,7 @@ Equality deletes are the only viable option for streaming upsert/CDC workloads (
 
 ### Streaming Read (DataStream API)
 
-Streaming reads discover new snapshots at a configurable interval. **Streaming reads only work for append-only tables** — tables with upserts (equality deletes) are NOT supported for streaming reads.
+Streaming reads discover new snapshots at a configurable interval. **Streaming reads only work for append-only tables** -- tables with upserts (equality deletes) are NOT supported for streaming reads.
 
 ```java
 IcebergSource<RowData> source = IcebergSource.forRowData()
@@ -244,11 +244,11 @@ DataStream<RowData> stream = env.fromSource(
 
 **Starting strategies:**
 
-* `INCREMENTAL_FROM_LATEST_SNAPSHOT` — Start from latest snapshot (inclusive), discover new appends
-* `INCREMENTAL_FROM_EARLIEST_SNAPSHOT` — Start from earliest snapshot (inclusive)
-* `TABLE_SCAN_THEN_INCREMENTAL` — Full table scan first, then switch to incremental
-* `INCREMENTAL_FROM_SNAPSHOT_ID` — Start from a specific snapshot ID (inclusive)
-* `INCREMENTAL_FROM_SNAPSHOT_TIMESTAMP` — Start from a specific timestamp (inclusive)
+* `INCREMENTAL_FROM_LATEST_SNAPSHOT` -- Start from latest snapshot (inclusive), discover new appends
+* `INCREMENTAL_FROM_EARLIEST_SNAPSHOT` -- Start from earliest snapshot (inclusive)
+* `TABLE_SCAN_THEN_INCREMENTAL` -- Full table scan first, then switch to incremental
+* `INCREMENTAL_FROM_SNAPSHOT_ID` -- Start from a specific snapshot ID (inclusive)
+* `INCREMENTAL_FROM_SNAPSHOT_TIMESTAMP` -- Start from a specific timestamp (inclusive)
 
 ### Streaming Read (SQL)
 
@@ -374,7 +374,7 @@ When using upsert mode with HASH distribution on a partitioned table, the partit
 .equalityFieldColumns(Arrays.asList("event_id", "event_date", "region"))
 ```
 
-Failing to include partition columns causes incorrect upsert behavior — updates may not find the correct rows to delete.
+Failing to include partition columns causes incorrect upsert behavior -- updates may not find the correct rows to delete.
 
 ## DDL Reference for Iceberg Tables in Flink SQL
 
@@ -412,7 +412,7 @@ ALTER TABLE my_table RENAME TO new_table_name;
 
 ### Flink DDL Limitations
 
-* No hidden partitioning transforms (`day()`, `bucket()`, `truncate()`) in DDL — use DataStream API or pre-computed columns
+* No hidden partitioning transforms (`day()`, `bucket()`, `truncate()`) in DDL -- use DataStream API or pre-computed columns
 * No computed columns
 * No watermark definitions in DDL
 * Column and partition changes not supported via ALTER TABLE

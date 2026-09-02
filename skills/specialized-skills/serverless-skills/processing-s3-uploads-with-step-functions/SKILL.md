@@ -16,7 +16,7 @@ version: 1
 
 This skill deploys an event-driven workflow using AWS CLI. When a file is uploaded to
 an S3 bucket, EventBridge triggers a Step Functions state machine. The state machine
-checks the file size and routes processing to either a Lambda function (files ≤ 6 MB)
+checks the file size and routes processing to either a Lambda function (files <= 6 MB)
 or a Fargate task (files > 6 MB).
 
 The architecture includes:
@@ -38,15 +38,15 @@ Use this skill when:
 
 Do not use this skill when:
 
-- All files are small enough for Lambda (use S3 → Lambda directly)
+- All files are small enough for Lambda (use S3 -> Lambda directly)
 - You need real-time streaming (use Kinesis)
 - You don't need file-size-based routing
 
 ## Prerequisites
 
-1. **AWS CLI v2** — Installed and configured. Verify with `aws sts get-caller-identity`.
-2. **Python 3.12** — For the Lambda function runtime.
-3. **Docker** — For building and pushing the Fargate container image.
+1. **AWS CLI v2** -- Installed and configured. Verify with `aws sts get-caller-identity`.
+2. **Python 3.12** -- For the Lambda function runtime.
+3. **Docker** -- For building and pushing the Fargate container image.
 
 ## Parameters
 
@@ -323,7 +323,7 @@ Constraints:
 
 - Fargate tasks with public IPs are exposed to the internet. Revoke the default allow-all egress rule and configure scoped egress: `aws ec2 revoke-security-group-egress --group-id {sg_id} --ip-permissions IpProtocol=-1,IpRanges='[{CidrIp=0.0.0.0/0}]'` then add `aws ec2 authorize-security-group-egress --group-id {sg_id} --protocol tcp --port 443 --cidr 0.0.0.0/0` and `aws ec2 authorize-security-group-egress --group-id {sg_id} --protocol udp --port 53 --cidr 0.0.0.0/0`. For production, consider using VPC endpoints for S3 and CloudWatch Logs instead of internet-routed traffic.
 - Scan container images for vulnerabilities before pushing to ECR. Enable ECR image scanning with: `aws ecr put-image-scanning-configuration --repository-name {ecr_repo_name} --image-scanning-configuration scanOnPush=true --region {region}`
-- Use IAM roles for credentials — never hardcode access keys in container code.
+- Use IAM roles for credentials -- never hardcode access keys in container code.
 - Enable encryption at rest for the S3 bucket: `aws s3api put-bucket-encryption --bucket {bucket_name} --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms"}}]}'`
 - Enable CloudWatch Logs encryption for Fargate container logs: `aws logs associate-kms-key --log-group-name /StepFunctionFargateTask --kms-key-arn <KMS_KEY_ARN>`
 - Configure a Dead Letter Queue on the EventBridge rule for failed invocations

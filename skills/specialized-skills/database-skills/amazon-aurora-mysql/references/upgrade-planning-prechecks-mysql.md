@@ -6,7 +6,7 @@ Run these against the database to identify actual upgrade blockers and behavior 
 
 ### SSM Run Command with IAM Authentication (preferred)
 
-IAM database authentication eliminates passwords entirely — the mysql client authenticates with a short-lived token generated from IAM credentials. Requires IAM auth enabled on the cluster and a database account configured for IAM auth.
+IAM database authentication eliminates passwords entirely -- the mysql client authenticates with a short-lived token generated from IAM credentials. Requires IAM auth enabled on the cluster and a database account configured for IAM auth.
 
 ```bash
 aws ssm send-command --instance-ids {instance_id} --document-name "AWS-RunShellScript" \
@@ -80,7 +80,7 @@ Flag: `mysql_native_password` still works but deprecated. `sha256_password` repl
 XA RECOVER;
 ```
 
-Flag: 🔴 Any results BLOCK the upgrade. Must commit or rollback first.
+Flag: [RED] Any results BLOCK the upgrade. Must commit or rollback first.
 
 ### 4. Server Character Set and Collation
 
@@ -88,7 +88,7 @@ Flag: 🔴 Any results BLOCK the upgrade. Must commit or rollback first.
 SELECT @@character_set_server, @@collation_server, @@character_set_database, @@collation_database;
 ```
 
-Flag: If `latin1` — MySQL 8.0 defaults to `utf8mb4`. New objects will differ unless parameter group preserves it.
+Flag: If `latin1` -- MySQL 8.0 defaults to `utf8mb4`. New objects will differ unless parameter group preserves it.
 
 ### 5. Schema-Level Character Sets
 
@@ -111,12 +111,12 @@ Interpretation:
 
 | Variable | Issue if... | Impact |
 |----------|------------|--------|
-| `query_cache_type=ON` | 🔴 Query cache REMOVED in 8.0 | Performance regression likely |
+| `query_cache_type=ON` | [RED] Query cache REMOVED in 8.0 | Performance regression likely |
 | `query_cache_size>0` | Memory was allocated to cache | Will be freed after upgrade |
-| `sql_mode=''` (empty) | 🟡 8.0 defaults to strict mode | Apps may break unless preserved |
-| `show_compatibility_56=ON` | 🔴 REMOVED in 8.0 | Monitoring querying INFORMATION_SCHEMA.GLOBAL_STATUS breaks |
-| `log_warnings` | 🟡 REMOVED in 8.0 | Replace with `log_error_verbosity` |
-| `innodb_strict_mode=OFF` | 🟡 8.0 defaults to ON | Preserve in parameter group |
+| `sql_mode=''` (empty) | [YELLOW] 8.0 defaults to strict mode | Apps may break unless preserved |
+| `show_compatibility_56=ON` | [RED] REMOVED in 8.0 | Monitoring querying INFORMATION_SCHEMA.GLOBAL_STATUS breaks |
+| `log_warnings` | [YELLOW] REMOVED in 8.0 | Replace with `log_error_verbosity` |
+| `innodb_strict_mode=OFF` | [YELLOW] 8.0 defaults to ON | Preserve in parameter group |
 
 ### 7. Stored Procedures and Functions
 
@@ -138,7 +138,7 @@ SELECT EVENT_SCHEMA, EVENT_NAME, DEFINER FROM information_schema.EVENTS
 WHERE DEFINER = '' OR DEFINER IS NULL;
 ```
 
-Flag: 🔴 Null definers cause precheck failures.
+Flag: [RED] Null definers cause precheck failures.
 
 ### 9. Partitioned Tables
 
@@ -177,7 +177,7 @@ WHERE user NOT IN ('rdsadmin','mysql.sys','rdsrepladmin');
 
 ### 12. Stale Table Statistics
 Query `mysql.innodb_table_stats.last_update` (when InnoDB last **recalculated stats**),
-not `information_schema.TABLES.UPDATE_TIME` (last DML — doesn't reflect stats freshness):
+not `information_schema.TABLES.UPDATE_TIME` (last DML -- doesn't reflect stats freshness):
 
 ```sql
 SELECT database_name, table_name, last_update,
@@ -188,14 +188,14 @@ AND (last_update IS NULL OR DATEDIFF(NOW(), last_update) > 7)
 ORDER BY days_since_stats_update DESC;
 ```
 
-Flag: 🟡 If stats are older than 7 days, recommend running `ANALYZE TABLE` on affected tables before the upgrade. Stale statistics can cause the 8.0 optimizer (more cost-based than 5.7) to choose suboptimal plans right after upgrade. `ANALYZE TABLE` alone refreshes statistics — do NOT run `OPTIMIZE TABLE` routinely: on Aurora's InnoDB it triggers a full table rebuild (`ALTER TABLE ... FORCE`) under a metadata lock, warranted only for genuine dead-row bloat (high `DATA_FREE`), not for refreshing stats.
+Flag: [YELLOW] If stats are older than 7 days, recommend running `ANALYZE TABLE` on affected tables before the upgrade. Stale statistics can cause the 8.0 optimizer (more cost-based than 5.7) to choose suboptimal plans right after upgrade. `ANALYZE TABLE` alone refreshes statistics -- do NOT run `OPTIMIZE TABLE` routinely: on Aurora's InnoDB it triggers a full table rebuild (`ALTER TABLE ... FORCE`) under a metadata lock, warranted only for genuine dead-row bloat (high `DATA_FREE`), not for refreshing stats.
 
 Action: For each table with stale stats:
 
 ```sql
 ANALYZE TABLE schema_name.table_name;
 -- Only if the table ALSO has significant dead-row bloat (high DATA_FREE), and in a
--- maintenance window — this rebuilds the table under a metadata lock:
+-- maintenance window -- this rebuilds the table under a metadata lock:
 -- OPTIMIZE TABLE schema_name.table_name;
 ```
 
@@ -203,6 +203,6 @@ ANALYZE TABLE schema_name.table_name;
 
 After running queries, generate:
 
-1. Categorized findings (🔴/🟡/🟢)
+1. Categorized findings ([RED]/[YELLOW]/[GREEN])
 2. For each finding: what was found, why it matters, action to take
 3. Recommended parameter group for target version preserving current behavior

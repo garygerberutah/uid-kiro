@@ -1,4 +1,4 @@
-# HISTORICAL INVENTORY ONLY — this lock file is intentionally inactive.
+# HISTORICAL INVENTORY ONLY -- this lock file is intentionally inactive.
 # It records the provider used to produce the inert topology snapshot.
 
 provider "registry.terraform.io/hashicorp/aws" {

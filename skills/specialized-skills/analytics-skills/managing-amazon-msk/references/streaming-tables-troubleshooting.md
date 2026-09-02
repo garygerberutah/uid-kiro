@@ -1,4 +1,4 @@
-# Streaming Tables — Troubleshooting
+# Streaming Tables -- Troubleshooting
 
 ## Channel States
 
@@ -8,7 +8,7 @@
 | `ACTIVE` | Delivering data |
 | `UPDATING` | Config change in progress (still delivering) |
 | `DELETING` | Being removed |
-| `FAILED` | Creation failed — check DescribeChannel + CW Logs |
+| `FAILED` | Creation failed -- check DescribeChannel + CW Logs |
 
 ## Channel Creation Failures
 
@@ -23,7 +23,7 @@ Provisioning is in progress. Run `aws kafka describe-channel` to monitor. If it 
 | Cause | Fix |
 |---|---|
 | Trust policy missing `kafka.amazonaws.com` | Fix trust policy principal and conditions |
-| Destination bucket doesn't exist | Create the S3 Table bucket in the same Region as the cluster. The Iceberg **table** is auto-created by Streaming Tables (`enableTableCreation: true`) — you **must not** pre-create the Iceberg table; pre-creating it will break Streaming Tables delivery. Only the bucket must exist. |
+| Destination bucket doesn't exist | Create the S3 Table bucket in the same Region as the cluster. The Iceberg **table** is auto-created by Streaming Tables (`enableTableCreation: true`) -- you **must not** pre-create the Iceberg table; pre-creating it will break Streaming Tables delivery. Only the bucket must exist. |
 | Schema can't be resolved from GSR | Verify: `aws glue get-schema --schema-id SchemaArn=<ARN>` |
 | Missing IAM permissions | Compare role policy against reference in [streaming-tables.md](streaming-tables.md) or [data-delivery-for-general-purpose-s3.md](data-delivery-for-general-purpose-s3.md) |
 | Wrong catalog ARN | Must be `arn:aws:glue:REGION:ACCOUNT_ID:catalog/s3tablescatalog/BUCKET` |
@@ -36,10 +36,10 @@ Provisioning is in progress. Run `aws kafka describe-channel` to monitor. If it 
 
 ### No data at destination
 
-1. Check `BytesIn` metric — if zero, no data being produced
+1. Check `BytesIn` metric -- if zero, no data being produced
 2. Check CloudWatch Logs for `AccessDenied`
 3. Verify producers are actively writing
-4. **No backfill** — only data produced AFTER enablement is delivered
+4. **No backfill** -- only data produced AFTER enablement is delivered
 
 ### Data freshness exceeds configured interval
 

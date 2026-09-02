@@ -22,7 +22,7 @@ These errors are returned immediately by the API call itself (`start-*`, `create
 | `ResourceQuotaExceededFault` | `create-*` / `start-*` calls | Account quota exceeded | Check Service Quotas console and request an increase for the relevant DMS resource |
 | `KMSKeyNotAccessibleFault` | `start-*` calls | DMS cannot access the KMS key | Check the KMS key policy allows the DMS service principal for the region |
 | `S3AccessDeniedFault` | `start-*` calls | DMS cannot access the S3 bucket | Verify the S3 role trust policy includes `dms.<region>.amazonaws.com` and the bucket policy does not block DMS |
-| `S3ResourceNotFoundFault` | `start-*` calls | S3 bucket does not exist | Validate: `aws s3api head-bucket --bucket <bucket_name>` — offer to create if missing |
+| `S3ResourceNotFoundFault` | `start-*` calls | S3 bucket does not exist | Validate: `aws s3api head-bucket --bucket <bucket_name>` -- offer to create if missing |
 | `InvalidSubnet` | `create-replication-subnet-group` | Subnets not in at least 2 AZs or wrong VPC | Re-run Phase 4b of the setup wizard with corrected subnet IDs |
 | `EntityAlreadyExists` | IAM `create-role` / `create-policy` | IAM resource already exists | Retrieve existing ARN: `aws iam get-role --role-name <name>` or `aws iam get-policy --policy-arn <arn>` |
 | `ResourceExistsException` | `secretsmanager create-secret` | Secret already exists | Retrieve existing ARN: `aws secretsmanager describe-secret --secret-id <name>` |
@@ -33,13 +33,13 @@ These errors are returned immediately by the API call itself (`start-*`, `create
 
 These errors do not fail the initial API call. The operation starts successfully but later transitions to a `failed` status, visible when checking the corresponding `describe-*` command (see [schema-conversion-operations.md](schema-conversion-operations.md) for the full list).
 
-### Step 1 — Retrieve the error message
+### Step 1 -- Retrieve the error message
 
 Use the corresponding `describe-*` command for the operation that failed (e.g., `describe-metadata-model-imports`, `describe-metadata-model-conversions`, `describe-metadata-model-assessments`, `describe-metadata-model-creations`, `describe-metadata-model-exports-as-script`). Extract `ErrorDetails.defaultErrorDetails.message` and match it to a group below.
 
 ---
 
-### Group 1 — Database Credentials
+### Group 1 -- Database Credentials
 
 **Messages:**
 
@@ -62,7 +62,7 @@ Use the corresponding `describe-*` command for the operation that failed (e.g., 
 
 ---
 
-### Group 2 — Database Connectivity
+### Group 2 -- Database Connectivity
 
 **Messages:**
 
@@ -80,12 +80,12 @@ Use the corresponding `describe-*` command for the operation that failed (e.g., 
      --filters Name=data-provider-identifier,Values=<project_name>-source
    ```
 
-2. Check security group egress rules — see [Verify Connectivity](#verify-connectivity).
+2. Check security group egress rules -- see [Verify Connectivity](#verify-connectivity).
 3. Confirm the database is running and reachable from the configured subnets.
 
 ---
 
-### Group 3 — Database Not Found
+### Group 3 -- Database Not Found
 
 **Messages:**
 
@@ -114,7 +114,7 @@ Use the corresponding `describe-*` command for the operation that failed (e.g., 
 
 ---
 
-### Group 4 — S3 Access and Configuration
+### Group 4 -- S3 Access and Configuration
 
 **Messages:**
 
@@ -163,7 +163,7 @@ Use the corresponding `describe-*` command for the operation that failed (e.g., 
 
 ---
 
-### Group 5 — S3 Versioning
+### Group 5 -- S3 Versioning
 
 **Message:**
 
@@ -190,7 +190,7 @@ Use the corresponding `describe-*` command for the operation that failed (e.g., 
 
 ---
 
-### Group 6 — Secrets Manager Access
+### Group 6 -- Secrets Manager Access
 
 **Messages:**
 
@@ -231,7 +231,7 @@ Use the corresponding `describe-*` command for the operation that failed (e.g., 
 
 ---
 
-### Group 7 — SSL / Certificate
+### Group 7 -- SSL / Certificate
 
 **Message:**
 
@@ -245,7 +245,7 @@ Use the corresponding `describe-*` command for the operation that failed (e.g., 
 
 ---
 
-### Group 8 — Insufficient Database Privileges
+### Group 8 -- Insufficient Database Privileges
 
 **Message:**
 
@@ -261,7 +261,7 @@ Use the corresponding `describe-*` command for the operation that failed (e.g., 
 
 ---
 
-### Group 9 — Project / Configuration Issues
+### Group 9 -- Project / Configuration Issues
 
 **Messages:**
 
@@ -286,7 +286,7 @@ Use the corresponding `describe-*` command for the operation that failed (e.g., 
 
 ---
 
-### Group 10 — Capacity / Transient Errors
+### Group 10 -- Capacity / Transient Errors
 
 **Messages:**
 
@@ -299,7 +299,7 @@ These are transient errors. Wait 5 minutes and retry the operation.
 
 ---
 
-#### Step 2 — Retry
+#### Step 2 -- Retry
 
 After the customer confirms the fix, ask:
 > "Would you like to retry the operation? (yes / no)"
@@ -308,7 +308,7 @@ If yes, return to the appropriate action. If no, return to the [Actions Menu](..
 
 ---
 
-### Group 8 — Offline Source Import Failure (Unexpected application error)
+### Group 8 -- Offline Source Import Failure (Unexpected application error)
 
 **Messages:**
 
@@ -333,7 +333,7 @@ If yes, return to the appropriate action. If no, return to the [Actions Menu](..
    aws s3 cp <S3Path><first_file.sql> - | head -5
    ```
 
-   Look for `USE [<name>]` or `CREATE DATABASE [<name>]`. Do not log or persist this output — DDL content may contain sensitive schema information. Use it only transiently to extract the database name.
+   Look for `USE [<name>]` or `CREATE DATABASE [<name>]`. Do not log or persist this output -- DDL content may contain sensitive schema information. Use it only transiently to extract the database name.
 
 3. If the configured `DatabaseName` does not match the database name in the DDL scripts, modify the data provider with the corrected `DatabaseName`. Keep all other settings (ServerName, Port, SslMode, S3Path, S3AccessRoleArn) unchanged from the describe output.
 
@@ -343,7 +343,7 @@ If yes, return to the appropriate action. If no, return to the [Actions Menu](..
    aws s3 cp s3://<artifacts_bucket>/<project_name>-migration-project/ddl-statistics/ds.csv -
    ```
 
-   Look for files with `FAILED` status in the CSV — these indicate individual DDL parsing errors.
+   Look for files with `FAILED` status in the CSV -- these indicate individual DDL parsing errors.
 
 5. Retry the import after the fix.
 

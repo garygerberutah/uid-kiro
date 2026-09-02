@@ -21,8 +21,8 @@ version: 3
 ## Overview
 
 This skill helps customers migrate self-managed Apache Kafka workloads to Amazon MSK
-Express. It provides three phases — **Discovery**, **Assessment**, and an optional
-**Simulation** — that can be run end-to-end or individually depending on the customer's needs.
+Express. It provides three phases -- **Discovery**, **Assessment**, and an optional
+**Simulation** -- that can be run end-to-end or individually depending on the customer's needs.
 
 ## Scope
 
@@ -46,21 +46,21 @@ Explain what this skill offers:
 
 > This skill helps you migrate to MSK Express in three phases:
 >
-> **Phase 1 — Discovery:** Inventory your source Kafka cluster — brokers, topics,
-> partition counts, configs, authentication, and workload metrics — plus two target
+> **Phase 1 -- Discovery:** Inventory your source Kafka cluster -- brokers, topics,
+> partition counts, configs, authentication, and workload metrics -- plus two target
 > decisions that drive cost: consumer rack affinity and any negotiated AWS pricing.
 > I can discover this from IaC files (Terraform, CDK, Docker Compose, Kubernetes
 > manifests), provide commands for you to run on your cluster, or you can provide the
 > information manually. Output: `migrate-to-msk-skill-artifacts/<cluster_name>/cluster-config.json`.
 >
-> **Phase 2 — Assessment:** Validate your cluster against MSK Express across 5
+> **Phase 2 -- Assessment:** Validate your cluster against MSK Express across 5
 > compatibility pillars (topology, Kafka version, configs, auth, quotas) and produce
 > a target Express specification using the managing-amazon-msk Skill's pricing logic.
 > I'll flag what Express will refuse vs what Express will silently convert. Outputs:
 > `compatibility.<cluster_name>.json`, the pricing results in Markdown `msk_sizing_pricing.md`,
 > and `msk-sizing-inputs.<cluster_name>.json`.
 >
-> **Phase 3 — Simulation:** Spin up an MSK Express cluster with load-testing
+> **Phase 3 -- Simulation:** Spin up an MSK Express cluster with load-testing
 > infrastructure to see how Express performs on your own workload, then run a vended
 > test (End-to-End Latency or Broker Restart Under Load) and review the results on a
 > CloudWatch dashboard.
@@ -76,13 +76,13 @@ Explain what this skill offers:
 **Guardrails for this overview response:**
 
 - This response is an overview and a routing question only. Do NOT begin, simulate, or pre-empt any phase.
-- Do NOT produce or estimate assessment output here — no verdicts, pillar findings, compatibility conclusions, broker counts, instance recommendations, or cost figures. Those values exist only after you run the Phase 2 scripts against a real `cluster-config.json`.
+- Do NOT produce or estimate assessment output here -- no verdicts, pillar findings, compatibility conclusions, broker counts, instance recommendations, or cost figures. Those values exist only after you run the Phase 2 scripts against a real `cluster-config.json`.
 - Do NOT open, read, or summarize the internals of `compatibility.py`, `simulation_load_test_config.py`, or the reference files to explain how a phase works. Describe the phases at the level shown above; do not walk the customer through the implementation.
-- When the customer chooses a phase, run that phase's scripts or flow to produce real results. Always operate the skill to answer — never answer from having read its source. For the exact commands, see "Running the assessment" in [references/assessment-compatibility.md](references/assessment-compatibility.md) for Phase 2, and [references/simulation.md](references/simulation.md) for Phase 3.
+- When the customer chooses a phase, run that phase's scripts or flow to produce real results. Always operate the skill to answer -- never answer from having read its source. For the exact commands, see "Running the assessment" in [references/assessment-compatibility.md](references/assessment-compatibility.md) for Phase 2, and [references/simulation.md](references/simulation.md) for Phase 3.
 
 ### 2. Discovery intent (DEFAULT when IaC files are provided)
 
-If the customer provides a directory path, IaC files, or says "here's our infra" —
+If the customer provides a directory path, IaC files, or says "here's our infra" --
 this is discovery intent. Run ONLY Phase 1 (Discovery). Do NOT run assessment,
 do NOT suggest migration steps, do NOT mention blockers or compatibility.
 Produce the `migrate-to-msk-skill-artifacts/<cluster_name>/cluster-config.json` file and stop.
@@ -96,8 +96,8 @@ already produced. Run Phase 2 (Assessment) only.
 
 Customer wants to test MSK Express with their workload. They can provide cluster
 sizing directly (instance type, broker count, Kafka version) or reference an earlier
-assessment. Proceed directly to [Phase 3 — Simulation](#phase-3--simulation-optional).
-An assessment is helpful but not required — the simulation asks for sizing inputs
+assessment. Proceed directly to [Phase 3 -- Simulation](#phase-3--simulation-optional).
+An assessment is helpful but not required -- the simulation asks for sizing inputs
 directly.
 
 ### 5. Informational questions
@@ -123,7 +123,7 @@ and answer based on knowledge of AWS MSK.
 
 ---
 
-## Phase 1 — Discovery
+## Phase 1 -- Discovery
 
 **Purpose:** Inventory the source cluster to build a migration profile.
 
@@ -133,7 +133,7 @@ and answer based on knowledge of AWS MSK.
 - Output from Kafka CLI commands the customer runs on their cluster
 - Manual information provided by the customer in conversation
 
-**Output:** `migrate-to-msk-skill-artifacts/<cluster_name>/cluster-config.json` — saved to the working directory.
+**Output:** `migrate-to-msk-skill-artifacts/<cluster_name>/cluster-config.json` -- saved to the working directory.
 
 ### Discovery rules
 
@@ -147,7 +147,7 @@ and answer based on knowledge of AWS MSK.
 
 ---
 
-## Phase 2 — Assessment
+## Phase 2 -- Assessment
 
 **Purpose:** Assess the cluster against MSK Express requirements and produce a target
 Express specification (instance type, broker count, monthly cost projection).
@@ -156,19 +156,19 @@ Express specification (instance type, broker count, monthly cost projection).
 
 **Outputs:**
 
-- `migrate-to-msk-skill-artifacts/<cluster_name>/compatibility.<cluster_name>.json` — five-pillar verdict.
-- `migrate-to-msk-skill-artifacts/<cluster_name>/msk_sizing_pricing.md` — the managing-amazon-msk Skill's pricing report with broker count and cost recommendations.
-- `migrate-to-msk-skill-artifacts/<cluster_name>/msk-sizing-inputs.<cluster_name>.json` — a record of the six input values for sizing logic.
+- `migrate-to-msk-skill-artifacts/<cluster_name>/compatibility.<cluster_name>.json` -- five-pillar verdict.
+- `migrate-to-msk-skill-artifacts/<cluster_name>/msk_sizing_pricing.md` -- the managing-amazon-msk Skill's pricing report with broker count and cost recommendations.
+- `migrate-to-msk-skill-artifacts/<cluster_name>/msk-sizing-inputs.<cluster_name>.json` -- a record of the six input values for sizing logic.
 
 Assessment has two independent halves; run them in either order, and a failure in
 one does not block the other:
 
-- **Compatibility** — `scripts/compatibility.py`, a pure file processor (no live
+- **Compatibility** -- `scripts/compatibility.py`, a pure file processor (no live
   AWS API calls) run via `uv run` with PEP 723 inline dependencies. It validates
-  the source across five pillars — topology, Kafka version, configs, auth, and
-  quotas — and emits one verdict per pillar (`INFO`, `ADVISORY`, or
+  the source across five pillars -- topology, Kafka version, configs, auth, and
+  quotas -- and emits one verdict per pillar (`INFO`, `ADVISORY`, or
   `ACTION_REQUIRED`, worst-of for the overall). Use those three strings verbatim.
-- **Sizing** — not a script in this skill. Load the managing-amazon-msk Skill and
+- **Sizing** -- not a script in this skill. Load the managing-amazon-msk Skill and
   run its `scripts/msk_sizing.py` with the workload inputs derived from
   `cluster-config.json`, passing `--broker-classes express`.
 
@@ -180,13 +180,13 @@ one does not block the other:
   and the **required response template** covering both artifacts. Do not freestyle
   the post-script summary.
 - Read [references/assessment-sizing.md](references/assessment-sizing.md) before
-  running sizing. It carries the input derivations (several are not one-to-one —
+  running sizing. It carries the input derivations (several are not one-to-one --
   getting them wrong silently produces a wrong broker count), the `target`-block
   flags for rack affinity and negotiated discounts, the Express-only presentation
   rule, and the source-footprint comparison.
 - Surface any `ACTION_REQUIRED` evidence to the user for awareness, but do not gate further phases on it. Express may still accept the workload with mitigations.
 - **Do NOT pivot back into discovery.** Assessment operates on the existing
-  `cluster-config.json` as-is. Partial data is fine — the scripts emit ADVISORY
+  `cluster-config.json` as-is. Partial data is fine -- the scripts emit ADVISORY
   evidence (`METRICS_MISSING`, `AZ_COUNT_UNKNOWN`, etc.) for missing fields;
   surface those findings and stop. Do not propose Kafka CLI commands, IaC walks,
   scripts, or questionnaires to fill the gaps.
@@ -195,7 +195,7 @@ one does not block the other:
 
 ---
 
-## Phase 3 — Simulation (optional)
+## Phase 3 -- Simulation (optional)
 
 Deploy a temporary, isolated MSK Express cluster and client fleet in the
 customer's account so they can see how Express performs on their own workload, then
@@ -211,7 +211,7 @@ static [assets/simulation-stack.yaml](assets/simulation-stack.yaml).
 ## Execution model
 
 Scripts run on the customer's local machine via `uv run`. They declare their own
-dependencies (PEP 723) and are pure file processors — no AWS API calls, no
+dependencies (PEP 723) and are pure file processors -- no AWS API calls, no
 network access, and no third-party dependencies (standard library only).
 
 ## Security Considerations
@@ -226,11 +226,11 @@ and [MSK IAM access control](https://docs.aws.amazon.com/msk/latest/developergui
 2. **Encryption at rest (mandatory).** Provision the target cluster with a
    customer-managed KMS key (or AWS-managed if your compliance posture allows).
 
-3. **Authentication — prefer IAM over long-lived credentials.** Configure the
+3. **Authentication -- prefer IAM over long-lived credentials.** Configure the
    MSK Express target with IAM authentication as the sole client auth method.
    This gives ephemeral, role-based credentials with full CloudTrail coverage.
 
-4. **Credential storage — use AWS Secrets Manager.** Store SASL/SCRAM and TLS
+4. **Credential storage -- use AWS Secrets Manager.** Store SASL/SCRAM and TLS
    credentials for source cluster access in Secrets Manager. Never pass passwords
    as CLI arguments.
 
@@ -240,13 +240,13 @@ and [MSK IAM access control](https://docs.aws.amazon.com/msk/latest/developergui
 
 6. **CloudTrail logging and CloudWatch alarms.** Ensure CloudTrail is enabled in
    the target account and covers `kafka.amazonaws.com` API calls. Configure alarms:
-   - `ClientAuthenticationFailure` — surge indicates credential problems or attack
-   - `ConnectionCloseCount` — abnormal spike may indicate connection-flooding
+   - `ClientAuthenticationFailure` -- surge indicates credential problems or attack
+   - `ConnectionCloseCount` -- abnormal spike may indicate connection-flooding
    - CloudTrail metric filters for denied `kafka-cluster:*` actions
    - Connection-rate alarms approaching the 100 conn/sec/broker IAM limit
 
 7. **Sensitive data handling.** Discovery and assessment outputs contain broker
-   addresses, auth hints, and broker config values. Treat these as sensitive — do
+   addresses, auth hints, and broker config values. Treat these as sensitive -- do
    not paste into public channels or ticketing systems without redaction.
 
 ## Troubleshooting

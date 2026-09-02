@@ -1,6 +1,6 @@
-# RDS for Oracle — Node.js
+# RDS for Oracle -- Node.js
 
-Driver: **`node-oracledb`** ≥ 6.x. Thin mode is default — no Oracle Instant Client needed.
+Driver: **`node-oracledb`** >= 6.x. Thin mode is default -- no Oracle Instant Client needed.
 
 ```bash
 npm install oracledb
@@ -14,7 +14,7 @@ const oracledb = require('oracledb');
 async function run() {
   const conn = await oracledb.getConnection({
     user: 'dbadmin',
-    password: '<from-secrets-manager>',  // fetch at runtime; see connection-auth.md section (b) — via AWS Secrets Manager
+    password: '<from-secrets-manager>',  // fetch at runtime; see connection-auth.md section (b) -- via AWS Secrets Manager
     connectString: 'mydb.xxxxxxxxxxxx.us-east-1.rds.amazonaws.com:1521/ORCL'
   });
   const result = await conn.execute('SELECT sysdate FROM dual');
@@ -83,7 +83,7 @@ async function shutdown() {
 }
 ```
 
-`conn.close()` in a `finally` block is essential — missing it leaks connections.
+`conn.close()` in a `finally` block is essential -- missing it leaks connections.
 
 ### Pool with Secrets Manager (AWS SDK v3)
 
@@ -115,7 +115,7 @@ Use the v3 SDK (`@aws-sdk/client-secrets-manager`), not the legacy `aws-sdk` v2.
 | Medium | 2 | 10 | 1 |
 | High | 5 | 20 | 2 |
 
-`poolMax` ≤ RDS `max_connections` / number of app instances.
+`poolMax` <= RDS `max_connections` / number of app instances.
 
 ## Express app example
 
@@ -184,7 +184,7 @@ exports.handler = async (event) => {
 };
 ```
 
-Keep `poolMax` low (1-2) — total Oracle connections = concurrent Lambda instances × `poolMax`.
+Keep `poolMax` low (1-2) -- total Oracle connections = concurrent Lambda instances x `poolMax`.
 
 ## TLS/TCPS thin mode
 
@@ -215,9 +215,9 @@ try {
   const conn = await oracledb.getConnection({ /* ... */ });
 } catch (err) {
   switch (err.errorNum) {
-    case 12170: console.error('TNS connect timeout — check SGs and network'); break;
+    case 12170: console.error('TNS connect timeout -- check SGs and network'); break;
     case 1017:  console.error('Invalid username/password'); break;
-    case 12541: console.error('No listener — check RDS endpoint/port'); break;
+    case 12541: console.error('No listener -- check RDS endpoint/port'); break;
     case 12514: console.error('Service name mismatch'); break;
     default:    console.error(`ORA-${err.errorNum}: ${err.message}`);
   }

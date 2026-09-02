@@ -41,7 +41,7 @@ def check(ok: bool, label: str, detail: str = "") -> None:
     if ok:
         print(f"  [pass] {label}")
     else:
-        print(f"  [FAIL] {label}" + (f" — {detail}" if detail else ""))
+        print(f"  [FAIL] {label}" + (f" -- {detail}" if detail else ""))
         failures.append(label)
 
 
@@ -90,7 +90,7 @@ try:
     # Unknown-to-OpenClaw keys must be harmless, not fatal.
     for k in ("allowed-tools", "metadata"):
         if k in fm:
-            print(f"         (note: '{k}' parsed then ignored by OpenClaw — inert, not fatal)")
+            print(f"         (note: '{k}' parsed then ignored by OpenClaw -- inert, not fatal)")
 except Exception as e:  # noqa: BLE001
     check(False, "frontmatter parses without error", str(e))
 
@@ -179,9 +179,9 @@ check(set(third_party) <= {"httpx", "bedrock_agentcore", "certifi", "boto3", "bo
 
 print(f"\n{'=' * 62}")
 if failures:
-    print(f"PORTABILITY: FAILED — {len(failures)}/{checks} checks failed")
+    print(f"PORTABILITY: FAILED -- {len(failures)}/{checks} checks failed")
     for f in failures:
         print(f"  - {f}")
     sys.exit(1)
-print(f"PORTABILITY: PASSED — {checks}/{checks} checks")
+print(f"PORTABILITY: PASSED -- {checks}/{checks} checks")
 sys.exit(0)

@@ -6,7 +6,7 @@ How to connect popular AI/ML frameworks to ElastiCache Valkey. This file covers 
 
 ## 1. Strands Agents
 
-**Package:** `strands-valkey-session-manager` (community package, v0.1.0+ — MIT license, maintained by jeromevdl)
+**Package:** `strands-valkey-session-manager` (community package, v0.1.0+ -- MIT license, maintained by jeromevdl)
 
 Import: `from strands_valkey_session_manager import ValkeySessionManager`
 

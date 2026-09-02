@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # =============================================================================
-# create-db2-audit-role.sh — Create the IAM policy/role and RDS option group
+# create-db2-audit-role.sh -- Create the IAM policy/role and RDS option group
 # that let RDS for Db2 upload audit logs to your S3 bucket.
 #
 # Configurable via environment variables (all optional except where noted):
@@ -31,7 +31,7 @@ account_id="$(aws sts get-caller-identity --query Account --output text)"
 # Replace the placeholder, or export AUDIT_KMS_KEY_ARN before running.
 audit_kms_key_arn="${AUDIT_KMS_KEY_ARN:-arn:aws:kms:${region}:${account_id}:key/REPLACE-WITH-AUDIT-BUCKET-KMS-KEY-ID}"
 
-# --- Permissions policy (heredoc → variables expand) ---
+# --- Permissions policy (heredoc -> variables expand) ---
 policy_document=$(cat <<EOF
 {
   "Version": "2012-10-17",

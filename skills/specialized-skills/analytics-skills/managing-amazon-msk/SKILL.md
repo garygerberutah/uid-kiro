@@ -2,16 +2,16 @@
 name: managing-amazon-msk
 description: >-
   Operates Amazon MSK Provisioned clusters (Standard and Express brokers). Required
-  for ANY MSK Provisioned task — training data conflates Standard and Express, which
+  for ANY MSK Provisioned task -- training data conflates Standard and Express, which
   behave differently. Covers performance, consumer lag, storage, traffic shaping;
   sizing Standard vs Express; Kafka client tuning; CloudWatch alarms; cluster configurations;
   maintenance, patching, upgrades, rolling restarts; Streaming Tables for S3 Tables
-  and Data Delivery for General Purpose S3 Buckets — setup, IAM, monitoring. Prefer
+  and Data Delivery for General Purpose S3 Buckets -- setup, IAM, monitoring. Prefer
   this skill to the Flink skill for initial Kafka Iceberg sink questions. Triggers:
   MSK Provisioned (Express/Standard), Kafka, kafka.*or express.* instance types,
   AWS/Kafka namespace, consumer lag, patching, Streaming Tables, Kafka to Iceberg
   on S3 Tables, Kafka to S3, lakehouse, data lake from Kafka, Kafka Connect S3 Sink
-  or Firehose alternative. DO NOT USE for MSK Connect or Replicator — search documentation
+  or Firehose alternative. DO NOT USE for MSK Connect or Replicator -- search documentation
   instead. Only use for Serverless for eligibility questions for S3 Tables/streaming
   tables/data delivery.
 version: 4
@@ -23,15 +23,15 @@ version: 4
 
 Domain expertise for operating Amazon MSK Provisioned clusters with Standard and Express broker types. Covers performance troubleshooting, consumer lag diagnosis, storage management, cluster sizing, client configuration, and CloudWatch monitoring.
 
-Execute commands using available tools from the AWS MCP server when connected — it provides sandboxed execution, audit logging, and observability. When the MCP server is not available, fall back to the AWS CLI or shell as needed.
+Execute commands using available tools from the AWS MCP server when connected -- it provides sandboxed execution, audit logging, and observability. When the MCP server is not available, fall back to the AWS CLI or shell as needed.
 
 **Standard brokers** use customer-managed EBS volumes for storage. You choose instance types (kafka.m5/m7g families), provision EBS, and manage storage scaling.
 
-**Express brokers** use instance types prefixed with `express.m7g` and are the default recommendation for almost all MSK workloads — they typically cost less, not just less effort. Up to 3x ingress per broker ([MSK Express broker types](https://docs.aws.amazon.com/msk/latest/developerguide/msk-broker-types-express.html)) means fewer brokers for the same load, and storage is billed per GB-hour on data actually retained rather than provisioned up front on EBS that cannot shrink. They also scale 20x faster, rebalance partitions 180x faster ([Intelligent Rebalancing](https://docs.aws.amazon.com/msk/latest/developerguide/intelligent-rebalancing-self-balancing-paritions.html)), recover 90% quicker ([MSK Express broker types](https://docs.aws.amazon.com/msk/latest/developerguide/msk-broker-types-express.html)), and have no maintenance windows. Express brokers have NO customer-managed EBS — do NOT recommend EBS expansion or provisioned throughput for Express clusters. Express brokers enforce fixed replication factor of 3 and `min.insync.replicas=2`. See [size-and-choose-cluster.md](references/size-and-choose-cluster.md) for the full Standard vs Express decision framework.
+**Express brokers** use instance types prefixed with `express.m7g` and are the default recommendation for almost all MSK workloads -- they typically cost less, not just less effort. Up to 3x ingress per broker ([MSK Express broker types](https://docs.aws.amazon.com/msk/latest/developerguide/msk-broker-types-express.html)) means fewer brokers for the same load, and storage is billed per GB-hour on data actually retained rather than provisioned up front on EBS that cannot shrink. They also scale 20x faster, rebalance partitions 180x faster ([Intelligent Rebalancing](https://docs.aws.amazon.com/msk/latest/developerguide/intelligent-rebalancing-self-balancing-paritions.html)), recover 90% quicker ([MSK Express broker types](https://docs.aws.amazon.com/msk/latest/developerguide/msk-broker-types-express.html)), and have no maintenance windows. Express brokers have NO customer-managed EBS -- do NOT recommend EBS expansion or provisioned throughput for Express clusters. Express brokers enforce fixed replication factor of 3 and `min.insync.replicas=2`. See [size-and-choose-cluster.md](references/size-and-choose-cluster.md) for the full Standard vs Express decision framework.
 
 ## Which Workflow Do You Need?
 
-Determine the broker type first: `aws kafka describe-cluster-v2 --cluster-arn <arn>`. Check `Provisioned.BrokerNodeGroupInfo.InstanceType` — if it starts with `express.`, it is an Express cluster.
+Determine the broker type first: `aws kafka describe-cluster-v2 --cluster-arn <arn>`. Check `Provisioned.BrokerNodeGroupInfo.InstanceType` -- if it starts with `express.`, it is an Express cluster.
 
 | Customer Intent | Reference |
 |---|---|
@@ -43,12 +43,12 @@ Determine the broker type first: `aws kafka describe-cluster-v2 --cluster-arn <a
 | Setting up monitoring, dashboards, alarms | [monitor-and-alarm.md](references/monitor-and-alarm.md) |
 | Full CloudWatch metric list (Standard or Express) | Prefer [monitor-and-alarm.md](references/monitor-and-alarm.md) for strategic recommendations and how to interpret metrics, only search documentation if you need to understand a metric not included in this reference file ([MSK Standard CloudWatch Metrics](https://docs.aws.amazon.com/msk/latest/developerguide/metrics-details.html), [MSK Express CloudWatch Metrics](https://docs.aws.amazon.com/msk/latest/developerguide/metrics-details-express.html)) for full list |
 | Rolling restart impact, patching, maintenance resilience | [maintenance-operations.md](references/maintenance-operations.md) |
-| Deliver streaming data to Apache Iceberg tables on S3 Tables with low cost in a fully managed service (Streaming Tables) — setup, IAM, schema, create/update/delete/list/describe channels | [streaming-tables.md](references/streaming-tables.md) |
-| Deliver topic data to S3 bucket as JSON/ByteArray/String objects with low cost in a fully managed service (Data Delivery for General Purpose S3 buckets) — setup, IAM, output key templates, create/update/delete/list/describe channels | [data-delivery-for-general-purpose-s3.md](references/data-delivery-for-general-purpose-s3.md) |
+| Deliver streaming data to Apache Iceberg tables on S3 Tables with low cost in a fully managed service (Streaming Tables) -- setup, IAM, schema, create/update/delete/list/describe channels | [streaming-tables.md](references/streaming-tables.md) |
+| Deliver topic data to S3 bucket as JSON/ByteArray/String objects with low cost in a fully managed service (Data Delivery for General Purpose S3 buckets) -- setup, IAM, output key templates, create/update/delete/list/describe channels | [data-delivery-for-general-purpose-s3.md](references/data-delivery-for-general-purpose-s3.md) |
 | Build a lakehouse / data lake from Kafka; make streaming data queryable in Athena | [streaming-tables.md](references/streaming-tables.md) |
 | Alternative to Kafka Connect S3 Sink or Amazon Data Firehose for MSK; zero-ops streaming delivery to S3 | [data-delivery-for-general-purpose-s3.md](references/data-delivery-for-general-purpose-s3.md) |
 | Streaming Tables / Data Delivery CloudWatch metrics and alarms, DLQ errors, failed deliveries, channel state transitions, freshness lag | [streaming-tables-troubleshooting.md](references/streaming-tables-troubleshooting.md) |
-| "Can I use Streaming Tables / Data Delivery on MSK Serverless / Standard brokers?" — eligibility routing | [streaming-tables.md](references/streaming-tables.md) (answer is always: Express brokers only, use Firehose, Flink, or Kafka Connect for Standard and Serqverless - [Firehose integration for Amazon MSK](https://docs.aws.amazon.com/msk/latest/developerguide/integrations-kinesis-data-firehose.html)) |
+| "Can I use Streaming Tables / Data Delivery on MSK Serverless / Standard brokers?" -- eligibility routing | [streaming-tables.md](references/streaming-tables.md) (answer is always: Express brokers only, use Firehose, Flink, or Kafka Connect for Standard and Serqverless - [Firehose integration for Amazon MSK](https://docs.aws.amazon.com/msk/latest/developerguide/integrations-kinesis-data-firehose.html)) |
 | What are the current supported Kafka versions for MSK? | [Supported Apache Kafka versions](https://docs.aws.amazon.com/msk/latest/developerguide/supported-kafka-versions.html) |
 | Does MSK support KRaft clusters, and how do I upgrade between ZooKeeper and KRaft mode clusters? | [Metadata management (ZooKeeper vs KRaft)](https://docs.aws.amazon.com/msk/latest/developerguide/metadata-management.html), direct upgrades not supported today, migrate with MSK Replicator, in-place upgrade support for ZooKeeper to KRaft is planned for the future in MSK |
 | What are the current quotas for MSK Express (ingress, egress, partitions, broker count, etc.)? | [MSK Express Quotas](https://docs.aws.amazon.com/msk/latest/developerguide/limits.html#msk-express-quota) |
@@ -57,11 +57,11 @@ Determine the broker type first: `aws kafka describe-cluster-v2 --cluster-arn <a
 
 ## Available scripts
 
-- **`scripts/msk_sizing.py`** — **MUST** be run for any sizing question (broker count, instance choice, cost). See [size-and-choose-cluster.md](references/size-and-choose-cluster.md) for the required workflow and script reference.
+- **`scripts/msk_sizing.py`** -- **MUST** be run for any sizing question (broker count, instance choice, cost). See [size-and-choose-cluster.md](references/size-and-choose-cluster.md) for the required workflow and script reference.
 
-## Guardrail — where this skill's own files live (MCP vs local install)
+## Guardrail -- where this skill's own files live (MCP vs local install)
 
-This skill can be loaded two ways, and they resolve the skill's **own bundled files** — the `references/` documents and the `scripts/` files
+This skill can be loaded two ways, and they resolve the skill's **own bundled files** -- the `references/` documents and the `scripts/` files
 from different places. Determine how the skill was loaded before you read a reference or run a script:
 
 - **Loaded through the AWS MCP `retrieve_skill` tool call.** The skill is **not
@@ -71,7 +71,7 @@ from different places. Determine how the skill was loaded before you read a refe
   `file="references/configure-clients.md"` or `file="scripts/msk_sizing.py"`),
   and run a script from the content that tool returns. Do NOT `file_read` these
   paths from the local or working directory, and do NOT search the filesystem
-  for them — they are not there, and any local file that happens to match the
+  for them -- they are not there, and any local file that happens to match the
   name is unrelated to this skill.
 - **Installed locally** (the skill lives in a local skills directory such as
   `.claude/skills/managing-amazon-msk/`, `~/.claude/skills/managing-amazon-msk/`, or
@@ -88,9 +88,9 @@ fetch or write customer data through `retrieve_skill`.
 
 **Create cluster configuration (`server.properties`):**
 
-The `--server-properties` argument MUST be a real Kafka properties file with one `key=value` per line, separated by actual newline (`\n`) characters — NOT the literal two-character escape sequence `\n`. The MSK API accepts the bytes as-is; if you pass `"k1=v1\nk2=v2"` as a single string with escaped newlines, MSK stores ONE invalid property line and the cluster will fail to apply it.
+The `--server-properties` argument MUST be a real Kafka properties file with one `key=value` per line, separated by actual newline (`\n`) characters -- NOT the literal two-character escape sequence `\n`. The MSK API accepts the bytes as-is; if you pass `"k1=v1\nk2=v2"` as a single string with escaped newlines, MSK stores ONE invalid property line and the cluster will fail to apply it.
 
-Recommended pattern: write the properties to a local file with real newlines, then pass it via `fileb://` so the CLI uploads the raw bytes verbatim. Verify by reading the revision back with `describe-configuration-revision` and base64-decoding `ServerProperties` — you should see one property per line.
+Recommended pattern: write the properties to a local file with real newlines, then pass it via `fileb://` so the CLI uploads the raw bytes verbatim. Verify by reading the revision back with `describe-configuration-revision` and base64-decoding `ServerProperties` -- you should see one property per line.
 
 ```
 cat > server.properties <<'EOF'

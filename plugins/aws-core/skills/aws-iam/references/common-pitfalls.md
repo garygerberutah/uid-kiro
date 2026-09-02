@@ -10,7 +10,7 @@ API operation names and IAM action names frequently differ. Always query the ser
 }
 ```
 
-Wrong — the correct action is `dynamodb:Query`.
+Wrong -- the correct action is `dynamodb:Query`.
 
 ## Missing Required Actions for an Operation
 
@@ -42,7 +42,7 @@ Too broad. Specify bucket and object paths: `arn:aws:s3:::my-bucket/*`.
 
 `ForAnyValue` evaluates to `FALSE` when the context key does not exist. Deny statements using `ForAnyValue` will not block requests when the key is missing.
 
-❌ **Incorrect:**
+[NO] **Incorrect:**
 
 ```json
 {
@@ -58,7 +58,7 @@ Too broad. Specify bucket and object paths: `arn:aws:s3:::my-bucket/*`.
 }
 ```
 
-✅ **Correct — add a separate Null-check statement:**
+[YES] **Correct -- add a separate Null-check statement:**
 
 ```json
 {
@@ -87,7 +87,7 @@ Too broad. Specify bucket and object paths: `arn:aws:s3:::my-bucket/*`.
 
 `ForAllValues` evaluates to `TRUE` when the context key does not exist. Allow statements using `ForAllValues` will grant access when the key is missing.
 
-❌ **Incorrect:**
+[NO] **Incorrect:**
 
 ```json
 {
@@ -100,7 +100,7 @@ Too broad. Specify bucket and object paths: `arn:aws:s3:::my-bucket/*`.
 }
 ```
 
-✅ **Correct — require the key to exist:**
+[YES] **Correct -- require the key to exist:**
 
 ```json
 {

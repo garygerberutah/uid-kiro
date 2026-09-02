@@ -49,15 +49,15 @@ Skills MUST NOT cross API namespaces.
 
 | Service | Organizations (delegated admin) | Invitation-based |
 |---------|:----:|:----:|
-| GuardDuty | ✅ (recommended) | ✅ |
-| Inspector | ✅ (required) | ❌ |
-| Macie | ✅ (recommended) | ✅ |
-| Detective | ✅ (recommended) | ✅ |
-| Security Hub | ✅ (required) | ❌ |
-| Security Hub CSPM | ✅ (recommended) | ✅ |
-| Security Lake | ✅ (required) | ❌ |
+| GuardDuty | [YES] (recommended) | [YES] |
+| Inspector | [YES] (required) | [NO] |
+| Macie | [YES] (recommended) | [YES] |
+| Detective | [YES] (recommended) | [YES] |
+| Security Hub | [YES] (required) | [NO] |
+| Security Hub CSPM | [YES] (recommended) | [YES] |
+| Security Lake | [YES] (required) | [NO] |
 
-For invitation-model services, each service has its own `list-members` API in its CLI namespace (e.g., `aws guardduty list-members`, `aws macie2 list-members`, `aws detective list-members`). These return accounts enrolled in that specific service — both organization-linked and invitation-linked members. This is distinct from `aws organizations list-accounts` which returns all accounts in the organization regardless of service enrollment.
+For invitation-model services, each service has its own `list-members` API in its CLI namespace (e.g., `aws guardduty list-members`, `aws macie2 list-members`, `aws detective list-members`). These return accounts enrolled in that specific service -- both organization-linked and invitation-linked members. This is distinct from `aws organizations list-accounts` which returns all accounts in the organization regardless of service enrollment.
 
 For Organizations-only services (Security Hub, Inspector, Security Lake), the account denominator comes from `aws organizations list-accounts`.
 

@@ -6,7 +6,7 @@ User wants to migrate from LiveAnalytics to InfluxDB 3, from self-managed Influx
 
 ## Migration Paths
 
-### Path 1: LiveAnalytics → InfluxDB 3 (Certified Migration Plugin)
+### Path 1: LiveAnalytics -> InfluxDB 3 (Certified Migration Plugin)
 
 LiveAnalytics is in maintenance mode. Use the **InfluxData certified LiveAnalytics migration plugin** and its companion migration client. **This plugin is recommended for smaller migrations (under 1 billion records / 125GB).** For larger datasets, contact the account team for guidance.
 
@@ -57,30 +57,30 @@ python3 liveanalytics_influxdb3_migration_client.py \
 
 **Cost note:** Data migration costs (S3 storage, data transfer) may apply. Discuss with account team for large migrations (5TB+).
 
-### Path 2: Self-Managed InfluxDB → Managed
+### Path 2: Self-Managed InfluxDB -> Managed
 
 **From self-managed InfluxDB 2:**
 
 1. Export using `influx backup` or line protocol export
-2. Provision managed V2 instance → route to `getting-started`
+2. Provision managed V2 instance -> route to `getting-started`
 3. Import using `influx restore` or line protocol write
 
 **From self-managed InfluxDB 3 / InfluxDB Cloud:**
 
 1. Export data via SQL queries to CSV/Parquet
-2. Provision managed V3 cluster → route to `getting-started`
+2. Provision managed V3 cluster -> route to `getting-started`
 3. Bulk import via line protocol or Parquet import
 
-### Path 3: Managed V2 → Managed V3
+### Path 3: Managed V2 -> Managed V3
 
 No in-place upgrade path. Requires data migration:
 
 1. Export from V2 using the InfluxDB 2 API `/api/v2/query` with CSV output
-2. Provision V3 cluster → route to `getting-started`
-3. Re-design schema for V3 → route to `schema-design` (tags/fields may need restructuring)
+2. Provision V3 cluster -> route to `getting-started`
+3. Re-design schema for V3 -> route to `schema-design` (tags/fields may need restructuring)
 4. Ingest via line protocol (compatible across versions)
 
-**Note:** InfluxDB 3 uses SQL and InfluxQL — Flux is not supported. Queries must be rewritten.
+**Note:** InfluxDB 3 uses SQL and InfluxQL -- Flux is not supported. Queries must be rewritten.
 
 ## Pre-Migration Checklist
 
@@ -88,6 +88,6 @@ No in-place upgrade path. Requires data migration:
 - [ ] Map source schema to target schema (route to `schema-design`)
 - [ ] Estimate target instance/cluster sizing
 - [ ] Ensure Marketplace subscription is active (required for V3 Enterprise)
-- [ ] Attach `AmazonTimestreamInfluxDBFullAccess` and `AmazonTimestreamConsoleFullAccess` IAM policies (required for first-time Marketplace/Read Replica activation; replace with a scoped custom policy for production — see getting-started)
+- [ ] Attach `AmazonTimestreamInfluxDBFullAccess` and `AmazonTimestreamConsoleFullAccess` IAM policies (required for first-time Marketplace/Read Replica activation; replace with a scoped custom policy for production -- see getting-started)
 - [ ] Test with a subset of data before full migration
 - [ ] Plan cutover window and rollback strategy

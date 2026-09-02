@@ -3,7 +3,7 @@ name: threat-modeling-with-aws-security-agent
 description: Run an AWS Security Agent threat model review on spec/design documents. Use when the user asks to review a spec for security, run a threat model, check if a design introduces security risks, review requirements.md or design.md for security posture changes, or STRIDE analysis.
 ---
 
-# AWS Security Agent — Threat Model Review
+# AWS Security Agent -- Threat Model Review
 
 Analyze spec documents (`requirements.md`, `design.md`) against the source code to identify security-posture changes using STRIDE methodology. No prior scan needed.
 
@@ -77,7 +77,7 @@ Read `.security-agent/config.json` for `agent_space_id` and `region`. If missing
 
 8. Persist to `scans.json` with `scan_type: "THREAT_MODEL"`.
 
-9. Tell user: "Threat model review started. Runtime varies with workspace size. I'll check every 2 minutes — say 'stop polling' to opt out."
+9. Tell user: "Threat model review started. Runtime varies with workspace size. I'll check every 2 minutes -- say 'stop polling' to opt out."
 
 10. **Poll** every 2 minutes:
 
@@ -87,7 +87,7 @@ Read `.security-agent/config.json` for `agent_space_id` and `region`. If missing
 
     Only respond when status changes.
 
-11. **On COMPLETED** → fetch threats:
+11. **On COMPLETED** -> fetch threats:
 
     ```bash
     aws securityagent list-threats --agent-space-id <id> --threat-job-id <tj-id>
@@ -100,13 +100,13 @@ Read `.security-agent/config.json` for `agent_space_id` and `region`. If missing
 Each threat includes: `statement`, `severity`, `stride` category, `threatImpact`, `recommendation`, `impactedAssets`.
 
 ```
-🟣 CRITICAL: {statement}
+[PURPLE] CRITICAL: {statement}
    STRIDE: {stride}
    Impact: {threatImpact}
    Assets: {impactedAssets}
    Recommendation: {recommendation}
 
-🔴 HIGH: {statement}
+[RED] HIGH: {statement}
    ...
 ```
 
@@ -116,7 +116,7 @@ Write full report to `.security-agent/findings-{scan_id}.md`. Call out any threa
 
 ## Rules
 
-- Threat model reviews are standalone — no prior scan needed
+- Threat model reviews are standalone -- no prior scan needed
 - Poll every 2 minutes, not faster
 - At least one spec file is required
 - Use absolute paths for workspace and spec files

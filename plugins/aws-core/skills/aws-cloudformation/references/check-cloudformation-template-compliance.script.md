@@ -115,7 +115,7 @@ Resources:
 ```
 Your template has 4 violations.
 
-**MyBucket (AWS::S3::Bucket) — Critical Security:**
+**MyBucket (AWS::S3::Bucket) -- Critical Security:**
 
 1. Public access not blocked. Add:
    PublicAccessBlockConfiguration:
@@ -130,7 +130,7 @@ Your template has 4 violations.
        - ServerSideEncryptionByDefault:
            SSEAlgorithm: aws:kms  # KMS encryption at rest
 
-**MyBucket (AWS::S3::Bucket) — Best Practice:**
+**MyBucket (AWS::S3::Bucket) -- Best Practice:**
 
 3. Versioning not enabled. Add:
    VersioningConfiguration:
@@ -140,7 +140,7 @@ Your template has 4 violations.
    LoggingConfiguration:
      DestinationBucketName: !Ref LogBucket
 
-**Advisory — Optional Enhancements:**
+**Advisory -- Optional Enhancements:**
 ObjectLock and Replication rules also flagged. Evaluate based on your use case before adding.
 ```
 

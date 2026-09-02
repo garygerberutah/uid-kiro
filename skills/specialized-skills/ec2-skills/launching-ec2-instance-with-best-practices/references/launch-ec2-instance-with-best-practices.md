@@ -188,7 +188,7 @@ Ensure an SSH key pair exists for instance access.
 
 **Constraints:**
 
-- If `allow_ssh_from` is NOT provided **and `workload_type` is not `bastion-host`** and no SSH ingress rule is being created, you MUST skip key pair creation entirely — SSM Session Manager does not require a key pair. Proceed to the next step.
+- If `allow_ssh_from` is NOT provided **and `workload_type` is not `bastion-host`** and no SSH ingress rule is being created, you MUST skip key pair creation entirely -- SSM Session Manager does not require a key pair. Proceed to the next step.
 - If `allow_ssh_from` IS provided or an SSH ingress rule is being created:
   - You MUST check if `key_pair_name` was provided
   - You MUST verify existing key pair if specified: `aws ec2 describe-key-pairs --key-names ${key_pair_name} --region ${region}`
@@ -316,13 +316,13 @@ Configure a security group with minimal required access based on workload type.
     - Port 22 (SSH) from specific IP only **if `allow_ssh_from` is provided**
   - **bastion-host**:
     - Port 22 (SSH) from specific IP only (NEVER 0.0.0.0/0)
-    - `allow_ssh_from` is REQUIRED for bastion-host — if not provided, you MUST ask the user for it before proceeding
+    - `allow_ssh_from` is REQUIRED for bastion-host -- if not provided, you MUST ask the user for it before proceeding
 - You MUST handle SSH access IP configuration:
   - If `allow_ssh_from` is provided:
     - Validate it's a proper CIDR block and add an SSH ingress rule for it
     - Recommend /32 for single IP (e.g., "203.0.113.25/32")
     - Warn against using 0.0.0.0/0 for SSH access
-  - If `allow_ssh_from` is NOT provided **and `workload_type` is not `bastion-host`**, default to NO SSH ingress rule — use AWS Systems Manager Session Manager instead (attach AmazonSSMManagedInstanceCore to the IAM role). Mention this choice in the summary and proceed without asking
+  - If `allow_ssh_from` is NOT provided **and `workload_type` is not `bastion-host`**, default to NO SSH ingress rule -- use AWS Systems Manager Session Manager instead (attach AmazonSSMManagedInstanceCore to the IAM role). Mention this choice in the summary and proceed without asking
 - You MUST add ingress rules using: `aws ec2 authorize-security-group-ingress --group-id ${sg_id} --ip-permissions IpProtocol=${protocol},FromPort=${port},ToPort=${port},IpRanges="[{CidrIp=${cidr},Description=${description}}]" --region ${region}`
 - You MUST NOT modify the default egress rule (allow all outbound) unless specifically required
 - You MUST add tags to the security group: `aws ec2 create-tags --resources ${sg_id} --tags Key=Name,Value=${sg_name} Key=Environment,Value=${environment} Key=WorkloadType,Value=${workload_type} Key=ManagedBy,Value=ec2-instance-launch-script --region ${region}`
@@ -581,7 +581,7 @@ Execute the instance launch with all configured settings.
 - You MUST inform the user immediately upon successful launch:
 
   ```
-  ✓ Instance launched successfully!
+  [OK] Instance launched successfully!
   Instance ID: i-0abcd1234efgh5678
   Private IP: 10.0.1.25
   Public IP: 203.0.113.45 (if applicable)
@@ -608,7 +608,7 @@ Monitor the instance until it's fully initialized and running.
   Waiting for instance to start...
   Status: pending (0:05)
   Status: pending (0:10)
-  Status: running (0:15) ✓
+  Status: running (0:15) [OK]
   ```
 
 - You MUST retrieve and display instance status checks once running:
@@ -627,9 +627,9 @@ Monitor the instance until it's fully initialized and running.
 - You MUST inform user when instance is fully ready:
 
   ```
-  ✓ Instance is running and ready!
-  System status check: passed ✓
-  Instance status check: passed ✓
+  [OK] Instance is running and ready!
+  System status check: passed [OK]
+  Instance status check: passed [OK]
   Time to ready: 2 minutes 45 seconds
   ```
 
@@ -860,7 +860,7 @@ instance_name: company-website-prod
 # EC2 Instance Launch Report
 
 **Generated:** 2025-10-14 15:30:45 UTC
-**Launch Status:** ✓ Success
+**Launch Status:** [OK] Success
 **Instance ID:** i-0abcd1234efgh5678
 
 ---
@@ -874,7 +874,7 @@ Successfully launched EC2 instance for production web server workload in us-east
 - **Operating System:** Amazon Linux 2023
 - **Region:** us-east-1a
 - **Launch Time:** 2:35 minutes
-- **Status:** Running ✓
+- **Status:** Running [OK]
 - **Estimated Monthly Cost:** $15.33
 
 ---
@@ -959,12 +959,12 @@ Successfully launched EC2 instance for production web server workload in us-east
 - **EC2 Metadata:** IMDSv2 enforced (secure)
 
 ### Security Features Enabled
-- ✓ EBS encryption enabled (all volumes)
-- ✓ IMDSv2 required (prevents SSRF attacks)
-- ✓ Termination protection enabled
-- ✓ Detailed monitoring enabled
-- ✓ Security group restricts SSH to specific IP
-- ✓ Least privilege IAM role attached
+- [OK] EBS encryption enabled (all volumes)
+- [OK] IMDSv2 required (prevents SSRF attacks)
+- [OK] Termination protection enabled
+- [OK] Detailed monitoring enabled
+- [OK] Security group restricts SSH to specific IP
+- [OK] Least privilege IAM role attached
 
 ---
 
@@ -999,7 +999,7 @@ aws ssm start-session --target i-0abcd1234efgh5678 --region us-east-1
 
 ```bash
 # Browser-based SSH from AWS Console
-# Navigate to: EC2 → Instances → i-0abcd1234efgh5678 → Connect → EC2 Instance Connect
+# Navigate to: EC2 -> Instances -> i-0abcd1234efgh5678 -> Connect -> EC2 Instance Connect
 ```
 
 ### Connection Details
@@ -1049,9 +1049,9 @@ aws ssm start-session --target i-0abcd1234efgh5678 --region us-east-1
 
 ### Cost Optimization Recommendations
 
-- ✓ Using burstable t3 instance (cost-efficient)
-- ✓ Using gp3 volumes (cheaper than gp2)
-- ✓ Right-sized for web server workload
+- [OK] Using burstable t3 instance (cost-efficient)
+- [OK] Using gp3 volumes (cheaper than gp2)
+- [OK] Right-sized for web server workload
 - Consider Reserved Instance for 1-year commitment: Save up to 40%
 - Consider Savings Plan for flexible commitment: Save up to 54%
 - Stop instance when not needed (dev/test only)
@@ -1300,7 +1300,7 @@ sudo tail -f /var/log/nginx/error.log
 
 ### Instance Termination
 
-**⚠️ WARNING: Termination is permanent and will delete the instance!**
+**[WARNING] WARNING: Termination is permanent and will delete the instance!**
 
 ```bash
 # Disable termination protection first
@@ -1501,45 +1501,45 @@ sudo tail -f /var/log/nginx/error.log
 
 ### Security
 
-- ✓ Minimize security group rules (least privilege)
-- ✓ Never expose databases to public internet
-- ✓ Use IMDSv2 for instance metadata (already configured)
-- ✓ Enable termination protection for production
-- ✓ Rotate SSH keys regularly
-- ✓ Use Systems Manager Session Manager to avoid SSH keys
-- ✓ Enable CloudTrail for API audit logging
-- ✓ Implement AWS Config for compliance monitoring
-- ✓ Use AWS Secrets Manager for sensitive data
+- [OK] Minimize security group rules (least privilege)
+- [OK] Never expose databases to public internet
+- [OK] Use IMDSv2 for instance metadata (already configured)
+- [OK] Enable termination protection for production
+- [OK] Rotate SSH keys regularly
+- [OK] Use Systems Manager Session Manager to avoid SSH keys
+- [OK] Enable CloudTrail for API audit logging
+- [OK] Implement AWS Config for compliance monitoring
+- [OK] Use AWS Secrets Manager for sensitive data
 
 ### Reliability
 
-- ✓ Create regular backups (AMIs and EBS snapshots)
-- ✓ Deploy across multiple AZs for high availability
-- ✓ Use Auto Scaling for automatic recovery
-- ✓ Implement health checks and monitoring
-- ✓ Set up CloudWatch alarms for critical metrics
-- ✓ Test recovery procedures regularly
-- ✓ Document runbooks for common incidents
+- [OK] Create regular backups (AMIs and EBS snapshots)
+- [OK] Deploy across multiple AZs for high availability
+- [OK] Use Auto Scaling for automatic recovery
+- [OK] Implement health checks and monitoring
+- [OK] Set up CloudWatch alarms for critical metrics
+- [OK] Test recovery procedures regularly
+- [OK] Document runbooks for common incidents
 
 ### Cost Optimization
 
-- ✓ Right-size instances based on actual usage
-- ✓ Stop instances when not in use (dev/test)
-- ✓ Use Reserved Instances or Savings Plans for steady workloads
-- ✓ Clean up unused snapshots and AMIs
-- ✓ Use gp3 volumes instead of gp2
-- ✓ Set up AWS Budgets and alerts
-- ✓ Review AWS Cost Explorer regularly
+- [OK] Right-size instances based on actual usage
+- [OK] Stop instances when not in use (dev/test)
+- [OK] Use Reserved Instances or Savings Plans for steady workloads
+- [OK] Clean up unused snapshots and AMIs
+- [OK] Use gp3 volumes instead of gp2
+- [OK] Set up AWS Budgets and alerts
+- [OK] Review AWS Cost Explorer regularly
 
 ### Performance
 
-- ✓ Choose appropriate instance type for workload
-- ✓ Use enhanced networking when available
-- ✓ Implement caching (application and CDN)
-- ✓ Optimize application code and database queries
-- ✓ Use EBS-optimized instances for I/O intensive workloads
-- ✓ Monitor and act on CloudWatch metrics
-- ✓ Consider Graviton processors (t4g) for better price-performance
+- [OK] Choose appropriate instance type for workload
+- [OK] Use enhanced networking when available
+- [OK] Implement caching (application and CDN)
+- [OK] Optimize application code and database queries
+- [OK] Use EBS-optimized instances for I/O intensive workloads
+- [OK] Monitor and act on CloudWatch metrics
+- [OK] Consider Graviton processors (t4g) for better price-performance
 
 ---
 

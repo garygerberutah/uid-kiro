@@ -1,4 +1,4 @@
-# Knowledge Bases — Retrieval & Query Reference
+# Knowledge Bases -- Retrieval & Query Reference
 
 ## Table of Contents
 
@@ -11,7 +11,7 @@
 
 ## Query API Decision Table
 
-Three APIs — agents pick the wrong one. Use this table:
+Three APIs -- agents pick the wrong one. Use this table:
 
 | Use Case | API | Endpoint | When |
 |----------|-----|----------|------|
@@ -25,7 +25,7 @@ Most common pattern: `aws bedrock-agent-runtime retrieve-and-generate --input '{
 
 ## Metadata Filtering Syntax
 
-Bedrock-specific filter syntax — not in model training data. Filters narrow retrieval to relevant documents before semantic search.
+Bedrock-specific filter syntax -- not in model training data. Filters narrow retrieval to relevant documents before semantic search.
 
 **Operators:**
 
@@ -69,10 +69,10 @@ Refer to the latest AWS documentation on Bedrock Knowledge Base RetrievalFilter 
 
 **Constraints:**
 
-- Metadata attributes MUST be defined during KB creation or data source configuration — you cannot filter on attributes that weren't declared as filterable
-- You MUST verify that the user's KB has metadata configured before constructing filter queries — filtering on undeclared attributes silently returns no results
+- Metadata attributes MUST be defined during KB creation or data source configuration -- you cannot filter on attributes that weren't declared as filterable
+- You MUST verify that the user's KB has metadata configured before constructing filter queries -- filtering on undeclared attributes silently returns no results
 - For KBs with >1000 documents, You SHOULD recommend metadata filtering for retrieval quality
-- **Security use case**: Metadata filtering can enforce document-level access control — assign role/permission metadata attributes (e.g., `access_level: "admin"`) during ingestion, then filter at query time based on the calling user's role to restrict which documents they can retrieve
+- **Security use case**: Metadata filtering can enforce document-level access control -- assign role/permission metadata attributes (e.g., `access_level: "admin"`) during ingestion, then filter at query time based on the calling user's role to restrict which documents they can retrieve
 
 ## Retrieval Configuration
 
@@ -85,8 +85,8 @@ Non-obvious defaults agents get wrong:
 
 **Score confidence threshold**: Set to filter low-relevance results.
 
-- Too high → no results returned (common failure)
-- Too low → noisy, irrelevant results
+- Too high -> no results returned (common failure)
+- Too low -> noisy, irrelevant results
 - Start with 0.5, tune based on evaluation
 - Refer to the latest AWS documentation on Bedrock Knowledge Base retrieval configuration for current options
 
@@ -96,18 +96,18 @@ For multi-turn RAG conversations:
 
 **Constraints:**
 
-- You MUST pass `sessionId` in `RetrieveAndGenerate` calls for multi-turn conversations — omitting it causes each query to be independent, silently losing all conversation context
-- You MUST NOT generate or set `sessionId` yourself — Amazon Bedrock auto-generates it on the first request; reuse the returned value for subsequent turns
-- For HIPAA/GDPR workloads, You MUST encrypt session data with a customer-managed KMS key via `--session-configuration '{"kmsKeyArn":"<kms-key-arn>"}'` — session data includes conversation history which may contain sensitive retrieved content
+- You MUST pass `sessionId` in `RetrieveAndGenerate` calls for multi-turn conversations -- omitting it causes each query to be independent, silently losing all conversation context
+- You MUST NOT generate or set `sessionId` yourself -- Amazon Bedrock auto-generates it on the first request; reuse the returned value for subsequent turns
+- For HIPAA/GDPR workloads, You MUST encrypt session data with a customer-managed KMS key via `--session-configuration '{"kmsKeyArn":"<kms-key-arn>"}'` -- session data includes conversation history which may contain sensitive retrieved content
 
 - Context from previous turns carries forward automatically when `sessionId` is passed
-- Sessions expire after a timeout — start a new session if expired
+- Sessions expire after a timeout -- start a new session if expired
 
 ## Generation Configuration
 
 For `RetrieveAndGenerate` only:
 
-- **Model selection**: Specify which model generates the answer (can differ from the embedding model — this is NOT a mismatch, despite what agents assume)
+- **Model selection**: Specify which model generates the answer (can differ from the embedding model -- this is NOT a mismatch, despite what agents assume)
 - **Prompt template**: Override the default RAG prompt to customize how the model uses retrieved chunks
 - **Guardrail integration**: Apply guardrails to the generated response via `guardrailConfiguration`
 - Refer to the latest AWS documentation on Bedrock RetrieveAndGenerate configuration for current options
@@ -122,8 +122,8 @@ Retrieved chunks are the primary vector for sensitive data exposure in RAG appli
 
 **Key risks:**
 
-- Retrieved chunks appear in the API response `citations[].retrievedReferences[].content.text` field — this raw text may contain PII even if the generated response is sanitized by guardrails
-- Guardrails are applied to the **input** (the augmented prompt, which includes retrieved chunks) and the **generated response** — but they are NOT applied to the raw `retrievedReferences` returned in the API response at runtime
+- Retrieved chunks appear in the API response `citations[].retrievedReferences[].content.text` field -- this raw text may contain PII even if the generated response is sanitized by guardrails
+- Guardrails are applied to the **input** (the augmented prompt, which includes retrieved chunks) and the **generated response** -- but they are NOT applied to the raw `retrievedReferences` returned in the API response at runtime
 - Application logging that captures the full API response will log sensitive chunk content
 
 **Mitigations:**
@@ -135,4 +135,4 @@ Retrieved chunks are the primary vector for sensitive data exposure in RAG appli
 
 ### Audit retrieval calls with CloudTrail
 
-`Retrieve` and `RetrieveAndGenerate` calls are logged as CloudTrail **data events** (not management events — they are not logged by default). To enable auditing of who queried what from the knowledge base, configure advanced event selectors with resource type `AWS::Bedrock::KnowledgeBase`. Refer to the latest [AWS documentation on Bedrock CloudTrail logging](https://docs.aws.amazon.com/bedrock/latest/userguide/logging-using-cloudtrail.html).
+`Retrieve` and `RetrieveAndGenerate` calls are logged as CloudTrail **data events** (not management events -- they are not logged by default). To enable auditing of who queried what from the knowledge base, configure advanced event selectors with resource type `AWS::Bedrock::KnowledgeBase`. Refer to the latest [AWS documentation on Bedrock CloudTrail logging](https://docs.aws.amazon.com/bedrock/latest/userguide/logging-using-cloudtrail.html).

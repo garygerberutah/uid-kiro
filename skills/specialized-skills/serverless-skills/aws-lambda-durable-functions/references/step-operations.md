@@ -304,12 +304,12 @@ user = context.step(
 **Example:**
 
 ```typescript
-// ❌ WRONG: Cannot nest durable operations in step
+// [NO] WRONG: Cannot nest durable operations in step
 await context.step('process', async () => {
   await context.wait({ seconds: 1 });  // ERROR!
 });
 
-// ✅ CORRECT: Use child context
+// [YES] CORRECT: Use child context
 await context.runInChildContext('process', async (childCtx) => {
   const data = await childCtx.step('fetch', async () => fetch());
   await childCtx.wait({ seconds: 1 });

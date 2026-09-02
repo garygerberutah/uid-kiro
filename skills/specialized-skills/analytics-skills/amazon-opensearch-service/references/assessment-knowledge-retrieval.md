@@ -1,12 +1,12 @@
-# Knowledge retrieval recipe — topic → tool → URL
+# Knowledge retrieval recipe -- topic -> tool -> URL
 
 When a `[verify]` tag remains in a draft, this file says where to look.
 
-The skill draft has stable-core embedded. ONLY hit external retrieval for **version-volatile** values. Resolve all `[verify]` tags in ONE batched pass — never per-claim.
+The skill draft has stable-core embedded. ONLY hit external retrieval for **version-volatile** values. Resolve all `[verify]` tags in ONE batched pass -- never per-claim.
 
 ## Three retrieval primitives
 
-The first two primitives are AWS-MCP-server-specific. They're convenient when the MCP server is loaded, but they are NOT required — every retrieval below has a non-MCP fallback (column 3).
+The first two primitives are AWS-MCP-server-specific. They're convenient when the MCP server is loaded, but they are NOT required -- every retrieval below has a non-MCP fallback (column 3).
 
 | Primitive | When | Non-MCP fallback |
 |---|---|---|
@@ -30,14 +30,14 @@ Per-domain routing rules:
 
 ## Batched verification recipe
 
-After drafting Steps 3–7 with `[verify]` tags, do this in ONE pass:
+After drafting Steps 3-7 with `[verify]` tags, do this in ONE pass:
 
 1. **Gather** all `[verify]` markers
 2. **Group by domain** (one call per domain when possible)
 3. **Run independent retrievals concurrently** (multiple tool calls in a single message)
 4. **Resolve each tag**: replace `[verify]` with confirmed value + source URL + retrieval timestamp in Citations
 
-## Topic → URL map
+## Topic -> URL map
 
 ### Amazon OpenSearch Service (Managed)
 
@@ -148,9 +148,9 @@ After drafting Steps 3–7 with `[verify]` tags, do this in ONE pass:
 Every `[verify]`-tagged claim that's resolved must be cited in the report's Citations section:
 
 ```
-- AOS Best Practices — Sharding (`bp-sharding.html`), retrieved <date>: <quoted value> — see references/sizing.md for canonical shard-cap heuristics
+- AOS Best Practices -- Sharding (`bp-sharding.html`), retrieved <date>: <quoted value> -- see references/sizing.md for canonical shard-cap heuristics
 - Migration Assistant for Amazon OpenSearch Service solution overview, retrieved <date>: <quoted source/target matrix>
-- Amazon OpenSearch Service pricing page, retrieved <date>: <quoted OCU definition> — see references/sizing.md for OCU sizing math
+- Amazon OpenSearch Service pricing page, retrieved <date>: <quoted OCU definition> -- see references/sizing.md for OCU sizing math
 ```
 
-Aim for ≥ 3 unique URLs in any full assessment. Cite what you used; no arbitrary floor.
+Aim for >= 3 unique URLs in any full assessment. Cite what you used; no arbitrary floor.

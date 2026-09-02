@@ -99,8 +99,8 @@ POST /my-hybrid-index/_search?search_pipeline=hybrid-search-pipeline
 ## AOSS Constraints
 
 - AOSS supports HNSW with Faiss engine only (no IVF, no Lucene engine). NMSLIB is removed in OS 3.x. For the engine matrix, see [vector-knn.md](vector-knn.md).
-- AOSS collections are either SEARCH or VECTORSEARCH type — choose VECTORSEARCH for k-NN
+- AOSS collections are either SEARCH or VECTORSEARCH type -- choose VECTORSEARCH for k-NN
 - Index names must not start with underscore on AOSS
-- AOSS does not support ISM policies — lifecycle is managed at the collection level
+- AOSS does not support ISM policies -- lifecycle is managed at the collection level
 
 > Ensure AOSS encryption at rest is enabled before indexing embeddings. Use SigV4 authentication for all operations.

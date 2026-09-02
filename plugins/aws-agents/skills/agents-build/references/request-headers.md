@@ -14,10 +14,10 @@ Pass custom HTTP headers from the caller through to your agent's invocation code
 
 AgentCore Runtime strips all incoming headers from the request before it reaches your agent code **except**:
 
-- `Authorization` — always passed through
-- Any header matching `X-Amzn-Bedrock-AgentCore-Runtime-Custom-*` — this is the reserved prefix for custom headers
+- `Authorization` -- always passed through
+- Any header matching `X-Amzn-Bedrock-AgentCore-Runtime-Custom-*` -- this is the reserved prefix for custom headers
 
-Anything else — `X-Tenant-Id`, `X-Correlation-Id`, `traceparent`, `A2A-Version`, `Idempotency-Key`, whatever — will not appear in your invocation context unless you explicitly add it to the runtime's request header allowlist.
+Anything else -- `X-Tenant-Id`, `X-Correlation-Id`, `traceparent`, `A2A-Version`, `Idempotency-Key`, whatever -- will not appear in your invocation context unless you explicitly add it to the runtime's request header allowlist.
 
 This is an intentional security boundary: the runtime doesn't forward arbitrary caller-supplied headers by default. It's also the #1 reason developers ask "why can't my agent see the header I'm sending?"
 
@@ -59,7 +59,7 @@ If the header names are fixed by a protocol or external system (A2A requires `A2
 
 Then `agentcore deploy`. The `$schema` URL at the top of the file (`https://schema.agentcore.aws.dev/v1/agentcore.json`) gives IDE autocomplete and validation for every field.
 
-**CLI shortcut** — `agentcore add agent --request-header-allowlist "X-Tenant-Id,A2A-Version"` writes the same array. **Important:** the CLI auto-prefixes entries with `X-Amzn-Bedrock-AgentCore-Runtime-Custom-` as they land in `agentcore.json`. If you're editing the JSON by hand, write the prefixed form directly. If you're using the CLI, pass the short name and let the CLI add the prefix.
+**CLI shortcut** -- `agentcore add agent --request-header-allowlist "X-Tenant-Id,A2A-Version"` writes the same array. **Important:** the CLI auto-prefixes entries with `X-Amzn-Bedrock-AgentCore-Runtime-Custom-` as they land in `agentcore.json`. If you're editing the JSON by hand, write the prefixed form directly. If you're using the CLI, pass the short name and let the CLI add the prefix.
 
 `Authorization` passes through by default and doesn't need to be in the allowlist.
 
@@ -68,7 +68,7 @@ Then `agentcore deploy`. The `$schema` URL at the top of the file (`https://sche
 - **Maximum 20 headers** in the allowlist (including `Authorization` if you include it explicitly)
 - **Header name length:** up to 256 characters
 - **Header value size:** up to 4 KB per header
-- **Names are case-sensitive** — list them exactly as they'll be sent
+- **Names are case-sensitive** -- list them exactly as they'll be sent
 - **Changes take effect after the next deploy** of the runtime
 
 If you hit the 20-header cap, combine related data into one JSON-encoded header rather than using many separate ones.
@@ -115,7 +115,7 @@ For agents that call external APIs with idempotency, propagating the caller's ke
 
 ## Reading the headers in agent code
 
-Headers arrive in the runtime's `context` object passed to your invocation handler. The exact accessor depends on the framework — check the bedrock-agentcore SDK docs for your language. In Python:
+Headers arrive in the runtime's `context` object passed to your invocation handler. The exact accessor depends on the framework -- check the bedrock-agentcore SDK docs for your language. In Python:
 
 ```python
 @app.entrypoint
@@ -129,14 +129,14 @@ Headers that weren't in the allowlist will be absent (not empty string) from the
 
 ## What won't work
 
-- **Sending headers without configuring the allowlist** — anything outside the default pass-through set is silently dropped. Your agent code won't see the header, and there's no error. Check the runtime's `requestHeaderConfiguration` if a header you expect to see isn't arriving.
-- **Using this for secrets** — 4 KB values and the allowlist configuration are designed for metadata, not credentials. Use the AgentCore Identity credential provider for API keys, OAuth tokens, and secrets. See `agents-connect` Path D.
-- **Dynamic headers** — the allowlist is static runtime configuration. You can't vary it per-request.
+- **Sending headers without configuring the allowlist** -- anything outside the default pass-through set is silently dropped. Your agent code won't see the header, and there's no error. Check the runtime's `requestHeaderConfiguration` if a header you expect to see isn't arriving.
+- **Using this for secrets** -- 4 KB values and the allowlist configuration are designed for metadata, not credentials. Use the AgentCore Identity credential provider for API keys, OAuth tokens, and secrets. See `agents-connect` Path D.
+- **Dynamic headers** -- the allowlist is static runtime configuration. You can't vary it per-request.
 
 ## Troubleshooting
 
 **"My agent doesn't see the header I'm sending"**
-Check (in order): (1) Is the header in the allowlist? (2) Is the spelling an exact match including case? (3) Did you redeploy the runtime after updating the allowlist? (4) Is the caller actually sending the header — `curl -v` or equivalent network inspection.
+Check (in order): (1) Is the header in the allowlist? (2) Is the spelling an exact match including case? (3) Did you redeploy the runtime after updating the allowlist? (4) Is the caller actually sending the header -- `curl -v` or equivalent network inspection.
 
 **"I hit the 20-header limit"**
 Consolidate related data into a single JSON-encoded header. For example, instead of `X-Region`, `X-Environment`, `X-Service-Name` as three separate headers, use `X-Context: {"region":"us-west-2","env":"prod","service":"billing"}`.

@@ -20,8 +20,8 @@ argument-hint: "[query|domain-id|'configure'|'status']"
 
 Amazon SageMaker Unified Studio (whose catalog feature is referred to below as SageMaker Catalog) exports asset metadata as a daily-snapshot
 Apache Iceberg table in the AWS-managed `aws-sagemaker-catalog` table bucket. This
-enables SQL queries over your entire data catalog inventory — asset counts, governance
-gaps, ownership audits, and historical comparisons — without building custom ETL.
+enables SQL queries over your entire data catalog inventory -- asset counts, governance
+gaps, ownership audits, and historical comparisons -- without building custom ETL.
 
 Data is partitioned by `snapshot_time` and exported once daily (around midnight per
 region). The table is read-only.
@@ -30,9 +30,9 @@ region). The table is read-only.
 
 | User intent | Use this skill? | Alternative |
 |---|---|---|
-| SQL analytics on catalog state (counts, governance, trends) | **Yes** | — |
-| Historical comparison ("what changed in catalog last week") | **Yes** — time travel via `snapshot_time` | — |
-| Find assets without owners or descriptions | **Yes** | — |
+| SQL analytics on catalog state (counts, governance, trends) | **Yes** | -- |
+| Historical comparison ("what changed in catalog last week") | **Yes** -- time travel via `snapshot_time` | -- |
+| Find assets without owners or descriptions | **Yes** | -- |
 | Find a specific table by name or concept | **No** | `finding-data-lake-assets` or Glue Discovery `search` |
 | Browse/enumerate catalog interactively | **No** | `exploring-data-catalog` |
 | Run a query *on* a table's data | **No** | `querying-data-lake` |
@@ -112,7 +112,7 @@ aws lakeformation grant-permissions \
 
 **Constraints:**
 
-- You MUST always filter by `snapshot_time` — without it, the query scans all historical snapshots and returns duplicates
+- You MUST always filter by `snapshot_time` -- without it, the query scans all historical snapshots and returns duplicates
 - You MUST confirm workgroup and output location before executing
 - Default to `DATE(snapshot_time) = CURRENT_DATE` for current state
 - You SHOULD use the key columns documented in this skill to build queries. If you need the full schema, run `get-tables` once:
@@ -125,14 +125,14 @@ aws lakeformation grant-permissions \
 
 | Column | What it holds | Usage |
 |--------|--------------|-------|
-| `snapshot_time` | Partition key — daily snapshot timestamp | **Always filter on this** |
+| `snapshot_time` | Partition key -- daily snapshot timestamp | **Always filter on this** |
 | `asset_id` | Unique catalog asset identifier | Primary key for lookups |
 | `resource_type_enum` | GlueTable, RedshiftTable, S3Collection, etc. | Filter by asset type |
 | `resource_id` | ARN or native identifier | Cross-reference with source systems |
 | `asset_name` | Business-friendly name | Display, search |
 | `resource_name` | Technical name (table name, prefix) | Filtering |
 | `business_description` | Business context (NULL if not provided) | Governance gaps |
-| `extended_metadata` | `map<string,string>` — flexible key-value attributes | Use bracket notation: `extended_metadata['owningEntityId']` |
+| `extended_metadata` | `map<string,string>` -- flexible key-value attributes | Use bracket notation: `extended_metadata['owningEntityId']` |
 | `asset_created_time` | When asset first appeared in catalog | Growth analysis |
 | `asset_updated_time` | Last modification time | Freshness checks |
 
@@ -165,7 +165,7 @@ GROUP BY DATE(snapshot_time)
 ORDER BY date DESC;
 ```
 
-**Time travel — compare current vs 7 days ago (new descriptions added):**
+**Time travel -- compare current vs 7 days ago (new descriptions added):**
 
 ```sql
 SELECT t.asset_id, t.resource_name,
@@ -202,11 +202,11 @@ WHERE DATE(snapshot_time) = CURRENT_DATE
 
 ## Key Behaviors
 
-- **Daily snapshots** — exported around midnight per region
-- **Always filter by `snapshot_time`** — without it you get all history (duplicates, slow)
-- **One domain per account per region** — to switch domains, delete config first
+- **Daily snapshots** -- exported around midnight per region
+- **Always filter by `snapshot_time`** -- without it you get all history (duplicates, slow)
+- **One domain per account per region** -- to switch domains, delete config first
 - **No additional charge** beyond S3 Tables storage + Athena queries
-- **Read-only** — to update asset metadata, use Glue Discovery APIs or SageMaker Unified Studio
+- **Read-only** -- to update asset metadata, use Glue Discovery APIs or SageMaker Unified Studio
 
 ## Troubleshooting
 

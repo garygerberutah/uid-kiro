@@ -79,11 +79,11 @@ aws rds create-db-instance \
 
 | Storage type | Min size | IOPS | Throughput |
 |---|---|---|---|
-| `gp3` | 20 GiB | Below 400 GiB: 3000 IOPS included by default (not configurable). ≥400 GiB: 3000-16000 | Below 400 GiB: 125 MB/s included by default (not configurable). ≥400 GiB: 125-1000 MB/s |
+| `gp3` | 20 GiB | Below 400 GiB: 3000 IOPS included by default (not configurable). >=400 GiB: 3000-16000 | Below 400 GiB: 125 MB/s included by default (not configurable). >=400 GiB: 125-1000 MB/s |
 | `io1` | 100 GiB | Required: 1000-64000 | N/A |
 | `io2` | 100 GiB | Required: 1000-256000 | N/A |
 
-**Do NOT pass `--iops` or `--storage-throughput` when `--allocated-storage` is below 400 GiB with gp3.** The API rejects them. Only specify these for ≥400 GiB gp3 or io1/io2.
+**Do NOT pass `--iops` or `--storage-throughput` when `--allocated-storage` is below 400 GiB with gp3.** The API rejects them. Only specify these for >=400 GiB gp3 or io1/io2.
 
 ## Instance Class Sizing
 
@@ -110,7 +110,7 @@ aws iam create-service-linked-role \
 aws license-manager get-service-settings
 ```
 
-If `get-service-settings` returns `AccessDenied`, your IAM role needs `license-manager:GetServiceSettings` and `license-manager:CreateLicenseConfiguration` (plus `iam:CreateServiceLinkedRole` for the one-time service-linked-role bootstrap) — scope to these specific actions rather than `license-manager:*`.
+If `get-service-settings` returns `AccessDenied`, your IAM role needs `license-manager:GetServiceSettings` and `license-manager:CreateLicenseConfiguration` (plus `iam:CreateServiceLinkedRole` for the one-time service-linked-role bootstrap) -- scope to these specific actions rather than `license-manager:*`.
 
 ### Create a license configuration
 

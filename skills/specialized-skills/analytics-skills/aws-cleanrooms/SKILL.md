@@ -15,9 +15,9 @@ Domain expertise for troubleshooting AWS Clean Rooms collaborations and custom M
 
 Determine the failure type:
 
-**Access denied or permission error?** → See [permission debugging procedure](references/permission-debugging.md). Covers IAM role policies (inline + attached managed), S3 bucket policies, KMS key policies, Lake Formation permissions, and cross-account trust.
+**Access denied or permission error?** -> See [permission debugging procedure](references/permission-debugging.md). Covers IAM role policies (inline + attached managed), S3 bucket policies, KMS key policies, Lake Formation permissions, and cross-account trust.
 
-**Missing CloudWatch logs for custom model jobs?** → See [custom model logging debugging procedure](references/custom-model-logging-debugging.md). Covers Configured Model Algorithm Association privacy configuration, ML Configuration role permissions, and log group verification.
+**Missing CloudWatch logs for custom model jobs?** -> See [custom model logging debugging procedure](references/custom-model-logging-debugging.md). Covers Configured Model Algorithm Association privacy configuration, ML Configuration role permissions, and log group verification.
 
 ## Additional resources
 

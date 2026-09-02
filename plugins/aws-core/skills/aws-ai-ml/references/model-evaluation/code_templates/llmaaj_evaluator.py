@@ -60,7 +60,7 @@ if CUSTOM_METRICS:
 
 evaluator = LLMAsJudgeEvaluator(**evaluator_kwargs)
 
-print("✅ Starting evaluation...")
+print("[YES] Starting evaluation...")
 print(f"Model: {MODEL}")
 print(f"Dataset: {DATASET}")
 print(f"Judge: {EVALUATOR_MODEL}")
@@ -71,7 +71,7 @@ if CUSTOM_METRICS:
 
 execution = evaluator.evaluate()
 
-print(f"\n✅ Evaluation job started!")
+print(f"\n[YES] Evaluation job started!")
 print(f"Job ARN: {execution.arn}")
 print(f"Job Name: {execution.name}")
 print(f"Status: {execution.status.overall_status}")

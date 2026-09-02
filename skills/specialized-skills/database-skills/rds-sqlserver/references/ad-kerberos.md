@@ -1,4 +1,4 @@
-# Active Directory and Kerberos — RDS SQL Server Windows auth
+# Active Directory and Kerberos -- RDS SQL Server Windows auth
 
 Windows authentication on RDS SQL Server requires:
 
@@ -13,7 +13,7 @@ Windows authentication on RDS SQL Server requires:
 
 - Fully managed by AWS
 - Multi-AZ by default
-- RDS integration is turnkey — automatic SPN registration, DNS CNAMEs
+- RDS integration is turnkey -- automatic SPN registration, DNS CNAMEs
 - Same directory can serve EC2, RDS, FSx, WorkSpaces
 
 ```bash
@@ -29,7 +29,7 @@ Get the Directory ID from the output (format: `d-xxxxxxxxxx`).
 
 ### Self-managed AD
 
-Run your own AD on EC2 (or connect to on-prem AD via TGW/VPN). More complex — no automatic SPN management.
+Run your own AD on EC2 (or connect to on-prem AD via TGW/VPN). More complex -- no automatic SPN management.
 
 For self-managed AD, RDS needs:
 
@@ -96,10 +96,10 @@ aws rds describe-db-instances \
 
 Statuses:
 
-- `pending` → in progress
-- `joined` → ready for Windows auth
-- `failed` → check CloudWatch Logs `rdsadmin/error` for cause
-- `kerberos-enabled` → all good (newer field name)
+- `pending` -> in progress
+- `joined` -> ready for Windows auth
+- `failed` -> check CloudWatch Logs `rdsadmin/error` for cause
+- `kerberos-enabled` -> all good (newer field name)
 
 ## Create SQL logins for AD users/groups
 
@@ -109,7 +109,7 @@ Connect as master user (SQL auth) and create a SQL login mapped to the Windows a
 -- For individual AD user (UPPERCASE is Microsoft best practice)
 CREATE LOGIN [CORP\JOE.DOE] FROM WINDOWS;
 
--- For AD group (preferred — no maintenance when people join/leave)
+-- For AD group (preferred -- no maintenance when people join/leave)
 CREATE LOGIN [CORP\DBA_TEAM] FROM WINDOWS;
 
 -- Grant DB access
@@ -119,9 +119,9 @@ ALTER ROLE db_datareader ADD MEMBER [CORP\DBA_TEAM];
 ALTER ROLE db_datawriter ADD MEMBER [CORP\DBA_TEAM];
 ```
 
-**Case matters in some SQL configurations** — use UPPERCASE consistently. `CORP\joe.doe` and `CORP\JOE.DOE` can be different logins depending on server collation.
+**Case matters in some SQL configurations** -- use UPPERCASE consistently. `CORP\joe.doe` and `CORP\JOE.DOE` can be different logins depending on server collation.
 
-## The CNAME — critical for Kerberos
+## The CNAME -- critical for Kerberos
 
 Kerberos requires the client to request a ticket for a service principal name (SPN). RDS has SPNs registered only for the domain CNAME format, not the RDS endpoint.
 
@@ -196,7 +196,7 @@ String url = "jdbc:sqlserver://mydb.corp.example.com:1433;"
 ### Python / pyodbc
 
 ```python
-# pyodbc — on domain-joined Windows or Linux with krb5 + keytab
+# pyodbc -- on domain-joined Windows or Linux with krb5 + keytab
 conn = pyodbc.connect(
     "Driver={ODBC Driver 18 for SQL Server};"
     "Server=mydb.corp.example.com,1433;"
@@ -206,14 +206,14 @@ conn = pyodbc.connect(
 )
 ```
 
-**pymssql does NOT support Kerberos** — use pyodbc.
+**pymssql does NOT support Kerberos** -- use pyodbc.
 
-## auth_scheme shows NTLM instead of KERBEROS — common cause
+## auth_scheme shows NTLM instead of KERBEROS -- common cause
 
 Most common reason Kerberos falls back to NTLM:
 
 1. **Client connected to RDS endpoint, not CNAME**
-   - `mydb.xxxx.us-east-1.rds.amazonaws.com` has no SPN → Kerberos fails → NTLM fallback
+   - `mydb.xxxx.us-east-1.rds.amazonaws.com` has no SPN -> Kerberos fails -> NTLM fallback
    - Fix: connect to the CNAME
 
 2. **SPN missing for the CNAME**
@@ -225,7 +225,7 @@ Most common reason Kerberos falls back to NTLM:
    - Fix: SG/firewall rules to DCs
 
 4. **Client has no TGT**
-   - Windows: `klist` — should show a TGT. If not, `kinit` or log off/on
+   - Windows: `klist` -- should show a TGT. If not, `kinit` or log off/on
    - Linux: check `/var/kerberos/krb5/user/` or `KRB5CCNAME` env var
 
 Verify:
@@ -235,18 +235,18 @@ SELECT auth_scheme, client_net_address
 FROM sys.dm_exec_connections WHERE session_id = @@SPID
 ```
 
-`auth_scheme = KERBEROS` — success. `NTLM` — fall through to one of the above causes.
+`auth_scheme = KERBEROS` -- success. `NTLM` -- fall through to one of the above causes.
 
-## Cannot generate SSPI context — common causes
+## Cannot generate SSPI context -- common causes
 
 Error: `The target principal name is incorrect. Cannot generate SSPI context`.
 
 Root causes (diagnose in this order):
 
-1. **CNAME doesn't resolve from the client** → DNS issue
-2. **CNAME resolves but SPN not registered** → `setspn -L` missing entry
-3. **Client clock skew > 5 min from DC** → NTP issue
-4. **Firewall blocks Kerberos (port 88)** → SG or corporate firewall
+1. **CNAME doesn't resolve from the client** -> DNS issue
+2. **CNAME resolves but SPN not registered** -> `setspn -L` missing entry
+3. **Client clock skew > 5 min from DC** -> NTP issue
+4. **Firewall blocks Kerberos (port 88)** -> SG or corporate firewall
 
 Run `klist` (Windows) or `klist -e` (Linux) to see if you have a ticket for `MSSQLSvc/mydb.corp.example.com:1433`.
 

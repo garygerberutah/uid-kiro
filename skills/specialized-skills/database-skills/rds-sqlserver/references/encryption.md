@@ -1,11 +1,11 @@
-# SSL/TLS Encryption — RDS SQL Server
+# SSL/TLS Encryption -- RDS SQL Server
 
 ## Defaults
 
 RDS SQL Server ships with a self-signed certificate for the instance. By default:
 
 - RDS **accepts** TLS connections on 1433
-- RDS **does not require** TLS — connections can be plaintext unless the client opts in
+- RDS **does not require** TLS -- connections can be plaintext unless the client opts in
 - The parameter `rds.force_ssl` is **0 by default** (SQL Server doesn't have this parameter like PostgreSQL does)
 
 To force TLS, use the `FORCE_ENCRYPTION` option group setting (see below).
@@ -27,7 +27,7 @@ Every driver has its own way to express "force TLS + validate cert":
 
 | Driver | Setting | Notes |
 |---|---|---|
-| pymssql | `encryption="require"` | Not `"request"` — that's opportunistic |
+| pymssql | `encryption="require"` | Not `"request"` -- that's opportunistic |
 | pyodbc | `Encrypt=Yes;TrustServerCertificate=No` | In connection string |
 | .NET SqlClient | `Encrypt=Mandatory;TrustServerCertificate=False` | 5.x defaults to Mandatory/False |
 | Java JDBC | `encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.rds.amazonaws.com` | hostname helps wildcard |
@@ -56,10 +56,10 @@ sudo update-ca-certificates   # Debian/Ubuntu
 
 Drivers that use the OS trust store (pymssql, pyodbc) will now validate.
 
-### Java — per-app truststore
+### Java -- per-app truststore
 
 ```bash
-# Split PEM — keytool imports only the first cert from a multi-cert PEM
+# Split PEM -- keytool imports only the first cert from a multi-cert PEM
 csplit -s -z -f rds- -b '%02d.pem' global-bundle.pem '/-----BEGIN CERTIFICATE-----/' '{*}'
 
 # Import each cert
@@ -76,7 +76,7 @@ java -Djavax.net.ssl.trustStore=/path/to/rds-truststore.jks \
      -jar app.jar
 ```
 
-### .NET — Windows cert store
+### .NET -- Windows cert store
 
 On Windows, import `global-bundle.pem` into the **Trusted Root Certification Authorities** store:
 
@@ -87,7 +87,7 @@ Import-Certificate -FilePath global-bundle.pem `
 
 On Linux .NET, install in OS store as above.
 
-### Node.js — pass CA explicitly
+### Node.js -- pass CA explicitly
 
 ```javascript
 const fs = require('fs');
@@ -161,7 +161,7 @@ aws rds describe-db-instances \
 # Expected: rds-ca-rsa2048-g1
 ```
 
-To rotate (no restart required for 2019→rsa2048-g1):
+To rotate (no restart required for 2019->rsa2048-g1):
 
 ```bash
 aws rds modify-db-instance \
@@ -174,11 +174,11 @@ After rotation, clients that don't have the current CA bundle will fail TLS hand
 
 ### Available CAs
 
-- `rds-ca-rsa2048-g1` — default, RSA 2048-bit, expires 2061
-- `rds-ca-rsa4096-g1` — RSA 4096-bit for stricter compliance
-- `rds-ca-ecc384-g1` — ECDSA P-384 (smaller, faster, requires TLS_ECDHE_ECDSA cipher suites)
+- `rds-ca-rsa2048-g1` -- default, RSA 2048-bit, expires 2061
+- `rds-ca-rsa4096-g1` -- RSA 4096-bit for stricter compliance
+- `rds-ca-ecc384-g1` -- ECDSA P-384 (smaller, faster, requires TLS_ECDHE_ECDSA cipher suites)
 
-`global-bundle.pem` contains all of these — rotating between them doesn't require a different bundle.
+`global-bundle.pem` contains all of these -- rotating between them doesn't require a different bundle.
 
 ## Common errors
 
@@ -188,7 +188,7 @@ Caused by:
 
 - TLS version mismatch (client < 1.2, server requires 1.2+)
 - Cert chain not trusted (CA bundle missing from client)
-- Network tampering (rare — check for corporate TLS proxies)
+- Network tampering (rare -- check for corporate TLS proxies)
 
 Fix: install CA bundle, upgrade client (SSMS 18.x+, drivers to current versions).
 
@@ -199,14 +199,14 @@ Client verifying CN against hostname. Either:
 - Connect to the exact hostname the cert was issued for (`mydb.xxxx.us-east-1.rds.amazonaws.com`), OR
 - Set `hostNameInCertificate=*.rds.amazonaws.com` (Java) / equivalent
 
-Common through SSM tunnel (CN won't match `localhost`) — see `ssm-tunneling.md`.
+Common through SSM tunnel (CN won't match `localhost`) -- see `ssm-tunneling.md`.
 
 ### `Could not establish trust relationship for the SSL/TLS secure channel`
 
 .NET-specific. Either:
 
 - Install RDS CA bundle in Trusted Root
-- Set `TrustServerCertificate=True` (dev only — don't use in prod)
+- Set `TrustServerCertificate=True` (dev only -- don't use in prod)
 
 ### SSMS pre-login failure
 
@@ -214,6 +214,6 @@ Upgrade SSMS to 18.x or later. SSMS 17 and earlier use TLS 1.0 by default and wi
 
 ## Don't do
 
-- Don't set `TrustServerCertificate=True` in production — it bypasses cert validation
+- Don't set `TrustServerCertificate=True` in production -- it bypasses cert validation
 - Don't disable `rds.force_ssl` by removing the option group; use it to enforce, not relax
-- Don't embed the CA bundle in the application code — distribute via package or OS trust store
+- Don't embed the CA bundle in the application code -- distribute via package or OS trust store

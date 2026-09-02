@@ -1,4 +1,4 @@
-# Amazon Bedrock Converse API — TypeScript SDK Quick Reference
+# Amazon Bedrock Converse API -- TypeScript SDK Quick Reference
 
 > Condensed patterns for @aws-sdk/client-bedrock-runtime. For full API structure
 > and provider-specific formats, see [model-invocation.md](model-invocation.md).
@@ -40,7 +40,7 @@ const response = await client.send(
     modelId: "us.anthropic.claude-sonnet-4-6",
     messages: [{ role: "user", content: [{ text: "Hello" }] }],
     inferenceConfig: {
-      maxTokens: 1024, // MUST set explicitly — see Non-Obvious Patterns
+      maxTokens: 1024, // MUST set explicitly -- see Non-Obvious Patterns
       temperature: 0.7,
     },
   })
@@ -51,11 +51,11 @@ console.log(response.output?.message?.content?.[0]?.text);
 
 ## Non-Obvious Patterns
 
-- **maxTokens MUST be set explicitly.** Leaving it unset defaults to model maximum (64K for Claude) and silently reserves 43x more quota than needed — the #1 cause of unexpected ThrottlingException.
-- **Cross-region model IDs** require a geographic prefix (`us.`, `eu.`, `apac.`, `global.`, `us-gov.`, `au.`, `jp.`, `ca.`, etc.). Using a direct model ID without the prefix for cross-region inference causes `ResourceNotFoundException` or `AccessDeniedException`. **Model IDs in code examples below may be outdated** — always verify current model IDs before use: `aws bedrock list-foundation-models --region <region>` and `aws bedrock list-inference-profiles --region <region>`, or refer to the latest [Bedrock supported models](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and [cross-region inference profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference-support.html).
+- **maxTokens MUST be set explicitly.** Leaving it unset defaults to model maximum (64K for Claude) and silently reserves 43x more quota than needed -- the #1 cause of unexpected ThrottlingException.
+- **Cross-region model IDs** require a geographic prefix (`us.`, `eu.`, `apac.`, `global.`, `us-gov.`, `au.`, `jp.`, `ca.`, etc.). Using a direct model ID without the prefix for cross-region inference causes `ResourceNotFoundException` or `AccessDeniedException`. **Model IDs in code examples below may be outdated** -- always verify current model IDs before use: `aws bedrock list-foundation-models --region <region>` and `aws bedrock list-inference-profiles --region <region>`, or refer to the latest [Bedrock supported models](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html) and [cross-region inference profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference-support.html).
 - **Newer models** may require inference profile IDs instead of model IDs. Verify the correct ID format: `aws bedrock get-foundation-model --model-identifier``<model-id>```
-- **Prompt management**: Pass prompt ARN as `modelId` — it *replaces* the model ID. When using managed prompts, MUST NOT include `inferenceConfig`, `system`, `toolConfig`, or `additionalModelRequestFields`. Messages are *appended* after the prompt's messages.
-- **Streaming events** arrive in order: `messageStart` → `contentBlockStart` → `contentBlockDelta` (repeated) → `contentBlockStop` → `messageStop` → `metadata`.
+- **Prompt management**: Pass prompt ARN as `modelId` -- it *replaces* the model ID. When using managed prompts, MUST NOT include `inferenceConfig`, `system`, `toolConfig`, or `additionalModelRequestFields`. Messages are *appended* after the prompt's messages.
+- **Streaming events** arrive in order: `messageStart` -> `contentBlockStart` -> `contentBlockDelta` (repeated) -> `contentBlockStop` -> `messageStop` -> `metadata`.
 - **Retry only**: ThrottlingException, ModelTimeoutException, ServiceUnavailableException, InternalServerException. Do NOT retry: ValidationException, AccessDeniedException.
 - **BedrockRuntimeClient** for inference, **BedrockClient** for management. Wrong client = `UnknownOperationException`.
 
@@ -119,7 +119,7 @@ if (response.stopReason === "tool_use") {
     const { name, input, toolUseId } = toolBlock;
     // name = "get_weather", input = { city: "Seattle" }
 
-    // IMPORTANT: Validate input before use — model outputs are untrusted.
+    // IMPORTANT: Validate input before use -- model outputs are untrusted.
     // The model could return malformed or unexpected values. Validate types,
     // lengths, and allowlists before passing to any tool handler.
 
@@ -132,7 +132,7 @@ if (response.stopReason === "tool_use") {
         content: [{
           toolResult: {
             toolUseId,
-            content: [{ text: "72°F, sunny" }],
+            content: [{ text: "72 degrees F, sunny" }],
           },
         }],
       },
@@ -160,7 +160,7 @@ const response = await client.send(
     guardrailConfig: {
       guardrailIdentifier: "my-guardrail-id",
       guardrailVersion: "1", // Pin version in production, don't use DRAFT
-      trace: "disabled", // MUST be "disabled" in production — "enabled" exposes PII/harmful content in response (HIPAA/GDPR risk)
+      trace: "disabled", // MUST be "disabled" in production -- "enabled" exposes PII/harmful content in response (HIPAA/GDPR risk)
     },
   })
 );
@@ -168,10 +168,10 @@ const response = await client.send(
 
 ## Best Practices
 
-1. Always set `maxTokens` explicitly — never rely on default
+1. Always set `maxTokens` explicitly -- never rely on default
 2. Use `BedrockRuntimeClient` for inference, `BedrockClient` for management
 3. Set `maxAttempts: 5` and `retryMode: "adaptive"` on client for adaptive retry
 4. Use cross-region model IDs (`us.` prefix) for higher availability
 5. Pin prompt management versions in production (`:1` suffix in ARN)
 6. Use `ConverseStreamCommand` for user-facing applications (lower time-to-first-token)
-7. Pin guardrail versions — don't use DRAFT in production
+7. Pin guardrail versions -- don't use DRAFT in production

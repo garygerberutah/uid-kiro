@@ -48,10 +48,10 @@ Example: `atx custom def exec -n my-td -p /source/repo -g 'additionalPlanContext
 |----------|---------|-------------|
 | `ATX_SHELL_TIMEOUT` | 900 (15 min) | Shell command timeout in seconds |
 | `ATX_DISABLE_UPDATE_CHECK` | false | Disable version check |
-| `AWS_PROFILE` | — | AWS credentials profile |
-| `AWS_ACCESS_KEY_ID` | — | AWS access key |
-| `AWS_SECRET_ACCESS_KEY` | — | AWS secret key |
-| `AWS_SESSION_TOKEN` | — | Session token (temporary credentials) |
+| `AWS_PROFILE` | -- | AWS credentials profile |
+| `AWS_ACCESS_KEY_ID` | -- | AWS access key |
+| `AWS_SECRET_ACCESS_KEY` | -- | AWS secret key |
+| `AWS_SESSION_TOKEN` | -- | Session token (temporary credentials) |
 
 ## IAM Permissions
 

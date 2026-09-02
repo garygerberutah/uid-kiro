@@ -188,7 +188,7 @@ aws lambda create-function --function-name $FUNCTION_NAME --runtime python3.13 \
   --capacity-provider-config \
     "LambdaManagedInstancesCapacityProviderConfig={CapacityProviderArn=arn:aws:lambda:$AWS_REGION:$ACCOUNT_ID:capacity-provider:$CP_NAME}"
 
-# 3. Publish version (triggers provisioning — takes several minutes)
+# 3. Publish version (triggers provisioning -- takes several minutes)
 aws lambda publish-version --function-name $FUNCTION_NAME
 
 # 4. Invoke (must use versioned ARN)

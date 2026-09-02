@@ -80,7 +80,7 @@ with four additional rule types that do not use customer domain lists:
 | --- | --- | --- |
 | **DGA (Domain Generation Algorithm)** | ML-based behavioral detection | Malware that generates random-looking domains for command-and-control |
 | **DNS Tunneling** | ML-based behavioral detection | Data exfiltration via DNS query/response payloads |
-| **Threat categories** | Rule-based categorization | Blocking domains by threat type (e.g., malware, ransomware, spyware, C2) — broader than the Foundational managed lists |
+| **Threat categories** | Rule-based categorization | Blocking domains by threat type (e.g., malware, ransomware, spyware, C2) -- broader than the Foundational managed lists |
 | **Content categories** | Rule-based categorization | Blocking domains by content type (e.g., gambling, adult content, streaming) for acceptable-use enforcement |
 
 DGA and DNS tunneling rules support confidence thresholds (HIGH, MEDIUM, LOW) that control the
@@ -220,11 +220,11 @@ lists on top only as needed.
 
 - You SHOULD start from one or more AWS-managed domain lists. The four publicly available managed
   lists are:
-  - `AWSManagedDomainsMalwareDomainList` — domains associated with malware distribution and hosting
-  - `AWSManagedDomainsBotnetCommandandControl` — domains used for botnet command-and-control
-  - `AWSManagedDomainsAggregateThreatList` — combined multi-threat list (superset of malware,
+  - `AWSManagedDomainsMalwareDomainList` -- domains associated with malware distribution and hosting
+  - `AWSManagedDomainsBotnetCommandandControl` -- domains used for botnet command-and-control
+  - `AWSManagedDomainsAggregateThreatList` -- combined multi-threat list (superset of malware,
     ransomware, botnet, spyware, DNS tunneling domains; includes domains from the other lists)
-  - `AWSManagedDomainsAmazonGuardDutyThreatList` — domains from Amazon GuardDuty DNS security
+  - `AWSManagedDomainsAmazonGuardDutyThreatList` -- domains from Amazon GuardDuty DNS security
     findings (internally generated threat intelligence)
   List the managed lists in the Region to find their IDs:
 
@@ -260,9 +260,9 @@ Add a rule to the rule group that references each domain list with the confirmed
 
 - You MUST confirm the block action with the customer before creating the rule, because the mode
   changes application behavior on a block:
-  - `NXDOMAIN` — the client is told the domain does not exist (fail fast)
-  - `NODATA` — the client gets an empty answer (quiet failure)
-  - `OVERRIDE` — the client is returned a CNAME to a domain you supply (redirect to a sinkhole)
+  - `NXDOMAIN` -- the client is told the domain does not exist (fail fast)
+  - `NODATA` -- the client gets an empty answer (quiet failure)
+  - `OVERRIDE` -- the client is returned a CNAME to a domain you supply (redirect to a sinkhole)
 - You SHOULD offer an ALERT-first rollout for an unfamiliar managed list: create the rule with
   `--action ALERT` first, confirm from query logs that legitimate domains are not caught, then
   switch the rule to `--action BLOCK`. ALERT logs the match and permits the query, avoiding an
@@ -340,7 +340,7 @@ matching expected traffic.
   (`aws logs associate-kms-key`), SSE-S3 or SSE-KMS on the S3 bucket, or server-side encryption on
   the Data Firehose stream
 - Query log records include `firewall_rule_group_id`, `firewall_rule_action`, and
-  `firewall_domain_list_id` for ALERT and BLOCK actions — use these to verify rules are
+  `firewall_domain_list_id` for ALERT and BLOCK actions -- use these to verify rules are
   matching expected traffic before switching from ALERT to BLOCK
 
 #### 5. Associate the rule group across all the customer's VPCs

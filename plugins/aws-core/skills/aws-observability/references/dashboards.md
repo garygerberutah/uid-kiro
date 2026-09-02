@@ -95,14 +95,14 @@ Two types:
 
 Variables are a top-level `variables` array in the dashboard body JSON, peer to `widgets`. They eliminate the need for per-function or per-instance dashboards.
 
-Shared dashboard viewers cannot change variable values — the dashboard renders with the default value only.
+Shared dashboard viewers cannot change variable values -- the dashboard renders with the default value only.
 
 ---
 
 ## Sharing constraints
 
 - Shared users **cannot see** composite alarm widgets, Logs Insights widgets, or custom widgets unless you add the corresponding permissions (`DescribeAlarms`, CloudWatch Logs query permissions, Lambda invoke) to the sharing IAM policy
-- `cloudwatch:GetMetricData` and `ec2:DescribeTags` **cannot be scoped** — shared users can query all metrics and EC2 tags in the account
+- `cloudwatch:GetMetricData` and `ec2:DescribeTags` **cannot be scoped** -- shared users can query all metrics and EC2 tags in the account
 - Cognito resources are created in **us-east-1** regardless of dashboard region
 
 ---

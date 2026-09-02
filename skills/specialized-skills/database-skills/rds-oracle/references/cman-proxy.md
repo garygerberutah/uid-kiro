@@ -1,4 +1,4 @@
-# RDS for Oracle — Oracle Connection Manager (CMAN)
+# RDS for Oracle -- Oracle Connection Manager (CMAN)
 
 **RDS for Oracle does NOT support RDS Proxy.** Use Oracle CMAN on EC2 when you need connection multiplexing, access control, session timeout management, or a proxy layer.
 
@@ -9,7 +9,7 @@ Source: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/oracle-cman.html
 ## Architecture
 
 ```
-Clients → CMAN (EC2, private subnet) → RDS Oracle
+Clients -> CMAN (EC2, private subnet) -> RDS Oracle
 ```
 
 On-prem clients connect to CMAN via VPN/Direct Connect. CMAN provides a stable proxy in front of the RDS endpoint.
@@ -158,16 +158,16 @@ sudo systemctl start oracle-cman
 | CMAN SG | Outbound | 1521 | RDS SG |
 | RDS SG | Inbound | 1521 | **CMAN SG** (not the client SG) |
 
-## High availability — NLB across two AZs
+## High availability -- NLB across two AZs
 
 ```
-Clients → NLB (TCP 1521) → CMAN-AZ1, CMAN-AZ2 → RDS Oracle
+Clients -> NLB (TCP 1521) -> CMAN-AZ1, CMAN-AZ2 -> RDS Oracle
 ```
 
 - Two CMAN EC2 instances, one per AZ
 - Network Load Balancer with TCP 1521 listener
 - Target group health check: TCP 1521
-- Route 53 CNAME `oracle-cman.example.internal` → NLB DNS name
+- Route 53 CNAME `oracle-cman.example.internal` -> NLB DNS name
 
 This survives single-AZ failures and lets you patch one CMAN at a time.
 
@@ -208,7 +208,7 @@ REMOTE_LISTENER = <cman-ec2-private-ip>:1521
 
 Set this on a DB parameter group, associate with the RDS instance, reboot.
 
-## JDBC thin driver proxy — SOURCE_ROUTE
+## JDBC thin driver proxy -- SOURCE_ROUTE
 
 JDBC thin doesn't use `tnsnames.ora`. Use a SOURCE_ROUTE descriptor in the URL:
 
@@ -258,11 +258,11 @@ resource "aws_security_group" "cman" {
 
 ## CMAN log files
 
-`$ORACLE_HOME/diag/netcman/<hostname>/<cman-alias>/trace/` — check when CMAN won't start or connections fail.
+`$ORACLE_HOME/diag/netcman/<hostname>/<cman-alias>/trace/` -- check when CMAN won't start or connections fail.
 
 ## Common failure modes
 
-- **`cmctl startup` fails** — `ORACLE_HOME` not set; `cman.ora` syntax error (run `cmctl validate`); port 1521 already in use.
-- **Clients can't connect through CMAN** — SG inbound on CMAN EC2 missing; CMAN not running; client DSN points at RDS instead of CMAN.
-- **Connections drop** — `SESSION_TIMEOUT` too low; NLB health check wrong; check CMAN logs.
-- **`ORA-12529` rejected** — source IP not in an `ACCEPT` rule. Add the CIDR or broaden the rule.
+- **`cmctl startup` fails** -- `ORACLE_HOME` not set; `cman.ora` syntax error (run `cmctl validate`); port 1521 already in use.
+- **Clients can't connect through CMAN** -- SG inbound on CMAN EC2 missing; CMAN not running; client DSN points at RDS instead of CMAN.
+- **Connections drop** -- `SESSION_TIMEOUT` too low; NLB health check wrong; check CMAN logs.
+- **`ORA-12529` rejected** -- source IP not in an `ACCEPT` rule. Add the CIDR or broaden the rule.

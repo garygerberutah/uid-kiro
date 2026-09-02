@@ -30,7 +30,7 @@ Works from both standalone accounts and delegated administrator accounts.
    aws guardduty get-detector --detector-id <DETECTOR_ID>
    ```
 
-3. Report ALL features from the `get-detector` response. The response includes a `features` array — enumerate each feature and its `status` (ENABLED/DISABLED). Do not hardcode a feature list; report whatever the API returns.
+3. Report ALL features from the `get-detector` response. The response includes a `features` array -- enumerate each feature and its `status` (ENABLED/DISABLED). Do not hardcode a feature list; report whatever the API returns.
 
    For reference on available features, see: https://docs.aws.amazon.com/guardduty/latest/ug/guardduty-features-activation-model.html
 
@@ -56,7 +56,7 @@ Works from both standalone accounts and delegated administrator accounts.
    aws guardduty describe-publishing-destination --detector-id <DETECTOR_ID> --destination-id <DEST_ID>
    ```
 
-   **Security check:** Verify publishing destination has SSE-KMS encryption configured — check for `KmsKeyArn` in the destination properties.
+   **Security check:** Verify publishing destination has SSE-KMS encryption configured -- check for `KmsKeyArn` in the destination properties.
 
 5. Check IP sets and threat intel sets:
 
@@ -142,10 +142,10 @@ Works from both standalone accounts and delegated administrator accounts.
 
 | Symptom | Resolution |
 |---|---|
-| list-detectors returns empty | GuardDuty not enabled — report as not configured |
-| Access denied on describe-organization-configuration | Not a delegated admin — run Workflow A instead |
-| get-member-detectors fails | Account not a member — verify with list-members |
-| list-organization-admin-accounts returns BadRequestException | Requires org management account — use describe-organization-configuration from DA |
+| list-detectors returns empty | GuardDuty not enabled -- report as not configured |
+| Access denied on describe-organization-configuration | Not a delegated admin -- run Workflow A instead |
+| get-member-detectors fails | Account not a member -- verify with list-members |
+| list-organization-admin-accounts returns BadRequestException | Requires org management account -- use describe-organization-configuration from DA |
 
 ## Output Sensitivity
 

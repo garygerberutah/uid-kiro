@@ -78,7 +78,7 @@ command.
   firewallmanager skill. This skill wires Shield Advanced to those pieces; it does not build them.
   AWS WAF is not optional alongside Shield Advanced: you SHOULD recommend an AWS WAF web ACL on
   every internet-facing protected resource (CloudFront distributions and Application Load Balancers)
-  as defense in depth — Shield Advanced and AWS WAF are complementary layer 3/4 and layer 7
+  as defense in depth -- Shield Advanced and AWS WAF are complementary layer 3/4 and layer 7
   controls, and the rate-based rule that AWS WAF provides is also what cost protection requires.
 
 ## Logging and monitoring

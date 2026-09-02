@@ -1,4 +1,4 @@
-# RDS for Oracle — Compute Runtime
+# RDS for Oracle -- Compute Runtime
 
 Platform patterns for EC2, ECS Fargate, EKS, and Lambda. Pair with `connection-auth.md` + the language reference.
 
@@ -7,7 +7,7 @@ Platform patterns for EC2, ECS Fargate, EKS, and Lambda. Pair with `connection-a
 Simplest setup. Instance has an IAM instance profile (not hard-coded creds).
 
 ```bash
-# Install client (thin mode preferred — no Oracle Client needed)
+# Install client (thin mode preferred -- no Oracle Client needed)
 pip install oracledb      # Python
 npm install oracledb      # Node.js
 ```
@@ -17,7 +17,7 @@ Attach an IAM role to the EC2 with:
 - `secretsmanager:GetSecretValue` on the RDS credentials secret ARN
 - `kms:Decrypt` on the CMK (if customer-managed)
 
-Security group: EC2 SG outbound → RDS SG inbound on 1521.
+Security group: EC2 SG outbound -> RDS SG inbound on 1521.
 
 Test:
 
@@ -28,7 +28,7 @@ python3 scripts/test_oracle_connection.py <endpoint> 1521 ORCL dbadmin
 
 ## ECS Fargate pattern
 
-Fargate tasks run in a VPC. Give the **task execution role** (not the task role) permission to read secrets — the ECS agent uses it to inject them:
+Fargate tasks run in a VPC. Give the **task execution role** (not the task role) permission to read secrets -- the ECS agent uses it to inject them:
 
 ```json
 {
@@ -44,7 +44,7 @@ Fargate tasks run in a VPC. Give the **task execution role** (not the task role)
 }
 ```
 
-Task definition — inject the username/password as env vars from one secret JSON:
+Task definition -- inject the username/password as env vars from one secret JSON:
 
 ```json
 {
@@ -77,12 +77,12 @@ Task definition — inject the username/password as env vars from one secret JSO
 Task (service) networking:
 
 - Subnets: private subnets in the same VPC as RDS (or peered)
-- `assignPublicIp: DISABLED` — pull images via NAT gateway or ECR VPC endpoint
+- `assignPublicIp: DISABLED` -- pull images via NAT gateway or ECR VPC endpoint
 - SG: outbound 1521 to RDS SG; outbound 443 to Secrets Manager (or VPC endpoint)
 
-Pool sizing: total connections = tasks × max pool size per task. Fargate auto-scaling ceiling sets the budget.
+Pool sizing: total connections = tasks x max pool size per task. Fargate auto-scaling ceiling sets the budget.
 
-## EKS pattern — IRSA + Secrets Store CSI Driver
+## EKS pattern -- IRSA + Secrets Store CSI Driver
 
 Recommended: inject secrets via the **AWS Secrets Store CSI Driver** with **IRSA** (IAM Roles for Service Accounts).
 
@@ -195,11 +195,11 @@ spec:
             secretProviderClass: oracle-creds
 ```
 
-Security group: pod SG (or node SG if not using pod SGs) outbound 1521 → RDS SG inbound 1521.
+Security group: pod SG (or node SG if not using pod SGs) outbound 1521 -> RDS SG inbound 1521.
 
-**Pool sizing**: total Oracle connections = `replicas × poolMax per pod`. Cap HPA `maxReplicas` with this budget in mind.
+**Pool sizing**: total Oracle connections = `replicas x poolMax per pod`. Cap HPA `maxReplicas` with this budget in mind.
 
-## Lambda pattern — VPC + Secrets Manager
+## Lambda pattern -- VPC + Secrets Manager
 
 Lambda must be configured with VPC, private subnets, and a security group. Each Lambda instance maintains its own pool, so keep `max` small (1-2).
 
@@ -212,7 +212,7 @@ aws lambda update-function-configuration \
   --region us-east-1
 ```
 
-Lambda SG outbound 1521 → RDS SG inbound 1521. Plus outbound 443 to Secrets Manager (via VPC endpoint or NAT).
+Lambda SG outbound 1521 -> RDS SG inbound 1521. Plus outbound 443 to Secrets Manager (via VPC endpoint or NAT).
 
 ### Build the oracledb layer (Python)
 
@@ -235,7 +235,7 @@ aws lambda update-function-configuration \
   --layers arn:aws:lambda:us-east-1:<account>:layer:oracledb:1
 ```
 
-### Handler — pool at module scope
+### Handler -- pool at module scope
 
 ```python
 import json, os, boto3, oracledb
@@ -263,19 +263,19 @@ Module-scope init is reused across warm invocations. Each cold start pays the po
 
 ### Cold-start optimization
 
-- **Thin mode** — no native library load, faster init (python-oracledb 6+ default).
-- **Smaller deployment package** — drop test data, docs, unused dependencies.
-- **Provisioned concurrency** for latency-sensitive workloads — keeps N instances warm.
-- **VPC endpoint for Secrets Manager** — avoids NAT gateway DNS round-trip.
-- **Keep memory ≤ 1 GB** unless you need more — higher memory = faster but more cost.
+- **Thin mode** -- no native library load, faster init (python-oracledb 6+ default).
+- **Smaller deployment package** -- drop test data, docs, unused dependencies.
+- **Provisioned concurrency** for latency-sensitive workloads -- keeps N instances warm.
+- **VPC endpoint for Secrets Manager** -- avoids NAT gateway DNS round-trip.
+- **Keep memory <= 1 GB** unless you need more -- higher memory = faster but more cost.
 
 ### Total-connection budget
 
-Total RDS connections from Lambda = concurrent invocations × `max` pool size. Monitor via CloudWatch `DatabaseConnections`. Cap with Lambda reserved concurrency if needed.
+Total RDS connections from Lambda = concurrent invocations x `max` pool size. Monitor via CloudWatch `DatabaseConnections`. Cap with Lambda reserved concurrency if needed.
 
-## RDS Proxy — not supported
+## RDS Proxy -- not supported
 
-**RDS Proxy does not support Oracle.** For Oracle connection multiplexing, use Oracle CMAN on EC2 — see `cman-proxy.md`.
+**RDS Proxy does not support Oracle.** For Oracle connection multiplexing, use Oracle CMAN on EC2 -- see `cman-proxy.md`.
 
 ## SSM for developer access
 

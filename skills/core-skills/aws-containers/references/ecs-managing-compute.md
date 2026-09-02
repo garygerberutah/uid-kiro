@@ -10,15 +10,15 @@ You package your application in containers and specify your compute requirements
 
 Important considerations:
 
-1. ECS Managed Instances is used through **capacity providers**, not a launch type. You enable ECS Managed Instances in your account, create a capacity provider (default instance selection or custom `instanceRequirements`), associate it with a cluster, and reference it in a capacity provider strategy. A capacity provider strategy can only contain one type of capacity provider — ECS Managed Instances, Auto Scaling group, or Fargate/Fargate_SPOT — not a mix.
+1. ECS Managed Instances is used through **capacity providers**, not a launch type. You enable ECS Managed Instances in your account, create a capacity provider (default instance selection or custom `instanceRequirements`), associate it with a cluster, and reference it in a capacity provider strategy. A capacity provider strategy can only contain one type of capacity provider -- ECS Managed Instances, Auto Scaling group, or Fargate/Fargate_SPOT -- not a mix.
 1. To make a task definition eligible, set the `requiresCompatibilities` parameter to include `MANAGED_INSTANCES`. A task definition can declare both `FARGATE` and `MANAGED_INSTANCES` for deployment flexibility, and existing Fargate task definitions using platform version `1.4.0` are compatible.
-1. The instances run an AWS-managed, security-hardened **Bottlerocket** AMI. Custom AMIs are not supported. There is no SSH access — use ECS Exec for debugging.
+1. The instances run an AWS-managed, security-hardened **Bottlerocket** AMI. Custom AMIs are not supported. There is no SSH access -- use ECS Exec for debugging.
 1. Instances have a **maximum lifetime of 14 days**; ECS drains and replaces them automatically to keep them patched. Long-running tasks that must exceed 14 days are not suitable for ECS Managed Instances.
 1. Two IAM roles are required: an _infrastructure role_ that lets ECS manage instances on your behalf, and an _instance profile_ for the workloads running on the instances.
 1. Supported CPU architectures are `X86_64` and `ARM64`. Supported network modes are `awsvpc` and `host`.
-1. The capacity provider can launch On-Demand or Spot Instances (and EC2 Capacity Reservations) via the `capacityOptionType` parameter on the instance launch template — valid values are `ON_DEMAND`, `SPOT`, and `RESERVED`, defaulting to `ON_DEMAND`. Spot uses spare EC2 capacity at reduced cost but can be interrupted with a two-minute notification.
+1. The capacity provider can launch On-Demand or Spot Instances (and EC2 Capacity Reservations) via the `capacityOptionType` parameter on the instance launch template -- valid values are `ON_DEMAND`, `SPOT`, and `RESERVED`, defaulting to `ON_DEMAND`. Spot uses spare EC2 capacity at reduced cost but can be interrupted with a two-minute notification.
 1. By default ECS packs multiple tasks onto a single instance for utilization. If you require strong isolation, you can configure ECS Managed Instances to run a single task per instance, giving each task VM-level security isolation boundaries.
-1. To prevent overly aggressive scale-in of underutilized instances, set the `scaleInAfter` parameter on the capacity provider's `infrastructureOptimization` configuration. It defines how many seconds (0–3600) ECS waits before optimizing idle or underutilized instances — a longer delay increases the chance of placing new tasks on existing instances and reduces startup time, while a shorter delay reduces cost. Use `null` for the default behavior or `-1` to disable automatic optimization entirely.
+1. To prevent overly aggressive scale-in of underutilized instances, set the `scaleInAfter` parameter on the capacity provider's `infrastructureOptimization` configuration. It defines how many seconds (0-3600) ECS waits before optimizing idle or underutilized instances -- a longer delay increases the chance of placing new tasks on existing instances and reduces startup time, while a shorter delay reduces cost. Use `null` for the default behavior or `-1` to disable automatic optimization entirely.
 1. See [the supported instance types documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/managed-instances-instance-types.html) to check which EC2 instance types are supported.
 
 See [the documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ManagedInstances.html) for more information.
@@ -42,7 +42,7 @@ AWS Fargate is a technology that you can use with Amazon ECS to run containers w
 
 ### Fargate Task Sizing
 
-Fargate task definitions require you to specify CPU and memory at the **task level** (most workloads only need task-level values; you can optionally also set container-level limits). Fargate allocates resources to match the configuration you request — there is no rounding or implicit default, so you must pick a valid combination. CPU can be expressed in CPU units or vCPUs (for example `1024` or `1 vCPU`) and memory in MiB or GB (for example `3072` or `3 GB`).
+Fargate task definitions require you to specify CPU and memory at the **task level** (most workloads only need task-level values; you can optionally also set container-level limits). Fargate allocates resources to match the configuration you request -- there is no rounding or implicit default, so you must pick a valid combination. CPU can be expressed in CPU units or vCPUs (for example `1024` or `1 vCPU`) and memory in MiB or GB (for example `3072` or `3 GB`).
 
 If your task needs more resources than provided, use the EC2 launch type or ECS Managed Instances.
 

@@ -1,4 +1,4 @@
-# ADOT collector configuration — traces to X-Ray, metrics to CloudWatch via EMF
+# ADOT collector configuration -- traces to X-Ray, metrics to CloudWatch via EMF
 #
 # Deployment options:
 # - EC2: daemon/agent

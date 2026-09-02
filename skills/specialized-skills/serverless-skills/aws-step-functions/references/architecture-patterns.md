@@ -1,8 +1,8 @@
 # Architecture Patterns (JSONata Mode)
 
-## Polling Loop (Wait → Check → Choice)
+## Polling Loop (Wait -> Check -> Choice)
 
-Some AWS operations and user-defined tasks are asynchronous. The states pattern is: Start Task → initial wait (what is the expected time it takes to complete the task?) → call describe/status API → check result → short wait → loop back.
+Some AWS operations and user-defined tasks are asynchronous. The states pattern is: Start Task -> initial wait (what is the expected time it takes to complete the task?) -> call describe/status API -> check result -> short wait -> loop back.
 
 See `assets/polling-loop-wait-check-choice.asl.json`
 
@@ -16,7 +16,7 @@ Step Functions has no built-in rollback. The saga pattern chains compensating ac
 
 See `assets/compensation-saga-pattern.asl.json`
 
-Compensation chain: `ReserveInventory` fails → `OrderFailed`. `ChargePayment` fails → `ReleaseInventory` → `OrderFailed`. `ShipOrder` fails → `RefundPayment` → `ReleaseInventory` → `OrderFailed`. Each Catch records `$failedStep` and `$errorInfo`. Compensation states use variables from forward steps (`$chargeId`, `$reservedQty`) to know what to undo.
+Compensation chain: `ReserveInventory` fails -> `OrderFailed`. `ChargePayment` fails -> `ReleaseInventory` -> `OrderFailed`. `ShipOrder` fails -> `RefundPayment` -> `ReleaseInventory` -> `OrderFailed`. Each Catch records `$failedStep` and `$errorInfo`. Compensation states use variables from forward steps (`$chargeId`, `$reservedQty`) to know what to undo.
 
 > **Security:** Enable encryption at rest (KMS) on the `InventoryTable` and any DynamoDB tables this workflow touches, since they hold order and inventory data.
 
@@ -41,7 +41,7 @@ Key elements:
 
 - `ToleratedFailurePercentage: 100` lets the Map complete even if every item fails. Lower the threshold to bail out early.
 - Filter on `$exists(Error)` to separate failed from successful iterations.
-- Guard filtered results with the `$type`/`$exists`/`[]` pattern — JSONata returns a single object (not a 1-element array) when exactly one item matches, and undefined when nothing matches.
+- Guard filtered results with the `$type`/`$exists`/`[]` pattern -- JSONata returns a single object (not a 1-element array) when exactly one item matches, and undefined when nothing matches.
 
 > **Security:** Use TLS for the external API calls and store any API credentials in AWS Secrets Manager. Encrypt at rest (KMS) any data store that holds the per-item inputs or results.
 
@@ -49,7 +49,7 @@ Key elements:
 
 ## Semaphore / Concurrency Lock
 
-Step Functions has no native mutual exclusion. Use DynamoDB conditional writes as a distributed lock when only one execution should process a given resource at a time. Pattern: acquire lock → do work → release lock, with Catch ensuring release on failure.
+Step Functions has no native mutual exclusion. Use DynamoDB conditional writes as a distributed lock when only one execution should process a given resource at a time. Pattern: acquire lock -> do work -> release lock, with Catch ensuring release on failure.
 
 See `assets/semaphore-concurrency-lock.asl.json`
 
@@ -67,7 +67,7 @@ Key elements:
 
 ## Human-in-the-Loop with Timeout Escalation
 
-Chain multiple `.waitForTaskToken` states with `States.Timeout` catches to build escalation: primary approver → manager → auto-reject.
+Chain multiple `.waitForTaskToken` states with `States.Timeout` catches to build escalation: primary approver -> manager -> auto-reject.
 
 See `assets/human-in-the-loop-with-timeout-escalation.asl.json`
 
@@ -75,7 +75,7 @@ See `assets/human-in-the-loop-with-timeout-escalation.asl.json`
 
 ---
 
-## Express → Standard Handoff
+## Express -> Standard Handoff
 
 Express workflows are more cost-effective for high volume State Machine Invocations, but don't support callbacks or long waits. Standard workflows handle those but cost per state transition. Use Express for fast, high-volume ingest and kick off a Standard execution for the long-running tail.
 

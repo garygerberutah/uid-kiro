@@ -269,7 +269,7 @@ If the S3 bucket name is already taken:
 - CloudWatch Logs: `CreateLogGroup`, `PutRetentionPolicy`, `DescribeLogGroups`, `TagLogGroup`
 - IAM: `CreateRole`, `PutRolePolicy`, `GetRole`, `TagRole`, `PassRole`
 
-**Do NOT use `*FullAccess` managed policies** — they grant admin-level wildcards beyond what this procedure requires.
+**Do NOT use `*FullAccess` managed policies** -- they grant admin-level wildcards beyond what this procedure requires.
 
 #### CloudWatch Log Group Creation Fails
 If log group creation fails:

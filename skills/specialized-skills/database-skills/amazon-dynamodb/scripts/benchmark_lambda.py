@@ -3,7 +3,7 @@
 Invoked by scripts/benchmark_model.py. Single file, stdlib + boto3 only.
 Every DynamoDB data-path call sets ReturnConsumedCapacity='INDEXES' and is
 timed with time.monotonic() so latency numbers reflect service + SDK
-overhead inside the same-region Lambda — not the user's local network.
+overhead inside the same-region Lambda -- not the user's local network.
 
 'INDEXES' rather than 'TOTAL' is load-bearing, not a preference. 'TOTAL' returns only
 the aggregate CapacityUnits: no Table block, no per-GSI blocks, no vector byte
@@ -19,7 +19,7 @@ Event schema (from the orchestrator):
       "invocations_total": 1,          # how many invocations for this run
       "patterns": [ <access_pattern>, ... ],  # from design JSON
       "tables":   [ <table_def>, ... ],       # from design JSON (includes key_schema)
-      "manifest": { deploy_model.py output — tables[].name (prefixed) },
+      "manifest": { deploy_model.py output -- tables[].name (prefixed) },
       "config": { ...benchmark_config.json knobs... }
     }
 
@@ -57,7 +57,7 @@ from botocore.config import Config as BotoConfig
 from botocore.exceptions import ClientError
 
 READ_OPS = {"GetItem", "Query", "Scan", "BatchGetItem", "TransactGetItems"}
-# SearchVectors is a read but consumes NO RCU — it is metered in bytes
+# SearchVectors is a read but consumes NO RCU -- it is metered in bytes
 # (VectorSearchRequestBytes), so it is tracked separately from consumed_cu rather than
 # folded into READ_OPS, where a naive report would show it as a free operation.
 VECTOR_SEARCH_OP = "SearchVectors"
@@ -70,14 +70,14 @@ THROTTLE_CODES = (
 
 # Keep Lambda response under the 6MB payload limit. Each row is roughly
 # 200-300 bytes JSON-encoded; 15k leaves headroom for gsi_cu dicts and errors.
-# This is the HARD payload safety bound — the sum of PHASE_ROW_BUDGET below is
+# This is the HARD payload safety bound -- the sum of PHASE_ROW_BUDGET below is
 # kept at or under it so the per-phase reservation never exceeds the payload.
 MAX_ROWS_PER_INVOCATION = 15_000
 
 # Per-PHASE row budget. A single shared global cap is wrong: warmup runs for
 # EVERY pattern before any measure row is recorded, so on a multi-pattern run
 # that fits in one invocation, warmup fills the whole 15k budget and `measure`
-# gets ZERO latency rows — the p50/p99 columns (and the hot-vs-cold p99 signal
+# gets ZERO latency rows -- the p50/p99 columns (and the hot-vs-cold p99 signal
 # that drives key_skew on on-demand tables) come back empty. Reserving a fixed
 # budget per phase guarantees `measure` always keeps its allocation no matter
 # how many warmup rows were produced. settle/seed are tiny in practice; the bulk
@@ -103,12 +103,12 @@ MIN_ROWS_PER_PATTERN_PHASE = 200
 # carry a string prefix, so we encode the pattern + role + index into a single
 # deterministic integer: a per-(pattern,role) "bank" offset (hash of the label,
 # kept well inside JS/DDB safe-integer range) plus the index. Distinct patterns,
-# distinct roles (pk vs sk), and distinct indices therefore never collide — the
+# distinct roles (pk vs sk), and distinct indices therefore never collide -- the
 # same uniqueness guarantee the string form gives, which the batch/transact
 # distinct-key walk depends on. A binary key ("B") gets the UTF-8 bytes of the
 # string form. Unknown/defaulted type is "S" (historical behavior).
-# Indices per (pattern,role) numeric "bank". Cross-bank disjointness — and thus
-# the collision-freedom the batch/transact distinct-key walk relies on — holds
+# Indices per (pattern,role) numeric "bank". Cross-bank disjointness -- and thus
+# the collision-freedom the batch/transact distinct-key walk relies on -- holds
 # as long as the per-bank index stays below this stride. Seed indices are
 # bounded by seed_items_per_table (default 500; thousands at most), so the 10M
 # headroom is never approached in practice.
@@ -116,7 +116,7 @@ _NUM_BANK_STRIDE = 10_000_000
 
 
 def _bank_offset(pattern_id: str, role: str) -> int:
-    # Stable, process-independent offset in [0, ~9e15) — comfortably within DDB's
+    # Stable, process-independent offset in [0, ~9e15) -- comfortably within DDB's
     # 38-digit number range and JS safe-int (2^53) so no precision is lost.
     h = 0
     for ch in f"{pattern_id}#{role}":
@@ -136,7 +136,7 @@ def _seed_key_val(pattern_id: str, idx: int, role: str, ktype: str):
     return s
 
 
-# GSI synthetic key value — type-aware, and IDENTICAL between the seed side and
+# GSI synthetic key value -- type-aware, and IDENTICAL between the seed side and
 # the query side so a GSI Query finds the items the seed wrote. role is "pk"/"sk".
 def _gsi_val(pattern_id: str, idx: int, role: str, ktype: str):
     if ktype == "N":
@@ -174,13 +174,13 @@ def _serialize(value):
     if isinstance(value, bytes):
         return {"B": value}
     if isinstance(value, (list, tuple)):
-        # A vector attribute. Must be an L of N — see _serialize_vector.
+        # A vector attribute. Must be an L of N -- see _serialize_vector.
         return _serialize_vector(value)
     raise ValueError(f"unsupported attribute type for {value!r}")
 
 
 def _serialize_vector(values):
-    """A vector attribute is a DynamoDB List of Numbers — never a Number Set.
+    """A vector attribute is a DynamoDB List of Numbers -- never a Number Set.
 
     Sending NS is rejected with the misleading 'Input collection contains duplicates'
     (the set collapses repeated values), which is why this is explicit.
@@ -203,7 +203,7 @@ def _build_item(pk_attr, pk_val, sk_attr, sk_val, target_size_bytes, gsi_attrs=N
     def _attr_value_bytes(v):
         # A vector attribute is an L of N, and it MUST be counted. Missing it is not a
         # rounding error: a 1024-dim embedding is ~8.7 KB, so an item declared at 2,048 B
-        # was being padded as though the vector weren't there and landed at 10,745 B —
+        # was being padded as though the vector weren't there and landed at 10,745 B --
         # 5.2x the declared size, which inflates base-table WCU for exactly the vector
         # designs this benchmark is meant to measure. Recursive because L can nest.
         if "L" in v:
@@ -214,7 +214,7 @@ def _build_item(pk_attr, pk_val, sk_attr, sk_val, target_size_bytes, gsi_attrs=N
             if t in v:
                 return len(v[t])
         # BOOL/NULL carry no value bytes and count as their key length only. That
-        # under-counts by a few bytes, which pads VERY slightly larger — never smaller —
+        # under-counts by a few bytes, which pads VERY slightly larger -- never smaller --
         # so the item still meets target_size_bytes.
         return 0
 
@@ -263,17 +263,17 @@ class RunContext:
         # designs are unaffected.
         #
         # Types are read from TWO sources, in increasing precedence:
-        #   1. entities[].attributes[] as {"name","type"} — the canonical schema
+        #   1. entities[].attributes[] as {"name","type"} -- the canonical schema
         #      form documented in references/cost-model-schema.md.
-        #   2. a table-level "attribute_definitions" block — the raw-CreateTable
+        #   2. a table-level "attribute_definitions" block -- the raw-CreateTable
         #      -API spelling an author (or LLM) naturally reaches for. Accepts
         #      BOTH {"attribute_name","attribute_type"} (API style) and the
         #      {"name","type"} shorthand. An explicit attribute_definitions entry
         #      WINS over an entities-derived type for the same attribute.
         #
         # CRITICAL: scripts/deploy_model.py (_collect_attr_types) parses these
-        # exact two sources with the same precedence. If the two ever diverge —
-        # deploy creates order_date as N but this map thinks it's S — key
+        # exact two sources with the same precedence. If the two ever diverge --
+        # deploy creates order_date as N but this map thinks it's S -- key
         # generation emits the wrong type and every write fails with
         # ValidationException (the W4 bug). Keep them in sync.
         def _norm_t(v):
@@ -295,7 +295,7 @@ class RunContext:
                 if name:
                     self.attr_types[(tn, name)] = _norm_t(a.get("attribute_type") or a.get("type"))
 
-        # Seed items per table — the number written in the seed phase. This is
+        # Seed items per table -- the number written in the seed phase. This is
         # also the size of the distinct-key pool the read-key sampler draws over
         # (see n_partitions below and n_distinct_keys in _dispatch); there is no
         # separate key-space knob.
@@ -303,12 +303,12 @@ class RunContext:
 
         # Item-collection cardinality. items_per_partition > 1 means each
         # partition key holds a real collection of that many items (distinct
-        # sort keys under a shared PK) instead of a singleton — so Query
+        # sort keys under a shared PK) instead of a singleton -- so Query
         # patterns read realistic multi-item pages and GSI collections are
         # observable. Default 1 preserves the historical singleton behavior of
         # quick/standard modes. The number of DISTINCT partitions is therefore
-        # seed_items // items_per_partition, and that partition count — not
-        # seed_items — is the space the read-key sampler draws over (a Query
+        # seed_items // items_per_partition, and that partition count -- not
+        # seed_items -- is the space the read-key sampler draws over (a Query
         # must target a partition that actually has a full collection seeded).
         self.items_per_partition = max(1, int(self.cfg.get("items_per_partition", 1)))
         self.n_partitions = max(1, self.seed_items // self.items_per_partition)
@@ -332,14 +332,14 @@ class RunContext:
         self.max_rps = float(self.cfg.get("max_rps_per_pattern", 50))
         # 32 worker threads per pattern. The per-pattern driver is an open-loop
         # scheduler feeding a ThreadPoolExecutor; since each call is I/O-bound (a
-        # DynamoDB round trip), threads — not CPU — set the sustainable rate. At
+        # DynamoDB round trip), threads -- not CPU -- set the sustainable rate. At
         # ~5-20ms/call, 32 threads sustain ~1500-2000 rps/pattern, raising the
         # single-Lambda ceiling well above the old ~800-1000 (8 threads) before
         # any multi-Lambda sharding would be needed. Overridable via config.
         self.concurrency = int(self.cfg.get("concurrency_per_pattern", 32))
         self.abort_throttle = float(self.cfg.get("abort_on_throttle_rate", 0.2))
         # Non-throttle error rate that taints a pattern and stops its window. Set
-        # well above the throttle threshold — a structural error (bad index/attr,
+        # well above the throttle threshold -- a structural error (bad index/attr,
         # duplicate key, access denied) reliably fails ~100% of calls, so 0.5
         # catches a genuinely broken pattern without tripping on sporadic
         # transient errors. Overridable via config for tuning.
@@ -401,11 +401,11 @@ class RunContext:
     def sampled_idx(self, key_counter: int) -> int:
         """Map a per-call counter to a seeded PARTITION index in [0, n_partitions).
 
-        "uniform" → round-robin (historical behavior). "zipf" → draw a rank by
+        "uniform" -> round-robin (historical behavior). "zipf" -> draw a rank by
         the precomputed cumulative distribution so a few partitions absorb most
         traffic. The space is the number of distinct seeded partitions, so a
         sampled index always points at a partition that has its full collection
-        seeded — never an unseeded key that would misread as empty/throttled."""
+        seeded -- never an unseeded key that would misread as empty/throttled."""
         n = self.n_partitions
         if n <= 1:
             return 0
@@ -429,10 +429,10 @@ class RowSink:
         self._rows: list = []
         self._lock = threading.Lock()
         self._n_patterns = max(1, int(n_patterns))
-        # Per-(pattern_id, phase) recorded counts — fair-share sub-cap within a
+        # Per-(pattern_id, phase) recorded counts -- fair-share sub-cap within a
         # phase so one busy pattern can't take the whole phase budget.
         self._per_key: dict = {}
-        # Per-phase recorded counts — the primary budget so warmup can't consume
+        # Per-phase recorded counts -- the primary budget so warmup can't consume
         # measure's allocation.
         self._phase_count: dict = {}
         # Per-(pattern, phase) stack of row indices that are currently
@@ -467,7 +467,7 @@ class RowSink:
                     self._noncrit.setdefault(key, []).append(idx)
                 return
             # No room. A throttled/error row is diagnostically more valuable than
-            # yet another success — so swap it in over an earlier NON-distressed
+            # yet another success -- so swap it in over an earlier NON-distressed
             # row for the same (pattern, phase). Otherwise the first N pre-throttle
             # successes monopolize the sample and p99 looks clean even when the
             # table is throttling hard. Exact call/throttle COUNTS are tracked
@@ -481,7 +481,7 @@ class RowSink:
                 if not (existing.get("throttled") or existing.get("error")):
                     self._rows[i] = row
                     return
-            # No swappable success row found — drop (sample already all-distress).
+            # No swappable success row found -- drop (sample already all-distress).
 
     def extend(self, rows):
         for r in rows:
@@ -497,7 +497,7 @@ class RowSink:
 
 
 # ---------------------------------------------------------------------------
-# Op dispatchers — each returns (consumed_cu_base, gsi_cu_by_index, latency_ms,
+# Op dispatchers -- each returns (consumed_cu_base, gsi_cu_by_index, latency_ms,
 # throttled_bool, error_str)
 # ---------------------------------------------------------------------------
 
@@ -516,7 +516,7 @@ def _consumed(cc_block):
     for ReturnConsumedCapacity='INDEXES'. Measured 2026-08-19: a PutItem fanning out to
     one ALL-projection GSI reported CapacityUnits=6.0 with no sub-blocks under 'TOTAL',
     versus Table=3.0 + GSI=3.0 under 'INDEXES'. So under 'TOTAL' the fallback below is
-    always taken, per-GSI comes back {}, and base absorbs the whole 6.0 — a 2x
+    always taken, per-GSI comes back {}, and base absorbs the whole 6.0 -- a 2x
     overstatement, with amplification_ratio pinned at 0. That is why the call sites use
     'INDEXES'; the fallback is now a genuine edge case rather than the normal path.
     """
@@ -618,7 +618,7 @@ def _time_call(fn, *args, **kwargs):
         # "TransactionCanceledException" whose ACTUAL per-item reasons live in
         # e.response["CancellationReasons"] (a list of {Code, Message}). The
         # top-level code alone can't tell a TransactionConflict (concurrent
-        # writes to the same key — a benchmark artifact on a small seeded key
+        # writes to the same key -- a benchmark artifact on a small seeded key
         # space) from a ConditionalCheckFailed (a guard the design relies on)
         # from a real ValidationException. Extract the distinct, non-"None"
         # reason codes so the report narrates from data instead of guessing.
@@ -656,7 +656,7 @@ def _dispatch(ctx: RunContext, pattern: dict, part_idx: int, member_counter: int
     """Dispatch one call of the declared operation. Never substitute op types.
 
     `part_idx` is the seeded PARTITION index chosen by the caller via
-    ctx.sampled_idx() (uniform round-robin or zipf hot-key skew) — passed in so
+    ctx.sampled_idx() (uniform round-robin or zipf hot-key skew) -- passed in so
     the caller can record it for the key-distribution histogram. `member_counter`
     selects which collection member within the partition a point op targets.
     The result dict carries `sampled_partition` so the drain can build the
@@ -688,7 +688,7 @@ def _dispatch(ctx: RunContext, pattern: dict, part_idx: int, member_counter: int
     npar = ctx.n_partitions
 
     # Resolve key attribute types once so every generated key value matches the
-    # declared type (a numeric key rejects a string value — the bug a "recorded_at"
+    # declared type (a numeric key rejects a string value -- the bug a "recorded_at"
     # N sort key hit). Defaults to "S".
     pk_type = ctx.key_type(td["table_name"], pk_attr or "")
     sk_type = ctx.key_type(td["table_name"], sk_attr) if sk_attr else "S"
@@ -708,7 +708,7 @@ def _dispatch(ctx: RunContext, pattern: dict, part_idx: int, member_counter: int
         return pkv, skv
 
     # Distinct seeded-key space, matching run_seed exactly:
-    #   sort-key table   -> npar partitions × ipp members = npar*ipp distinct
+    #   sort-key table   -> npar partitions x ipp members = npar*ipp distinct
     #                       (pk, sk) pairs; flat index g maps pidx=g//ipp,
     #                       global_idx=g.
     #   no-sort-key table-> run_seed writes one item per partition over
@@ -718,7 +718,7 @@ def _dispatch(ctx: RunContext, pattern: dict, part_idx: int, member_counter: int
     # A flat index walked modulo this count yields ONLY distinct keys, so
     # multi-key requests can never contain a duplicate (DynamoDB rejects a whole
     # BatchGetItem/BatchWriteItem/Transact* request that lists the same key
-    # twice — "Provided list of item keys contains duplicates"). This replaces
+    # twice -- "Provided list of item keys contains duplicates"). This replaces
     # the old (part_idx+j)%npar walk, which wrapped onto an already-used key
     # whenever items_per_request exceeded the distinct space (the common case on
     # a no-SK table where the space is just `npar` partitions).
@@ -779,14 +779,14 @@ def _dispatch(ctx: RunContext, pattern: dict, part_idx: int, member_counter: int
                 }
             g_pk = gsi_def["partition_key"]
             # If the GSI shares its PK attribute with the base table's PK or
-            # SK, seeding did NOT set a synthetic gsi value (see run_seed) —
+            # SK, seeding did NOT set a synthetic gsi value (see run_seed) --
             # so query with the base PK/SK value. Otherwise use the synthetic.
             if g_pk == pk_attr:
                 g_pk_val = pk_val
             elif g_pk == sk_attr:
                 g_pk_val = sk_val
             else:
-                # Synthetic GSI PK — seeded off the partition index (pidx==idx),
+                # Synthetic GSI PK -- seeded off the partition index (pidx==idx),
                 # type-aware, IDENTICAL to run_seed's _gsi_val so the Query hits.
                 g_pk_val = _gsi_val(pid, idx, "pk", ctx.key_type(td["table_name"], g_pk))
             kwargs = dict(
@@ -810,7 +810,7 @@ def _dispatch(ctx: RunContext, pattern: dict, part_idx: int, member_counter: int
         return _time_call(client.query, **kwargs)
 
     if op == "Scan":
-        # One-shot per Mechanics #16 — do not loop. Limit items to the
+        # One-shot per Mechanics #16 -- do not loop. Limit items to the
         # declared items_per_request to keep costs predictable.
         return _time_call(
             client.scan,
@@ -867,7 +867,7 @@ def _dispatch(ctx: RunContext, pattern: dict, part_idx: int, member_counter: int
         )
 
     if op == "UpdateItem":
-        # Update a single attribute — mirrors a typical mutate-one-field call.
+        # Update a single attribute -- mirrors a typical mutate-one-field call.
         key = {pk_attr: _serialize(pk_val)}
         if sk_attr:
             key[sk_attr] = _serialize(sk_val)
@@ -912,7 +912,7 @@ def _dispatch(ctx: RunContext, pattern: dict, part_idx: int, member_counter: int
         )
 
     if op == "TransactWriteItems":
-        # Use declared item_sizes if present; fall back to items_per × item_size.
+        # Use declared item_sizes if present; fall back to items_per x item_size.
         # A transaction caps at 100 items and cannot operate on the SAME item
         # twice ("Transaction request cannot include multiple operations on one
         # item"), so walk DISTINCT seeded keys. The number of writes is the count
@@ -991,8 +991,8 @@ def _dispatch(ctx: RunContext, pattern: dict, part_idx: int, member_counter: int
                 "error": "vector_index_metadata_missing",
             }
         # A deterministic pseudo-random unit-ish vector. Content does not affect
-        # metering — measurement showed bytes depend on TopK, projection and dimensions,
-        # not on the query vector's values — so a fixed seed keeps runs comparable.
+        # metering -- measurement showed bytes depend on TopK, projection and dimensions,
+        # not on the query vector's values -- so a fixed seed keeps runs comparable.
         rng = random.Random(f"{pattern['pattern_id']}:{part_idx}")
         query_vector = [{"N": f"{rng.uniform(-1.0, 1.0):.6f}"} for _ in range(dims)]
 
@@ -1012,8 +1012,8 @@ def _dispatch(ctx: RunContext, pattern: dict, part_idx: int, member_counter: int
             #
             # The coincidence cases are load-bearing, exactly as they are for a GSI Query
             # above. When the search-schema partition key IS the table's PK or SK, neither
-            # run_seed nor the PutItem path writes a separate synthetic "vector_pk" value —
-            # the attribute already holds the base key value — so searching for the
+            # run_seed nor the PutItem path writes a separate synthetic "vector_pk" value --
+            # the attribute already holds the base key value -- so searching for the
             # synthetic one queries a partition nothing was ever written to. The search
             # returns no results, VectorSearchRequestBytes reports ~0, and the index reads
             # as FREE, which is the precise failure this instrumentation exists to prevent
@@ -1120,7 +1120,7 @@ def run_seed(ctx: RunContext, sink: RowSink) -> dict:
         #
         # Layout: n_partitions distinct partition keys, each holding
         # items_per_partition members (distinct sort keys). The global sort-key
-        # index is pidx*ipp + member — the SAME mapping _dispatch._key_at uses,
+        # index is pidx*ipp + member -- the SAME mapping _dispatch._key_at uses,
         # so a Query on partition `pidx` reads the full seeded collection and a
         # point op resolves to a real member. With items_per_partition=1 this
         # reduces to the historical one-item-per-partition behavior.
@@ -1130,7 +1130,7 @@ def run_seed(ctx: RunContext, sink: RowSink) -> dict:
         ipp = ctx.items_per_partition if sk_attr else 1
         n_part = ctx.n_partitions if sk_attr else ctx.seed_items
         # Resolve key types so seeded primary keys match _dispatch's generated
-        # keys EXACTLY (same type, same value) — otherwise a Query/GetItem would
+        # keys EXACTLY (same type, same value) -- otherwise a Query/GetItem would
         # look for a key the seed never wrote. Defaults to "S".
         pk_type = ctx.key_type(orig_table, pk_attr or "")
         sk_type = ctx.key_type(orig_table, sk_attr) if sk_attr else "S"
@@ -1147,7 +1147,7 @@ def run_seed(ctx: RunContext, sink: RowSink) -> dict:
                         g_pk = g["partition_key"]
                         g_sk = g.get("sort_key")
                         # Key the GSI PK off the PARTITION (pidx), not the member,
-                        # so the GSI also holds a real collection per partition —
+                        # so the GSI also holds a real collection per partition --
                         # this is what makes GSI Query and GSI amplification
                         # observable at volume. Never overwrite an attribute that
                         # is the base table's own PK/SK (that would corrupt the
@@ -1204,8 +1204,8 @@ def run_seed(ctx: RunContext, sink: RowSink) -> dict:
                     items.append(it)
 
         # Deduplicate by primary key as a safety net. Each pattern's keys embed
-        # its own pattern_id (via _seed_key_val(pid, …)), so patterns sharing a
-        # table do NOT collide — this table gets ~seed_items items PER pattern, by design
+        # its own pattern_id (via _seed_key_val(pid, ...)), so patterns sharing a
+        # table do NOT collide -- this table gets ~seed_items items PER pattern, by design
         # (each pattern reads its own seeded keyspace via _dispatch._key_at). The
         # dedup only guards against an accidental intra-pattern collision; it is
         # effectively a no-op for the current key layout. (The spend estimate in
@@ -1213,7 +1213,7 @@ def run_seed(ctx: RunContext, sink: RowSink) -> dict:
         # volume; do not assume cross-pattern dedup shrinks it.)
         def _keyval(av):
             # The single scalar value out of a DDB attribute-value dict,
-            # whatever its type tag (S/N/B) — so dedup works for numeric keys
+            # whatever its type tag (S/N/B) -- so dedup works for numeric keys
             # too, not just strings.
             if not av:
                 return None
@@ -1247,7 +1247,7 @@ def run_seed(ctx: RunContext, sink: RowSink) -> dict:
                     "latency_ms": res["latency_ms"],
                     "consumed_cu": res["consumed_cu"],
                     "gsi_cu": res["gsi_cu"],
-                    # Vector capacity is metered in bytes, not CU — carried through
+                    # Vector capacity is metered in bytes, not CU -- carried through
                     # because a SearchVectors pattern has no other cost signal.
                     "vector_search_bytes": res.get("vector_search_bytes", 0.0),
                     "vector_write_bytes": res.get("vector_write_bytes") or {},
@@ -1257,7 +1257,7 @@ def run_seed(ctx: RunContext, sink: RowSink) -> dict:
                 }
             )
             # Handle UnprocessedItems with bounded exponential backoff. Seeding
-            # is correctness, not measurement — and now that the data-path client
+            # is correctness, not measurement -- and now that the data-path client
             # has retries disabled (so the MEASURE phase can observe throttles),
             # seeding must do its own retry, especially against a low PROVISIONED
             # capacity where BatchWriteItem will shed items until capacity frees.
@@ -1294,17 +1294,17 @@ def run_seed(ctx: RunContext, sink: RowSink) -> dict:
     return seed_count_per_table
 
 
-SEED_VERIFY_CAP = 2000  # max items counted per table — bounds the verify cost
+SEED_VERIFY_CAP = 2000  # max items counted per table -- bounds the verify cost
 
 
 def verify_seed(ctx: RunContext, seed_counts: dict) -> dict:
     """Verify seed landed via a bounded-pagination Scan(Select=COUNT).
 
-    DescribeTable.ItemCount is eventually consistent — updated ~every 6h — so a
+    DescribeTable.ItemCount is eventually consistent -- updated ~every 6h -- so a
     freshly-seeded table always reports 0. A Scan with Select=COUNT returns a
     ground-truth count of what landed. The OLD implementation used Limit=1, so
     `Count` capped at 1 and `passed = actual > 0` was true whenever a SINGLE
-    item landed — a table that seeded 1 of 1000 items read as clean, hiding a
+    item landed -- a table that seeded 1 of 1000 items read as clean, hiding a
     massive shortfall that silently corrupts every measurement on that table.
 
     Now we paginate, accumulating `Count`, until we either reach the target
@@ -1313,9 +1313,9 @@ def verify_seed(ctx: RunContext, seed_counts: dict) -> dict:
 
     Per-table result fields:
       expected            declared seed target
-      actual              items counted (≥ this many exist; '+' if we stopped at cap)
+      actual              items counted (>= this many exist; '+' if we stopped at cap)
       sampled             True if we stopped at the cap before exhausting the table
-      passed              expected==0, OR actual ≥ 50% of the capped target
+      passed              expected==0, OR actual >= 50% of the capped target
       seed_shortfall_ratio  1 - actual/expected (0.0 when expected==0); only
                             meaningful when not `sampled`
     """
@@ -1339,7 +1339,7 @@ def verify_seed(ctx: RunContext, seed_counts: dict) -> dict:
                     sampled = bool(start_key)
                     break
                 if not start_key:
-                    break  # exhausted the table — `actual` is exact
+                    break  # exhausted the table -- `actual` is exact
         except ClientError:
             actual = 0
         # Threshold against the CAPPED target, not raw expected, so a table with
@@ -1376,7 +1376,7 @@ def run_pattern_window(
 
     `counts`, if given, receives EXACT (uncapped) call/throttle tallies keyed by
     (pattern_id, phase). Recorded rows are per-key capped for the response
-    payload, but these counts see every call — so throttle totals stay accurate
+    payload, but these counts see every call -- so throttle totals stay accurate
     even when the latency-percentile rows are down-sampled.
     """
     import queue
@@ -1396,7 +1396,7 @@ def run_pattern_window(
     # signal, tallied separately and surfaced via the skew/taint path); a
     # non-throttle error is usually structural (ValidationException from a bad
     # index/attr/duplicate-key, AccessDenied, ResourceNotFound) and would
-    # otherwise vanish — observed_cu is 0, so it can masquerade as a benign
+    # otherwise vanish -- observed_cu is 0, so it can masquerade as a benign
     # expected-vs-observed delta. `error_codes` tallies the distinct codes so the
     # report can name the cause (e.g. {"ValidationException": 80}).
     stats: dict[str, Any] = {
@@ -1450,7 +1450,7 @@ def run_pattern_window(
                 if in_ramp:
                     stats["ramp_throttles"] += 1
             elif res["error"]:
-                # Non-throttle failure — structural, not capacity. Count it
+                # Non-throttle failure -- structural, not capacity. Count it
                 # separately so it cannot hide inside a "0 observed CU" delta.
                 stats["errors"] += 1
                 code = res["error"]
@@ -1476,20 +1476,20 @@ def run_pattern_window(
                     "latency_ms": res["latency_ms"],
                     "consumed_cu": res["consumed_cu"],
                     "gsi_cu": res["gsi_cu"],
-                    # Vector capacity is metered in bytes, not CU — carried through
+                    # Vector capacity is metered in bytes, not CU -- carried through
                     # because a SearchVectors pattern has no other cost signal.
                     "vector_search_bytes": res.get("vector_search_bytes", 0.0),
                     "vector_write_bytes": res.get("vector_write_bytes") or {},
                     "throttled": res["throttled"],
                     "error": res["error"],
-                    # Partition the read/write targeted — drives the per-pattern
+                    # Partition the read/write targeted -- drives the per-pattern
                     # key-distribution histogram (hot-partition skew, Mechanics #3).
                     "key_idx": part_idx,
                 }
             )
-            # Abort guard — active through ramp window during measurement.
+            # Abort guard -- active through ramp window during measurement.
             # `pid not in tainted` so a throttle burst doesn't overwrite an
-            # error-rate taint already set below — the distinct reason strings
+            # error-rate taint already set below -- the distinct reason strings
             # ("ramp:throttle_rate=" vs "error_rate=:CODE") must each survive so
             # the report can tell a throttled pattern from a structurally broken
             # one. (The downstream correctness finding keys off exact error
@@ -1504,7 +1504,7 @@ def run_pattern_window(
                 if rate > ctx.abort_throttle:
                     # Warmup-only throttles: do NOT taint; stop warmup early.
                     stop_flag.set()
-            # Error-rate guard — distinct from throttling. A high NON-throttle
+            # Error-rate guard -- distinct from throttling. A high NON-throttle
             # error rate during measurement means the pattern is structurally
             # broken (bad index/attr, duplicate key, access denied), not capacity-
             # bound: its observed CU/latency are meaningless, so taint it and stop
@@ -1561,7 +1561,7 @@ def run_pattern_window(
 def run_warmup(ctx: RunContext, sink: RowSink, tainted: dict, counts: dict):
     if ctx.warmup_seconds <= 0:
         return
-    # Serialize patterns so they don't compete in a tiny Lambda — but each
+    # Serialize patterns so they don't compete in a tiny Lambda -- but each
     # pattern uses its internal ThreadPoolExecutor so within-pattern calls
     # still overlap.
     for p in ctx.patterns:
@@ -1591,7 +1591,7 @@ def handler(event, context):
     # CRITICAL: data-path retries are DISABLED (max_attempts=1). boto3's default
     # "standard"/"legacy" retry modes transparently re-issue throttled requests
     # (ProvisionedThroughputExceeded / ThrottlingException) and only surface the
-    # eventual success — which would make a load benchmark whose entire job is to
+    # eventual success -- which would make a load benchmark whose entire job is to
     # OBSERVE throttling report zero throttles even when the table is throttling
     # hard. We want each throttle counted once, not retried away. The orchestrator
     # already disables retries on the Lambda invoke for the same reason. (Seeding,
@@ -1600,7 +1600,7 @@ def handler(event, context):
     # Size the HTTP connection pool to the per-pattern driver concurrency.
     # botocore defaults max_pool_connections to 10; the measurement driver runs
     # `concurrency_per_pattern` threads (default 32), so the default pool starves
-    # — threads block waiting for a connection ("Connection pool is full"), which
+    # -- threads block waiting for a connection ("Connection pool is full"), which
     # inflates the measured p99 with DRIVER queueing that has nothing to do with
     # DynamoDB. Pool to the concurrency + headroom so the measured latency
     # reflects the service, not the client. (+8 covers the warmup warm-pool and

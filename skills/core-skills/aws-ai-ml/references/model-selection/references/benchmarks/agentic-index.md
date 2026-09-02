@@ -1,11 +1,11 @@
 # Agentic Index
 
-AA's composite agentic score: GDPval-AA (real-world tasks, 44 occupations) + τ²-bench Telecom.
+AA's composite agentic score: GDPval-AA (real-world tasks, 44 occupations) + tau2-bench Telecom.
 
 **Use this for:** Autonomous agents, workflow automation, tool-using assistants.
 
 **Source:** Artificial Analysis (artificialanalysis.ai).
-"—" = no data — infer from similar models in the same family, but tell the user you're inferring.
+"--" = no data -- infer from similar models in the same family, but tell the user you're inferring.
 
 |   # | Model                                  | Family      | Score |
 |-----|----------------------------------------|-------------|-------|
@@ -30,15 +30,15 @@ AA's composite agentic score: GDPval-AA (real-world tasks, 44 occupations) + τ�
 |  19 | Nova Pro                               | Amazon Nova |   4.7 |
 |  20 | Nova Micro                             | Amazon Nova |   4.7 |
 |  21 | Llama 3.2 1B Instruct                  | Meta Llama  |   0.0 |
-|   — | Llama 3.2 3B Instruct                  | Meta Llama  |     — |
-|   — | Qwen3 4B (mode: reasoning)             | Qwen        |     — |
-|   — | Qwen2.5 72B Instruct                   | Qwen        |     — |
-|   — | Qwen2.5 32B Instruct                   | Qwen        |     — |
-|   — | DeepSeek R1 Distill Llama 70B          | DeepSeek    |     — |
-|   — | DeepSeek R1 Distill Llama 8B           | DeepSeek    |     — |
-|   — | DeepSeek R1 Distill Qwen 32B           | DeepSeek    |     — |
-|   — | DeepSeek R1 Distill Qwen 14B           | DeepSeek    |     — |
-|   — | DeepSeek R1 Distill Qwen 1.5B          | DeepSeek    |     — |
-|   — | Qwen2.5 14B Instruct                   | Qwen        |     — |
-|   — | Qwen2.5 7B Instruct                    | Qwen        |     — |
-|   — | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     — |
+|   -- | Llama 3.2 3B Instruct                  | Meta Llama  |     -- |
+|   -- | Qwen3 4B (mode: reasoning)             | Qwen        |     -- |
+|   -- | Qwen2.5 72B Instruct                   | Qwen        |     -- |
+|   -- | Qwen2.5 32B Instruct                   | Qwen        |     -- |
+|   -- | DeepSeek R1 Distill Llama 70B          | DeepSeek    |     -- |
+|   -- | DeepSeek R1 Distill Llama 8B           | DeepSeek    |     -- |
+|   -- | DeepSeek R1 Distill Qwen 32B           | DeepSeek    |     -- |
+|   -- | DeepSeek R1 Distill Qwen 14B           | DeepSeek    |     -- |
+|   -- | DeepSeek R1 Distill Qwen 1.5B          | DeepSeek    |     -- |
+|   -- | Qwen2.5 14B Instruct                   | Qwen        |     -- |
+|   -- | Qwen2.5 7B Instruct                    | Qwen        |     -- |
+|   -- | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     -- |

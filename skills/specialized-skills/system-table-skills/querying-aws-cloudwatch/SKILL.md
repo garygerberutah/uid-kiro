@@ -27,8 +27,8 @@ The CloudWatch Logs S3 Tables integration exports log data as Apache Iceberg tab
 
 | User intent | Use this skill? | Alternative |
 |---|---|---|
-| Run SQL across large volumes of log data | **Yes** | — |
-| Correlate logs with S3 metadata or other tables | **Yes** — join across catalogs | — |
+| Run SQL across large volumes of log data | **Yes** | -- |
+| Correlate logs with S3 metadata or other tables | **Yes** -- join across catalogs | -- |
 | Quick log search / pattern matching | **No** | CloudWatch Logs Insights (faster for ad-hoc) |
 | Real-time log streaming/tailing | **No** | CloudWatch Logs console or `logs filter-log-events` |
 | Set up alarms on log patterns | **No** | CloudWatch Metric Filters / Alarms |
@@ -77,8 +77,8 @@ aws s3tables list-table-buckets --region <REGION> \
   --query "tableBuckets[?name=='aws-cloudwatch']"
 ```
 
-- Empty result → integration not enabled. Guide user through setup.
-- Bucket exists but no namespaces → integration enabled but no log data yet (only captures events *after* association).
+- Empty result -> integration not enabled. Guide user through setup.
+- Bucket exists but no namespaces -> integration enabled but no log data yet (only captures events *after* association).
 
 List available tables:
 
@@ -110,7 +110,7 @@ aws logs associate-source-to-s3-table-integration \
 
 **Associate all data sources (wildcard):**
 
-> ⚠️ **Warning**: Wildcard association delivers all current and future data sources to S3 Tables. Use specific associations for tighter control over what log data lands in queryable tables.
+> [WARNING] **Warning**: Wildcard association delivers all current and future data sources to S3 Tables. Use specific associations for tighter control over what log data lands in queryable tables.
 
 ```bash
 aws logs associate-source-to-s3-table-integration \
@@ -149,7 +149,7 @@ aws lakeformation grant-permissions \
 
 **Constraints:**
 
-- You MUST ALWAYS run get-tables on the target namespace and include the command in your response before writing any SQL query — schemas vary by data source. Never skip this step even if you already know the likely schema. Run `get-tables` once on the target namespace (one call returns all tables + columns + types + descriptions):
+- You MUST ALWAYS run get-tables on the target namespace and include the command in your response before writing any SQL query -- schemas vary by data source. Never skip this step even if you already know the likely schema. Run `get-tables` once on the target namespace (one call returns all tables + columns + types + descriptions):
 
   ```
   aws glue get-tables --catalog-id "<ACCOUNT>:s3tablescatalog/aws-cloudwatch" --database-name "<namespace>" --region <REGION>
@@ -158,7 +158,7 @@ aws lakeformation grant-permissions \
 - You MUST confirm workgroup and output location before executing
 - You MUST inform user that only logs received *after* association are available (no backfill)
 
-**Example — VPC Flow Logs rejected traffic:**
+**Example -- VPC Flow Logs rejected traffic:**
 
 ```sql
 SELECT srcaddr, dstaddr, dstport, protocol, packets, bytes
@@ -168,7 +168,7 @@ ORDER BY bytes DESC
 LIMIT 50;
 ```
 
-**Example — WAF blocked requests:**
+**Example -- WAF blocked requests:**
 
 ```sql
 SELECT timestamp, action, terminatingRuleId, httpSourceId
@@ -178,7 +178,7 @@ ORDER BY timestamp DESC
 LIMIT 50;
 ```
 
-**Example — correlate VPC Flow Logs with S3 object metadata:**
+**Example -- correlate VPC Flow Logs with S3 object metadata:**
 
 ```sql
 SELECT f.srcaddr, f.dstaddr, f.bytes, j.key, j.record_type
@@ -191,11 +191,11 @@ WHERE j.record_type = 'CREATE'
 
 ## Key Behaviors
 
-- **No backfill** — only new log events after association are delivered to S3 Tables
-- **Retention follows log group** — when log group retention expires, data is removed from the table
+- **No backfill** -- only new log events after association are delivered to S3 Tables
+- **Retention follows log group** -- when log group retention expires, data is removed from the table
 - **Deleting a log group** removes its data from the S3 table
-- **No additional storage charge** — included in CloudWatch pricing
-- **Schemas are per-data-source** — always run `get-tables` on the target namespace before building complex queries
+- **No additional storage charge** -- included in CloudWatch pricing
+- **Schemas are per-data-source** -- always run `get-tables` on the target namespace before building complex queries
 
 ## Troubleshooting
 

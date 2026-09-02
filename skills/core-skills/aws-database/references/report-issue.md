@@ -1,13 +1,13 @@
 # Report Issue
 
-Use this when the user reports that the skill gave incorrect guidance, a wrong recommendation, missing information, or could be improved. This is feedback about the skill instructions — not about an AWS service itself.
+Use this when the user reports that the skill gave incorrect guidance, a wrong recommendation, missing information, or could be improved. This is feedback about the skill instructions -- not about an AWS service itself.
 
 ## Procedure
 
 1. **Offer to help.** Let the user know you can help them submit feedback, and present the available channels:
-   - **GitHub** (primary) — for bug reports and feature requests on the skill itself. Publicly tracked at `aws/agent-toolkit-for-aws`.
-   - **AWS Support** — for issues tied to their AWS account, service behavior, or billing. Requires an AWS Support plan.
-   - **Security concerns** — should not be filed publicly. Direct to AWS vulnerability disclosure.
+   - **GitHub** (primary) -- for bug reports and feature requests on the skill itself. Publicly tracked at `aws/agent-toolkit-for-aws`.
+   - **AWS Support** -- for issues tied to their AWS account, service behavior, or billing. Requires an AWS Support plan.
+   - **Security concerns** -- should not be filed publicly. Direct to AWS vulnerability disclosure.
 
    Ask which channel they'd prefer. If they decline to submit anything, thank them and move on.
 
@@ -21,7 +21,7 @@ Use this when the user reports that the skill gave incorrect guidance, a wrong r
    | Unclear guidance | "I don't understand", "that's confusing", "contradicts itself" | Selection logic was ambiguous about serverless |
    | Handoff failure | "it didn't load the skill", "I got stuck after choosing", "no service skill" | Skill chose Aurora PostgreSQL but couldn't hand off to the service skill |
 
-3. **Capture as an assertion.** Structure the feedback as a test case — this is the most actionable format for improving the skill:
+3. **Capture as an assertion.** Structure the feedback as a test case -- this is the most actionable format for improving the skill:
 
    ```json
    {
@@ -41,11 +41,11 @@ Use this when the user reports that the skill gave incorrect guidance, a wrong r
 
    Based on what the user chose in step 1:
 
-   **GitHub — Bug report** (wrong recommendation, outdated fact, missing coverage, unclear guidance, handoff failure):
+   **GitHub -- Bug report** (wrong recommendation, outdated fact, missing coverage, unclear guidance, handoff failure):
    - Direct the user to: `https://github.com/aws/agent-toolkit-for-aws/issues/new/choose` and select the bug report template.
    - If you have access to GitHub tools (gh CLI, GitHub MCP), help pre-fill the template from the assertion captured above.
 
-   **GitHub — Feature request** (new capability, new service coverage, workflow suggestion):
+   **GitHub -- Feature request** (new capability, new service coverage, workflow suggestion):
    - Direct the user to: `https://github.com/aws/agent-toolkit-for-aws/issues/new/choose` and select the feature request template.
 
    **AWS Support** (private, or account-specific issues):

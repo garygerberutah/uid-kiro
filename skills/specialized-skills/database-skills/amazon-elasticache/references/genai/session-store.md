@@ -97,7 +97,7 @@ def list_user_sessions(user_id: str, limit: int = 20) -> list[str]:
 
 ## Strands Integration
 
-The `strands-valkey-session-manager` package (community package, v0.1.0+ — MIT license, maintained by jeromevdl) provides a drop-in `ValkeySessionManager`. Five lines of setup:
+The `strands-valkey-session-manager` package (community package, v0.1.0+ -- MIT license, maintained by jeromevdl) provides a drop-in `ValkeySessionManager`. Five lines of setup:
 
 ```python
 import valkey

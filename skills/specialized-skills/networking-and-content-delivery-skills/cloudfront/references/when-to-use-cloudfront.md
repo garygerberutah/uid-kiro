@@ -156,8 +156,8 @@ chooses a pricing plan, and surfaces the console link to verify.
 **Constraints:**
 
 - You MUST create the distribution with the chosen origin and let CloudFront set the default cache
-  behavior. For an S3 origin you MUST first create an origin access control (OAC) — see
-  protecting-your-origins for the `create-origin-access-control` call — and reference its id via
+  behavior. For an S3 origin you MUST first create an origin access control (OAC) -- see
+  protecting-your-origins for the `create-origin-access-control` call -- and reference its id via
   `OriginAccessControlId` in the create call below (replace `{oac_id}`), so the origin is locked from
   the start rather than created reachable-and-then-hardened. Do not embed a static managed cache
   policy id; look up the current `Managed-CachingOptimized` policy by name and use its id for
@@ -272,7 +272,7 @@ entry point, or sub-minute failover.
   traffic; attach an AWS WAF rate-based rule to API distributions.
 - **Enforce a minimum TLS version.** Set the viewer protocol policy to redirect-HTTP-to-HTTPS (or
   HTTPS-only) and, when adding a custom domain, set the minimum protocol version to a current strong
-  TLS 1.2-or-higher security policy rather than relying on the default — choose the newest TLS 1.2+
+  TLS 1.2-or-higher security policy rather than relying on the default -- choose the newest TLS 1.2+
   policy CloudFront offers rather than a hardcoded string (see managing-certificates-with-cloudfront).
 - **Do not leave the origin unlocked.** A distribution whose origin is directly reachable lets
   viewers bypass the edge entirely; lock the origin (see protecting-your-origins).

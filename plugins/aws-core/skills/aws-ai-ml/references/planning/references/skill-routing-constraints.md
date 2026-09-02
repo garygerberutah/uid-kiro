@@ -83,7 +83,7 @@ When the user chooses to go straight to fine-tuning:
 - **Do not resolve ambiguous constraints yourself when selecting or
 
   filtering models.** Terms like "lightweight", "fast", "small", or
-  "cheap" are resolved through the use-case-specification →
+  "cheap" are resolved through the use-case-specification ->
   select-for-deployment pipeline, not by agent inference. If the user
-  has not gone through use-case-specification, activate it — do not
+  has not gone through use-case-specification, activate it -- do not
   substitute your own interpretation of their words.

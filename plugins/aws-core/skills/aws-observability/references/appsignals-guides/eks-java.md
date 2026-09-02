@@ -129,7 +129,7 @@ template {
 
 **Verification:**
 
-- Open AWS CloudWatch Console → Application Signals → Services
+- Open AWS CloudWatch Console -> Application Signals -> Services
 
 **Troubleshooting**
 Refer to the [CloudWatch APM troubleshooting guide](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Application-Signals-Enable-Troubleshoot.html).

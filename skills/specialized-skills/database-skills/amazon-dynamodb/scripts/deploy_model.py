@@ -10,11 +10,11 @@ writes a manifest describing everything created.
 The bench-only deploy deliberately diverges from SKILL.md Best Practices:
 
     DeletionProtection = False    (bench tables are meant to be deleted)
-    PITR                = off     (2-minute lifetime — PITR adds cost, no value)
-    TTL                 = not set (sweep cadence is hours — bench ends first)
+    PITR                = off     (2-minute lifetime -- PITR adds cost, no value)
+    TTL                 = not set (sweep cadence is hours -- bench ends first)
 
 These defaults match SKILL.md Data modeling #3's own logic for ephemeral /
-cache-like tables. Production designs still get Best Practices defaults —
+cache-like tables. Production designs still get Best Practices defaults --
 this is a tooling choice for the benchmark, not a rule change.
 
 Safety contract:
@@ -55,7 +55,7 @@ REQUIRED_PREFIX = "ddb-skill-bench-"
 TYPE_MAP = {"S": "S", "N": "N", "B": "B"}
 
 
-# Lambda role trust policy — the only principal allowed to assume is the Lambda
+# Lambda role trust policy -- the only principal allowed to assume is the Lambda
 # service itself, and only when the source account matches the deploying account
 # (aws:SourceAccount guards against confused-deputy assumption from other
 # accounts). The account is known from the preflight identity check, so we build
@@ -86,7 +86,7 @@ LAMBDA_HANDLER = "benchmark.handler"
 
 # Brief abort window shown ONLY on an interactive terminal, after the
 # caller-identity banner and before any resource is created. Non-interactive
-# (agent/CI) runs skip it — consent was already given via --yes-deploy.
+# (agent/CI) runs skip it -- consent was already given via --yes-deploy.
 _ABORT_WINDOW_S = 5
 
 
@@ -118,14 +118,14 @@ def _validate_design(model: dict) -> None:
     aps = model.get("access_patterns") or []
     if not aps:
         _die(
-            "design JSON has no access_patterns — refusing (Mechanics #2: "
+            "design JSON has no access_patterns -- refusing (Mechanics #2: "
             "unknown RPS is a design gap, not a benchmark input)."
         )
     for ap in aps:
         if not ap.get("peak_rps"):
             _die(
                 f"access pattern {ap.get('pattern_id', '?')} has missing or "
-                "zero peak_rps — refusing per Mechanics #2."
+                "zero peak_rps -- refusing per Mechanics #2."
             )
     for t in model["tables"]:
         ks = t.get("key_schema") or {}
@@ -153,7 +153,7 @@ def _validate_pattern_refs(model: dict) -> None:
         tn = ap.get("table")
         if not tn:
             _die(
-                f'access pattern {pid} has no "table" — every pattern must '
+                f'access pattern {pid} has no "table" -- every pattern must '
                 "name the table it runs against."
             )
         td = tables_by_name.get(tn)
@@ -169,14 +169,14 @@ def _validate_pattern_refs(model: dict) -> None:
         vec_names = {v.get("index_name") for v in ((td or {}).get("vector_indexes") or [])}
         gsi_names = {g.get("index_name") for g in ((td or {}).get("gsis") or [])}
 
-        # SearchVectors reads a VECTOR index, never a GSI — and the reverse is also
+        # SearchVectors reads a VECTOR index, never a GSI -- and the reverse is also
         # true, so each operation is checked against the right index family. Getting
         # this wrong fails every call at runtime while the observed CU reads as 0,
         # which a naive report then calls cheap.
         if op == "SearchVectors":
             if not idx:
                 _die(
-                    f'access pattern {pid} is a SearchVectors but has no "index" — '
+                    f'access pattern {pid} is a SearchVectors but has no "index" -- '
                     "it must name the vector index to search."
                 )
             if idx not in vec_names:
@@ -200,7 +200,7 @@ def _validate_pattern_refs(model: dict) -> None:
                     f"access pattern {pid} uses index {idx!r} on table {tn!r}, "
                     f"but that table defines no such GSI. Defined GSIs on {tn}: "
                     f"{sorted(n for n in gsi_names if n)}. A Query/Scan against a "
-                    "non-existent index fails every call at runtime — add the GSI "
+                    "non-existent index fails every call at runtime -- add the GSI "
                     'to the table or correct the "index" field.'
                 )
 
@@ -209,7 +209,7 @@ def _ensure_resource_prefix(cfg: dict, today: str) -> bool:
     """Fill in resource_prefix when the caller did not supply one.
 
     The agent should NOT have to hand-build the prefix (date + uuid8) and get
-    its shape exactly right only to be refused — the script can generate a
+    its shape exactly right only to be refused -- the script can generate a
     valid, run-unique prefix itself. `today` is the YYYYMMDD already derived
     from this run's clock so the prefix and the manifest's created_at agree.
 
@@ -268,7 +268,7 @@ def _preflight(boto3_mod, cfg: dict, dry_run: bool = False) -> dict:
         code = e.response.get("Error", {}).get("Code", "Unknown")
         _die(
             f"sts get-caller-identity failed ({code}): {e}. "
-            f"Credentials may be expired — try: aws sso login --profile "
+            f"Credentials may be expired -- try: aws sso login --profile "
             f"{cfg['aws_profile']}"
         )
     except EndpointConnectionError as e:
@@ -299,7 +299,7 @@ def _preflight(boto3_mod, cfg: dict, dry_run: bool = False) -> dict:
 
     bar = "#" * 72
     print(bar)
-    print("# WARNING — this will create REAL AWS resources in the account shown")
+    print("# WARNING -- this will create REAL AWS resources in the account shown")
     print("# below. A benchmark run typically costs single-digit cents but")
     print("# involves:")
     print("#   - Multiple DynamoDB tables and GSIs with live capacity.")
@@ -323,7 +323,7 @@ def _preflight(boto3_mod, cfg: dict, dry_run: bool = False) -> dict:
     # Consent was already given via --yes-deploy (validated in main before we
     # got here), so the deploy proceeds immediately. Only when this is an
     # interactive terminal AND a real deploy do we offer a real, brief abort
-    # window — in an agent/CI run (no TTY) there is no human to press Ctrl-C, so
+    # window -- in an agent/CI run (no TTY) there is no human to press Ctrl-C, so
     # we must not print a "cancel now" prompt that nobody can act on, and a dry
     # run creates nothing so there is nothing to abort.
     if dry_run:
@@ -335,7 +335,7 @@ def _preflight(boto3_mod, cfg: dict, dry_run: bool = False) -> dict:
         interactive = False
     if interactive:
         print(
-            f"\nThis account is shown above. Deploying in {_ABORT_WINDOW_S}s — "
+            f"\nThis account is shown above. Deploying in {_ABORT_WINDOW_S}s -- "
             "press Ctrl-C now to abort if it is NOT a testing account."
         )
         try:
@@ -351,12 +351,12 @@ def _preflight(boto3_mod, cfg: dict, dry_run: bool = False) -> dict:
 
 
 def _collect_attr_types(tables: list[dict]) -> dict[str, dict[str, str]]:
-    """Per-table map of attribute-name → DynamoDB type letter ("S"/"N"/"B").
+    """Per-table map of attribute-name -> DynamoDB type letter ("S"/"N"/"B").
 
     Types are read from TWO sources, in increasing precedence:
-      1. entities[].attributes[] as {"name","type"} — the canonical schema form
+      1. entities[].attributes[] as {"name","type"} -- the canonical schema form
          documented in references/cost-model-schema.md.
-      2. a table-level "attribute_definitions" block — the raw-CreateTable-API
+      2. a table-level "attribute_definitions" block -- the raw-CreateTable-API
          spelling an author (or LLM) naturally reaches for. Accepts BOTH
          {"attribute_name","attribute_type"} (API style) and the {"name","type"}
          shorthand. An explicit attribute_definitions entry WINS over an
@@ -367,7 +367,7 @@ def _collect_attr_types(tables: list[dict]) -> dict[str, dict[str, str]]:
     its true type (or leaving it to default to "S") makes CreateTable build the
     wrong AttributeType, so writes of the real value fail with
     ValidationException in production. scripts/benchmark_lambda.py builds the
-    identical map with the same precedence — keep the two in sync.
+    identical map with the same precedence -- keep the two in sync.
     """
 
     def _norm_t(v) -> str:
@@ -432,7 +432,7 @@ def _build_create_kwargs(
             # (`attributes` is canonical per cost-model-schema.md; calculate_costs
             # and iterate_design's fingerprint also accept `non_key_attributes` /
             # `NonKeyAttributes`). Reading only `attributes` here would silently
-            # create the GSI with an EMPTY include list — projecting nothing —
+            # create the GSI with an EMPTY include list -- projecting nothing --
             # when the design used another spelling, while the calculator and
             # fingerprint happily saw the attributes. Stay consistent.
             include_attrs = (
@@ -541,8 +541,8 @@ def _build_create_kwargs(
         # Bench-only: deletion protection OFF (see module docstring).
         "DeletionProtectionEnabled": False,
         # Encryption at rest: DynamoDB ALWAYS encrypts at rest. The default is an
-        # AWS-owned key (no cost, no key management) — correct for ephemeral bench
-        # tables — and is the implicit state when no SSESpecification is sent. We
+        # AWS-owned key (no cost, no key management) -- correct for ephemeral bench
+        # tables -- and is the implicit state when no SSESpecification is sent. We
         # intentionally do NOT pass SSESpecification here: DynamoDB's SSEType only
         # accepts "KMS" (a customer-/AWS-managed CMK); there is no "AES256" SSEType
         # on DynamoDB (that is an S3 spelling) and sending one is rejected with a
@@ -556,7 +556,7 @@ def _build_create_kwargs(
     # Optional PROVISIONED capacity for a deliberate capacity-ceiling test. On
     # on-demand, adaptive capacity auto-scales the table and absorbs a hot key,
     # so a single load generator rarely produces throttles. A low provisioned
-    # total imposes a HARD table-wide ceiling adaptive capacity cannot exceed —
+    # total imposes a HARD table-wide ceiling adaptive capacity cannot exceed --
     # the reliable way to observe hot-partition throttling (Mechanics #3) and to
     # validate a planned provisioned capacity (Mechanics #19). Set via the
     # design's table.provisioned_capacity = {"read": N, "write": M}, or globally
@@ -591,7 +591,7 @@ def _build_create_kwargs(
     if vector_indexes:
         # A single CreateTable may define several vector indexes (up to the per-table
         # limit of 5), and creating them inline avoids the UpdateTable backfill path
-        # entirely — measured at 20s inline versus 8m33s for an add-to-existing-table on
+        # entirely -- measured at 20s inline versus 8m33s for an add-to-existing-table on
         # a six-item table.
         if len(vector_indexes) > 5:
             _die(
@@ -619,7 +619,7 @@ def _create_table_one(client, kwargs: dict) -> None:
     except ClientError as e:
         code = e.response.get("Error", {}).get("Code", "")
         if code == "ResourceInUseException":
-            print(f"  note: {kwargs['TableName']} already exists — reusing.")
+            print(f"  note: {kwargs['TableName']} already exists -- reusing.")
         else:
             raise
 
@@ -640,7 +640,7 @@ def _wait_vector_indexes_ready(client, table_name: str, timeout_s: int = 1800) -
     vector index, so returning there hands the benchmark an index that rejects
     SearchVectors. There is no `BACKFILLING` index status: the correct predicate is
     `IndexStatus == "ACTIVE" and not Backfilling`, and it is the only one correct on both
-    creation paths — measured, the two report `Backfilling` differently:
+    creation paths -- measured, the two report `Backfilling` differently:
 
       inline CreateTable : CREATING with the Backfilling key ABSENT, then ACTIVE (~20s)
       UpdateTable add    : CREATING/Backfilling=false, then CREATING/Backfilling=true,
@@ -700,7 +700,7 @@ def _deploy_tables_concurrent(client, table_specs: list[tuple[dict, str]]):
 # DynamoDB vector operations (SearchVectors and friends) ship in botocore 1.43.64. The
 # managed Lambda python3.12 runtime bundles a much older boto3, so a vector benchmark run
 # MUST carry its own SDK or every SearchVectors call dies with AttributeError while the
-# observed capacity reads as zero — i.e. it looks like a free pattern rather than a broken
+# observed capacity reads as zero -- i.e. it looks like a free pattern rather than a broken
 # one.
 #
 # Shipping only the newer dynamodb service model via AWS_DATA_PATH does NOT work: the new
@@ -708,7 +708,7 @@ def _deploy_tables_concurrent(client, table_specs: list[tuple[dict, str]]):
 # (`EndpointResolutionError: Unknown parameter type: stringArray`), and SearchVectors is
 # served by a dedicated endpoint that must be resolved from those rules. Verified.
 #
-# So the whole SDK is vendored from the LOCAL install — which the skill already requires —
+# So the whole SDK is vendored from the LOCAL install -- which the skill already requires --
 # rather than pip-installed at deploy time. No network, no new dependency. The cost (~18 MB
 # zipped, a few seconds of upload) is paid ONLY by designs that declare a vector index;
 # every other design gets the same few-KB package as before.
@@ -743,7 +743,7 @@ def _build_lambda_zip(bundle_vector_sdk: bool = False) -> bytes:
     if not handler_src.exists():
         _die(
             f"lambda handler not found at {handler_src}. The skill is missing "
-            "the scripts/benchmark_lambda.py file — reinstall the skill."
+            "the scripts/benchmark_lambda.py file -- reinstall the skill."
         )
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
@@ -806,14 +806,14 @@ def _build_role_policy(prefix: str, region: str, account: str) -> dict:
                 # Condition references one does not match a SearchVectors call and the
                 # result is a DENIAL rather than a grant. Folding this action into a
                 # conditioned statement silently breaks vector search while that
-                # statement's other actions keep working — which presents as a broken
+                # statement's other actions keep working -- which presents as a broken
                 # index rather than a policy fault. See SKILL.md "Security
                 # considerations" #6 and references/vector-search.md.
                 #
                 # The `/index/*` wildcard is deliberate HERE and only here: this is a
                 # throwaway benchmark role whose table ARN is already bounded by the bench
                 # prefix, and whose indexes this same run creates and destroys. Do NOT copy
-                # the wildcard into a production policy — name the specific index(es) the
+                # the wildcard into a production policy -- name the specific index(es) the
                 # workload searches, or a vector index added to the table later inherits
                 # the grant silently. references/vector-search.md shows the scoped form.
                 "Effect": "Allow",
@@ -828,7 +828,7 @@ def _build_role_policy(prefix: str, region: str, account: str) -> dict:
                     "logs:PutLogEvents",
                 ],
                 # Least privilege: scope to this bench run's own Lambda log
-                # groups (prefix-namespaced) — never account-wide "*".
+                # groups (prefix-namespaced) -- never account-wide "*".
                 "Resource": (
                     f"arn:aws:logs:{region}:{account}:" f"log-group:/aws/lambda/{prefix}*:*"
                 ),
@@ -864,7 +864,7 @@ def _deploy_lambda(
         if code == "EntityAlreadyExists":
             role = iam.get_role(RoleName=role_name)["Role"]
             role_arn = role["Arn"]
-            print(f"  note: role {role_name} already exists — reusing.")
+            print(f"  note: role {role_name} already exists -- reusing.")
         else:
             raise
 
@@ -880,7 +880,7 @@ def _deploy_lambda(
     memory = int(cfg.get("lambda_memory_mb") or DEFAULT_LAMBDA_MEMORY_MB)
     timeout = int(cfg.get("lambda_timeout_seconds") or DEFAULT_LAMBDA_TIMEOUT_S)
 
-    # IAM role is eventually consistent — CreateFunction can fail on "cannot
+    # IAM role is eventually consistent -- CreateFunction can fail on "cannot
     # be assumed by Lambda" even after CreateRole returns. Retry with backoff.
     create_kwargs = dict(
         FunctionName=fn_name,
@@ -910,7 +910,7 @@ def _deploy_lambda(
             msg = str(e)
             last_err = e
             if code == "ResourceConflictException":
-                print(f"  note: function {fn_name} already exists — updating code + config.")
+                print(f"  note: function {fn_name} already exists -- updating code + config.")
                 lam.update_function_code(FunctionName=fn_name, ZipFile=zip_bytes)
                 waiter = lam.get_waiter("function_updated")
                 waiter.wait(FunctionName=fn_name)
@@ -928,7 +928,7 @@ def _deploy_lambda(
             if code == "InvalidParameterValueException" and (
                 "cannot be assumed" in msg or "role defined" in msg
             ):
-                print(f"  waiting for IAM role to be assumable… ({delay:.0f}s)")
+                print(f"  waiting for IAM role to be assumable... ({delay:.0f}s)")
                 time.sleep(delay)
                 delay = min(delay * 1.5, 8.0)
                 continue
@@ -984,7 +984,7 @@ def main():
     _validate_config(cfg)
     if prefix_was_generated:
         print(
-            f"No resource_prefix supplied — generated {cfg['resource_prefix']!r} "
+            f"No resource_prefix supplied -- generated {cfg['resource_prefix']!r} "
             "for this run (override by setting resource_prefix in the config)."
         )
 
@@ -1013,7 +1013,7 @@ def main():
     if global_provisioned:
         print(
             f"Provisioned-capacity mode: {global_provisioned} "
-            "(hard ceiling; bench-only — production designs default to "
+            "(hard ceiling; bench-only -- production designs default to "
             "on-demand)."
         )
 
@@ -1030,7 +1030,7 @@ def main():
         specs.append((kwargs, t["table_name"]))
 
     if dry_run:
-        print("\nDRY RUN — intended resources:")
+        print("\nDRY RUN -- intended resources:")
         for k, orig in specs:
             print(f"  table: {k['TableName']} (from {orig})")
         print(f"  lambda: {prefix}bench  (not built in dry run)")
@@ -1038,7 +1038,7 @@ def main():
         return
 
     # --- Deploy tables concurrently ---
-    print(f"\nDeploying {len(specs)} table(s) concurrently …")
+    print(f"\nDeploying {len(specs)} table(s) concurrently ...")
     descs = _deploy_tables_concurrent(ddb, specs)
 
     deployed_tables = []
@@ -1076,7 +1076,7 @@ def main():
         )
 
     # --- Deploy Lambda + IAM role ---
-    print(f"\nDeploying benchmark Lambda and IAM role …")
+    print(f"\nDeploying benchmark Lambda and IAM role ...")
     has_vectors = any(t.get("vector_indexes") for t in (model.get("tables") or []))
     lambda_info = _deploy_lambda(session, cfg, ident, prefix, tags, bundle_vector_sdk=has_vectors)
 

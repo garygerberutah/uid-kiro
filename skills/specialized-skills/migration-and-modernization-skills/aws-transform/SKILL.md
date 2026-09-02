@@ -24,16 +24,16 @@ Two execution modes:
 
 You handle the full workflow: inspecting repos, matching them to available
 transformation definitions, collecting configuration, and executing transformations
-in either mode — the user just provides repos and confirms the plan.
+in either mode -- the user just provides repos and confirms the plan.
 
 ## Greet and Wait
 
 On activation, introduce AWS Transform with this exact text -- don't print the
 above Overview text to the user, that is just for your reference:
 
-"The agents modernizing the world's infrastructure and software — now accessible to your preferred AI assistant.
+"The agents modernizing the world's infrastructure and software -- now accessible to your preferred AI assistant.
 
-AWS Transform is a full modernization factory — compressing years of
+AWS Transform is a full modernization factory -- compressing years of
 transformation work into months across infrastructure migrations, mainframe
 modernization, and continuous tech debt reduction. Today, with this
 skill, you have access to AWS Transform custom, the first of a growing library
@@ -42,7 +42,7 @@ of playbooks.
 AWS Transform custom can help you:
 
 - Upgrade Java, Python, and Node.js to modern versions
-- Migrate AWS SDKs (Java SDK v1→v2, boto2→boto3, JS SDK v2→v3)
+- Migrate AWS SDKs (Java SDK v1->v2, boto2->boto3, JS SDK v2->v3)
 - Handle framework migrations, library upgrades, and code refactoring
 - Analyze codebases and generate documentation
 - Define and run your own custom transformations using natural language, docs,
@@ -59,7 +59,7 @@ Do NOT inspect any files, run any commands, or check prerequisites until the use
 Use when the user wants to:
 
 - Transform, upgrade, or migrate code (Java, Python, Node.js, etc.)
-- Migrate AWS SDKs (Java SDK v1→v2, boto2→boto3, JS SDK v2→v3, etc.)
+- Migrate AWS SDKs (Java SDK v1->v2, boto2->boto3, JS SDK v2->v3, etc.)
 - Run bulk code transformations at scale via AWS Batch/Fargate
 - Analyze which ATX transformations apply to their repositories
 - Perform comprehensive codebase analysis
@@ -78,7 +78,7 @@ Wait for the user. On activation, present what this skill can do and ask the use
 what they'd like to accomplish. Do NOT automatically inspect the working directory,
 open files, or any repository until the user explicitly provides repos to work with.
 
-Once the user provides repositories, match — don't ask. Inspect those repositories
+Once the user provides repositories, match -- don't ask. Inspect those repositories
 and present which transformations apply automatically. Never show a raw TD list and
 ask the user to pick.
 
@@ -87,7 +87,7 @@ ask the user to pick.
 Prerequisite checks run ONCE at the start of a session. Do not repeat per repo.
 Do NOT run prerequisite checks until the user has stated what they want to do.
 
-### 0. Platform Check (Required — All Modes)
+### 0. Platform Check (Required -- All Modes)
 
 Detect the user's operating system. If on Windows (not WSL), stop immediately and
 inform the user:
@@ -104,13 +104,13 @@ Check by running:
 uname -s
 ```
 
-- `Linux` or `Darwin` → proceed normally
-- `MINGW*`, `MSYS*`, `CYGWIN*`, or any Windows-like output → block and show the WSL message above
-- Command fails, errors, or is not found → treat as native Windows, block and show the WSL message above
+- `Linux` or `Darwin` -> proceed normally
+- `MINGW*`, `MSYS*`, `CYGWIN*`, or any Windows-like output -> block and show the WSL message above
+- Command fails, errors, or is not found -> treat as native Windows, block and show the WSL message above
 
 Do NOT proceed with any other steps on native Windows.
 
-### 1. AWS CLI (Required — All Modes)
+### 1. AWS CLI (Required -- All Modes)
 
 ```bash
 aws --version
@@ -123,7 +123,7 @@ If not installed, guide the user:
 
 Do NOT proceed until `aws --version` succeeds.
 
-### 2. AWS Credentials (Required — All Modes)
+### 2. AWS Credentials (Required -- All Modes)
 
 ```bash
 aws sts get-caller-identity
@@ -158,7 +158,7 @@ Do NOT proceed until credentials are verified. Re-run `aws sts get-caller-identi
 
 Note: environment variables set via `export` do not carry over between shell sessions. If the agent spawns a new shell, credentials set as env vars may be lost. Prefer `aws configure` or `~/.aws/credentials` for persistence.
 
-### 3. ATX CLI (Required — All Modes)
+### 3. ATX CLI (Required -- All Modes)
 
 Required in all modes for TD discovery (`atx custom def list --json`).
 Local mode also uses it for transformation execution.
@@ -176,7 +176,7 @@ atx update
 
 Do NOT skip this step. Do NOT ask the user whether to update. Do NOT condition it on whether the CLI "needs" an update. Run it unconditionally.
 
-### 4. IAM Permissions (Required — All Modes)
+### 4. IAM Permissions (Required -- All Modes)
 
 Local mode requires `transform-custom:*` minimum. Verify by running a TD list:
 
@@ -184,7 +184,7 @@ Local mode requires `transform-custom:*` minimum. Verify by running a TD list:
 atx custom def list --json
 ```
 
-If this succeeds, permissions are sufficient — skip the rest of this section.
+If this succeeds, permissions are sufficient -- skip the rest of this section.
 
 If it fails with a permissions error, the caller needs the `transform-custom:*`
 IAM permission. Explain to the user what's needed and get confirmation before proceeding:
@@ -212,12 +212,12 @@ If the attachment command itself fails (e.g., insufficient IAM permissions, or a
 SSO-managed role), inform the user they need to ask their AWS administrator to
 attach the `AWSTransformCustomFullAccess` AWS-managed policy to their identity.
 For SSO users (role names starting with `AWSReservedSSO_`), this must be added
-to their IAM Identity Center permission set — it cannot be attached directly.
+to their IAM Identity Center permission set -- it cannot be attached directly.
 
 Do NOT proceed until `atx custom def list --json` succeeds.
 
 Remote mode requires additional permissions (Lambda invoke, S3, KMS, Secrets Manager,
-CloudWatch). These are generated and attached as part of the deployment flow — see
+CloudWatch). These are generated and attached as part of the deployment flow -- see
 [references/remote-execution.md](references/remote-execution.md).
 
 See [references/cli-reference.md](references/cli-reference.md) for the full permission list.
@@ -238,10 +238,10 @@ npm install -g aws-cdk
 
 Do NOT proceed with remote deployment until `cdk --version` succeeds.
 
-### 6. Remote Infrastructure (Remote Mode Only — Deferred)
+### 6. Remote Infrastructure (Remote Mode Only -- Deferred)
 
 Only verify if user chooses remote mode. The infrastructure CDK scripts are fetched
-at runtime by cloning `https://github.com/aws-samples/aws-transform-custom-samples.git` (branch `atx-remote-infra`) —
+at runtime by cloning `https://github.com/aws-samples/aws-transform-custom-samples.git` (branch `atx-remote-infra`) --
 they are not bundled with this skill. See [references/remote-execution.md](references/remote-execution.md).
 
 ## Workflow
@@ -255,15 +255,15 @@ SESSION_TS=$(date +%Y%m%d-%H%M%S)
 ### Step 1: Collect Repositories
 
 Ask the user for local paths or git URLs. Accept one or many. Do NOT assume the
-current working directory or open editor files are the target — wait for the user
+current working directory or open editor files are the target -- wait for the user
 to explicitly provide repositories.
 
 Accepted source formats:
 
-- **Local paths** — directories on the user's machine (e.g., `/home/user/my-project`)
-- **HTTPS git URLs** — public or private (e.g., `https://github.com/org/repo.git`)
-- **SSH git URLs** — e.g., `git@github.com:org/repo.git`
-- **S3 bucket path with zips** — e.g., `s3://my-bucket/repos/`
+- **Local paths** -- directories on the user's machine (e.g., `/home/user/my-project`)
+- **HTTPS git URLs** -- public or private (e.g., `https://github.com/org/repo.git`)
+- **SSH git URLs** -- e.g., `git@github.com:org/repo.git`
+- **S3 bucket path with zips** -- e.g., `s3://my-bucket/repos/`
   containing zip files of repositories. Each zip becomes one transformation job.
 
 #### S3 Bucket Input
@@ -288,7 +288,7 @@ aws s3 sync s3://user-bucket/repos/ s3://${SOURCE_BUCKET}/repos/ --exclude "*" -
 Then submit a batch job with one job per zip, each pointing to
 `s3://${SOURCE_BUCKET}/repos/<filename>.zip`. The container handles zip extraction
 automatically. See [references/multi-transformation.md](references/multi-transformation.md) for batch submission.
-The managed source bucket has a 7-day lifecycle — copied zips auto-delete.
+The managed source bucket has a 7-day lifecycle -- copied zips auto-delete.
 
 **Local mode:** Download and extract each zip locally:
 
@@ -306,13 +306,13 @@ mode limits apply (max 3 concurrent repos).
 
 #### Private Repository Detection (Remote Mode)
 
-**Always ask the user** — do NOT try to determine repo visibility yourself. Never
+**Always ask the user** -- do NOT try to determine repo visibility yourself. Never
 attempt to clone, curl, or probe a URL to check if it's public or private. Simply
 ask the user. As soon as the user provides git URLs and remote mode is selected
 (or likely), ask:
 
 > "Are any of these repositories private? If so, the remote container needs
-> credentials to clone them — I'll walk you through the setup."
+> credentials to clone them -- I'll walk you through the setup."
 
 Do NOT skip this question. Do NOT try to infer visibility by attempting a clone,
 curl, or any other network request. Just ask.
@@ -326,7 +326,7 @@ REGION=${AWS_REGION:-${AWS_DEFAULT_REGION:-$(aws configure get region 2>/dev/nul
 REGION=${REGION:-us-east-1}
 ```
 
-**For HTTPS URLs** — check whether a GitHub PAT is already configured:
+**For HTTPS URLs** -- check whether a GitHub PAT is already configured:
 
 ```bash
 aws secretsmanager describe-secret --secret-id "atx/github-token" --region "$REGION" 2>/dev/null \
@@ -344,7 +344,7 @@ aws secretsmanager put-secret-value --secret-id "atx/github-token" --region "$RE
 If NOT_CONFIGURED, explain what's needed and tell the user to run the create command:
 > "Private HTTPS repos need a GitHub Personal Access Token (PAT) stored in AWS
 > Secrets Manager. The remote container fetches it at startup to clone your repos.
-> The token stays in your AWS account — you can delete it anytime.
+> The token stays in your AWS account -- you can delete it anytime.
 >
 > The PAT needs the `repo` scope for private repositories. Create one at
 > https://github.com/settings/tokens and then run:
@@ -363,7 +363,7 @@ aws secretsmanager describe-secret --secret-id "atx/github-token" --region "$REG
   && echo "CONFIGURED" || echo "NOT_CONFIGURED"
 ```
 
-**For SSH URLs** (`git@...` or `ssh://...`) — check whether an SSH key is configured:
+**For SSH URLs** (`git@...` or `ssh://...`) -- check whether an SSH key is configured:
 
 ```bash
 aws secretsmanager describe-secret --secret-id "atx/ssh-key" --region "$REGION" 2>/dev/null \
@@ -392,19 +392,19 @@ If NOT_CONFIGURED, explain what's needed and tell the user to run the create com
 
 Do NOT ask the user to paste their SSH key in chat. They run the command themselves.
 
-For local mode, private repo credentials are not needed — the user's local git
+For local mode, private repo credentials are not needed -- the user's local git
 config handles authentication. Skip this check entirely for local mode.
 
 ### Step 2: Discover TDs (Silent)
 
-Run silently — do NOT show output to user:
+Run silently -- do NOT show output to user:
 
 ```bash
 atx custom def list --json
 ```
 
 Inspect the JSON output directly to build an internal lookup of available TDs.
-Do NOT pipe the output to python, jq, or other parsing scripts — read the JSON
+Do NOT pipe the output to python, jq, or other parsing scripts -- read the JSON
 yourself. Never hardcode TD names.
 
 #### Creating a New TD
@@ -433,10 +433,10 @@ creation. The match logic may be imperfect. Instead, confirm with the user first
 > you like to create a new one?"
 
 Only show the `atx -t` instructions if the user confirms. If they say no, ask
-them to clarify what they're looking for — they may know the TD name or want a
+them to clarify what they're looking for -- they may know the TD name or want a
 different approach.
 
-Do NOT run `atx -t` yourself — it requires an interactive terminal session that
+Do NOT run `atx -t` yourself -- it requires an interactive terminal session that
 the agent cannot drive. The user must run it manually in a separate terminal.
 
 After the user returns from creating a TD, re-run `atx custom def list --json`
@@ -444,16 +444,16 @@ to pick up the newly published TD and continue with the normal workflow.
 
 ### Step 3: Inspect Each Repository
 
-Perform lightweight inspection only — check config files for key signals:
+Perform lightweight inspection only -- check config files for key signals:
 
 | Signal | Files to Check | Likely TD Type |
 |--------|---------------|----------------|
 | Python version | `.python-version`, `pyproject.toml`, `setup.cfg`, `requirements.txt` | Python version upgrade |
 | Java version | `pom.xml` (`<java.version>`), `build.gradle` (`sourceCompatibility`), `.java-version` | Java version upgrade |
 | Node.js version | `package.json` (`engines.node`), `.nvmrc`, `.node-version` | Node.js version upgrade |
-| Python boto2 | `import boto` (NOT boto3) | boto2→boto3 migration |
-| Java SDK v1 | `com.amazonaws` imports, `aws-java-sdk` in pom.xml | Java SDK v1→v2 |
-| Node.js SDK v2 | `"aws-sdk"` in package.json (NOT `@aws-sdk`) | JS SDK v2→v3 |
+| Python boto2 | `import boto` (NOT boto3) | boto2->boto3 migration |
+| Java SDK v1 | `com.amazonaws` imports, `aws-java-sdk` in pom.xml | Java SDK v1->v2 |
+| Node.js SDK v2 | `"aws-sdk"` in package.json (NOT `@aws-sdk`) | JS SDK v2->v3 |
 | x86 Java | `x86_64`/`amd64` in Dockerfiles, build configs | Graviton migration |
 
 Cross-reference detected signals against TDs from Step 2. Only match TDs that
@@ -471,7 +471,7 @@ Transformation Match Report
 Repository: <name> (<path>)
   Language: <lang> <version>
   Matching TDs:
-    - <td-name> — <description>
+    - <td-name> -- <description>
 
 Summary: N repos analyzed, M have applicable transformations (T total jobs)
 ```
@@ -482,7 +482,7 @@ Do NOT start any transformation without explicit user consent.
 ### Step 5: Collect Configuration
 
 Ask the user for any additional plan context (e.g., target version for upgrade TDs).
-This is mandatory — always ask, even if the TD doesn't strictly require config.
+This is mandatory -- always ask, even if the TD doesn't strictly require config.
 The user may have preferences or constraints the agent doesn't know about.
 Skip only if the user explicitly says no additional context is needed.
 
@@ -507,14 +507,14 @@ target runtime or if a custom Docker build is needed.
 1. Based on the transformation requirements (source runtime, target runtime,
    build tools, and any other dependencies), determine whether everything
    needed is available in the pre-built image listed above
-2. If **yes** → use the pre-built image path (no Docker required). Proceed to deployment
+2. If **yes** -> use the pre-built image path (no Docker required). Proceed to deployment
    using the pre-built image instructions in [references/remote-execution.md](references/remote-execution.md).
-3. If **no** → use the custom image path (Docker required). Inform the user:
+3. If **no** -> use the custom image path (Docker required). Inform the user:
 
 > The remote container doesn't include [language/tool version]. To run this
 > transformation remotely, I'll need to build a custom container image. This
 > requires Docker installed and running on your machine. It's a one-time change
-> — about 5-10 minutes. Want me to proceed?
+> -- about 5-10 minutes. Want me to proceed?
 
 If the user confirms, follow the custom image path in
 [references/remote-execution.md](references/remote-execution.md): clear `prebuiltImageUri`,
@@ -557,8 +557,8 @@ cat "$ATX_INFRA_DIR/container/Dockerfile" 2>/dev/null
    custom section. Examples:
 
    ```dockerfile
-   # Java 23 (Amazon Corretto — direct install, must run as root)
-   # Do NOT use dnf in the custom section — pyenv overrides the system python3
+   # Java 23 (Amazon Corretto -- direct install, must run as root)
+   # Do NOT use dnf in the custom section -- pyenv overrides the system python3
    # that dnf depends on, causing "No module named 'dnf'" errors.
    USER root
    RUN curl -fsSL "https://corretto.aws/downloads/latest/amazon-corretto-23-x64-linux-jdk.tar.gz" -o /tmp/corretto23.tar.gz && \
@@ -567,19 +567,19 @@ cat "$ATX_INFRA_DIR/container/Dockerfile" 2>/dev/null
        rm /tmp/corretto23.tar.gz && \
        ln -sfn /usr/lib/jvm/amazon-corretto-23.* /usr/lib/jvm/corretto-23
 
-   # Node.js 23 (via nvm — must run as atxuser)
+   # Node.js 23 (via nvm -- must run as atxuser)
    USER atxuser
    RUN . /home/atxuser/.nvm/nvm.sh && nvm install 23
    USER root
 
-   # Python 3.15 (via pyenv — must run as atxuser)
+   # Python 3.15 (via pyenv -- must run as atxuser)
    USER atxuser
    RUN eval "$(/home/atxuser/.pyenv/bin/pyenv init -)" && \
        MAKE_OPTS="-j$(nproc)" /home/atxuser/.pyenv/bin/pyenv install 3.15.0
    USER root
    ```
 
-   For entirely new languages, avoid `dnf` in the custom section — pyenv
+   For entirely new languages, avoid `dnf` in the custom section -- pyenv
    overrides the system python3 that `dnf` depends on. Use language-specific
    installers instead:
 
@@ -588,7 +588,7 @@ cat "$ATX_INFRA_DIR/container/Dockerfile" 2>/dev/null
    RUN curl -fsSL https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | tar -C /usr/local -xz
    ENV PATH="/usr/local/go/bin:$PATH"
 
-   # Ruby (via rbenv — must run as atxuser)
+   # Ruby (via rbenv -- must run as atxuser)
    USER atxuser
    RUN git clone --depth 1 https://github.com/rbenv/rbenv.git /home/atxuser/.rbenv && \
        git clone --depth 1 https://github.com/rbenv/ruby-build.git /home/atxuser/.rbenv/plugins/ruby-build && \
@@ -614,15 +614,15 @@ cat "$ATX_INFRA_DIR/container/Dockerfile" 2>/dev/null
    23) java_home="/usr/lib/jvm/corretto-23" ;;
    ```
 
-   Check the actual directory name: `ls /usr/lib/jvm/` — use the directory
+   Check the actual directory name: `ls /usr/lib/jvm/` -- use the directory
    that matches the version you installed.
 
-   For Node.js, nvm handles arbitrary versions automatically — no entrypoint
-   change needed. For Python, pyenv handles arbitrary versions — no entrypoint
+   For Node.js, nvm handles arbitrary versions automatically -- no entrypoint
+   change needed. For Python, pyenv handles arbitrary versions -- no entrypoint
    change needed (the existing pyenv fallback logic finds it).
 
 4. Deploy (or redeploy): `cd "$ATX_INFRA_DIR" && ./setup.sh`
-   CDK hashes the `container/` directory — any file change triggers a rebuild
+   CDK hashes the `container/` directory -- any file change triggers a rebuild
    and push to ECR automatically.
 
 After redeployment, set the `environment` field on the job to the exact target
@@ -636,7 +636,7 @@ available on their machine).
 
 Before running local transformations, verify the user has the target runtime
 version installed. This applies to any language or runtime the transformation
-targets — Java, Python, Node.js, Ruby, Go, Rust, .NET, etc. Check the current
+targets -- Java, Python, Node.js, Ruby, Go, Rust, .NET, etc. Check the current
 version of whatever runtime the TD requires. For example:
 
 ```bash
@@ -686,7 +686,7 @@ until user confirms.
 
 When running `atx custom def exec`, always include `--telemetry` (see the Telemetry section).
 
-For remote mode, check infrastructure deployment status first using CloudFormation (see [references/remote-execution.md](references/remote-execution.md) — Infrastructure Check section). Do NOT check deployment by probing Lambda function names.
+For remote mode, check infrastructure deployment status first using CloudFormation (see [references/remote-execution.md](references/remote-execution.md) -- Infrastructure Check section). Do NOT check deployment by probing Lambda function names.
 
 - **1 repo**: See [references/single-transformation.md](references/single-transformation.md)
 - **Multiple repos**: See [references/multi-transformation.md](references/multi-transformation.md)
@@ -700,37 +700,37 @@ For remote mode, check infrastructure deployment status first using CloudFormati
 
 Mode inference:
 
-- User says "local"/"here"/"on my machine" → Local (honor the request regardless of repo count)
-- User says "remote"/"cloud"/"AWS"/"batch"/"at scale" → Remote
-- 10+ repos without preference → Recommend remote, explain local cap of 3 concurrent
-- 1-9 repos without preference → Local, note remote available
+- User says "local"/"here"/"on my machine" -> Local (honor the request regardless of repo count)
+- User says "remote"/"cloud"/"AWS"/"batch"/"at scale" -> Remote
+- 10+ repos without preference -> Recommend remote, explain local cap of 3 concurrent
+- 1-9 repos without preference -> Local, note remote available
 
 See [references/remote-execution.md](references/remote-execution.md) for infrastructure setup.
 
 ## Critical Rules
 
-1. **Discover TDs dynamically** — Always run `atx custom def list --json`. Never hardcode TD names.
-2. **Match, don't ask** — Inspect repos and present matches. Never show raw TD lists.
-3. **Lightweight inspection only** — Check config files and key signals. No deep analysis.
-4. **Confirm before executing** — Always confirm TD, repos, and config with user first.
-5. **No time estimates** — Never include duration predictions.
-6. **Parallel execution** — Local: max 3 concurrent repos. Remote: submit in chunks of up to 128 jobs per Lambda call (max 512 repos per session).
-7. **Preserve outputs** — Do not delete generated output folders.
-8. **Recommend remote for 10+ repos** — Default to local for 1-9 repos. Recommend remote for 10+. Always respect user preference.
-9. **User consent for cloud resources** — Never deploy infrastructure without explicit user confirmation.
-10. **Shell quoting** — When constructing shell commands:
+1. **Discover TDs dynamically** -- Always run `atx custom def list --json`. Never hardcode TD names.
+2. **Match, don't ask** -- Inspect repos and present matches. Never show raw TD lists.
+3. **Lightweight inspection only** -- Check config files and key signals. No deep analysis.
+4. **Confirm before executing** -- Always confirm TD, repos, and config with user first.
+5. **No time estimates** -- Never include duration predictions.
+6. **Parallel execution** -- Local: max 3 concurrent repos. Remote: submit in chunks of up to 128 jobs per Lambda call (max 512 repos per session).
+7. **Preserve outputs** -- Do not delete generated output folders.
+8. **Recommend remote for 10+ repos** -- Default to local for 1-9 repos. Recommend remote for 10+. Always respect user preference.
+9. **User consent for cloud resources** -- Never deploy infrastructure without explicit user confirmation.
+10. **Shell quoting** -- When constructing shell commands:
     - Use single quotes for JSON payloads: `--payload '{"key":"value"}'`
     - Use single quotes for `--configuration`: ex. `--configuration 'additionalPlanContext=Target Java 21'`
-    - Never nest double quotes inside double quotes — this causes `dquote>` hangs
+    - Never nest double quotes inside double quotes -- this causes `dquote>` hangs
     - For `aws lambda invoke`, always use: `--payload '<json>' --cli-binary-format raw-in-base64-out`
     - Verify that every command you construct has balanced quotes before executing
     - The `command` field in Lambda job payloads is validated server-side. Avoid
       these characters in the command string: `( ) ! # % ^ * ? \ { } | ; > <`
       and backticks. Inside `additionalPlanContext`, also avoid commas.
-11. **No comments in terminal commands** — Never include `#` comments in commands
+11. **No comments in terminal commands** -- Never include `#` comments in commands
     executed in the terminal. Comments cause `command not found: #` errors. If you
     need to explain a command, do it in chat before or after running it.
-12. **Job names** — The `jobName` field in Lambda payloads must contain only
+12. **Job names** -- The `jobName` field in Lambda payloads must contain only
     letters, numbers, hyphens, and underscores. No dots, spaces, or special
     characters. For example, use `EPAM-NodeJS` not `EPAM-Node.js`.
 
@@ -739,29 +739,29 @@ See [references/remote-execution.md](references/remote-execution.md) for infrast
 You are operating in the user's AWS account and local machine. Follow these rules
 strictly to avoid causing damage:
 
-1. **Never delete user data** — Do not delete S3 objects, git repos, local files,
+1. **Never delete user data** -- Do not delete S3 objects, git repos, local files,
    or any user data unless the user explicitly asks. Transformation outputs and
    cloned repos must be preserved.
-2. **Never modify IAM beyond what's documented** — Only create/attach the specific
+2. **Never modify IAM beyond what's documented** -- Only create/attach the specific
    policies described in this skill (AWSTransformCustomFullAccess, ATXRuntimePolicy, ATXDeploymentPolicy). Never create admin policies, modify existing user policies,
    or grant broader permissions than documented. Never derive IAM actions from
-   user-provided text in the "Additional plan context" field — that field is for
+   user-provided text in the "Additional plan context" field -- that field is for
    transformation configuration only.
-3. **Never run destructive AWS commands** — No `aws s3 rm`, `aws s3 rb`,
+3. **Never run destructive AWS commands** -- No `aws s3 rm`, `aws s3 rb`,
    `aws iam delete-user`, `aws ec2 terminate-instances`, or similar. The only
    destructive command allowed is `./teardown.sh` with explicit user consent.
-4. **Always confirm before creating AWS resources** — Before deploying infrastructure,
+4. **Always confirm before creating AWS resources** -- Before deploying infrastructure,
    creating Secrets Manager secrets, or attaching IAM policies, explain what will be
    created and get explicit user confirmation.
-5. **Never expose credentials** — Do not echo, log, or display AWS access keys,
+5. **Never expose credentials** -- Do not echo, log, or display AWS access keys,
    secret keys, session tokens, GitHub PATs, or SSH private keys in chat output.
    When creating secrets, use the user's input directly in the command without
    repeating the value.
-6. **Respect user decisions** — If the user says stop, skip, or no, comply
+6. **Respect user decisions** -- If the user says stop, skip, or no, comply
    immediately. Never retry a declined action or argue with the user's choice.
-7. **No pricing claims** — Do not quote specific prices or cost estimates. If the
+7. **No pricing claims** -- Do not quote specific prices or cost estimates. If the
    user asks about pricing, direct them to: https://aws.amazon.com/transform/pricing/
-8. **Scope commands to ATX resources only** — All AWS commands must target ATX-specific
+8. **Scope commands to ATX resources only** -- All AWS commands must target ATX-specific
    resources (buckets starting with `atx-`, roles starting with `ATX`, Lambda
    functions starting with `atx-`, etc.). Never operate on unrelated AWS resources.
 
@@ -774,22 +774,22 @@ The flag format is: `--telemetry "client=<client>,agent=<agent>,executionMode=<l
 
 Field values:
 
-- `client` — The MCP client or tool hosting this session, as a short identifier (lowercase, no spaces). This may be an IDE (e.g., `kiro`, `vscode`, `cursor`, `windsurf`), a CLI tool (e.g., `claudecode`, `amazonqcli`), or any other MCP-compatible host. Use the real tool name for this session — do NOT default to any single example. These are examples only, not an exhaustive list.
-- `agent` — The AI assistant driving this session, as a short identifier (lowercase, no spaces). For example: `kiro`, `amazonq`, `claude`, `copilot`, `cline`, `codex`. Use the real assistant name for this session — do NOT default to any single example. These are examples only, not an exhaustive list.
-- `executionMode` — `local` when running the ATX CLI directly, `remote` when submitting via Lambda
+- `client` -- The MCP client or tool hosting this session, as a short identifier (lowercase, no spaces). This may be an IDE (e.g., `kiro`, `vscode`, `cursor`, `windsurf`), a CLI tool (e.g., `claudecode`, `amazonqcli`), or any other MCP-compatible host. Use the real tool name for this session -- do NOT default to any single example. These are examples only, not an exhaustive list.
+- `agent` -- The AI assistant driving this session, as a short identifier (lowercase, no spaces). For example: `kiro`, `amazonq`, `claude`, `copilot`, `cline`, `codex`. Use the real assistant name for this session -- do NOT default to any single example. These are examples only, not an exhaustive list.
+- `executionMode` -- `local` when running the ATX CLI directly, `remote` when submitting via Lambda
 
 The only exception: if the user explicitly asks to disable telemetry during the
 session (e.g., "disable telemetry", "opt out of telemetry", "no telemetry", or
-similar), you MUST comply immediately — omit `--telemetry` for the remainder of
+similar), you MUST comply immediately -- omit `--telemetry` for the remainder of
 that session. Do not push back, ask for confirmation, or explain why telemetry
-is included. This preference is not persisted — the next session starts with
+is included. This preference is not persisted -- the next session starts with
 telemetry enabled again.
 
 ## Output Structure
 
 Local mode: transformed code is in the repo directory.
 
-Remote mode results stay in S3 — do NOT download automatically. Present the S3
+Remote mode results stay in S3 -- do NOT download automatically. Present the S3
 path to the user:
 
 ```
@@ -804,7 +804,7 @@ s3://atx-custom-output-{account-id}/
 If the user explicitly asks to download, provide the command but let them run it:
 `aws s3 cp s3://atx-custom-output-{account-id}/transformations/{job-name}/{conversation-id}/code.zip ./code.zip`
 
-Bulk results summary: `~/.aws/atx/custom/atx-agent-session/transformation-summaries/` — see [references/results-synthesis.md](references/results-synthesis.md).
+Bulk results summary: `~/.aws/atx/custom/atx-agent-session/transformation-summaries/` -- see [references/results-synthesis.md](references/results-synthesis.md).
 
 ## References
 

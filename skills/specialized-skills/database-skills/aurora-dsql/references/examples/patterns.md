@@ -4,9 +4,9 @@ Part of [Aurora DSQL Implementation Examples](../dsql-examples.md).
 
 > **`pool` in every example MUST be a DSQL Connector pool, not a bare driver pool.** Construct
 > it via `new AuroraDSQLPool(...)` from `@aws/aurora-dsql-node-postgres-connector` (or the
-> equivalent for your language — see [language.md](../language.md)). Bare `pg.Pool` /
+> equivalent for your language -- see [language.md](../language.md)). Bare `pg.Pool` /
 > `psycopg.connection` / `pgx.Pool` works until the first 15-minute token expiry and then starts
-> returning auth errors on every new connection — DSQL users who try the bare form report this
+> returning auth errors on every new connection -- DSQL users who try the bare form report this
 > as a DSQL bug. Workflow 0b in SKILL.md covers Connector verification.
 
 ---
@@ -131,8 +131,8 @@ INSERT INTO distributors VALUES (nextval('order_seq'), 'nothing');
 
 ### Choosing a CACHE Size
 
-- **CACHE >= 65536** — high-frequency identifier generation, many concurrent sessions, tolerates gaps (e.g., IoT ingestion, job run IDs)
-- **CACHE = 1** — low allocation rates, identifiers should follow allocation order more closely, minimizing gaps matters (e.g., account numbers, reference numbers)
+- **CACHE >= 65536** -- high-frequency identifier generation, many concurrent sessions, tolerates gaps (e.g., IoT ingestion, job run IDs)
+- **CACHE = 1** -- low allocation rates, identifiers should follow allocation order more closely, minimizing gaps matters (e.g., account numbers, reference numbers)
 
 ---
 

@@ -5,7 +5,7 @@ AA's composite coding score: Terminal-Bench Hard (agentic SWE/sysadmin) + SciCod
 **Use this for:** Software engineering, scientific computing, system administration, code-heavy tasks.
 
 **Source:** Artificial Analysis (artificialanalysis.ai).
-"—" = no data — infer from similar models in the same family, but tell the user you're inferring.
+"--" = no data -- infer from similar models in the same family, but tell the user you're inferring.
 
 |   # | Model                                  | Family      | Score |
 |-----|----------------------------------------|-------------|-------|
@@ -32,13 +32,13 @@ AA's composite coding score: Terminal-Bench Hard (agentic SWE/sysadmin) + SciCod
 |  21 | Qwen3 1.7B (mode: reasoning)           | Qwen        |   1.4 |
 |  22 | Qwen3 0.6B (mode: reasoning)           | Qwen        |   0.9 |
 |  23 | Llama 3.2 1B Instruct                  | Meta Llama  |   0.6 |
-|   — | Llama 3.2 3B Instruct                  | Meta Llama  |     — |
-|   — | Qwen3 4B (mode: reasoning)             | Qwen        |     — |
-|   — | Qwen2.5 32B Instruct                   | Qwen        |     — |
-|   — | DeepSeek R1 Distill Llama 8B           | DeepSeek    |     — |
-|   — | DeepSeek R1 Distill Qwen 32B           | DeepSeek    |     — |
-|   — | DeepSeek R1 Distill Qwen 14B           | DeepSeek    |     — |
-|   — | DeepSeek R1 Distill Qwen 1.5B          | DeepSeek    |     — |
-|   — | Qwen2.5 14B Instruct                   | Qwen        |     — |
-|   — | Qwen2.5 7B Instruct                    | Qwen        |     — |
-|   — | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     — |
+|   -- | Llama 3.2 3B Instruct                  | Meta Llama  |     -- |
+|   -- | Qwen3 4B (mode: reasoning)             | Qwen        |     -- |
+|   -- | Qwen2.5 32B Instruct                   | Qwen        |     -- |
+|   -- | DeepSeek R1 Distill Llama 8B           | DeepSeek    |     -- |
+|   -- | DeepSeek R1 Distill Qwen 32B           | DeepSeek    |     -- |
+|   -- | DeepSeek R1 Distill Qwen 14B           | DeepSeek    |     -- |
+|   -- | DeepSeek R1 Distill Qwen 1.5B          | DeepSeek    |     -- |
+|   -- | Qwen2.5 14B Instruct                   | Qwen        |     -- |
+|   -- | Qwen2.5 7B Instruct                    | Qwen        |     -- |
+|   -- | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     -- |

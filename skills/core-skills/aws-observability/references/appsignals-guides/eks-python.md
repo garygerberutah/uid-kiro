@@ -150,7 +150,7 @@ template {
 
 **Verification:**
 
-- Open AWS CloudWatch Console → Application Signals → Services
+- Open AWS CloudWatch Console -> Application Signals -> Services
 - Look for your service and check that traces and metrics are being collected
 
 **Warning for Django:**

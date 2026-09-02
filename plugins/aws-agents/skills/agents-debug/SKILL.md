@@ -1,7 +1,7 @@
 ---
 name: agents-debug
 description: >
-  Use when your agent or environment is broken — wrong answers, errors,
+  Use when your agent or environment is broken -- wrong answers, errors,
   timeouts, tool failures, or CLI issues. Reads traces and logs to
   diagnose root causes. Also checks prerequisites when the CLI itself
   isn't working. Triggers on: "agent not working", "wrong answer",
@@ -10,10 +10,10 @@ description: >
   denied", "command not found", "stuck in DELETING", "maxVms exceeded",
   "cold start diagnosis", "cold start slow", "agentcore create error",
   "create failed", "exit code 7", "connection refused local dev".
-  Not for deploy failures — use agents-deploy. Not for performance
-  tuning without errors — use agents-optimize. Not for VPC
-  configuration — use agents-build. Not for observability setup or
-  missing logs — use agents-optimize.
+  Not for deploy failures -- use agents-deploy. Not for performance
+  tuning without errors -- use agents-optimize. Not for VPC
+  configuration -- use agents-build. Not for observability setup or
+  missing logs -- use agents-optimize.
 allowed-tools: Read Grep Glob Bash
 metadata:
   type: skill
@@ -37,16 +37,16 @@ Diagnose why your AgentCore agent or environment isn't working correctly.
 
 Do NOT use for:
 
-- Deploy failures (CDK errors, IAM during deploy) → use `agents-deploy`
-- Scaffolding a new project → use `agents-get-started`
-- Measuring quality or setting up monitoring → use `agents-optimize`
+- Deploy failures (CDK errors, IAM during deploy) -> use `agents-deploy`
+- Scaffolding a new project -> use `agents-get-started`
+- Measuring quality or setting up monitoring -> use `agents-optimize`
 
 ## Input
 
 `$ARGUMENTS` is optional:
 
 ```
-/agents-debug                      # interactive — describe what's wrong
+/agents-debug                      # interactive -- describe what's wrong
 /agents-debug traces               # read and explain recent traces
 /agents-debug logs                 # search recent logs for errors
 /agents-debug memory               # diagnose memory recall issues specifically
@@ -80,7 +80,7 @@ Ask (or infer from context):
 
 ### Step 3: Read traces and logs automatically
 
-Don't ask the developer to paste logs — read them directly.
+Don't ask the developer to paste logs -- read them directly.
 
 ```bash
 # List recent traces
@@ -100,7 +100,7 @@ agentcore logs --runtime <AgentName> --since 2h --query "timeout"
 agentcore logs --runtime <AgentName> --since 2h --query "model access"
 ```
 
-**Important:** CloudWatch put-to-get latency is **~10 seconds end-to-end** — that's the delay from when a span is emitted to when it's readable by `agentcore traces get` or `agentcore run eval`. There is **no separate "trace ingested but eval not ready yet" window**; the same ingestion step unlocks both paths. Older skills and docs said 30–60s for traces and 2–5 minutes for evals — both are stale. If you just invoked the agent, wait ~15 seconds and both trace reads and evals will work.
+**Important:** CloudWatch put-to-get latency is **~10 seconds end-to-end** -- that's the delay from when a span is emitted to when it's readable by `agentcore traces get` or `agentcore run eval`. There is **no separate "trace ingested but eval not ready yet" window**; the same ingestion step unlocks both paths. Older skills and docs said 30-60s for traces and 2-5 minutes for evals -- both are stale. If you just invoked the agent, wait ~15 seconds and both trace reads and evals will work.
 
 Read `agentcore/agentcore.json` to get the agent name if not provided.
 
@@ -114,9 +114,9 @@ Read `agentcore/agentcore.json` to get the agent name if not provided.
 
 Fix:
 
-1. Go to AWS Console → Amazon Bedrock → Model access
+1. Go to AWS Console -> Amazon Bedrock -> Model access
 2. Enable the model your agent uses
-3. Wait 1–2 minutes for access to propagate
+3. Wait 1-2 minutes for access to propagate
 
 **Second cause:** The execution role is missing `bedrock:InvokeModel`.
 
@@ -140,7 +140,7 @@ Model IDs starting with a geographic prefix are cross-region inference profiles 
 | `apac.` | Asia Pacific | ap-northeast-1, ap-southeast-1, ap-southeast-2, ap-south-1 |
 | `global.` | All commercial regions worldwide | All supported regions |
 
-The AgentCore CLI scaffolds `global.` by default (e.g., `global.anthropic.claude-sonnet-4-5-20250929-v1:0`). All prefixes require model access enabled in every destination region the profile covers. For `us.` profiles, enable in all US regions; for `eu.`, all EU regions; for `global.`, all supported regions. Not all models support all prefixes — `global.` is currently available for select models only. Use `global.` for maximum throughput when available, or a geographic prefix when data residency requirements constrain where inference can run. Check the Bedrock inference profiles docs for current model × prefix availability.
+The AgentCore CLI scaffolds `global.` by default (e.g., `global.anthropic.claude-sonnet-4-5-20250929-v1:0`). All prefixes require model access enabled in every destination region the profile covers. For `us.` profiles, enable in all US regions; for `eu.`, all EU regions; for `global.`, all supported regions. Not all models support all prefixes -- `global.` is currently available for select models only. Use `global.` for maximum throughput when available, or a geographic prefix when data residency requirements constrain where inference can run. Check the Bedrock inference profiles docs for current model x prefix availability.
 
 ---
 
@@ -164,7 +164,7 @@ agentcore fetch access --name <AgentName> --type agent
 **Step 3:** Common tool call failures:
 
 **Gateway URL not set (local dev):**
-The `AGENTCORE_GATEWAY_*_URL` env var is only set after deploy. In `agentcore dev`, gateway tools aren't available. This is expected — the agent should handle this gracefully.
+The `AGENTCORE_GATEWAY_*_URL` env var is only set after deploy. In `agentcore dev`, gateway tools aren't available. This is expected -- the agent should handle this gracefully.
 
 **Auth failure on tool call:**
 
@@ -227,9 +227,9 @@ If the agent should be using memory context but isn't, see the "Symptom: Memory 
 agentcore status --type memory --json | jq '.memories[].strategies'
 ```
 
-1. Wait 5–30 seconds after a session ends — LTM extraction is async. The agent must finish its session before facts are extracted.
+1. Wait 5-30 seconds after a session ends -- LTM extraction is async. The agent must finish its session before facts are extracted.
 
-2. Use UUIDs (v4) for session IDs — the platform requires a minimum of 33 characters. Short IDs like "session-1" cause LTM to fail silently. `agentcore invoke` generates compliant IDs by default.
+2. Use UUIDs (v4) for session IDs -- the platform requires a minimum of 33 characters. Short IDs like "session-1" cause LTM to fail silently. `agentcore invoke` generates compliant IDs by default.
 
 3. Verify the memory resource is ACTIVE:
 
@@ -245,7 +245,7 @@ agentcore status --type memory
 agentcore status --type memory --json | jq '.memories[].id'
 ```
 
-1. Verify the `actor_id` is consistent across sessions — memory is scoped per actor.
+1. Verify the `actor_id` is consistent across sessions -- memory is scoped per actor.
 
 2. Check the namespace paths in your retrieval config match the namespaces used when writing.
 
@@ -259,7 +259,7 @@ agentcore status --type memory --json | jq '.memories[].id'
 agentcore traces get <traceId> --runtime <AgentName>
 ```
 
-Look for long-running steps — model calls, tool calls, memory operations.
+Look for long-running steps -- model calls, tool calls, memory operations.
 
 **Step 2:** Common timeout causes:
 
@@ -277,9 +277,9 @@ Look for long-running steps — model calls, tool calls, memory operations.
 
 ## Symptom: `ServiceQuotaExceededException: maxVms limit exceeded` (despite low observed concurrency)
 
-Your CloudWatch "concurrent sessions" metric shows modest numbers (maybe 30–50) but `InvokeAgentRuntime` calls return `ServiceQuotaExceededException: maxVms limit exceeded`.
+Your CloudWatch "concurrent sessions" metric shows modest numbers (maybe 30-50) but `InvokeAgentRuntime` calls return `ServiceQuotaExceededException: maxVms limit exceeded`.
 
-**What's actually happening:** CloudWatch's concurrent-sessions metric is not the same as live microVM count. The `maxVms` quota counts all environments your account has active — including ones that finished their invocation but haven't been reclaimed yet. Idle-but-not-yet-reclaimed environments count against the quota until `idleRuntimeSessionTimeout` expires (default 900 seconds / 15 minutes) or you explicitly stop them.
+**What's actually happening:** CloudWatch's concurrent-sessions metric is not the same as live microVM count. The `maxVms` quota counts all environments your account has active -- including ones that finished their invocation but haven't been reclaimed yet. Idle-but-not-yet-reclaimed environments count against the quota until `idleRuntimeSessionTimeout` expires (default 900 seconds / 15 minutes) or you explicitly stop them.
 
 If your code uses a new session ID per request and doesn't call `StopRuntimeSession`, every request leaves an environment sitting idle for 15 minutes counting against the quota.
 
@@ -298,7 +298,7 @@ If your code uses a new session ID per request and doesn't call `StopRuntimeSess
 
 3. **Lower `idleRuntimeSessionTimeout`.** If your sessions are short-lived and you can't add `StopRuntimeSession` everywhere, lower the timeout by editing the runtime's `lifecycleConfiguration` in `agentcore/agentcore.json` and running `agentcore deploy`.
 
-4. **Only after the above, request a quota increase.** See `agents-harden` (loads [`references/limits.md`](../agents-harden/references/limits.md)) — request it through the Service Quotas console (Amazon Bedrock AgentCore), not by filing a support ticket directly.
+4. **Only after the above, request a quota increase.** See `agents-harden` (loads [`references/limits.md`](../agents-harden/references/limits.md)) -- request it through the Service Quotas console (Amazon Bedrock AgentCore), not by filing a support ticket directly.
 
 See `agents-harden` Session lifecycle management section for the full pattern.
 
@@ -332,13 +332,13 @@ agentcore status --runtime <AgentName> --json
 agentcore status --type memory
 ```
 
-**Initialization timeout:** The agent takes too long to be ready for its first request — heavy imports at module level, synchronous database connections, or MCP client initialization during startup can exceed the service's health-check window. The symptom looks like a 424 on the first invoke but healthy on subsequent ones. Fix: move expensive setup out of module level, use lazy initialization, or warm the agent before production traffic. See `agents-harden` Initialization time section for patterns.
+**Initialization timeout:** The agent takes too long to be ready for its first request -- heavy imports at module level, synchronous database connections, or MCP client initialization during startup can exceed the service's health-check window. The symptom looks like a 424 on the first invoke but healthy on subsequent ones. Fix: move expensive setup out of module level, use lazy initialization, or warm the agent before production traffic. See `agents-harden` Initialization time section for patterns.
 
 ---
 
 ## Symptom: Local invocations fail with connection-refused / exit code 7
 
-Usually not an agent bug — the dev server is on a different port than you expect.
+Usually not an agent bug -- the dev server is on a different port than you expect.
 
 **Default ports `agentcore dev` binds:**
 
@@ -348,11 +348,11 @@ Usually not an agent bug — the dev server is on a different port than you expe
 | MCP | 8000 |
 | A2A | 9000 |
 
-**When the default is occupied** (second dev session, a lingering process from a previous run, another service on 8080), the CLI **auto-increments** silently: 8080 → 8081 → 8082. A test harness or `curl` script hardcoded to 8080 will get `Connection refused` (curl exit code 7) while the agent is running fine on 8082.
+**When the default is occupied** (second dev session, a lingering process from a previous run, another service on 8080), the CLI **auto-increments** silently: 8080 -> 8081 -> 8082. A test harness or `curl` script hardcoded to 8080 will get `Connection refused` (curl exit code 7) while the agent is running fine on 8082.
 
 Diagnose in this order:
 
-1. Read the CLI banner that `agentcore dev` prints — it shows the actual bound port and URL. This is always the source of truth.
+1. Read the CLI banner that `agentcore dev` prints -- it shows the actual bound port and URL. This is always the source of truth.
 2. If the banner is gone (terminal cleared, running in background), check the log file:
 
    ```bash
@@ -373,13 +373,13 @@ Diagnose in this order:
 - Kill the process squatting on the default: `lsof -tiTCP:8080 -sTCP:LISTEN | xargs kill`
 - Update the hardcoded port in your test harness to read from the CLI output or from an env var
 
-This is also a common source of "works locally one day, fails the next" reports — the port shifted between runs.
+This is also a common source of "works locally one day, fails the next" reports -- the port shifted between runs.
 
 ---
 
 ## Symptom: Gateway tool calls failing with auth errors
 
-**Step 1:** Verify the auth type matches the target type. This is the most common gateway error — using the wrong outbound auth for the target:
+**Step 1:** Verify the auth type matches the target type. This is the most common gateway error -- using the wrong outbound auth for the target:
 
 | Target type | Valid outbound auth |
 |---|---|
@@ -397,7 +397,7 @@ agentcore logs --runtime <AgentName> --since 1h --query "401"
 agentcore logs --runtime <AgentName> --since 1h --query "403"
 ```
 
-If tokens are expiring, verify the OAuth credential provider's token endpoint is reachable and the client credentials are still valid. For MCP server targets with OAuth, the gateway handles token refresh automatically — if it's failing, the credential provider config may be wrong.
+If tokens are expiring, verify the OAuth credential provider's token endpoint is reachable and the client credentials are still valid. For MCP server targets with OAuth, the gateway handles token refresh automatically -- if it's failing, the credential provider config may be wrong.
 
 **Step 3:** Check the credential is configured:
 
@@ -410,7 +410,7 @@ agentcore status --type gateway --json
 
 ## Symptom: No traces appearing
 
-**Wait ~15 seconds** — there's a short delay (typically ~10s) between invocation and trace availability.
+**Wait ~15 seconds** -- there's a short delay (typically ~10s) between invocation and trace availability.
 
 If still no traces after ~30 seconds:
 
@@ -428,15 +428,15 @@ AgentCore doesn't capture raw stdout. It uses OpenTelemetry to ship logs to Clou
 
 **1. Your entrypoint must be wrapped with `opentelemetry-instrument`.**
 
-CodeZip builds do this automatically. Docker/Container builds need it added manually — this is the #1 thing people miss.
+CodeZip builds do this automatically. Docker/Container builds need it added manually -- this is the #1 thing people miss.
 
 In your Dockerfile CMD:
 
 ```dockerfile
-# ✅ Correct — wrapped with opentelemetry-instrument
+# [YES] Correct -- wrapped with opentelemetry-instrument
 CMD ["opentelemetry-instrument", "python", "main.py"]
 
-# ❌ Wrong — no OTEL wrapper, logs won't appear
+# [NO] Wrong -- no OTEL wrapper, logs won't appear
 CMD ["python", "main.py"]
 ```
 
@@ -445,26 +445,26 @@ CMD ["python", "main.py"]
 ```
 logs:CreateLogGroup
 logs:CreateLogStream
-logs:PutLogEvents    → scoped to /aws/bedrock-agentcore/runtimes/*
+logs:PutLogEvents    -> scoped to /aws/bedrock-agentcore/runtimes/*
 xray:PutTelemetryRecords
-xray:PutTraceSegments → scoped to *
+xray:PutTraceSegments -> scoped to *
 ```
 
 If using the AgentCore CLI with CodeZip, the CDK scaffold adds these automatically. If using a custom role or Container build, verify they're present.
 
 **3. Use Python's `logging` module, not `print()`.**
 
-OTEL hooks into `logging` automatically — no custom handlers needed. `print()` statements won't appear in CloudWatch.
+OTEL hooks into `logging` automatically -- no custom handlers needed. `print()` statements won't appear in CloudWatch.
 
 ```python
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# ✅ This appears in CloudWatch
+# [YES] This appears in CloudWatch
 logger.info("Processing request")
 
-# ❌ This does NOT appear in CloudWatch
+# [NO] This does NOT appear in CloudWatch
 print("Processing request")
 ```
 
@@ -472,7 +472,7 @@ print("Processing request")
 
 ### Logs missing for Terraform/CDK/IaC-deployed runtimes
 
-A common pattern: a runtime deployed via Terraform, CDK, or a custom IAM role works correctly (returns responses) but no CloudWatch log streams appear — while the same agent code deployed via the AgentCore Console logs fine.
+A common pattern: a runtime deployed via Terraform, CDK, or a custom IAM role works correctly (returns responses) but no CloudWatch log streams appear -- while the same agent code deployed via the AgentCore Console logs fine.
 
 This is almost always an IAM scoping issue. The execution role for a runtime deployed via the Console gets broad CloudWatch permissions by default. IaC templates often scope those permissions narrowly to `/aws/bedrock-agentcore/runtimes/*`, which breaks log stream creation.
 
@@ -507,7 +507,7 @@ Your agent uses SSE or long-polling responses and the connection drops mid-strea
 
 - `RemoteProtocolError: peer closed connection without sending complete message body`
 - `IncompleteRead` exception while iterating the stream
-- Silent disconnect — no error, no `[DONE]` event, response just stops
+- Silent disconnect -- no error, no `[DONE]` event, response just stops
 - Happens during multi-tool-use conversations (5+ sequential tool calls)
 - Fails well before any client-side timeout
 
@@ -544,7 +544,7 @@ async def invoke(payload, context):
         async for event in emit_keepalive(tool_task):
             yield event
 
-        # Tool completed — emit the real result
+        # Tool completed -- emit the real result
         result = await tool_task
         yield f"data: {json.dumps({'type': 'result', 'content': result})}\n\n"
         yield "data: [DONE]\n\n"
@@ -572,7 +572,7 @@ for chunk in response.iter_lines():
 
 ## Symptom: Traces appear merged across concurrent agent invocations
 
-You run multiple agent invocations in parallel with unique `runtimeSessionId` values, but the AI Observability dashboard groups them as one session — making it impossible to isolate a single run. Data plane logs show the session IDs are correctly unique 1:1 with request IDs, but the trace view still merges them.
+You run multiple agent invocations in parallel with unique `runtimeSessionId` values, but the AI Observability dashboard groups them as one session -- making it impossible to isolate a single run. Data plane logs show the session IDs are correctly unique 1:1 with request IDs, but the trace view still merges them.
 
 **Most common cause: the caller isn't enabling Active Tracing**, so upstream spans arrive with `Sampled=0`. AgentCore respects upstream trace-sampling decisions by default. If the parent context says "don't sample," spans drop and concurrent invocations can appear merged in the dashboard.
 
@@ -586,7 +586,7 @@ aws lambda update-function-configuration \
   --tracing-config Mode=Active
 ```
 
-Or in the Lambda console: Configuration → Monitoring and operations tools → AWS X-Ray → Active tracing.
+Or in the Lambda console: Configuration -> Monitoring and operations tools -> AWS X-Ray -> Active tracing.
 
 **ECS / EC2 / container caller:** Initialize the AWS X-Ray SDK and ensure outbound calls to AgentCore are instrumented. For Python, use `aws-xray-sdk` and patch the SDK:
 
@@ -617,7 +617,7 @@ Not the endpoint ARN:
 arn:aws:bedrock-agentcore:<region>:<account>:runtime/<runtime-name>/runtime-endpoint/DEFAULT
 ```
 
-Invoking with the endpoint ARN can bypass the full trace instrumentation path. This is a subtle trap — both ARNs produce successful responses, but only the agent ARN produces complete traces.
+Invoking with the endpoint ARN can bypass the full trace instrumentation path. This is a subtle trap -- both ARNs produce successful responses, but only the agent ARN produces complete traces.
 
 ---
 
@@ -625,7 +625,7 @@ Invoking with the endpoint ARN can bypass the full trace instrumentation path. T
 
 You called `DeleteAgentRuntime`, got a successful response with `status: DELETING`, and the runtime has been stuck in that state for more than 30 minutes. Attempting to delete the default endpoint separately returns `ConflictException: Default endpoints are removed when you delete the agent.`
 
-**What's happening:** The deletion workflow is stuck on the service side. Retrying `DeleteAgentRuntime` won't help — the call succeeds immediately (returning DELETING) but the back-end workflow is the thing that's stuck. Customer-side tooling can't force-complete it.
+**What's happening:** The deletion workflow is stuck on the service side. Retrying `DeleteAgentRuntime` won't help -- the call succeeds immediately (returning DELETING) but the back-end workflow is the thing that's stuck. Customer-side tooling can't force-complete it.
 
 **What to do:**
 
@@ -644,8 +644,8 @@ Orphaned resources from a stuck deletion (ENIs, workload identities) may need ma
 
 ## Framework-specific issues
 
-**LangGraph — model format:**
-Older versions of `langchain-aws` required the model ID without the cross-region prefix. Recent versions may support cross-region inference profiles — check your installed version:
+**LangGraph -- model format:**
+Older versions of `langchain-aws` required the model ID without the cross-region prefix. Recent versions may support cross-region inference profiles -- check your installed version:
 
 ```bash
 pip show langchain-aws | grep Version
@@ -661,12 +661,12 @@ llm = init_chat_model("anthropic.claude-sonnet-4-5-20250929-v1:0", model_provide
 llm = init_chat_model("global.anthropic.claude-sonnet-4-5-20250929-v1:0", ...)
 ```
 
-Verify against the current langchain-aws release notes: https://github.com/langchain-ai/langchain-aws/releases — cross-region inference profile support has been evolving.
+Verify against the current langchain-aws release notes: https://github.com/langchain-ai/langchain-aws/releases -- cross-region inference profile support has been evolving.
 
-**Google ADK — Gemini only:**
+**Google ADK -- Gemini only:**
 ADK only works with Gemini models. If you're seeing model errors with ADK, check that `GEMINI_API_KEY` is set and you're using a `gemini-*` model ID.
 
-**A2A agents — wrong port:**
+**A2A agents -- wrong port:**
 A2A servers must run on port 9000. If your A2A agent isn't responding, check it's not accidentally running on 8080.
 
 ---
@@ -675,11 +675,11 @@ A2A servers must run on port 9000. If your A2A agent isn't responding, check it'
 
 A trace shows the full execution path of one agent invocation. Key sections:
 
-- **Model invocations** — what the model was asked and what it responded
-- **Tool calls** — which tools were called, with what inputs, and what they returned
-- **Memory operations** — what was read from and written to memory
-- **Policy decisions** — what was allowed or denied (if policy engine is attached)
-- **Latency breakdown** — time spent in each component
+- **Model invocations** -- what the model was asked and what it responded
+- **Tool calls** -- which tools were called, with what inputs, and what they returned
+- **Memory operations** -- what was read from and written to memory
+- **Policy decisions** -- what was allowed or denied (if policy engine is attached)
+- **Latency breakdown** -- time spent in each component
 
 ```bash
 # Download trace to a file for detailed inspection
@@ -694,7 +694,7 @@ cat trace.json | jq '.trace.orchestrationTrace.modelInvocationOutput'
 - Explanation of what the trace shows (if reading traces)
 - Handoff to the appropriate skill when the fix is outside debug's scope
 
-## After diagnosis — handoff
+## After diagnosis -- handoff
 
 Once you've identified the root cause, hand off to the skill that owns the fix:
 

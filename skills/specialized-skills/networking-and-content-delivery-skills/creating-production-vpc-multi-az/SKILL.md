@@ -24,9 +24,9 @@ Key parameters:
 
 - `vpc_name` (required): Name prefix for all resources
 - `region` (required): Target AWS region
-- `allowed_web_cidrs` (required): CIDR blocks allowed for web access — allow 0.0.0.0/0 only if explicitly requested
+- `allowed_web_cidrs` (required): CIDR blocks allowed for web access -- allow 0.0.0.0/0 only if explicitly requested
 - `vpc_cidr` (optional, default `10.0.0.0/16`): VPC CIDR block
-- `availability_zones` (optional, default 3): Number of AZs (2–6)
+- `availability_zones` (optional, default 3): Number of AZs (2-6)
 - `environment` (required): Environment tag
 - `enable_ssh_access` (optional, default false): Whether to create SSH security group
 

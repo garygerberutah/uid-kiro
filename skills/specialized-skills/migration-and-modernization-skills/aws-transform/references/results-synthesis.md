@@ -10,7 +10,7 @@ Write one file: `~/.aws/atx/custom/atx-agent-session/transformation-summaries/tr
 mkdir -p ~/.aws/atx/custom/atx-agent-session/transformation-summaries
 ```
 
-**Important:** Do NOT use heredoc (`cat << EOF`) to write this file — heredoc
+**Important:** Do NOT use heredoc (`cat << EOF`) to write this file -- heredoc
 blocks can hang in shell environments. Use a command (ex. `printf '%s'`) to write the content.
 
 ## Template

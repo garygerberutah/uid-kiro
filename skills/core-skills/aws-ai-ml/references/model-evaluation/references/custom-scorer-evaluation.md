@@ -18,7 +18,7 @@ If the check fails (the user has no eval dataset), tell the user and offer to he
 
 > "Custom Scorer evaluation requires an evaluation dataset. Would you like help choosing a different evaluation type?"
 
-If they want help choosing a different evaluation type → break this workflow and read `references/evaluation-type-guide.md`.
+If they want help choosing a different evaluation type -> break this workflow and read `references/evaluation-type-guide.md`.
 
 If the check passes, proceed.
 
@@ -50,14 +50,14 @@ Then read `references/custom-lambda-scorer.md` and follow its instructions. Retu
 
 > "Which type of scorer would you like to use?
 >
-> 1. **Prime Math** — built-in scorer for math problems (checks answer correctness)
-> 2. **Prime Code** — built-in scorer for coding problems (executes code against test cases)
-> 3. **Custom Lambda** — your own scoring logic as a Lambda function. You can use an existing registered evaluator or create a new one.
+> 1. **Prime Math** -- built-in scorer for math problems (checks answer correctness)
+> 2. **Prime Code** -- built-in scorer for coding problems (executes code against test cases)
+> 3. **Custom Lambda** -- your own scoring logic as a Lambda function. You can use an existing registered evaluator or create a new one.
 >
 > Which would you prefer?"
 
-- If built-in (Prime Math or Prime Code) → note the choice and proceed to Step 5.
-- If custom Lambda → read `references/custom-lambda-scorer.md` and follow its instructions to resolve the evaluator. Then return here and proceed to Step 5. You MUST follow these instructions before moving on.
+- If built-in (Prime Math or Prime Code) -> note the choice and proceed to Step 5.
+- If custom Lambda -> read `references/custom-lambda-scorer.md` and follow its instructions to resolve the evaluator. Then return here and proceed to Step 5. You MUST follow these instructions before moving on.
 
 ### Step 5: Validate dataset format
 
@@ -77,7 +77,7 @@ If you already know from context, confirm and move on. Otherwise, ask:
 > 2. **Just a base model**
 > 3. **Both, with a comparison**
 
-⏸ Wait for user approval.
+[PAUSE] Wait for user approval.
 
 ### Step 7: Resolve Model Package ARN
 
@@ -103,7 +103,7 @@ If they provide a group name, resolve the ARN by running `aws sagemaker list-mod
 
 **This step only applies if the evaluation scope includes the base model (option 2 or 3 from Step 6).** If the user chose fine-tuned only, skip to Step 9.
 
-For **comparison mode** (option 3): the base model is resolved automatically from the fine-tuned model's lineage — no additional input needed.
+For **comparison mode** (option 3): the base model is resolved automatically from the fine-tuned model's lineage -- no additional input needed.
 
 For **base model only** (option 2): you need a JumpStart model ID (e.g., `meta-textgeneration-llama-3-2-1b-instruct`). Check if you already know it from context. If not, ask:
 
@@ -170,7 +170,7 @@ Summarize everything and ask for approval:
 >
 > Does this look right?"
 
-⏸ Wait for user approval.
+[PAUSE] Wait for user approval.
 
 ### Step 15: Generate code
 
@@ -178,7 +178,7 @@ Read `../references/code_output_guide.md` for output format rules.
 
 If no project directory exists, load the **directory-management** reference to set one up.
 
-Read `code_templates/custom_scorer_evaluator.py`, substitute the collected values into the placeholders, and write the cells. The template uses `# Cell N: Label` markers — each marker starts a new notebook cell, with everything between one marker and the next becoming that cell's content.
+Read `code_templates/custom_scorer_evaluator.py`, substitute the collected values into the placeholders, and write the cells. The template uses `# Cell N: Label` markers -- each marker starts a new notebook cell, with everything between one marker and the next becoming that cell's content.
 
 ### Step 16: Post-generation
 
@@ -186,10 +186,10 @@ Read `code_templates/custom_scorer_evaluator.py`, substitute the collected value
 
 ```
 To run:
-1. Cell 1 — configuration and SDK install
-2. Cell 2 — start evaluation
-3. Cell 3 — polls status automatically (~25-60 min)
-4. Cell 4 — show results
+1. Cell 1 -- configuration and SDK install
+2. Cell 2 -- start evaluation
+3. Cell 3 -- polls status automatically (~25-60 min)
+4. Cell 4 -- show results
 
 ```
 
@@ -199,9 +199,9 @@ Evaluation can take hours depending on your dataset. Present the user with optio
 
 > "Would you like me to:
 >
-> 1. Leave it to you — run with `python scripts/[script_name]`
+> 1. Leave it to you -- run with `python scripts/[script_name]`
 > 2. Run it and wait until it's done
-> 3. Start it but don't wait — we can check status later"
+> 3. Start it but don't wait -- we can check status later"
 
 - **Option 1:** Done. Wait for user to come back.
 - **Option 2:** Execute the script as-is. `execution.wait()` polls until complete. Report results.
@@ -211,8 +211,8 @@ Note: `evaluate()` does not accept a `wait` parameter. It always returns immedia
 
 **Checking status:**
 
-- `describe-pipeline-execution --pipeline-execution-arn ARN` → `PipelineExecutionStatus`
-- `list-pipeline-execution-steps --pipeline-execution-arn ARN` → per-step `StepStatus`, `FailureReason`
+- `describe-pipeline-execution --pipeline-execution-arn ARN` -> `PipelineExecutionStatus`
+- `list-pipeline-execution-steps --pipeline-execution-arn ARN` -> per-step `StepStatus`, `FailureReason`
 
 **Showing results after completion:**
 
@@ -224,11 +224,11 @@ Note: `evaluate()` does not accept a `wait` parameter. It always returns immedia
 A: Both built-in and custom scorers automatically produce standard NLP metrics (F1, ROUGE, BLEU) alongside your custom scores.
 
 **Q: Does my IAM role need special permissions for Custom Scorer?**
-A: Yes — if using a custom Lambda scorer, the IAM role needs `lambda:InvokeFunction` permission for the scorer's Lambda function. Built-in scorers (Prime Math/Code) don't require additional permissions.
+A: Yes -- if using a custom Lambda scorer, the IAM role needs `lambda:InvokeFunction` permission for the scorer's Lambda function. Built-in scorers (Prime Math/Code) don't require additional permissions.
 
 **Q: Can I create a new reward function through this skill?**
-A: Yes — if you choose Custom Lambda and don't have an existing evaluator, the agent will walk you through creating one from a template and registering it via `Evaluator.create`.
+A: Yes -- if you choose Custom Lambda and don't have an existing evaluator, the agent will walk you through creating one from a template and registering it via `Evaluator.create`.
 
 ## Nova Model Notes
 
-Custom Scorer evaluation works with Nova models via Custom Lambda. Built-in scorers (Prime Math, Prime Code) are not supported — the pipeline will run without error, but the scorer will not execute.
+Custom Scorer evaluation works with Nova models via Custom Lambda. Built-in scorers (Prime Math, Prime Code) are not supported -- the pipeline will run without error, but the scorer will not execute.

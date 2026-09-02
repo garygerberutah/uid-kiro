@@ -4,9 +4,9 @@
 
 | Option | When to use | BucketKeyEnabled | Block SSE-C |
 |---|---|---|---|
-| SSE-S3 (AES256) | Default — no KMS needed | true | true |
+| SSE-S3 (AES256) | Default -- no KMS needed | true | true |
 | SSE-KMS (customer managed key) | Need key policy control or cross-account sharing | true | true |
-| SSE-KMS (AWS managed `aws/s3`) | **Never** — no key policy control, blocks cross-account | — | — |
+| SSE-KMS (AWS managed `aws/s3`) | **Never** -- no key policy control, blocks cross-account | -- | -- |
 
 ## SSE-S3 (Recommended Default)
 
@@ -21,9 +21,9 @@ aws s3api put-bucket-encryption \
 
 You MUST specify the KMS key by its full ARN (`arn:aws:kms:<region>:<account>:key/<key-id>`). Do NOT use a key alias.
 
-You MUST apply a least-privilege key policy when creating a KMS key. Do NOT rely on the AWS default key policy — it grants `kms:*` to the account root, which allows any IAM principal with matching IAM permissions to perform all KMS operations on the key.
+You MUST apply a least-privilege key policy when creating a KMS key. Do NOT rely on the AWS default key policy -- it grants `kms:*` to the account root, which allows any IAM principal with matching IAM permissions to perform all KMS operations on the key.
 
-> **Important**: The S3 API accepts both `aws/s3` and key aliases (e.g. `alias/my-key`) without returning an error — it will store whatever value you provide. These restrictions are agent-enforced constraints, not API-enforced. Always verify the stored value with `get-bucket-encryption` after applying.
+> **Important**: The S3 API accepts both `aws/s3` and key aliases (e.g. `alias/my-key`) without returning an error -- it will store whatever value you provide. These restrictions are agent-enforced constraints, not API-enforced. Always verify the stored value with `get-bucket-encryption` after applying.
 
 ### Least-Privilege KMS Key Policy Template
 
@@ -80,8 +80,8 @@ Save the following as `key-policy.json` before creating the key. Replace `<accou
 
 **Key policy notes:**
 
-- `AllowKeyAdministration` — grants key management to a specific admin role. Replace `<key-admin-role>` with your actual admin role name.
-- `AllowS3EncryptionUsage` — restricts encrypt/decrypt to S3 in the specified region and account via `kms:ViaService` and `kms:CallerAccount` conditions. Scope the `Principal` down to specific roles if cross-account access is not needed.
+- `AllowKeyAdministration` -- grants key management to a specific admin role. Replace `<key-admin-role>` with your actual admin role name.
+- `AllowS3EncryptionUsage` -- restricts encrypt/decrypt to S3 in the specified region and account via `kms:ViaService` and `kms:CallerAccount` conditions. Scope the `Principal` down to specific roles if cross-account access is not needed.
 - Do NOT include a blanket `kms:*` statement. If you need to grant additional principals access, add narrowly scoped statements.
 
 ```bash
@@ -105,14 +105,14 @@ aws s3api put-bucket-encryption \
 
 ## Why Block SSE-C (always block)
 
-- SSE-C keys are managed outside AWS — no CloudTrail audit trail
+- SSE-C keys are managed outside AWS -- no CloudTrail audit trail
 - Key loss = permanent data loss
 - Cannot enforce rotation policies
 - Incompatible with centralized compliance requirements
 
 ## Enforce HTTPS in Transit
 
-> **⚠️ If the bucket already has a policy**, merge this `DenyInsecureTransport` statement into the existing `Statement` array rather than replacing the whole policy. See [put-bucket-policy safety rules](../SKILL.md#put-bucket-policy-safety-rules).
+> **[WARNING] If the bucket already has a policy**, merge this `DenyInsecureTransport` statement into the existing `Statement` array rather than replacing the whole policy. See [put-bucket-policy safety rules](../SKILL.md#put-bucket-policy-safety-rules).
 
 ```json
 {
@@ -128,6 +128,6 @@ aws s3api put-bucket-encryption \
 }
 ```
 
-`Principal: "*"` and `Action: "s3:*"` are required wildcards — a Deny policy must match all principals and actions to be effective. Do NOT narrow these.
+`Principal: "*"` and `Action: "s3:*"` are required wildcards -- a Deny policy must match all principals and actions to be effective. Do NOT narrow these.
 
-Do NOT pin TLS certificates — AWS rotates them automatically.
+Do NOT pin TLS certificates -- AWS rotates them automatically.

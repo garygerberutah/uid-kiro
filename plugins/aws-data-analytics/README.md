@@ -4,12 +4,12 @@
 
 This plugin brings AWS data engineering expertise directly into your coding assistant, covering the full data lifecycle across [AWS Analytics](https://aws.amazon.com/big-data/datalakes-and-analytics/) services; currently, skills are provided to assist with the following capability areas:
 
-- **Data Lake Operations** — Build and operate a data lake on AWS: create managed Iceberg tables on Amazon S3 Tables, ingest data from diverse sources (S3, JDBC databases, Snowflake, BigQuery, DynamoDB, AWS Glue catalog tables), and query across default and federated catalogs with Amazon Athena.
-- **Data Discovery** — Inventory and audit your AWS Glue Data Catalog across S3 Tables, Amazon Redshift-federated, and remote Iceberg catalogs. Resolve data asset references by name, keyword, column, or reverse-lookup from S3 location metadata in the catalog.
-- **Vector Storage** — Store and query vector embeddings using Amazon S3 Vectors for cost-effective semantic search and RAG workloads.
-- **External Connectivity** — Create and troubleshoot AWS Glue connections to JDBC databases (Oracle, SQL Server, PostgreSQL, MySQL, RDS, Aurora), Amazon Redshift, Snowflake, and BigQuery.
-- **Search & Observability (OpenSearch)** — Migrate from Solr/Elasticsearch/self-managed OpenSearch into Amazon OpenSearch Service or Serverless, provision domains and collections, and build vector/semantic/hybrid search, log analytics, and trace analytics.
-- **Data Warehouse (Amazon Redshift)** — Write Redshift SQL on a provisioned cluster or Serverless workgroup: DDL and distribution/sort keys, COPY/UNLOAD, system views, and the Data API.
+- **Data Lake Operations** -- Build and operate a data lake on AWS: create managed Iceberg tables on Amazon S3 Tables, ingest data from diverse sources (S3, JDBC databases, Snowflake, BigQuery, DynamoDB, AWS Glue catalog tables), and query across default and federated catalogs with Amazon Athena.
+- **Data Discovery** -- Inventory and audit your AWS Glue Data Catalog across S3 Tables, Amazon Redshift-federated, and remote Iceberg catalogs. Resolve data asset references by name, keyword, column, or reverse-lookup from S3 location metadata in the catalog.
+- **Vector Storage** -- Store and query vector embeddings using Amazon S3 Vectors for cost-effective semantic search and RAG workloads.
+- **External Connectivity** -- Create and troubleshoot AWS Glue connections to JDBC databases (Oracle, SQL Server, PostgreSQL, MySQL, RDS, Aurora), Amazon Redshift, Snowflake, and BigQuery.
+- **Search & Observability (OpenSearch)** -- Migrate from Solr/Elasticsearch/self-managed OpenSearch into Amazon OpenSearch Service or Serverless, provision domains and collections, and build vector/semantic/hybrid search, log analytics, and trace analytics.
+- **Data Warehouse (Amazon Redshift)** -- Write Redshift SQL on a provisioned cluster or Serverless workgroup: DDL and distribution/sort keys, COPY/UNLOAD, system views, and the Data API.
 
 ## Agent Skills
 
@@ -41,9 +41,9 @@ The data lake skills cover the jobs-to-be-done for building and operating a data
 
 ### How It Works
 
-- **Create tables** — The `creating-data-lake-table` skill sets up managed Iceberg tables on Amazon S3 Tables with automatic compaction, snapshot management, AWS Glue catalog registration, partitioning, and IAM access control.
-- **Ingest data** — The `ingesting-into-data-lake` skill moves data from local files, S3, JDBC databases (Oracle, SQL Server, PostgreSQL, MySQL, RDS, Aurora, Amazon Redshift), Snowflake, BigQuery, DynamoDB, or existing AWS Glue catalog tables into your data lake. Supports one-time loads, recurring pipelines, and migrations.
-- **Query data** — The `querying-data-lake` skill executes Athena SQL queries across default and federated catalogs, with workgroup selection, statement classification, cost tracking, and error recovery.
+- **Create tables** -- The `creating-data-lake-table` skill sets up managed Iceberg tables on Amazon S3 Tables with automatic compaction, snapshot management, AWS Glue catalog registration, partitioning, and IAM access control.
+- **Ingest data** -- The `ingesting-into-data-lake` skill moves data from local files, S3, JDBC databases (Oracle, SQL Server, PostgreSQL, MySQL, RDS, Aurora, Amazon Redshift), Snowflake, BigQuery, DynamoDB, or existing AWS Glue catalog tables into your data lake. Supports one-time loads, recurring pipelines, and migrations.
+- **Query data** -- The `querying-data-lake` skill executes Athena SQL queries across default and federated catalogs, with workgroup selection, statement classification, cost tracking, and error recovery.
 
 ### Examples
 
@@ -56,8 +56,8 @@ The data lake skills cover the jobs-to-be-done for building and operating a data
 
 The discovery skills help you understand what data exists in your AWS account and find specific assets quickly.
 
-- **`exploring-data-catalog`** — Full inventory and audit across AWS Glue Data Catalog, S3 Tables, Amazon Redshift-federated, and remote Iceberg catalogs. Maps your data landscape, flags stale tables, and suggests improvements.
-- **`finding-data-lake-assets`** — Resolves fuzzy data references ("our orders table", "the sales dataset") to concrete catalog entries using layered search across AWS Glue, S3, S3 Tables, and Amazon Redshift.
+- **`exploring-data-catalog`** -- Full inventory and audit across AWS Glue Data Catalog, S3 Tables, Amazon Redshift-federated, and remote Iceberg catalogs. Maps your data landscape, flags stale tables, and suggests improvements.
+- **`finding-data-lake-assets`** -- Resolves fuzzy data references ("our orders table", "the sales dataset") to concrete catalog entries using layered search across AWS Glue, S3, S3 Tables, and Amazon Redshift.
 
 ### Examples
 
@@ -103,8 +103,8 @@ In your local environment, configure AWS credentials and set your target region 
 
 Configure AWS credentials using one of the following methods:
 
-- **AWS CLI** — Run [`aws configure`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) (IAM credentials) or [`aws sso login`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html) (IAM Identity Center)
-- **Environment variables** — Set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN`. See [Configuring environment variables](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html) for details.
+- **AWS CLI** -- Run [`aws configure`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) (IAM credentials) or [`aws sso login`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html) (IAM Identity Center)
+- **Environment variables** -- Set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN`. See [Configuring environment variables](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html) for details.
 
 Your IAM role needs permissions for the AWS services used by the skills you install. The relevant IAM action namespaces are:
 
@@ -131,7 +131,7 @@ The skills in this plugin follow AWS best practices, but they are fully customiz
 - [Amazon S3 Vectors](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors.html)
 - [Amazon Athena User Guide](https://docs.aws.amazon.com/athena/latest/ug/what-is.html)
 - [AWS Glue Developer Guide](https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html)
-- [Agent Skills open standard — Anthropic](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
+- [Agent Skills open standard -- Anthropic](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
 - [AWS Agent Toolkit for AWS](https://github.com/aws/agent-toolkit-for-aws)
 
 ## License

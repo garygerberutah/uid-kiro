@@ -8,7 +8,7 @@ SigV4a (multi-region signing) is required for:
 
 Without it you get: `Neither CRT nor JS SigV4a implementation is available.`
 
-## Two implementations — pick one
+## Two implementations -- pick one
 
 ### Option A: CRT (Node.js only, better performance)
 
@@ -17,7 +17,7 @@ npm install @aws-sdk/signature-v4-crt
 ```
 
 ```js
-import "@aws-sdk/signature-v4-crt"; // side-effect import only — registers itself
+import "@aws-sdk/signature-v4-crt"; // side-effect import only -- registers itself
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const client = new S3Client({ region: "us-east-1" });
@@ -35,7 +35,7 @@ npm install @aws-sdk/signature-v4a
 ```
 
 ```js
-import "@aws-sdk/signature-v4a"; // side-effect import only — registers itself
+import "@aws-sdk/signature-v4a"; // side-effect import only -- registers itself
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const client = new S3Client({ region: "us-east-1" });
@@ -44,7 +44,7 @@ const client = new S3Client({ region: "us-east-1" });
 
 ## Key rules
 
-- The import is a **side-effect only** — do not use any exported values. Just `import "..."`.
+- The import is a **side-effect only** -- do not use any exported values. Just `import "..."`.
 - Do NOT install both. If both are present, CRT takes precedence.
 - CRT version does not work in browsers. Use JS version for browser environments.
 - JS version in browsers is not recommended due to large bundle size.

@@ -1,6 +1,6 @@
 # Custom Scorer Evaluation Dataset Formats
 
-Dataset format requirements for evaluation datasets used with the Custom Scorer pathway. Note that these are distinct from any requirements for training dataset formats — they are specifically for datasets scored by Prime Math, Prime Code, or a Custom Lambda during model evaluation.
+Dataset format requirements for evaluation datasets used with the Custom Scorer pathway. Note that these are distinct from any requirements for training dataset formats -- they are specifically for datasets scored by Prime Math, Prime Code, or a Custom Lambda during model evaluation.
 
 ## Format by scorer type
 
@@ -31,7 +31,7 @@ Evaluates mathematical reasoning by comparing model output to a ground truth ans
 
 ### Prime Code
 
-Evaluates code generation by executing the model's output against test cases (stdin → stdout).
+Evaluates code generation by executing the model's output against test cases (stdin -> stdout).
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -58,7 +58,7 @@ Evaluates code generation by executing the model's output against test cases (st
 
 Uses your own Lambda function to score model outputs. The dataset format depends on the model type.
 
-#### Dataset for Custom Lambda — OSS models
+#### Dataset for Custom Lambda -- OSS models
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -73,12 +73,12 @@ Uses your own Lambda function to score model outputs. The dataset format depends
 
 ```
 
-#### Dataset for Custom Lambda — Nova models
+#### Dataset for Custom Lambda -- Nova models
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `messages` | array | yes | Conversation array with `role` and `content` (plain strings, not objects) |
-| `reference_answer` | string | no | Ground truth — required only if your Lambda compares against it |
+| `reference_answer` | string | no | Ground truth -- required only if your Lambda compares against it |
 
 Messages may include a `system` role (optional):
 

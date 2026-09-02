@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * generate-pdf.ts — Node.js entry point for PDF generation.
+ * generate-pdf.ts -- Node.js entry point for PDF generation.
  *
  * Reads one or more pricing-estimate JSON documents (output of
  * `calculate.ts` / `parse-cassandra.ts`) and writes a PDF report to disk.
@@ -176,7 +176,7 @@ function readJsonStdinSync(): Record<string, unknown> {
 function extractEstimate(json: Record<string, unknown>, label: string): Estimate {
     const reportData = json.report_data as ReportDataShape | undefined;
     if (!reportData) {
-        throw new Error(`Input JSON for "${label}" is missing report_data — was it produced by calculate.ts or parse-cassandra.ts?`);
+        throw new Error(`Input JSON for "${label}" is missing report_data -- was it produced by calculate.ts or parse-cassandra.ts?`);
     }
     const compat = json.compatibility as RawCompatibility | undefined;
     return {

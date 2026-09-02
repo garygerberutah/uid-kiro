@@ -18,13 +18,13 @@ Aurora DSQL is designed for massive horizontal scale without latency degradation
 - **PREFER more concurrent connections with smaller batches** - Higher concurrency typically yields better throughput
 - **SHOULD implement connection pooling** - Reuse connections to minimize token overhead; respect 10,000 max per cluster (verify via the AWS MCP Server's `aws___search_documentation` if available, or the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/): `aurora dsql connection limits`)
 - **PREFER initial pool size 10-50 per instance** - Generate fresh IAM auth tokens in pool hooks (e.g., `BeforeConnect`) for 15-minute expiration (verify via the AWS MCP Server's `aws___search_documentation` if available, or the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/): `aurora dsql authentication token`)
-- **MUST set pool max-lifetime under 60 minutes** - DSQL closes connections at the 60-minute cap. Set max-lifetime to ~50 minutes so connections recycle ahead of that and the application never observes a server-initiated close mid-query. Examples: HikariCP `maxLifetime: 3000000` (50 min), psycopg-pool `max_lifetime=3000`, node-postgres pool — pair `idleTimeoutMillis` with a separate lifetime guard.
+- **MUST set pool max-lifetime under 60 minutes** - DSQL closes connections at the 60-minute cap. Set max-lifetime to ~50 minutes so connections recycle ahead of that and the application never observes a server-initiated close mid-query. Examples: HikariCP `maxLifetime: 3000000` (50 min), psycopg-pool `max_lifetime=3000`, node-postgres pool -- pair `idleTimeoutMillis` with a separate lifetime guard.
 - **SHOULD retry internal errors with new connection** - Internal errors are retryable, but SHOULD use a new connection from the pool
 - **SHOULD implement backoff with jitter** - Avoid thundering herd; scale pools gradually
 
 ### Batch Size Optimization
 
-- **PREFER batches of 500-1,000 rows** - Balance throughput and transaction limits (defaults: 3,000 rows, 10 MiB, 5 minutes max — verify via the AWS MCP Server's `aws___search_documentation` if available, or the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/): `aurora dsql transaction limits`)
+- **PREFER batches of 500-1,000 rows** - Balance throughput and transaction limits (defaults: 3,000 rows, 10 MiB, 5 minutes max -- verify via the AWS MCP Server's `aws___search_documentation` if available, or the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/): `aurora dsql transaction limits`)
 - **SHOULD process batches concurrently** - Use multiple connections; consider multiple threads for bulk loading
 - **Smaller batches reduce** lock contention, enable better concurrency, fail faster, distribute load evenly
 
@@ -53,5 +53,5 @@ Aurora DSQL supports both UUID-based identifiers and integer values generated us
 
 **REQUIRED:** Specify CACHE explicitly when creating sequences or identity columns. Supported values are 1 or >= 65536 (verify via the AWS MCP Server's `aws___search_documentation` if available, or the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/): `aurora dsql sequence cache`).
 
-- **CACHE >= 65536** — suited for high-frequency identifier generation, many concurrent sessions, and workloads that tolerate gaps and ordering effects (e.g., IoT/telemetry ingestion, job run IDs, internal order numbers)
-- **CACHE = 1** — suited for low allocation rates where identifiers should follow allocation order more closely and minimizing gaps matters more than throughput (e.g., account numbers, reference numbers)
+- **CACHE >= 65536** -- suited for high-frequency identifier generation, many concurrent sessions, and workloads that tolerate gaps and ordering effects (e.g., IoT/telemetry ingestion, job run IDs, internal order numbers)
+- **CACHE = 1** -- suited for low allocation rates where identifiers should follow allocation order more closely and minimizing gaps matters more than throughput (e.g., account numbers, reference numbers)

@@ -1,11 +1,11 @@
 ---
 name: scanning-with-aws-security-agent
-description: Run an AWS Security Agent scan on the workspace — uploads the source to AWS, scans it with the managed Security Agent service, and returns ranked, verified findings with code locations and remediations. Use when the user asks to scan code, find vulnerabilities, run a security scan or review, check security issues, check scan status, show findings, list recent scans, or stop a scan.
+description: Run an AWS Security Agent scan on the workspace -- uploads the source to AWS, scans it with the managed Security Agent service, and returns ranked, verified findings with code locations and remediations. Use when the user asks to scan code, find vulnerabilities, run a security scan or review, check security issues, check scan status, show findings, list recent scans, or stop a scan.
 ---
 
-# AWS Security Agent — Code Scans
+# AWS Security Agent -- Code Scans
 
-This skill handles full repository scans. Setup (agent space, role, bucket) is handled by the **`setup-security-agent`** skill — if `.security-agent/config.json` is missing, the scan workflow auto-runs setup inline first.
+This skill handles full repository scans. Setup (agent space, role, bucket) is handled by the **`setup-security-agent`** skill -- if `.security-agent/config.json` is missing, the scan workflow auto-runs setup inline first.
 
 ---
 
@@ -21,7 +21,7 @@ This skill handles full repository scans. Setup (agent space, role, bucket) is h
 
 ### Rules for proactive suggestions
 
-- Always ask before running — never auto-trigger scans
+- Always ask before running -- never auto-trigger scans
 - Single-line suggestions, not multi-paragraph pitches
 - If the user declines, do not bring it up again in the same session
 
@@ -29,9 +29,9 @@ This skill handles full repository scans. Setup (agent space, role, bucket) is h
 
 ## Local state
 
-Read `.security-agent/config.json` for `agent_space_id` and `region`. If `config.json` is missing, tell the user one line — "First scan in this workspace — running setup first." — and run the **`setup-security-agent`** workflow inline (steps from that skill's SKILL.md) before continuing. First-time scans should "just work."
+Read `.security-agent/config.json` for `agent_space_id` and `region`. If `config.json` is missing, tell the user one line -- "First scan in this workspace -- running setup first." -- and run the **`setup-security-agent`** workflow inline (steps from that skill's SKILL.md) before continuing. First-time scans should "just work."
 
-Track scans in `.security-agent/scans.json` (keep last 50 entries). The per-workspace CodeReview ID is stored in `config.json → code_reviews[<abs_path>]` so subsequent scans reuse the same CodeReview.
+Track scans in `.security-agent/scans.json` (keep last 50 entries). The per-workspace CodeReview ID is stored in `config.json -> code_reviews[<abs_path>]` so subsequent scans reuse the same CodeReview.
 
 ### Resolving the values you need
 
@@ -44,7 +44,7 @@ The CLI examples below use placeholders. Resolve them at the start of every scan
 | `<account>` | `aws sts get-caller-identity --query Account --output text` (cache for the rest of the turn) |
 | `<role-arn>` | `arn:aws:iam::<account>:role/SecurityAgentScanRole` |
 | `<bucket>` | `security-agent-scans-<account>-<region>` |
-| `<cr-id>` | `code_review_id` from `config.json → code_reviews[<abs_path>]` |
+| `<cr-id>` | `code_review_id` from `config.json -> code_reviews[<abs_path>]` |
 | `<job_id>` | `codeReviewJobId` returned by `start-code-review-job` |
 | `<WORKSPACE_ID>` | `printf '%s' "$(pwd)" \| md5sum \| cut -c1-12` |
 
@@ -54,7 +54,7 @@ These are derived rather than stored in config so they can never drift out of sy
 
 ## Pre-scan checks
 
-1. **Read `config.json`.** If missing → run the `setup-security-agent` workflow inline first, then continue.
+1. **Read `config.json`.** If missing -> run the `setup-security-agent` workflow inline first, then continue.
 2. **Verify agent space still exists:**
 
    ```bash
@@ -101,7 +101,7 @@ For scanning only changed code, use the `diff-scanning-with-aws-security-agent` 
    aws s3 cp /tmp/source.zip s3://<bucket>/security-scans/source/<WORKSPACE_ID>/source.zip
    ```
 
-4. **Get or create the per-workspace CodeReview.** Look up `config.json → code_reviews[<abs_path>]`.
+4. **Get or create the per-workspace CodeReview.** Look up `config.json -> code_reviews[<abs_path>]`.
    - If present, use that `code_review_id`.
    - If absent, create:
 
@@ -111,7 +111,7 @@ For scanning only changed code, use the `diff-scanning-with-aws-security-agent` 
        --assets sourceCode=[{s3Location=s3://<bucket>/security-scans/source/<WORKSPACE_ID>/source.zip}]
      ```
 
-     Capture `codeReviewId` and persist to `config.json → code_reviews[<abs_path>]`.
+     Capture `codeReviewId` and persist to `config.json -> code_reviews[<abs_path>]`.
    - Title default: `pre-cr-<git-branch>` (use `git rev-parse --abbrev-ref HEAD`). Replace any spaces with hyphens.
 5. **Start the job:**
 
@@ -136,7 +136,7 @@ For scanning only changed code, use the `diff-scanning-with-aws-security-agent` 
    }
    ```
 
-7. Tell user: "Full scan started (scan_id: {id}). Takes ~45 minutes. I'll check every 5 minutes — say 'stop polling' to opt out."
+7. Tell user: "Full scan started (scan_id: {id}). Takes ~45 minutes. I'll check every 5 minutes -- say 'stop polling' to opt out."
 8. Run the **Polling Loop** below with `sleep 300` between checks.
 
 ---
@@ -152,11 +152,11 @@ After starting a scan:
    aws securityagent batch-get-code-review-jobs --agent-space-id <id> --code-review-job-ids <job_id>
    ```
 
-3. Compare `status` to last seen status. Only respond to the user when status CHANGES (e.g., `IN_PROGRESS` → `COMPLETED`) or on terminal state (`COMPLETED`, `FAILED`, `STOPPED`).
-4. Do not report "still in progress" multiple times — that's noise.
-5. If user says "stop polling" or "check later" → stop the loop and tell them: "Say 'scan status' or 'show findings' anytime."
-6. On `COMPLETED` → run the **Findings** workflow.
-7. On `FAILED` → fetch the job's error info (`statusReason` if present), tell the user, write a brief failure note to `.security-agent/findings-{scan_id}.md`.
+3. Compare `status` to last seen status. Only respond to the user when status CHANGES (e.g., `IN_PROGRESS` -> `COMPLETED`) or on terminal state (`COMPLETED`, `FAILED`, `STOPPED`).
+4. Do not report "still in progress" multiple times -- that's noise.
+5. If user says "stop polling" or "check later" -> stop the loop and tell them: "Say 'scan status' or 'show findings' anytime."
+6. On `COMPLETED` -> run the **Findings** workflow.
+7. On `FAILED` -> fetch the job's error info (`statusReason` if present), tell the user, write a brief failure note to `.security-agent/findings-{scan_id}.md`.
 
 ---
 
@@ -200,19 +200,19 @@ If the user asked for a minimum severity (e.g., "high and above"), filter to tha
 Group by severity. File path + line for each:
 
 ```
-🟣 CRITICAL: {name}
+[PURPLE] CRITICAL: {name}
    File: {filePath}:{lineStart}
    {description}
 
-🔴 HIGH: {name}
+[RED] HIGH: {name}
    File: {filePath}:{lineStart}
    {description}
 
-🟡 MEDIUM: {name}
+[YELLOW] MEDIUM: {name}
    File: {filePath}:{lineStart}
    {description}
 
-🟢 LOW: {name}
+[GREEN] LOW: {name}
    File: {filePath}:{lineStart}
    {description}
 ```
@@ -222,7 +222,7 @@ Group by severity. File path + line for each:
 Write to `.security-agent/findings-{scan_id}.md`. Include EVERY field returned (findingId, name, description, riskLevel, riskType, confidence, status, codeLocations with filePath/lineStart/lineEnd, and remediationCode if present).
 
 ```markdown
-# Security Scan Report — {scan_id}
+# Security Scan Report -- {scan_id}
 
 **Scan type**: FULL
 **Title**: {title}
@@ -239,7 +239,7 @@ Write to `.security-agent/findings-{scan_id}.md`. Include EVERY field returned (
 
 ## Findings
 
-### 🟣 CRITICAL: {name}
+### [PURPLE] CRITICAL: {name}
 - **ID**: {findingId}
 - **Risk type**: {riskType}
 - **Confidence**: {confidence}
@@ -296,18 +296,18 @@ Read `.security-agent/scans.json`. Show in a compact table:
 ## Rules
 
 - Always run pre-scan checks (config exists + agent space verified) before any scan
-- Scan APIs return immediately — poll status every 5 minutes
+- Scan APIs return immediately -- poll status every 5 minutes
 - Use the most recent scan in `scans.json` if the user doesn't name one
-- Title must not contain spaces — use hyphens. Default to git branch name.
-- Don't dump raw JSON — format with severity icons + file locations
+- Title must not contain spaces -- use hyphens. Default to git branch name.
+- Don't dump raw JSON -- format with severity icons + file locations
 - On `ResourceNotFoundException` from `start-code-review-job`, recreate the CodeReview and retry once
 
 ---
 
 ## Troubleshooting
 
-- **"Not configured" / `config.json` missing** → run `setup-security-agent` skill first
-- **`AccessDenied` on `s3 cp`** → bucket not registered on agent space, or trust policy wrong. Re-run setup.
-- **`ResourceNotFoundException` on agent space** → it was deleted. Re-run setup.
-- **Scan stuck in PREFLIGHT for >10 min** → backend issue, not client. Show `batch-get-code-review-jobs` output and tell user to escalate.
-- **Code too large (zip > 2 GB)** → run on a subdirectory instead.
+- **"Not configured" / `config.json` missing** -> run `setup-security-agent` skill first
+- **`AccessDenied` on `s3 cp`** -> bucket not registered on agent space, or trust policy wrong. Re-run setup.
+- **`ResourceNotFoundException` on agent space** -> it was deleted. Re-run setup.
+- **Scan stuck in PREFLIGHT for >10 min** -> backend issue, not client. Show `batch-get-code-review-jobs` output and tell user to escalate.
+- **Code too large (zip > 2 GB)** -> run on a subdirectory instead.

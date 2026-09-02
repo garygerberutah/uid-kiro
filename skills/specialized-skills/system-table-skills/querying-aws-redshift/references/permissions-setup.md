@@ -1,6 +1,6 @@
 # Permissions Setup: Athena and Redshift Access to Published System Tables
 
-Loaded on demand from `querying-aws-redshift` SKILL.md. Read this before running the IAM, Lake Formation, or auto-mount setup — the SKILL.md summary states the constraints but not the full command sequence.
+Loaded on demand from `querying-aws-redshift` SKILL.md. Read this before running the IAM, Lake Formation, or auto-mount setup -- the SKILL.md summary states the constraints but not the full command sequence.
 
 ## For Athena Querying
 
@@ -19,7 +19,7 @@ aws athena update-work-group \
   --configuration-updates 'EnforceWorkGroupConfiguration=true,ResultConfigurationUpdates={OutputLocation=s3://<RESULTS_BUCKET>/<PREFIX>/,EncryptionConfiguration={EncryptionOption=SSE_KMS,KmsKey=<KEY_ARN>}}'
 ```
 
-`EnforceWorkGroupConfiguration=true` is the part that matters — without it a client can pass its own unencrypted `ResultConfiguration` per query. Verify with `aws athena get-work-group --work-group <WORKGROUP>`.
+`EnforceWorkGroupConfiguration=true` is the part that matters -- without it a client can pass its own unencrypted `ResultConfiguration` per query. Verify with `aws athena get-work-group --work-group <WORKGROUP>`.
 
 Confirm the catalog is registered:
 
@@ -28,8 +28,8 @@ aws glue get-databases --region <REGION> \
   --catalog-id "<ACCOUNT>:s3tablescatalog/aws-redshift"
 ```
 
-- Returns namespaces (databases) → catalog is registered and queryable.
-- `EntityNotFoundException` / `CATALOG_NOT_FOUND` → S3 Tables integration not enabled. Enable the S3 Tables integration: S3 console > Table buckets > Enable integration.
+- Returns namespaces (databases) -> catalog is registered and queryable.
+- `EntityNotFoundException` / `CATALOG_NOT_FOUND` -> S3 Tables integration not enabled. Enable the S3 Tables integration: S3 console > Table buckets > Enable integration.
 
 ## For Redshift Querying (Auto-Mounted S3 Tables Catalog)
 
@@ -83,7 +83,7 @@ aws iam put-role-policy \
 
 At a terminal you can substitute `file://trust-policy.json` / `file://inline-policy.json` for the inline strings, which avoids shell-quoting problems with long documents. Inline is the primary form because `file://` silently fails wherever the executing agent has no filesystem.
 
-**Do not attach `AWSLakeFormationDataAdmin` to this role.** The role above is attached to the cluster (Step 2) and is used to *serve queries*; it needs read access only. The Lake Formation setup steps below (`register-resource` in Step 3, `put-data-lake-settings` in Step 4) are data-lake-administrator operations that `AdministratorAccess` alone does not satisfy — Lake Formation gates them on data lake admin status rather than on IAM alone. Run those steps as **the human or automation principal performing setup**, not as the cluster's role, so the cluster never holds administrative Lake Formation permissions at runtime:
+**Do not attach `AWSLakeFormationDataAdmin` to this role.** The role above is attached to the cluster (Step 2) and is used to *serve queries*; it needs read access only. The Lake Formation setup steps below (`register-resource` in Step 3, `put-data-lake-settings` in Step 4) are data-lake-administrator operations that `AdministratorAccess` alone does not satisfy -- Lake Formation gates them on data lake admin status rather than on IAM alone. Run those steps as **the human or automation principal performing setup**, not as the cluster's role, so the cluster never holds administrative Lake Formation permissions at runtime:
 
 ```bash
 # One-time, on the SETUP principal (not the cluster role):
@@ -113,7 +113,7 @@ aws iam attach-role-policy \
   }
   ```
 
-  Once setup is complete, detach it from the setup principal too — nothing in steady-state querying needs it. The cluster's role only ever needs the read-only inline policy below.
+  Once setup is complete, detach it from the setup principal too -- nothing in steady-state querying needs it. The cluster's role only ever needs the read-only inline policy below.
 
 - Inline policy for S3 Tables, Glue, and Lake Formation access, scoped to the `aws-redshift` table bucket and its catalog:
 
@@ -167,11 +167,11 @@ aws iam attach-role-policy \
 }
 ```
 
-`lakeformation:GetDataAccess` is the one action here that cannot be scoped by resource ARN — the Lake Formation documentation states that `"Resource": "*"` is required and "specifying any other resource for this permission is not supported." The actual data authorization comes from the Lake Formation grants, not from this statement. The `aws:ResourceAccount` condition constrains it to same-account table buckets, so the role cannot be used to vend credentials for a table bucket shared in from another account. Use `StringEquals`, not `StringLike` — `aws:ResourceAccount` is a sensitive condition key and wildcards in it defeat the check.
+`lakeformation:GetDataAccess` is the one action here that cannot be scoped by resource ARN -- the Lake Formation documentation states that `"Resource": "*"` is required and "specifying any other resource for this permission is not supported." The actual data authorization comes from the Lake Formation grants, not from this statement. The `aws:ResourceAccount` condition constrains it to same-account table buckets, so the role cannot be used to vend credentials for a table bucket shared in from another account. Use `StringEquals`, not `StringLike` -- `aws:ResourceAccount` is a sensitive condition key and wildcards in it defeat the check.
 
-Note the shape of the Glue database and table ARNs: federated S3 Tables catalogs nest under `s3tablescatalog/<table-bucket>`, so the resource path is `database/s3tablescatalog/aws-redshift/*`, not the bare `database/*`. The bare form would grant metadata read on every database and table in the account's default Glue catalog — far more than querying published system tables needs.
+Note the shape of the Glue database and table ARNs: federated S3 Tables catalogs nest under `s3tablescatalog/<table-bucket>`, so the resource path is `database/s3tablescatalog/aws-redshift/*`, not the bare `database/*`. The bare form would grant metadata read on every database and table in the account's default Glue catalog -- far more than querying published system tables needs.
 
-If you hit a permission error during initial setup that the scoped policy above doesn't cover, widen it deliberately and narrow it back down for production — do not fall back to `"Action": "*"` on `"Resource": "*"`.
+If you hit a permission error during initial setup that the scoped policy above doesn't cover, widen it deliberately and narrow it back down for production -- do not fall back to `"Action": "*"` on `"Resource": "*"`.
 
 ### Step 2: Attach Role to Cluster
 

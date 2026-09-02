@@ -9,7 +9,7 @@ Default account-level quotas for ElastiCache. Most are adjustable via the Servic
 | Nodes per region | 300 | Yes | L-DFE45DF3 |
 | Nodes per cluster (cluster mode enabled) | 90 (max 500 for Valkey 7.2+ or Redis OSS 5.0.6+) | Yes | L-AF354865 (verify in your account via `list-service-quotas`) |
 | Nodes per cluster (Memcached) | 60 | Yes | L-8C334AD1 |
-| Nodes per shard (architectural limit) | 6 | No | — |
+| Nodes per shard (architectural limit) | 6 | No | -- |
 | Parameter groups per region | 300 | Yes | L-3F15A733 |
 | Serverless caches per region | 40 | Yes | L-BBCDAECC |
 | Serverless snapshots per day per cache | 24 | Yes | L-75A7B5A4 |

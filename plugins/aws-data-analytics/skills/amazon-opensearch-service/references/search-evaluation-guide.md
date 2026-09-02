@@ -28,7 +28,7 @@ Run all test queries through the search pipeline and collect top-k results for e
 
 ### Step 3: Judge Relevance
 
-For each query, review the returned documents and assign a relevance grade to each query-document pair. Grade every document in the top-k results — do not skip any.
+For each query, review the returned documents and assign a relevance grade to each query-document pair. Grade every document in the top-k results -- do not skip any.
 
 **Grading scale:**
 
@@ -39,7 +39,7 @@ For each query, review the returned documents and assign a relevance grade to ea
 | 1 | Marginal | The document shares a topic or keyword with the query but does not satisfy the search intent. |
 | 0 | Irrelevant | The document has no meaningful connection to the query. |
 
-**Judgment prompt — for each query-document pair, evaluate:**
+**Judgment prompt -- for each query-document pair, evaluate:**
 
 1. **Intent match**: What is the user trying to find with this query? Does this document satisfy that intent?
 2. **Content relevance**: How well does the document's content relate to the query?
@@ -51,7 +51,7 @@ Three metrics are computed per query per method, all at cutoff `k`:
 
 | Metric | Formula | What it measures |
 |--------|---------|------------------|
-| **nDCG@k** | Normalized Discounted Cumulative Gain | Ranking quality — are the best docs at the top? |
+| **nDCG@k** | Normalized Discounted Cumulative Gain | Ranking quality -- are the best docs at the top? |
 | **P@k** | Precision at k | What fraction of top-k results are relevant? |
 | **MRR** | Mean Reciprocal Rank | How quickly does the first relevant result appear? |
 
@@ -119,8 +119,8 @@ The evaluation passes if **any** of:
 
 Present results, then offer:
 
-1. **Restart with improvements** — Apply recommended fixes and rebuild the search setup
-2. **Deploy as-is** — Current configuration is acceptable
-3. **Done for now** — Keep experimenting
+1. **Restart with improvements** -- Apply recommended fixes and rebuild the search setup
+2. **Deploy as-is** -- Current configuration is acceptable
+3. **Done for now** -- Keep experimenting
 
 If HIGH severity findings exist, recommend option 1 and explain the specific fix.

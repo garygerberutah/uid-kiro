@@ -126,7 +126,7 @@ new CloudWatch({ protocol: AwsSmithyRpcV2CborProtocol }); // CBOR
 ## Middleware Caching
 
 ```js
-// Cache middleware stack per client+command — reduces per-request overhead.
+// Cache middleware stack per client+command -- reduces per-request overhead.
 // Do not use if you modify the middleware stack after requests begin.
 new S3Client({ cacheMiddleware: true });
 ```

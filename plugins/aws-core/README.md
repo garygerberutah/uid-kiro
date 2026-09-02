@@ -1,6 +1,6 @@
 # aws-core
 
-The primary plugin for the Agent Toolkit for AWS. This plugin gives your AI coding agent the AWS MCP Server configuration and a curated set of agent skills — everything it needs to build, deploy, and manage applications on AWS.
+The primary plugin for the Agent Toolkit for AWS. This plugin gives your AI coding agent the AWS MCP Server configuration and a curated set of agent skills -- everything it needs to build, deploy, and manage applications on AWS.
 
 ## Install
 

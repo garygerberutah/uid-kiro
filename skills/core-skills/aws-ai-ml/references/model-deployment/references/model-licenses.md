@@ -6,9 +6,9 @@ Display the license or service terms to the user and follow any instructions in 
 
 The **Gated (EULA)** column tells you what to do with the JumpStart base-deploy `accept_eula` flag:
 
-- **Yes** — the model is gated. Set `accept_eula=True` in the deploy template ONLY after the user accepts the license at the Step 4 gate. Never auto-accept.
-- **No** — the model is not gated. Leave `accept_eula=False`.
-- **N/A** — the model is not deployed via the JumpStart pathway (e.g. Nova), so the flag does not apply.
+- **Yes** -- the model is gated. Set `accept_eula=True` in the deploy template ONLY after the user accepts the license at the Step 4 gate. Never auto-accept.
+- **No** -- the model is not gated. Leave `accept_eula=False`.
+- **N/A** -- the model is not deployed via the JumpStart pathway (e.g. Nova), so the flag does not apply.
 
 Gated status is a property of the license terms, not the vendor.
 

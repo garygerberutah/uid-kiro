@@ -16,10 +16,10 @@ This reference provides design guidance, naming conventions, operational pattern
 **Constraints:**
 
 - You MUST recommend a tiered policy model (classify services by business criticality) rather than one policy per service
-- You MUST set the availability SLO higher as criticality rises. The API accepts only a fixed set of SLO values and rejects out-of-set ones — **confirm the valid values from the API/docs** (e.g. `aws resiliencehubv2 create-policy help`) rather than relying on a hardcoded list (illustratively, values such as `99.9`/`99.95`/`99.99`).
+- You MUST set the availability SLO higher as criticality rises. The API accepts only a fixed set of SLO values and rejects out-of-set ones -- **confirm the valid values from the API/docs** (e.g. `aws resiliencehubv2 create-policy help`) rather than relying on a hardcoded list (illustratively, values such as `99.9`/`99.95`/`99.99`).
 - You MUST tighten RTO/RPO as criticality rises (single-digit minutes for critical, hours for low)
-- You MUST match the DR approach to criticality (more aggressive for more critical services), using a value from the API's DR-approach enum — **verify the valid set via the API/docs** (e.g. `aws resiliencehubv2 create-policy help`); illustratively `ACTIVE_ACTIVE` … `BACKUP_AND_RESTORE`.
-- Example (illustrative, not a fixed table): critical payments/auth → `99.99` + low-minutes RTO + `ACTIVE_ACTIVE`; standard internal tools → `99.9` + tens-of-minutes RTO + `WARM_STANDBY`; low dev/test → `99.9` + multi-hour RTO + `BACKUP_AND_RESTORE`. Treat the RTO figures as rough illustration, not commitments — very aggressive multi-AZ RTOs (≈1 minute) are realistic only for clean, hard failures; gray/partial failures are slower to detect and recover, so set targets you can actually meet under realistic failure modes.
+- You MUST match the DR approach to criticality (more aggressive for more critical services), using a value from the API's DR-approach enum -- **verify the valid set via the API/docs** (e.g. `aws resiliencehubv2 create-policy help`); illustratively `ACTIVE_ACTIVE` ... `BACKUP_AND_RESTORE`.
+- Example (illustrative, not a fixed table): critical payments/auth -> `99.99` + low-minutes RTO + `ACTIVE_ACTIVE`; standard internal tools -> `99.9` + tens-of-minutes RTO + `WARM_STANDBY`; low dev/test -> `99.9` + multi-hour RTO + `BACKUP_AND_RESTORE`. Treat the RTO figures as rough illustration, not commitments -- very aggressive multi-AZ RTOs (~1 minute) are realistic only for clean, hard failures; gray/partial failures are slower to detect and recover, so set targets you can actually meet under realistic failure modes.
 
 ### Policy Anti-Patterns
 
@@ -48,22 +48,22 @@ This reference provides design guidance, naming conventions, operational pattern
 **Constraints:**
 
 - You MUST recommend resilience-specific tags that serve double duty (NGRH discovery + FIS targeting):
-  - `resilience:tier` — Policy tier (0-3)
-  - `resilience:system` — Parent system name
-  - `resilience:service` — Service name
-  - `resilience:owner` — Owning team
-  - `resilience:fis-enabled` — Whether FIS experiments are authorized ("true"/"false")
+  - `resilience:tier` -- Policy tier (0-3)
+  - `resilience:system` -- Parent system name
+  - `resilience:service` -- Service name
+  - `resilience:owner` -- Owning team
+  - `resilience:fis-enabled` -- Whether FIS experiments are authorized ("true"/"false")
 
 ## Input Source Strategy
 
 **Constraints:**
 
 - You MUST recommend input sources in priority order:
-  1. CloudFormation stacks — Most reliable, tracks drift
-  2. Terraform state — Good for multi-cloud shops
-  3. EKS clusters — For containerized workloads
-  4. Resource tags — Catch-all for resources outside IaC
-  5. Design files — For planned (not yet deployed) architectures
+  1. CloudFormation stacks -- Most reliable, tracks drift
+  2. Terraform state -- Good for multi-cloud shops
+  3. EKS clusters -- For containerized workloads
+  4. Resource tags -- Catch-all for resources outside IaC
+  5. Design files -- For planned (not yet deployed) architectures
 
 ## FIS Experiment Hygiene
 
@@ -76,7 +76,7 @@ This reference provides design guidance, naming conventions, operational pattern
   - Month 1: Multi-component, single-fault (AZ failure affecting multiple services)
   - Quarter 1: Multi-fault, cascading (AZ failure + increased load)
   - Ongoing: Surprise experiments (unannounced to on-call team)
-- You MUST enforce that every experiment has stop conditions — never run without them
+- You MUST enforce that every experiment has stop conditions -- never run without them
 - You MUST recommend enabling FIS experiment logging (`--log-configuration` to CloudWatch Logs or S3) for every experiment to capture action-execution detail for audit and post-experiment analysis; the log destination SHOULD be KMS-encrypted since experiment logs can reveal topology and failure modes
 - You SHOULD recommend naming: `{service}-{scenario}-{scope}` (e.g., checkout-api-az-failure-us-east-1a)
 
@@ -108,7 +108,7 @@ This reference provides design guidance, naming conventions, operational pattern
 - You MUST always require safety rules (never allow all-off state)
 - You MUST recommend documenting the failover runbook (who can flip controls, under what conditions)
 - You SHOULD recommend testing failover monthly (use FIS to trigger, ARC to recover)
-- You SHOULD recommend enabling and monitoring CloudTrail across the whole lifecycle for a complete audit trail — routing control state changes (ARC), `fis:StartExperiment`/`fis:StopExperiment` (FIS), and `resiliencehubv2` assessment/finding operations (NGRH)
+- You SHOULD recommend enabling and monitoring CloudTrail across the whole lifecycle for a complete audit trail -- routing control state changes (ARC), `fis:StartExperiment`/`fis:StopExperiment` (FIS), and `resiliencehubv2` assessment/finding operations (NGRH)
 
 ## Operational Cadence
 
@@ -127,11 +127,11 @@ This reference provides design guidance, naming conventions, operational pattern
 **Constraints:**
 
 - You MUST warn against these anti-patterns when encountered:
-  - "We'll add resilience later" — Build it in from day one
-  - Testing only in non-prod — Production has different failure modes
-  - Manual failover only — Automate with ARC routing controls
-  - Assessing once and forgetting — Architecture drifts, re-assess regularly
-  - Ignoring achievability=NOT_ACHIEVABLE — Fix architecture before testing
-  - FIS without stop conditions — Unbounded blast radius
-  - ARC without safety rules — Risk of turning off all traffic
-  - Marking findings resolved without FIS validation — Paper compliance; validate the fix with a fault-injection experiment BEFORE marking the finding resolved, never after
+  - "We'll add resilience later" -- Build it in from day one
+  - Testing only in non-prod -- Production has different failure modes
+  - Manual failover only -- Automate with ARC routing controls
+  - Assessing once and forgetting -- Architecture drifts, re-assess regularly
+  - Ignoring achievability=NOT_ACHIEVABLE -- Fix architecture before testing
+  - FIS without stop conditions -- Unbounded blast radius
+  - ARC without safety rules -- Risk of turning off all traffic
+  - Marking findings resolved without FIS validation -- Paper compliance; validate the fix with a fault-injection experiment BEFORE marking the finding resolved, never after

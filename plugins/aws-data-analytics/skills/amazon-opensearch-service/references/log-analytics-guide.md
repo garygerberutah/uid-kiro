@@ -1,6 +1,6 @@
-# Log-analytics capability — entry point and guide
+# Log-analytics capability -- entry point and guide
 
-This file is the **entry point** for the `log-analytics` capability. It covers log search at scale, observability, PPL queries, anomaly detection, OpenSearch Dashboards, alerting, and SIEM patterns — including replatforming from Splunk, Datadog, or self-managed ELK.
+This file is the **entry point** for the `log-analytics` capability. It covers log search at scale, observability, PPL queries, anomaly detection, OpenSearch Dashboards, alerting, and SIEM patterns -- including replatforming from Splunk, Datadog, or self-managed ELK.
 
 ## When to use this capability
 
@@ -28,7 +28,7 @@ Cross-cutting refs you may also load: [`observability.md`](observability.md) (IS
 
 ## Overview
 
-This guide instructs you on how to perform log analytics against an existing OpenSearch domain or collection. The approach is discovery-first: understand what indices exist, learn the schema, sample the data, then build queries. Do not assume any particular index pattern or field names — discover them.
+This guide instructs you on how to perform log analytics against an existing OpenSearch domain or collection. The approach is discovery-first: understand what indices exist, learn the schema, sample the data, then build queries. Do not assume any particular index pattern or field names -- discover them.
 
 ## Data Plane Access with awscurl
 
@@ -82,13 +82,13 @@ awscurl --service aoss --region $AWS_REGION \
 
 Determine the domain or collection type and endpoint using the AWS CLI (or `call_aws` if the AWS MCP server is available):
 
-- If the user names a domain: `aws opensearch describe-domain --domain-name <name>` → extract `Endpoint` and `ARN` (region from ARN). With AWS MCP: `call_aws opensearch describe-domain`.
-- If the user names a collection: `aws opensearchserverless batch-get-collection --names <name>` → extract `collectionEndpoint`. With AWS MCP: `call_aws opensearchserverless batch-get-collection`.
+- If the user names a domain: `aws opensearch describe-domain --domain-name <name>` -> extract `Endpoint` and `ARN` (region from ARN). With AWS MCP: `call_aws opensearch describe-domain`.
+- If the user names a collection: `aws opensearchserverless batch-get-collection --names <name>` -> extract `collectionEndpoint`. With AWS MCP: `call_aws opensearchserverless batch-get-collection`.
 - If unclear: list with `aws opensearch list-domain-names` or `aws opensearchserverless list-collections`
 
 This is important because the connection method, authentication, and available features differ between AOS domains and AOSS collections.
 
-## Phase 1 — Discover Available Indices
+## Phase 1 -- Discover Available Indices
 
 > **AOSS Note:** OpenSearch Serverless does not support `_cat` APIs. Use `--service aoss` instead of `--service es` for all AOSS requests. For index discovery on AOSS, use PPL: `source = * | stats count() by index`.
 
@@ -119,7 +119,7 @@ awscurl --service es --region $AWS_REGION \
 
 After discovering indices, ask the user which index or index pattern they want to analyze if it's not obvious. If there are multiple log indices, ask about the relationship between them (e.g., are they daily rollover indices for the same data? different applications? different log levels?).
 
-## Phase 2 — Understand the Schema
+## Phase 2 -- Understand the Schema
 
 Once you know the target index pattern, inspect its mapping to learn the available fields.
 
@@ -145,18 +145,18 @@ awscurl --service es --region $AWS_REGION \
 
 From the mapping, identify:
 
-1. **Timestamp field** — usually `@timestamp`, `timestamp`, `time`, or `event.created`
-2. **Log level field** — `level`, `log.level`, `severity`, `severityText`, `loglevel`
-3. **Message field** — `message`, `msg`, `body`, `log`, `event.original`
-4. **Service/source field** — `service`, `service.name`, `host.name`, `source`, `kubernetes.pod.name`, `resource.attributes.service.name`
-5. **Error fields** — `error.message`, `error.stack_trace`, `exception.type`
-6. **Correlation fields** — `traceId`, `trace_id`, `spanId`, `request_id`, `correlation_id`
+1. **Timestamp field** -- usually `@timestamp`, `timestamp`, `time`, or `event.created`
+2. **Log level field** -- `level`, `log.level`, `severity`, `severityText`, `loglevel`
+3. **Message field** -- `message`, `msg`, `body`, `log`, `event.original`
+4. **Service/source field** -- `service`, `service.name`, `host.name`, `source`, `kubernetes.pod.name`, `resource.attributes.service.name`
+5. **Error fields** -- `error.message`, `error.stack_trace`, `exception.type`
+6. **Correlation fields** -- `traceId`, `trace_id`, `spanId`, `request_id`, `correlation_id`
 
-If the mapping is large or unclear, ask the user: "I see fields like X, Y, Z — which field contains the log message? Which one is the log level?"
+If the mapping is large or unclear, ask the user: "I see fields like X, Y, Z -- which field contains the log message? Which one is the log level?"
 
 ### Sample Documents
 
-Always look at a few real documents to understand the actual data shape — mappings alone can be misleading (e.g., dynamic fields, nested objects, multi-value fields):
+Always look at a few real documents to understand the actual data shape -- mappings alone can be misleading (e.g., dynamic fields, nested objects, multi-value fields):
 
 Via PPL:
 
@@ -174,21 +174,21 @@ Review the sample documents to confirm:
 - Whether the message field is structured JSON or free-text
 - Whether there are nested objects that need backtick-quoting in PPL
 
-## Phase 3 — Ask Clarifying Questions (If Needed)
+## Phase 3 -- Ask Clarifying Questions (If Needed)
 
 If the schema is not self-explanatory, ask the user:
 
 - "What does this index contain? Application logs, access logs, audit logs?"
-- "I see multiple log indices (X, Y, Z) — are these from different services or different time periods?"
-- "The message field appears to contain JSON — should I parse specific fields from it?"
-- "I see a `trace_id` field — do you want to correlate logs with traces?"
+- "I see multiple log indices (X, Y, Z) -- are these from different services or different time periods?"
+- "The message field appears to contain JSON -- should I parse specific fields from it?"
+- "I see a `trace_id` field -- do you want to correlate logs with traces?"
 - "What time range are you interested in?"
 
 Do not skip this step if the data is ambiguous. Getting the schema right upfront saves failed queries later.
 
-## Phase 4 — Perform Analytics
+## Phase 4 -- Perform Analytics
 
-With the schema understood, build PPL queries using the actual field names discovered above. All examples below use placeholder field names — substitute with the real ones.
+With the schema understood, build PPL queries using the actual field names discovered above. All examples below use placeholder field names -- substitute with the real ones.
 
 ### Running PPL Queries
 
@@ -287,19 +287,19 @@ source=<INDEX_PATTERN> | grok <MESSAGE_FIELD> '%{IP:client_ip} %{WORD:method} %{
 
 > **Caveat:** `grok` processes all matching rows in memory. Add `| head N` before `grok` on large indices to avoid resource errors.
 
-## Phase 5 — Advanced Analysis
+## Phase 5 -- Advanced Analysis
 
 ### Cross-Index Correlation
 
 If logs span multiple indices (e.g., application logs + access logs), correlate using shared fields like `request_id`, `trace_id`, or timestamp proximity:
 
-Step 1 — Find an event of interest in one index:
+Step 1 -- Find an event of interest in one index:
 
 ```
 source=<APP_LOGS> | where <LEVEL_FIELD> = 'ERROR' | fields <CORRELATION_FIELD>, <TIMESTAMP_FIELD>, <MESSAGE_FIELD> | head 10
 ```
 
-Step 2 — Look up the same correlation ID in the other index:
+Step 2 -- Look up the same correlation ID in the other index:
 
 ```
 source=<ACCESS_LOGS> | where <CORRELATION_FIELD> = '<VALUE>' | fields <TIMESTAMP_FIELD>, <MESSAGE_FIELD>
@@ -372,7 +372,7 @@ Client: `clientip`, Request: `request`, Status: `response`, Bytes: `bytes`, Meth
 
 - Always backtick-quote dotted field names: `` `log.level` ``, `` `host.name` ``
 - Use `head N` before memory-intensive commands (`grok`, `streamstats`, `eventstats`)
-- Use `span(<timestamp>, <interval>)` for time bucketing — common intervals: `5m`, `15m`, `1h`, `1d`
+- Use `span(<timestamp>, <interval>)` for time bucketing -- common intervals: `5m`, `15m`, `1h`, `1d`
 - Use `match()` for full-text search, `like` for wildcard patterns, `match_phrase()` for exact phrases
 - Use `patterns` for automatic log message clustering
 - Use `dedup` to find unique error messages: `dedup <MESSAGE_FIELD> | fields <MESSAGE_FIELD>`

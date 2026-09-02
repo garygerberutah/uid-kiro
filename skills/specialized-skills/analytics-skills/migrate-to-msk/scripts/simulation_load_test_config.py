@@ -7,16 +7,16 @@
 Deterministic compute + guardrail engine for the MSK Express load-test simulation.
 
 Three actions:
-  compute  — given cluster sizing (instance_type, broker_count), emit all derived
+  compute  -- given cluster sizing (instance_type, broker_count), emit all derived
              values: cluster capacity, auto-sized client fleet, and per-test
              default parameters + bounds. Feeds CFN parameters and test templates.
-  render   — given the same sizing, write a local, ready-to-deploy copy of the
+  render   -- given the same sizing, write a local, ready-to-deploy copy of the
              CloudFormation template with the customer's sizing AND the computed
              fleet baked in as parameter Defaults. The source template stays static;
              this emits a derived artifact to a working-directory path so the customer
              deploys from a local file (never from the skill source). The Kafka client
              is installed post-deploy via SSM, so nothing client-related is baked here.
-  validate — given a test type and a proposed config, return PASS/REJECT plus
+  validate -- given a test type and a proposed config, return PASS/REJECT plus
              inline WARNINGS. The agent loops back on REJECT, surfaces WARNINGS
              as one-sentence notes and proceeds.
 
@@ -36,7 +36,7 @@ import sys
 from pathlib import Path
 
 # The static source template lives alongside this script in the skill package.
-# It is resolved internally and never surfaced to the customer — render() emits a
+# It is resolved internally and never surfaced to the customer -- render() emits a
 # derived local copy, and all customer-facing commands point at that copy instead.
 SOURCE_TEMPLATE = Path(__file__).resolve().parent.parent / "assets" / "simulation-stack.yaml"
 
@@ -256,7 +256,7 @@ def _throughput_warnings(name, tput, sustained, max_quota, warnings):
     if tput > max_quota:
         warnings.append(
             f"{name}={tput} MB/s exceeds the cluster's maximum ingress quota "
-            f"({max_quota} MB/s) — MSK Express throttles read/write traffic beyond this, "
+            f"({max_quota} MB/s) -- MSK Express throttles read/write traffic beyond this, "
             f"so the cluster cannot actually sustain that rate."
         )
         return True

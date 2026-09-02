@@ -1,4 +1,4 @@
-# Provisioning capability — entry point and reference
+# Provisioning capability -- entry point and reference
 
 This file is the **entry point** for the `provisioning` capability. It covers cost considerations, security, high availability, and provides a navigation index over the rest of the provisioning files. Infrastructure operations use standard **AWS CLI** commands (e.g., `aws opensearch describe-domain`, `aws opensearchserverless create-collection`); the AWS MCP server's `call_aws` is a streamlined alternative when available but is not required. Data-plane operations (queries, mappings, ISM) use `awscurl` (SigV4-authenticated HTTP requests) regardless of MCP presence.
 
@@ -29,8 +29,8 @@ Cross-cutting refs you may also load: [`sizing.md`](sizing.md) (instance/storage
 
 ## Sizing-related universal rules (apply when this capability sizes a domain)
 
-- **Current-generation instances.** Default to Graviton (`r7g`/`r8g` for memory-optimized; `m7g`/`m8g` for cluster managers). `r6g`/`r6gd` only with explicit justification (existing RIs, specific compatibility need). Full instance family list: see [supported-instance-types.html](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html); rule and rationale: [sizing.md §Instance family selection](sizing.md).
-- **Input honesty.** When sizing on UNKNOWN inputs, lead with `[BLOCKER — need input]` OR present 2–3 tiered bands (small/medium/large workload assumption). Never present a single point estimate built on invented numbers.
+- **Current-generation instances.** Default to Graviton (`r7g`/`r8g` for memory-optimized; `m7g`/`m8g` for cluster managers). `r6g`/`r6gd` only with explicit justification (existing RIs, specific compatibility need). Full instance family list: see [supported-instance-types.html](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html); rule and rationale: [sizing.md Section Instance family selection](sizing.md).
+- **Input honesty.** When sizing on UNKNOWN inputs, lead with `[BLOCKER -- need input]` OR present 2-3 tiered bands (small/medium/large workload assumption). Never present a single point estimate built on invented numbers.
 
 ## Cross-capability handoff
 
@@ -42,7 +42,7 @@ Cross-cutting refs you may also load: [`sizing.md`](sizing.md) (instance/storage
 ## Cost: OpenSearch Serverless
 
 - Charged per OCU (OpenSearch Compute Units) hour
-- For current OCU floors, redundancy options, and Vector-Search OCU isolation rules, see [sizing.md §OCU model](sizing.md).
+- For current OCU floors, redundancy options, and Vector-Search OCU isolation rules, see [sizing.md Section OCU model](sizing.md).
 - Scales automatically based on workload
 - Storage charged separately per GB
 - Neural sparse enrichment: charged based on SemanticSearchOCU CloudWatch metric
@@ -53,9 +53,9 @@ Cross-cutting refs you may also load: [`sizing.md`](sizing.md) (instance/storage
 - EBS storage (GB-month)
 - Data transfer and snapshot storage
 
-For monthly cost figures, plug your sizing inputs into <https://calculator.aws> — pricing changes per-region and per-account (RI / Savings Plan / EDP discount math).
+For monthly cost figures, plug your sizing inputs into <https://calculator.aws> -- pricing changes per-region and per-account (RI / Savings Plan / EDP discount math).
 
-Cost optimization levers (no dollar figures — see calculator.aws): Reserved Instances, right-sizing, UltraWarm for cold data, OR1 for log workloads, gp3 storage, Auto-Tune. For instance-family selection rule and rationale, see [sizing.md §Instance family selection](sizing.md); full instance family catalog at [supported-instance-types.html](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html).
+Cost optimization levers (no dollar figures -- see calculator.aws): Reserved Instances, right-sizing, UltraWarm for cold data, OR1 for log workloads, gp3 storage, Auto-Tune. For instance-family selection rule and rationale, see [sizing.md Section Instance family selection](sizing.md); full instance family catalog at [supported-instance-types.html](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html).
 
 ## Security Best Practices
 

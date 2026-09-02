@@ -1,9 +1,9 @@
-# Node.js — tedious (and mssql wrapper)
+# Node.js -- tedious (and mssql wrapper)
 
 Two options:
 
-- **`tedious`** — low-level pure-JS driver (no native deps). Direct control, works in Lambda out of the box.
-- **`mssql`** — higher-level wrapper around tedious, adds connection pooling and a friendlier API.
+- **`tedious`** -- low-level pure-JS driver (no native deps). Direct control, works in Lambda out of the box.
+- **`mssql`** -- higher-level wrapper around tedious, adds connection pooling and a friendlier API.
 
 Use `mssql` for most applications. Use raw `tedious` only when you need fine-grained control.
 
@@ -11,7 +11,7 @@ Use `mssql` for most applications. Use raw `tedious` only when you need fine-gra
 
 ```bash
 npm install tedious        # low-level
-npm install mssql          # recommended — wrapper with pooling
+npm install mssql          # recommended -- wrapper with pooling
 ```
 
 ## Minimal connection with mssql
@@ -59,7 +59,7 @@ async function connect() {
 | `trustServerCertificate: false` requires RDS CA bundle | See below |
 | `port: 1433` as number, NOT string (opposite of pymssql) | tedious parses to number |
 | Pool `max` is per-process | Scale down for Lambda |
-| Connection events — listen for `'error'` | Otherwise silent failures |
+| Connection events -- listen for `'error'` | Otherwise silent failures |
 
 ## TLS with cert validation
 
@@ -133,7 +133,7 @@ async function getPool() {
       server: c.host, port: 1433,
       database: c.dbname, user: c.username, password: c.password,
       options: { encrypt: true, trustServerCertificate: false, connectTimeout: 5000 },
-      pool: { max: 2, min: 0, idleTimeoutMillis: 10000 },  // small — Lambda
+      pool: { max: 2, min: 0, idleTimeoutMillis: 10000 },  // small -- Lambda
     });
   })();
   return poolPromise;
@@ -148,7 +148,7 @@ exports.handler = async (event) => {
 
 Use `@aws-sdk/client-secrets-manager` (AWS SDK v3). AWS SDK v2 (`aws-sdk` package) is deprecated and should not be used for new Lambda code.
 
-For high-concurrency Lambda, use RDS Proxy — see `rds-proxy.md`.
+For high-concurrency Lambda, use RDS Proxy -- see `rds-proxy.md`.
 
 ## ECS / EKS
 
@@ -189,7 +189,7 @@ When Secrets Manager rotates the password, active connections fail with error 18
 ```javascript
 pool.on('error', async err => {
   if (err.code === 'ELOGIN' || err.number === 18456) {
-    console.log('Credentials rotated — rebuilding pool');
+    console.log('Credentials rotated -- rebuilding pool');
     await pool.close();
     poolPromise = null;      // reset the lazy init
   }
@@ -235,4 +235,4 @@ conn.on('connect', err => {
 conn.connect();
 ```
 
-No built-in pool — wrap in `tarn.js` or switch to `mssql`.
+No built-in pool -- wrap in `tarn.js` or switch to `mssql`.

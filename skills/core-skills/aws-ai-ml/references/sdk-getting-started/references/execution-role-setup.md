@@ -28,15 +28,15 @@ aws iam get-role --role-name <ROLE_NAME>
 
 ```
 
-- **AccessDenied** → warn: "⚠️ Cannot verify role (missing iam:GetRole). Proceeding with unverified role." Continue.
-- **Role found** → check `AssumeRolePolicyDocument` for trust principals:
-  - `sagemaker.amazonaws.com` missing → STOP. Tell user their role needs `sagemaker.amazonaws.com` in the trust policy. Link to [the SageMaker model-customization prerequisites documentation](https://docs.aws.amazon.com/sagemaker/latest/dg/model-customize-open-weight-prereq.html).
-  - `bedrock.amazonaws.com` missing → WARN: "Role missing bedrock trust. Bedrock steps may fail."
-  - `lambda.amazonaws.com` missing (and plan includes RLVR) → WARN: "Role missing lambda trust. RLVR reward functions will fail."
+- **AccessDenied** -> warn: "[WARNING] Cannot verify role (missing iam:GetRole). Proceeding with unverified role." Continue.
+- **Role found** -> check `AssumeRolePolicyDocument` for trust principals:
+  - `sagemaker.amazonaws.com` missing -> STOP. Tell user their role needs `sagemaker.amazonaws.com` in the trust policy. Link to [the SageMaker model-customization prerequisites documentation](https://docs.aws.amazon.com/sagemaker/latest/dg/model-customize-open-weight-prereq.html).
+  - `bedrock.amazonaws.com` missing -> WARN: "Role missing bedrock trust. Bedrock steps may fail."
+  - `lambda.amazonaws.com` missing (and plan includes RLVR) -> WARN: "Role missing lambda trust. RLVR reward functions will fail."
 
 ## Required Permissions
 
-Attach the `AmazonSageMakerModelCustomizationCoreAccess` managed policy to your SageMaker AI execution role. This policy covers the permissions needed for model customization — serverless training, custom reward-function RL, model evaluation, and deployment to SageMaker AI or Bedrock endpoints.
+Attach the `AmazonSageMakerModelCustomizationCoreAccess` managed policy to your SageMaker AI execution role. This policy covers the permissions needed for model customization -- serverless training, custom reward-function RL, model evaluation, and deployment to SageMaker AI or Bedrock endpoints.
 
 For full setup instructions (including separate scoped-down roles for Lambda and Bedrock), see: https://docs.aws.amazon.com/sagemaker/latest/dg/model-customize-open-weight-prereq.html
 

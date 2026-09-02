@@ -1,6 +1,6 @@
 # Sending WhatsApp Messages
 
-> **Security:** Avoid sensitive data in template parameters, freeform message text, and all message content — they appear in CloudTrail logs. See [SKILL.md — Security Considerations](../SKILL.md#security-considerations).
+> **Security:** Avoid sensitive data in template parameters, freeform message text, and all message content -- they appear in CloudTrail logs. See [SKILL.md -- Security Considerations](../SKILL.md#security-considerations).
 
 ## Contents
 
@@ -10,17 +10,17 @@
 - [Expected Output](#expected-output)
 - [Freeform Constraints](#freeform-constraints)
 
-The `--message` parameter is a blob type — base64-encode the JSON.
+The `--message` parameter is a blob type -- base64-encode the JSON.
 
-⚠️ The `"to"` field MUST use E.164 format WITH the `+` prefix (e.g., `"+14155551234"`, NOT `"14155551234"`). Alternatively, recipients can be addressed by Business-Scoped User ID (BSUID) — a username in the format `CC.alphanumeric` (e.g., `US.13491208655302741918`) passed via the `"recipient"` field instead of `"to"`.
+[WARNING] The `"to"` field MUST use E.164 format WITH the `+` prefix (e.g., `"+14155551234"`, NOT `"14155551234"`). Alternatively, recipients can be addressed by Business-Scoped User ID (BSUID) -- a username in the format `CC.alphanumeric` (e.g., `US.13491208655302741918`) passed via the `"recipient"` field instead of `"to"`.
 
 **Required JSON body fields (all message types):**
 
-- `"messaging_product": "whatsapp"` — mandatory, always this value
-- `"to"` — recipient in E.164 format with `+` prefix
-- `"type"` — message type (`"template"`, `"text"`, `"image"`, `"document"`, etc.)
+- `"messaging_product": "whatsapp"` -- mandatory, always this value
+- `"to"` -- recipient in E.164 format with `+` prefix
+- `"type"` -- message type (`"template"`, `"text"`, `"image"`, `"document"`, etc.)
 
-**⚠️ API Version:** Before constructing commands, determine the Meta Graph API version to use by checking [Meta's Graph API changelog](https://developers.facebook.com/docs/graph-api/changelog). The examples below use `v{Major}.{Minor}` as a placeholder — substitute the latest supported version in `v{Major}.{Minor}` format (e.g., `v21.0`).
+**[WARNING] API Version:** Before constructing commands, determine the Meta Graph API version to use by checking [Meta's Graph API changelog](https://developers.facebook.com/docs/graph-api/changelog). The examples below use `v{Major}.{Minor}` as a placeholder -- substitute the latest supported version in `v{Major}.{Minor}` format (e.g., `v21.0`).
 
 ## Template Messages
 
@@ -74,7 +74,7 @@ aws socialmessaging send-whatsapp-message \
 
 ```
 
-### Send Image (via Media ID — Recommended for Sensitive Content)
+### Send Image (via Media ID -- Recommended for Sensitive Content)
 
 ```bash
 MESSAGE=$(printf '%s' '{"messaging_product":"whatsapp","recipient_type":"individual","to":"+14155551234","type":"image","image":{"id":"XXXXXXXXXXXXXXXXXXXX","caption":"Your receipt"}}' | base64 | tr -d '\n')
@@ -86,7 +86,7 @@ aws socialmessaging send-whatsapp-message \
 
 ```
 
-For non-sensitive images, you may use a public URL instead of a media ID — the URL must remain accessible for the full 30-day message availability window:
+For non-sensitive images, you may use a public URL instead of a media ID -- the URL must remain accessible for the full 30-day message availability window:
 
 **Security:** For sensitive content (receipts, invoices, documents with PII), upload via `post-whatsapp-message-media` and reference by media ID instead of using publicly accessible URLs. See [managing-media.md](managing-media.md#usage-in-messages).
 
@@ -119,12 +119,12 @@ aws socialmessaging send-whatsapp-message \
 
 ```
 
-A `messageId` confirms queued for delivery — not delivered. Configure event destinations for delivery status.
+A `messageId` confirms queued for delivery -- not delivered. Configure event destinations for delivery status.
 
 ## Freeform Constraints
 
 - MUST be sent within 24h of customer's last inbound message
-- No API to check window status — verify from application logs or event destination history
+- No API to check window status -- verify from application logs or event destination history
 - Text length limits per [WhatsApp Cloud API reference](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages)
-- Media limits vary by type — consult [WhatsApp Cloud API media reference](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/media) for supported formats and size constraints
-- Media URLs must be publicly accessible via HTTPS and remain available for the full 30-day message availability window — Meta can re-fetch media at any time during this period. For sensitive content (receipts, invoices, PII), upload via `post-whatsapp-message-media` and reference by media ID instead — see [managing-media.md](managing-media.md#usage-in-messages). Note: public URLs are logged in CloudTrail and may be cached by intermediaries. Ensure CloudTrail logs are encrypted with a KMS CMK to protect logged URLs and message metadata.
+- Media limits vary by type -- consult [WhatsApp Cloud API media reference](https://developers.facebook.com/docs/whatsapp/cloud-api/reference/media) for supported formats and size constraints
+- Media URLs must be publicly accessible via HTTPS and remain available for the full 30-day message availability window -- Meta can re-fetch media at any time during this period. For sensitive content (receipts, invoices, PII), upload via `post-whatsapp-message-media` and reference by media ID instead -- see [managing-media.md](managing-media.md#usage-in-messages). Note: public URLs are logged in CloudTrail and may be cached by intermediaries. Ensure CloudTrail logs are encrypted with a KMS CMK to protect logged URLs and message metadata.

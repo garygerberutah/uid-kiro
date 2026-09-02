@@ -1,4 +1,4 @@
-# Aurora serverless — Inline Formulas and Pricing Tables
+# Aurora serverless -- Inline Formulas and Pricing Tables
 
 Companion to [instructions.md](serverless-advisory-instructions.md). Use this when you can't run `scripts/acu_calculator.py` and must compute inline, or when you need the pricing tables. Worked examples are in [worked-examples.md](serverless-advisory-worked-examples.md).
 
@@ -8,25 +8,25 @@ Run `python3 scripts/acu_calculator.py estimate --flag...` if shell is available
 
 ### ACU sizing formula
 
-Aurora serverless sizes between **min_ACU** and **max_ACU**. One ACU ≈ 2 GiB memory + proportional CPU. Memory/CPU ratios differ by original provisioned family:
+Aurora serverless sizes between **min_ACU** and **max_ACU**. One ACU ~ 2 GiB memory + proportional CPU. Memory/CPU ratios differ by original provisioned family:
 
-| Family | Memory per ACU (GiB) | ACU coefficient (vCPU → ACU) | Notes |
+| Family | Memory per ACU (GiB) | ACU coefficient (vCPU -> ACU) | Notes |
 |---|---|---|---|
-| r6g, r7g, r8g (memory-optimized) | 2.0 | 4 | Aurora's default "r-ratio" — 1 vCPU at sustained full CPU ≈ 4 ACU |
+| r6g, r7g, r8g (memory-optimized) | 2.0 | 4 | Aurora's default "r-ratio" -- 1 vCPU at sustained full CPU ~ 4 ACU |
 | t3, t4g (burstable) | 1.0 | 2 | Rarely right-sized for serverless; recommend provisioned if workload is steady |
 | x2g (memory-extreme) | 4.0 | 4 | High memory-per-ACU; good candidate when working set is the bottleneck |
 
-**min_ACU** (steady baseline) = `max(0.5, cpu_avg% / 100 × vCPUs × ACU_coef)`, rounded up to nearest 0.5
+**min_ACU** (steady baseline) = `max(0.5, cpu_avg% / 100 x vCPUs x ACU_coef)`, rounded up to nearest 0.5
 
-**peak_ACU** (raw burst) = `cpu_max% / 100 × vCPUs × ACU_coef`, rounded up to nearest 0.5
+**peak_ACU** (raw burst) = `cpu_max% / 100 x vCPUs x ACU_coef`, rounded up to nearest 0.5
 
-**typical_ACU** (weighted) = `(0.95 × cpu_p95% + 0.05 × cpu_max%) / 100 × vCPUs × ACU_coef`, rounded up to nearest 0.5
+**typical_ACU** (weighted) = `(0.95 x cpu_p95% + 0.05 x cpu_max%) / 100 x vCPUs x ACU_coef`, rounded up to nearest 0.5
 
-**max_ACU** (recommended ceiling) = `max(round_up(peak_ACU × 1.30), round_up(typical_ACU × 1.50))`, capped at 256. Note peak_ACU and max_ACU are distinct: peak is the raw burst, max adds headroom — e.g. peak 12.0 → max 16.0.
+**max_ACU** (recommended ceiling) = `max(round_up(peak_ACU x 1.30), round_up(typical_ACU x 1.50))`, capped at 256. Note peak_ACU and max_ACU are distinct: peak is the raw burst, max adds headroom -- e.g. peak 12.0 -> max 16.0.
 
-If `cpu_avg` is not given, estimate as `cpu_avg ≈ 0.60 × cpu_p95`.
+If `cpu_avg` is not given, estimate as `cpu_avg ~ 0.60 x cpu_p95`.
 
-If working_set_GiB is supplied, enforce **min_ACU ≥ working_set_GiB / 2.0** (memory floor) — the min must provision at least as much RAM as the working set, or page-cache churn will negate the sizing.
+If working_set_GiB is supplied, enforce **min_ACU >= working_set_GiB / 2.0** (memory floor) -- the min must provision at least as much RAM as the working set, or page-cache churn will negate the sizing.
 
 ### ACU pricing table (on-demand, us-east-1)
 
@@ -40,9 +40,9 @@ If working_set_GiB is supplied, enforce **min_ACU ≥ working_set_GiB / 2.0** (m
 | af-south-1 | $0.16 | Higher-tier regions |
 | sa-east-1 | $0.25 | Higher-tier regions |
 
-**Monthly compute (Aurora serverless)** = `ACU × ACU_rate × 730 hours × num_instances`.
+**Monthly compute (Aurora serverless)** = `ACU x ACU_rate x 730 hours x num_instances`.
 
-For a range estimate, report: low = `min_ACU × rate × 730`, mid = `typical_ACU × rate × 730`, high = `max_ACU × rate × 730`.
+For a range estimate, report: low = `min_ACU x rate x 730`, mid = `typical_ACU x rate x 730`, high = `max_ACU x rate x 730`.
 
 ### Provisioned compute pricing table (on-demand, us-east-1)
 
@@ -68,14 +68,14 @@ Use this to compare against Aurora serverless cost. Multiply by ~1.15 for us-wes
 | db.t4g.medium | 2 | 4 | $0.073 | $53 |
 | db.t4g.large | 2 | 8 | $0.146 | $107 |
 
-Rates are Aurora On-Demand (Aurora Standard, Single-AZ) in us-east-1 (static fallback values). Aurora MySQL and Aurora PostgreSQL compute rates are identical for these instance classes. These are fallback values for inline estimation only — the `acu_calculator.py` script fetches live pricing from the AWS Pricing API (or public bulk pricing CSV) at runtime when available.
+Rates are Aurora On-Demand (Aurora Standard, Single-AZ) in us-east-1 (static fallback values). Aurora MySQL and Aurora PostgreSQL compute rates are identical for these instance classes. These are fallback values for inline estimation only -- the `acu_calculator.py` script fetches live pricing from the AWS Pricing API (or public bulk pricing CSV) at runtime when available.
 
 ### Storage and I/O pricing (both Standard and serverless, us-east-1)
 
 | Item | Standard $/unit | Notes |
 |---|---|---|
 | Storage | $0.10 per GiB-month | Charged on consumed, not allocated |
-| I/O | $0.20 per million request | Aurora Standard — see [../io-optimized/instructions.md](io-optimized-instructions.md) for when I/O-Optimized breakeven applies |
-| Backup storage | $0.021 per GiB-month | After 1× cluster size free |
+| I/O | $0.20 per million request | Aurora Standard -- see [../io-optimized/instructions.md](io-optimized-instructions.md) for when I/O-Optimized breakeven applies |
+| Backup storage | $0.021 per GiB-month | After 1x cluster size free |
 
-Regional multiplier: us-west-2 / eu-west-1 ≈ 1.15×, APAC ≈ 1.25×.
+Regional multiplier: us-west-2 / eu-west-1 ~ 1.15x, APAC ~ 1.25x.

@@ -143,10 +143,10 @@ Attach the necessary AWS managed policies or create and attach custom inline pol
 
 - You MUST attach each AWS managed policy using: `aws iam attach-role-policy --role-name ${role_name} --policy-arn ${policy_arn}`
 - You MUST use proper policy ARNs in the format: `arn:aws:iam::aws:policy/${policy_name}`
-- Common managed policy ARNs to use (PREFER LEAST PRIVILEGE — avoid FullAccess policies):
+- Common managed policy ARNs to use (PREFER LEAST PRIVILEGE -- avoid FullAccess policies):
   - S3 Read Only: `arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess` (acceptable for read-only use cases)
   - DynamoDB Read Only: `arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess` (acceptable for read-only use cases)
-  - SQS Read Only: `arn:aws:iam::aws:policy/AmazonSQSReadOnlyAccess` (acceptable for queue monitoring/inspection only — consumers that process messages need a custom policy with `sqs:ReceiveMessage` and `sqs:DeleteMessage`)
+  - SQS Read Only: `arn:aws:iam::aws:policy/AmazonSQSReadOnlyAccess` (acceptable for queue monitoring/inspection only -- consumers that process messages need a custom policy with `sqs:ReceiveMessage` and `sqs:DeleteMessage`)
   - SSM Managed Instance Core: `arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore`
 - You MUST NOT recommend or attach FullAccess or overly broad managed policies (e.g., `AmazonS3FullAccess`, `AmazonDynamoDBFullAccess`, `AmazonSQSFullAccess`, `AmazonSNSFullAccess`, `SecretsManagerReadWrite`, `CloudWatchLogsFullAccess`). Instead, create custom policies scoped to specific resources.
 - You MUST prefer custom inline policies over managed policies for write access:
@@ -226,7 +226,7 @@ Confirm the instance profile is properly configured and test that credentials ar
   aws s3 ls
   ```
 
-- You MUST NOT use IMDSv1 (plain curl without token) — always use IMDSv2 with a session token
+- You MUST NOT use IMDSv1 (plain curl without token) -- always use IMDSv2 with a session token
 - You MUST explain that applications using AWS SDKs will automatically use these credentials
 - You MUST provide code examples for common SDK languages to verify automatic credential resolution:
   - **Python (boto3)**:
@@ -455,12 +455,12 @@ During Step 3, the user chose to create a new IAM role.
 
 ## Verification Results
 
-### Instance Profile Attachment: ✓ Success
+### Instance Profile Attachment: [OK] Success
 
 - Instance profile successfully attached to instance i-0abcd1234efgh5678
 - Configuration is active and ready to use
 
-### Role and Policy Validation: ✓ Success
+### Role and Policy Validation: [OK] Success
 
 - IAM role exists and is properly configured
 - Trust policy allows EC2 service to assume role
@@ -580,9 +580,9 @@ System.out.println("Found " + dynamoResponse.tableNames().size() + " DynamoDB ta
 
 ### Implemented
 
-- ✓ Using IAM roles instead of hardcoded credentials
-- ✓ Instance profile provides automatic credential rotation
-- ✓ Credentials are temporary and expire automatically
+- [OK] Using IAM roles instead of hardcoded credentials
+- [OK] Instance profile provides automatic credential rotation
+- [OK] Credentials are temporary and expire automatically
 
 ### Recommended Additional Steps
 
@@ -772,7 +772,7 @@ aws iam delete-role --role-name web-server-role
 
 - Wait 30-60 seconds after attaching instance profile for propagation
 - Verify the instance profile is properly associated with the instance
-- Check that IMDSv2 is configured — use token-based requests (see testing instructions above)
+- Check that IMDSv2 is configured -- use token-based requests (see testing instructions above)
 - Ensure security groups allow outbound traffic to metadata service (should be default)
 
 ### Role Assumption Failures

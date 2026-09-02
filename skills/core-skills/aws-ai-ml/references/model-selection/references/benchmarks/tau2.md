@@ -1,11 +1,11 @@
-# τ²-bench
+# tau2-bench
 
 Multi-turn customer service simulation with dual-control (agent + user modify shared state). Telecom domain.
 
 **Use this for:** Multi-turn tool use with policy following, accurate state management through API calls.
 
 **Source:** Artificial Analysis (artificialanalysis.ai).
-"—" = no data — infer from similar models in the same family, but tell the user you're inferring.
+"--" = no data -- infer from similar models in the same family, but tell the user you're inferring.
 
 |   # | Model                                  | Family      | Score |
 |-----|----------------------------------------|-------------|-------|
@@ -34,11 +34,11 @@ Multi-turn customer service simulation with dual-control (agent + user modify sh
 |  23 | Nova Pro                               | Amazon Nova | 14.0% |
 |  24 | Nova Micro                             | Amazon Nova | 14.0% |
 |  25 | Llama 3.2 1B Instruct                  | Meta Llama  |  0.0% |
-|   — | Qwen2.5 32B Instruct                   | Qwen        |     — |
-|   — | DeepSeek R1 Distill Llama 8B           | DeepSeek    |     — |
-|   — | DeepSeek R1 Distill Qwen 32B           | DeepSeek    |     — |
-|   — | DeepSeek R1 Distill Qwen 14B           | DeepSeek    |     — |
-|   — | DeepSeek R1 Distill Qwen 1.5B          | DeepSeek    |     — |
-|   — | Qwen2.5 14B Instruct                   | Qwen        |     — |
-|   — | Qwen2.5 7B Instruct                    | Qwen        |     — |
-|   — | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     — |
+|   -- | Qwen2.5 32B Instruct                   | Qwen        |     -- |
+|   -- | DeepSeek R1 Distill Llama 8B           | DeepSeek    |     -- |
+|   -- | DeepSeek R1 Distill Qwen 32B           | DeepSeek    |     -- |
+|   -- | DeepSeek R1 Distill Qwen 14B           | DeepSeek    |     -- |
+|   -- | DeepSeek R1 Distill Qwen 1.5B          | DeepSeek    |     -- |
+|   -- | Qwen2.5 14B Instruct                   | Qwen        |     -- |
+|   -- | Qwen2.5 7B Instruct                    | Qwen        |     -- |
+|   -- | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     -- |

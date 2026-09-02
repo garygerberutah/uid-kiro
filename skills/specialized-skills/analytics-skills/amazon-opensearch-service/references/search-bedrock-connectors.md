@@ -9,7 +9,7 @@
 # For AOSS, use ml.opensearchservice.amazonaws.com instead (see AOSS-Specific Notes below)
 # Both aws:SourceAccount and aws:SourceArn conditions are required to prevent
 # confused-deputy: ArnLike narrows trust to a specific domain (or collection
-# for AOSS — replace the resource pattern accordingly) so other domains in
+# for AOSS -- replace the resource pattern accordingly) so other domains in
 # the same account can't assume this role.
 aws iam create-role --role-name OpenSearchBedrockRole \
   --assume-role-policy-document '{

@@ -2,12 +2,12 @@
 
 ## Overview
 
-Reviews Security Hub CSPM configuration — standards, controls, and compliance posture management using ASFF format. Covers enabled standards (FSBP, CIS, PCI-DSS, NIST 800-53, NIST 800-171, AI Best Practices, Resource Tagging), control status, automation rules, and organization-wide policy enforcement.
+Reviews Security Hub CSPM configuration -- standards, controls, and compliance posture management using ASFF format. Covers enabled standards (FSBP, CIS, PCI-DSS, NIST 800-53, NIST 800-171, AI Best Practices, Resource Tagging), control status, automation rules, and organization-wide policy enforcement.
 
 Security Hub CSPM provides two categories of functionality:
 
-- **Compliance management** — standards, controls, compliance findings
-- **ASFF hub features** — finding aggregation, automation rules, custom actions, cross-region aggregation
+- **Compliance management** -- standards, controls, compliance findings
+- **ASFF hub features** -- finding aggregation, automation rules, custom actions, cross-region aggregation
 
 This skill works from both standalone accounts and delegated administrator accounts.
 
@@ -127,7 +127,7 @@ This skill works from both standalone accounts and delegated administrator accou
 
 | Symptom | Check |
 |---------|-------|
-| Standard shows enabled but no controls | describe-standards-controls — may be pending initial evaluation |
+| Standard shows enabled but no controls | describe-standards-controls -- may be pending initial evaluation |
 | Control status NOT_AVAILABLE | Resource type not present in account |
 | Automation rule not triggering | Check rule criteria and RuleStatus=ENABLED |
 | Configuration policy not applying | Verify association target and policy status |

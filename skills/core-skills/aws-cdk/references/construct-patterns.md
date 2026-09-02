@@ -20,14 +20,14 @@ This reference covers construct selection, composition, cross-stack wiring, and 
 
 ## Scope and Construct IDs
 
-Every construct is created with `new SomeConstruct(scope, id, props?)`. The first two arguments are not interchangeable boilerplate — misusing them is a common review finding.
+Every construct is created with `new SomeConstruct(scope, id, props?)`. The first two arguments are not interchangeable boilerplate -- misusing them is a common review finding.
 
 ### Scope (first argument)
 
-Inside a construct's `constructor`, you MUST pass `this` as the scope of child constructs — NOT the incoming `scope` argument:
+Inside a construct's `constructor`, you MUST pass `this` as the scope of child constructs -- NOT the incoming `scope` argument:
 
 ```typescript
-// ❌ INCORRECT — child parented to the wrong node
+// [NO] INCORRECT -- child parented to the wrong node
 export class MyConstruct extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
@@ -35,7 +35,7 @@ export class MyConstruct extends Construct {
   }
 }
 
-// ✅ CORRECT
+// [YES] CORRECT
 export class MyConstruct extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
@@ -48,7 +48,7 @@ Passing `this` makes the child a child of the current construct, which is almost
 
 ### Construct ID (second argument)
 
-The construct ID is the locally unique identifier within a scope. The IDs between a CloudFormation resource and its containing `Stack` are concatenated into the resource's **logical ID** — and changing a logical ID replaces the resource.
+The construct ID is the locally unique identifier within a scope. The IDs between a CloudFormation resource and its containing `Stack` are concatenated into the resource's **logical ID** -- and changing a logical ID replaces the resource.
 
 - Construct IDs SHOULD be short and to the point.
 - You SHOULD NOT interpolate variables into a construct ID: if the variable's value changes, the logical ID changes and the resource is replaced. Legitimate exceptions (constructs created in a loop; an intentional, conditional replacement) MUST be annotated with a comment explaining why.
@@ -66,7 +66,7 @@ You SHOULD prefer L2 constructs as the default choice. They provide sensible def
 | -------------------------------------- | ------------------------------------------ |
 | Pure logic, no AWS resource            | Plain TypeScript/Python class              |
 | Single resource with stricter defaults | Extend the L2 class (is-a)                 |
-| Composition of multiple resources      | Extend `Construct` (has-a) — this is an L3 |
+| Composition of multiple resources      | Extend `Construct` (has-a) -- this is an L3 |
 | Organization-wide policy enforcement   | `Aspect`                                   |
 
 ### When L1 is viable
@@ -79,9 +79,9 @@ L3 constructs provision multiple resources behind a single API. You MUST read wh
 
 ### When an L2 doesn't expose a property
 
-Use this escalation ladder — prefer the first option that works:
+Use this escalation ladder -- prefer the first option that works:
 
-1. **Cfn<Resource>PropsMixin** (preferred) — type-safe, applied via `.with()`:
+1. **Cfn<Resource>PropsMixin** (preferred) -- type-safe, applied via `.with()`:
 
    ```typescript
    import { CfnBucketPropsMixin } from '@aws-cdk/cfn-property-mixins/aws-s3';
@@ -90,7 +90,7 @@ Use this escalation ladder — prefer the first option that works:
    }));
    ```
 
-2. **`addPropertyOverride`** — untyped, string-keyed last resort:
+2. **`addPropertyOverride`** -- untyped, string-keyed last resort:
 
    ```typescript
    const cfnBucket = bucket.node.defaultChild as s3.CfnBucket;
@@ -101,7 +101,7 @@ Use this escalation ladder — prefer the first option that works:
 
 ## Mixing L1 and L2
 
-When a stack contains both L1 and L2 constructs, you MUST use `I<Resource>Ref` interfaces and Facades to bridge them — do not pass L1 property types to L2 props or vice versa, as their types are not interchangeable.
+When a stack contains both L1 and L2 constructs, you MUST use `I<Resource>Ref` interfaces and Facades to bridge them -- do not pass L1 property types to L2 props or vice versa, as their types are not interchangeable.
 
 ### I<Resource>Ref interfaces (e.g. IBucketRef)
 
@@ -127,11 +127,11 @@ table.grantReadData(myFunction);
 
 When you need to customize a resource, follow this order (least invasive first):
 
-1. L2 prop — use the built-in property if available.
-2. Mixin — add behavior via a helper function.
-3. `Cfn<Resource>PropsMixin` — type-safe L1 prop injection.
-4. `node.defaultChild` — access the underlying L1 construct.
-5. `addPropertyOverride` — override arbitrary CloudFormation properties.
+1. L2 prop -- use the built-in property if available.
+2. Mixin -- add behavior via a helper function.
+3. `Cfn<Resource>PropsMixin` -- type-safe L1 prop injection.
+4. `node.defaultChild` -- access the underlying L1 construct.
+5. `addPropertyOverride` -- override arbitrary CloudFormation properties.
 
 You SHOULD exhaust each level before moving to the next.
 
@@ -227,7 +227,7 @@ export class ApiWithQueue extends Construct {
 
 ### Stable logical IDs
 
-The default child ID determines the CloudFormation logical ID. You MUST NOT change construct IDs after deployment — this causes resource replacement. Use the `Default` child ID convention for the primary resource in an L3.
+The default child ID determines the CloudFormation logical ID. You MUST NOT change construct IDs after deployment -- this causes resource replacement. Use the `Default` child ID convention for the primary resource in an L3.
 
 ### Escape via defaultChild
 
@@ -277,7 +277,7 @@ Capture the full template and compare against a stored baseline:
 expect(template.toJSON()).toMatchSnapshot();
 ```
 
-You SHOULD use snapshot tests to detect unintended drift but MUST NOT rely on them as the sole testing strategy — they are brittle and hard to review.
+You SHOULD use snapshot tests to detect unintended drift but MUST NOT rely on them as the sole testing strategy -- they are brittle and hard to review.
 
 ### Logical ID stability tests
 
@@ -307,7 +307,7 @@ Integration tests SHOULD be run in a dedicated test account. They MUST NOT run a
 
 ### Application best practices
 
-- Make decisions at synth time — use explicit `env` to enable synth-time logic.
+- Make decisions at synth time -- use explicit `env` to enable synth-time logic.
 - Use generated physical names (CDK default) unless cross-stack or cross-app references require explicit names.
 - Set explicit `removalPolicy` and `logRetention` on every resource.
 - Separate stateful resources (databases, buckets) into their own stack.

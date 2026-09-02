@@ -18,7 +18,7 @@ const $ = NormalizedSchema.of(PutBucketAclRequest$);
 // to walk the schema and validate an object at runtime.
 ```
 
-Useful when accepting unknown user input. Note: schemas do not include required-field or numeric-range constraints (by design — the SDK favors server-side validation).
+Useful when accepting unknown user input. Note: schemas do not include required-field or numeric-range constraints (by design -- the SDK favors server-side validation).
 
 ## Use case 2: Serialization to non-default formats
 
@@ -35,4 +35,4 @@ const deserializer = codec.createDeserializer();
 const result = await deserializer.read(PutItemInput$, json);
 ```
 
-A schema is required (rather than dynamic heuristics) because serialized representations can be ambiguous — e.g. a number could be a timestamp, a base64 string could be a `Uint8Array`. CBOR is also supported via `CborCodec` from `@smithy/core/cbor`.
+A schema is required (rather than dynamic heuristics) because serialized representations can be ambiguous -- e.g. a number could be a timestamp, a base64 string could be a `Uint8Array`. CBOR is also supported via `CborCodec` from `@smithy/core/cbor`.

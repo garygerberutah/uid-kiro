@@ -10,11 +10,11 @@ Files saved with the `.asl.json` extension get automatic validation from the AWS
 
 The TestState API enables unit and integration testing of Step Functions without deployment. Key capabilities:
 
-- **Mock service integrations** — Test without invoking real services
-- **Advanced states** — Map, Parallel, Activity, `.sync`, `.waitForTaskToken` (require mocks)
-- **Control execution** — Simulate retries, Map iterations, error scenarios
-- **Chain tests** — Use output→input to test execution paths
-- **Optional IAM** — When mocking, `roleArn` optional
+- **Mock service integrations** -- Test without invoking real services
+- **Advanced states** -- Map, Parallel, Activity, `.sync`, `.waitForTaskToken` (require mocks)
+- **Control execution** -- Simulate retries, Map iterations, error scenarios
+- **Chain tests** -- Use output->input to test execution paths
+- **Optional IAM** -- When mocking, `roleArn` optional
 
 ### Before Accessing AWS
 
@@ -24,7 +24,7 @@ Before calling the TestState API, follow this sequence:
 2. Check for AWS credentials: run `aws sts get-caller-identity` and verify the response.
 3. If credentials are available, confirm the IAM role ARN to use for execution (or omit if using mocks).
 4. If credentials are unavailable, help the user construct the CLI/SDK call to run manually.
-5. Never assume AWS access — always ask before making any AWS API call.
+5. Never assume AWS access -- always ask before making any AWS API call.
 
 > **Prefer short-lived credentials:** Use credentials from an IAM role (EC2 instance profile, ECS task role, or AWS IAM Identity Center) rather than long-lived access keys stored in `~/.aws/credentials`.
 
@@ -50,11 +50,11 @@ aws stepfunctions test-state \
 
 ## Critical: Service-Specific Mock Structure
 
-**⚠️ Mocks MUST match AWS service API response schema exactly** — field names (case-sensitive), types, required fields.
+**[WARNING] Mocks MUST match AWS service API response schema exactly** -- field names (case-sensitive), types, required fields.
 
 ### Finding Mock Structure
 
-1. Identify service from `Resource` ARN: `arn:aws:states:::lambda:invoke` → Lambda `Invoke` API
+1. Identify service from `Resource` ARN: `arn:aws:states:::lambda:invoke` -> Lambda `Invoke` API
 2. Consult AWS SDK docs for that API's Response Syntax
 3. Structure mock to match
 
@@ -72,7 +72,7 @@ aws stepfunctions test-state \
 | Step Functions  | `StartExecution` | `{ExecutionArn, StartDate}`             | `'{"result":"{\"ExecutionArn\":\"arn:...\",\"StartDate\":\"...\"}"}'`         |
 | Secrets Manager | `GetSecretValue` | `{ARN, Name, SecretString?}`            | `'{"result":"{\"Name\":\"MySecret\",\"SecretString\":\"...\"}"}'`             |
 
-**For `.sync` patterns:** Mock the **polling API** (e.g., `startExecution.sync:2` → mock `DescribeExecution`, NOT `StartExecution`)
+**For `.sync` patterns:** Mock the **polling API** (e.g., `startExecution.sync:2` -> mock `DescribeExecution`, NOT `StartExecution`)
 
 ### Mock Syntax
 
@@ -82,9 +82,9 @@ aws stepfunctions test-state \
 
 **Validation modes:**
 
-- `STRICT` (default): All required fields, correct types — use in CI/CD
-- `PRESENT`: Only validate fields present — flexible testing
-- `NONE`: No validation — quick prototyping only
+- `STRICT` (default): All required fields, correct types -- use in CI/CD
+- `PRESENT`: Only validate fields present -- flexible testing
+- `NONE`: No validation -- quick prototyping only
 
 ## Testing Map States
 
@@ -156,11 +156,11 @@ Response includes: `status:"CAUGHT_ERROR"`, `nextState`, `catchIndex`, error in 
 Mock the **polling API**, not initial call:
 
 ```bash
-# startExecution.sync:2 → mock DescribeExecution
+# startExecution.sync:2 -> mock DescribeExecution
 --mock '{"result":"{\"Status\":\"SUCCEEDED\",\"Output\":\"{...}\"}"}'
 ```
 
-Common patterns: `startExecution.sync:2`→`DescribeExecution`, `batch:submitJob.sync`→`DescribeJobs`, `glue:startJobRun.sync`→`GetJobRun`
+Common patterns: `startExecution.sync:2`->`DescribeExecution`, `batch:submitJob.sync`->`DescribeJobs`, `glue:startJobRun.sync`->`GetJobRun`
 
 ### .waitForTaskToken
 
@@ -253,11 +253,11 @@ test_state "State2" "$RESULT" '{"result":"..."}'
 3. **Use STRICT validation in CI/CD** to catch mismatches early
 4. **Test all error paths** with appropriate error codes
 5. **Chain tests** to validate multi-state execution paths
-6. **Start with NONE→PRESENT→STRICT** when developing mocks
+6. **Start with NONE->PRESENT->STRICT** when developing mocks
 7. **Use DEBUG for data flow**, TRACE for HTTP debugging
 8. **Mock external dependencies** to isolate state machine logic
 9. **Test Map failure thresholds** with `mapIterationFailureCount`
-10. **Never expose `--reveal-secrets` output** — keep it out of version control, shell history, CI/CD build logs, and CloudWatch Logs; redirect to a file with restricted permissions and avoid persisting DEBUG/TRACE output that may contain secrets
+10. **Never expose `--reveal-secrets` output** -- keep it out of version control, shell history, CI/CD build logs, and CloudWatch Logs; redirect to a file with restricted permissions and avoid persisting DEBUG/TRACE output that may contain secrets
 
 ## Quick Reference
 

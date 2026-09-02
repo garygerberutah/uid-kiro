@@ -155,15 +155,15 @@ def reward_function(sample: Dict[str, Any], index: int) -> Dict[str, Any]:
     # You MUST update them to match YOUR use case
     #
     # The evaluation framework sends each sample with these fields:
-    #   model_response: str — the model's generated text
-    #   query: str — the original prompt sent to the model
-    #   response: str — ground truth from the dataset
-    #   reference_answer: dict {"text": str} OR str — ground truth (type varies)
-    #   id: str — unique sample identifier
+    #   model_response: str -- the model's generated text
+    #   query: str -- the original prompt sent to the model
+    #   response: str -- ground truth from the dataset
+    #   reference_answer: dict {"text": str} OR str -- ground truth (type varies)
+    #   id: str -- unique sample identifier
     response = sample.get("model_response", "")
     question = sample.get("query", "")
 
-    # reference_answer may be a dict or a plain string — handle both
+    # reference_answer may be a dict or a plain string -- handle both
     ref_answer = sample.get("reference_answer", "")
     if isinstance(ref_answer, dict):
         reference_answer = ref_answer.get("text", "") or sample.get("response", "")

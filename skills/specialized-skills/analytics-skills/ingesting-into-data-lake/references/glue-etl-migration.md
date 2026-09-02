@@ -22,7 +22,7 @@ Use Glue ETL (Path B) when Athena CTAS would time out, when transforms are compl
 
 Use `--cli-input-json` to avoid shell escaping issues:
 
-> **Glue --conf format**: In Glue `DefaultArguments`, multiple Spark configs must be passed as a single `--conf` value with space-separated `--conf key=value` pairs. Do not split them into separate JSON keys — Glue only reads one `--conf` key.
+> **Glue --conf format**: In Glue `DefaultArguments`, multiple Spark configs must be passed as a single `--conf` value with space-separated `--conf key=value` pairs. Do not split them into separate JSON keys -- Glue only reads one `--conf` key.
 
 ```json
 {

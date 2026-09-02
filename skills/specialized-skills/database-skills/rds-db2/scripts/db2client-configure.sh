@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# db2client-configure.sh  —  Configure db2dsdriver.cfg for RDS DB2 RT client
+# db2client-configure.sh  --  Configure db2dsdriver.cfg for RDS DB2 RT client
 # =============================================================================
 # Run as db2inst1 after db2-driver.sh has installed the RT client:
 #
@@ -22,7 +22,7 @@ log_success() { echo -e "${GREEN}[SUCCESS]${NC} $(date '+%H:%M:%S') - $1" >&2; }
 log_warning() { echo -e "${YELLOW}[WARNING]${NC} $(date '+%H:%M:%S') - $1" >&2; }
 log_error()   { echo -e "${RED}[  ERROR]${NC} $(date '+%H:%M:%S') - $1" >&2; }
 
-# RDS cert bundle URL — partition-aware (commercial / GovCloud / China)
+# RDS cert bundle URL -- partition-aware (commercial / GovCloud / China)
 rds_truststore_url() {
   local region="$1"
   case "$region" in
@@ -39,12 +39,12 @@ rds_truststore_url() {
 # to be a member of an Active Directory / Kerberos realm.
 #
 # Detection order (first match wins):
-#   1. 'realm list' shows "configured: kerberos-member"  (realmd + sssd — most common)
+#   1. 'realm list' shows "configured: kerberos-member"  (realmd + sssd -- most common)
 #   2. /etc/krb5.conf contains a default_realm           (any kerberos setup)
 #
 # When domain-joined, also validates that a TGT exists in the Kerberos cache.
 # RDS for Db2 does not support local user authentication when Kerberos is
-# enabled — a valid TGT is required for ALL connections (including the
+# enabled -- a valid TGT is required for ALL connections (including the
 # internal bootstrap query). The script exits if no ticket is found.
 #
 IS_DOMAIN_JOINED=false
@@ -57,13 +57,13 @@ detect_domain_join() {
     realm_out=$(realm list 2>/dev/null)
     if echo "$realm_out" | grep -q "configured: kerberos-member"; then
       KRB_REALM=$(echo "$realm_out" | awk '/^[^ ]/ {realm=$1} /configured: kerberos-member/ {print realm; exit}')
-      log_info "Domain join detected via 'realm list' — realm: $KRB_REALM"
+      log_info "Domain join detected via 'realm list' -- realm: $KRB_REALM"
       # Only treat the host as domain-joined if a valid TGT is present. Otherwise
       # the Kerberos DSNs would be written but fail at connect time.
       if _require_tgt; then
         IS_DOMAIN_JOINED=true
       else
-        log_warning "Domain join detected but no valid TGT — Kerberos DSNs will NOT be created"
+        log_warning "Domain join detected but no valid TGT -- Kerberos DSNs will NOT be created"
         IS_DOMAIN_JOINED=false
       fi
       return
@@ -76,20 +76,20 @@ detect_domain_join() {
     realm_line=$(grep -i '^\s*default_realm\s*=' /etc/krb5.conf 2>/dev/null | head -1)
     if [ -n "$realm_line" ]; then
       KRB_REALM=$(echo "$realm_line" | awk -F'=' '{gsub(/[[:space:]]/,"",$2); print $2}')
-      log_info "Domain join detected via /etc/krb5.conf — realm: $KRB_REALM"
+      log_info "Domain join detected via /etc/krb5.conf -- realm: $KRB_REALM"
       # Only treat the host as domain-joined if a valid TGT is present. Otherwise
       # the Kerberos DSNs would be written but fail at connect time.
       if _require_tgt; then
         IS_DOMAIN_JOINED=true
       else
-        log_warning "Domain join detected but no valid TGT — Kerberos DSNs will NOT be created"
+        log_warning "Domain join detected but no valid TGT -- Kerberos DSNs will NOT be created"
         IS_DOMAIN_JOINED=false
       fi
       return
     fi
   fi
 
-  log_info "No domain join detected — Kerberos DSN parameters will not be added"
+  log_info "No domain join detected -- Kerberos DSN parameters will not be added"
 }
 
 # Gate: verify a valid TGT exists. Called only when IS_DOMAIN_JOINED=true.
@@ -99,7 +99,7 @@ detect_domain_join() {
 # that the Kerberos ticket provides for discovery).
 _require_tgt() {
   if ! command -v klist &>/dev/null; then
-    log_error "klist not found — cannot verify Kerberos ticket."
+    log_error "klist not found -- cannot verify Kerberos ticket."
     log_error "Install krb5-workstation (AL2/AL2023) and obtain a ticket:"
     log_error "  sudo dnf install -y krb5-workstation"
     log_error "  kinit $(whoami)@${KRB_REALM}"
@@ -110,7 +110,7 @@ _require_tgt() {
     log_error "============================================================="
     log_error "This host is domain-joined (realm: $KRB_REALM)."
     log_error "RDS for Db2 does not support local user authentication"
-    log_error "when Kerberos is enabled — a valid TGT is required."
+    log_error "when Kerberos is enabled -- a valid TGT is required."
     log_error ""
     log_error "No Kerberos ticket found in the cache. Obtain one first:"
     log_error "  kinit $(whoami)@${KRB_REALM}"
@@ -120,10 +120,10 @@ _require_tgt() {
     return 1
   fi
 
-  # Ticket exists — show the principal so the user can confirm it's the right one
+  # Ticket exists -- show the principal so the user can confirm it's the right one
   local principal
   principal=$(klist 2>/dev/null | awk '/^Default principal:/ {print $3}')
-  log_success "Kerberos TGT found — principal: ${principal:-<unknown>}"
+  log_success "Kerberos TGT found -- principal: ${principal:-<unknown>}"
 }
 
 # --- Defaults ---
@@ -132,14 +132,14 @@ DB2USER_NAME=${DB2USER_NAME:-"db2inst1"}
 DB_NAMES_INPUT=${DB_NAMES:-""}   # optional: comma-separated list, e.g. DB_NAMES=DB2DB,MYDB
 E_URL=${E_URL:-""}               # optional: custom RDS endpoint, e.g.
                                  #   E_URL="--endpoint-url https://rds-siteb.us-east-1.amazonaws.com --no-verify-ssl"
-SSL_CERT_FILE=""                 # set by download_pem_file() — do not set manually
+SSL_CERT_FILE=""                 # set by download_pem_file() -- do not set manually
 declare -a HELP_COMMANDS=()
 declare -a DB_INSTANCES=()
 declare -a MASTER_USER_NAMES=()
 declare -a MASTER_USER_PASSWORDS=()
 declare -a DB_NAMES=()
 
-# Wrapper for all 'aws rds' calls — injects E_URL when set.
+# Wrapper for all 'aws rds' calls -- injects E_URL when set.
 # Usage:  aws_rds describe-db-instances --region ... --query ... --output text
 aws_rds() {
   # shellcheck disable=SC2086
@@ -154,13 +154,13 @@ validate() {
     log_error "REGION is required. Example: BUCKET=... REGION=us-east-1 source db2client-configure.sh"
     return 1
   fi
-  # BUCKET is optional — only needed for airgap SSL cert download
+  # BUCKET is optional -- only needed for airgap SSL cert download
   if [ "$(whoami)" != "$DB2USER_NAME" ]; then
     log_error "This script must be run as $DB2USER_NAME. Run: sudo su - $DB2USER_NAME"
     return 1
   fi
   if [ ! -d "$HOME/sqllib" ]; then
-    log_error "RT client not installed — $HOME/sqllib not found. Run db2-driver.sh as root first."
+    log_error "RT client not installed -- $HOME/sqllib not found. Run db2-driver.sh as root first."
     return 1
   fi
 }
@@ -196,7 +196,7 @@ set_credentials() {
   fi
   # Fall back to configured profile
   if [ -n "${AWS_ACCESS_KEY_ID:-}" ] && [ -n "${AWS_SECRET_ACCESS_KEY:-}" ]; then
-    # SECURITY: AWS_ACCESS_KEY_ID/SECRET are long-lived static keys — acceptable
+    # SECURITY: AWS_ACCESS_KEY_ID/SECRET are long-lived static keys -- acceptable
     # only for temporary CI/CD automation, NEVER for production. Production
     # workflows MUST obtain credentials through a CloudShell/EC2 IAM role (handled
     # above) or a configured profile, never hard-coded or long-lived keys.
@@ -241,7 +241,7 @@ list_db_instances() {
     return 0
   fi
 
-  # Interactive selection — one instance only
+  # Interactive selection -- one instance only
   local choice=-1
   while [ "$choice" -lt 1 ] || [ "$choice" -gt ${#existing_instances[@]} ]; do
     echo "Available DB2 instances:" >&2
@@ -315,10 +315,10 @@ get_all_master_passwords() {
     fi
 
     if [ -n "$file_password" ] && [ "$file_password" != "replace this with the master user password" ]; then
-      log_warning "Using password from $password_file for $db_instance (dev/test only — use --manage-master-user-password in production)"
+      log_warning "Using password from $password_file for $db_instance (dev/test only -- use --manage-master-user-password in production)"
       MASTER_USER_PASSWORDS+=("$file_password")
     else
-      log_warning "No password found for $db_instance — prompting"
+      log_warning "No password found for $db_instance -- prompting"
       read -rsp "Password for $db_instance: " entered_password; echo
       MASTER_USER_PASSWORDS+=("${entered_password:-}")
     fi
@@ -330,15 +330,15 @@ get_all_master_passwords() {
 # =============================================================================
 #
 # Resolution order:
-#   1. DB_NAMES env var  — comma-separated list, e.g. DB_NAMES=DB2DB,MYDB
+#   1. DB_NAMES env var  -- comma-separated list, e.g. DB_NAMES=DB2DB,MYDB
 #                          (useful for automation or when RDSADMIN is inaccessible)
 #   2. DBName field on the RDS instance  (single-database, most common case)
 #   3. Bootstrap connect to RDSADMIN + rdsadmin.list_databases()
-#      — requires the connecting user to have CONNECT on RDSADMIN
-#      — when domain-joined, this uses the Kerberos TGT (no master user/password)
-#      — when Kerberos is active but the AD user lacks RDSADMIN access, this
+#      -- requires the connecting user to have CONNECT on RDSADMIN
+#      -- when domain-joined, this uses the Kerberos TGT (no master user/password)
+#      -- when Kerberos is active but the AD user lacks RDSADMIN access, this
 #        step fails and the script falls through to the interactive prompt
-#   4. Interactive prompt  — user enters names manually; skipped when stdin
+#   4. Interactive prompt  -- user enters names manually; skipped when stdin
 #                            is not a terminal (non-interactive mode)
 #
 get_all_database_names() {
@@ -370,7 +370,7 @@ get_all_database_names() {
   fi
 
   # --- Resolution 3: Bootstrap connect to RDSADMIN ---
-  log_info "No default database set — attempting RDSADMIN bootstrap query"
+  log_info "No default database set -- attempting RDSADMIN bootstrap query"
   local connect_out connect_rc
   if [ "${IS_DOMAIN_JOINED:-false}" = "true" ]; then
     connect_out=$(db2 "connect to $temp_dsn" 2>&1)
@@ -406,7 +406,7 @@ get_all_database_names() {
       local principal
       principal=$(klist 2>/dev/null | awk '/^Default principal:/ {print $3}')
       log_warning "Kerberos principal '${principal}' may not have CONNECT privilege on RDSADMIN."
-      log_warning "This is expected — RDSADMIN is protected and AD users are not granted access by default."
+      log_warning "This is expected -- RDSADMIN is protected and AD users are not granted access by default."
     fi
   fi
 
@@ -426,30 +426,30 @@ get_all_database_names() {
       log_info "Registering databases: ${DB_NAMES[*]}"
       return 0
     fi
-    log_warning "No databases entered — only the RDSDBSSL admin DSN will be created for $db_instance_id"
+    log_warning "No databases entered -- only the RDSDBSSL admin DSN will be created for $db_instance_id"
   else
-    log_warning "Non-interactive mode and no DB_NAMES set — only the admin DSN will be created"
+    log_warning "Non-interactive mode and no DB_NAMES set -- only the admin DSN will be created"
     log_warning "Re-run with: DB_NAMES=<name1,name2> REGION=$REGION source db2client-configure.sh"
   fi
 
-  return 0  # not fatal — admin DSN is still useful
+  return 0  # not fatal -- admin DSN is still useful
 }
 
 # =============================================================================
 # DSN helpers
 # =============================================================================
 #
-# Naming convention (all aliases must be ≤ 8 characters):
+# Naming convention (all aliases must be <= 8 characters):
 #
 #   Admin database (RDSADMIN):
-#     RDSAT    — TCP,  local auth (SERVER_ENCRYPT)
-#     RDSAS    — SSL,  local auth
-#     RDSAKS   — SSL,  Kerberos
+#     RDSAT    -- TCP,  local auth (SERVER_ENCRYPT)
+#     RDSAS    -- SSL,  local auth
+#     RDSAKS   -- SSL,  Kerberos
 #
 #   User databases (<DB>, truncated to fit):
-#     <DB>T    — TCP,  local auth
-#     <DB>S    — SSL,  local auth
-#     <DB>SK   — SSL,  Kerberos
+#     <DB>T    -- TCP,  local auth
+#     <DB>S    -- SSL,  local auth
+#     <DB>SK   -- SSL,  Kerberos
 #
 #   Multi-instance: numeric index appended before the type suffix,
 #   e.g. RDSAT0 / RDSAT1, DB2DB0T / DB2DB0S / DB2DB0SK
@@ -549,11 +549,11 @@ download_pem_file() {
   #   Downloads <region>-bundle.pem from the public RDS truststore.
   #   The bundle is reordered so RSA2048 is first (Db2 CLP requirement).
   #
-  # Custom endpoint  (E_URL set — PrivateLink, siteb, internal domain):
+  # Custom endpoint  (E_URL set -- PrivateLink, siteb, internal domain):
   #   The server presents a cert signed by an internal/Preprod CA that is
   #   NOT in the public RDS bundle. Instead, the root CA is extracted live
   #   from the server's TLS chain and saved as <region>-siteb-root-ca.pem.
-  #   Only the root is needed — GSKit walks the chain from root to leaf.
+  #   Only the root is needed -- GSKit walks the chain from root to leaf.
 
   if [ -n "${E_URL:-}" ]; then
     _download_pem_custom_endpoint "$@"
@@ -588,7 +588,7 @@ _download_pem_standard() {
 
   # Reorder certificates so RSA2048 is first.
   # Db2 CLP picks the first cert in the bundle for the TLS handshake.
-  # RDS for Db2 only has RSA2048 — if RSA4096 is first (e.g. us-west-1)
+  # RDS for Db2 only has RSA2048 -- if RSA4096 is first (e.g. us-west-1)
   # the CLP connection fails. Python/JCC drivers iterate all certs so
   # they are unaffected. This reorder is a no-op for regions where
   # RSA2048 is already first (e.g. us-east-1).
@@ -614,10 +614,10 @@ _download_pem_standard() {
       log_info "SSL cert reordered: RSA2048 first (Db2 CLP compatibility)"
     else
       rm -f "$tmp_pem"
-      log_warning "SSL cert reorder skipped — openssl subject parse returned empty"
+      log_warning "SSL cert reorder skipped -- openssl subject parse returned empty"
     fi
   else
-    log_warning "openssl not found — skipping cert reorder (Db2 CLP may fail on regions where RSA2048 is not first)"
+    log_warning "openssl not found -- skipping cert reorder (Db2 CLP may fail on regions where RSA2048 is not first)"
   fi
 
   log_success "SSL certificate saved to $pem_file"
@@ -639,16 +639,16 @@ _download_pem_custom_endpoint() {
   fi
 
   if [ -z "${DB_ADDRESS:-}" ]; then
-    log_error "DB_ADDRESS not set — cannot extract root CA from custom endpoint"
+    log_error "DB_ADDRESS not set -- cannot extract root CA from custom endpoint"
     return 1
   fi
 
   if ! command -v openssl &>/dev/null; then
-    log_error "openssl not found — required to extract root CA from custom endpoint"
+    log_error "openssl not found -- required to extract root CA from custom endpoint"
     return 1
   fi
 
-  log_info "Custom endpoint detected (E_URL set) — extracting root CA from TLS chain ..."
+  log_info "Custom endpoint detected (E_URL set) -- extracting root CA from TLS chain ..."
   log_info "Connecting to $DB_ADDRESS:${SSL_PORT:-50443} ..."
 
   # Pull full chain, skip the leaf (cert #1), save intermediate + root
@@ -663,7 +663,7 @@ _download_pem_custom_endpoint() {
     return 1
   fi
 
-  # Extract root CA — the last self-signed cert in the chain
+  # Extract root CA -- the last self-signed cert in the chain
   # (issuer == subject). Works for chains of any depth.
   echo "$full_chain" | awk '
     /-----BEGIN CERTIFICATE-----/ { n++; cert="" }
@@ -737,8 +737,8 @@ configure_dsn() {
     log_info "============================================================================"
     log_info "Processing: $DB_INSTANCE_IDENTIFIER"
 
-    [ -z "$MASTER_USER_NAME" ]     && log_error "No master user for $DB_INSTANCE_IDENTIFIER — skipping" && continue
-    [ -z "$MASTER_USER_PASSWORD" ] && log_warning "No password for $DB_INSTANCE_IDENTIFIER — skipping"  && continue
+    [ -z "$MASTER_USER_NAME" ]     && log_error "No master user for $DB_INSTANCE_IDENTIFIER -- skipping" && continue
+    [ -z "$MASTER_USER_PASSWORD" ] && log_warning "No password for $DB_INSTANCE_IDENTIFIER -- skipping"  && continue
 
     local DB_ADDRESS DB_TCP_IP_PORT
     DB_ADDRESS=$(aws_rds describe-db-instances \
@@ -752,7 +752,7 @@ configure_dsn() {
       --query "DBInstances[0].Endpoint.Port" \
       --output text 2>/dev/null)
 
-    [ -z "$DB_ADDRESS" ] && log_error "No endpoint for $DB_INSTANCE_IDENTIFIER — skipping" && continue
+    [ -z "$DB_ADDRESS" ] && log_error "No endpoint for $DB_INSTANCE_IDENTIFIER -- skipping" && continue
 
     # -----------------------------------------------------------------------
     # Read parameter group values for this instance
@@ -773,7 +773,7 @@ configure_dsn() {
     [ -n "$SSL_PORT" ]           && WANT_SSL=true
 
     if [ "$WANT_SSL" = "false" ] && [ "$WANT_TCP" = "false" ]; then
-      log_warning "Neither TCPIP port nor ssl_svcename configured for $DB_INSTANCE_IDENTIFIER — skipping"
+      log_warning "Neither TCPIP port nor ssl_svcename configured for $DB_INSTANCE_IDENTIFIER -- skipping"
       continue
     fi
 
@@ -785,12 +785,12 @@ configure_dsn() {
     if [ "$WANT_TCP" = "true" ]; then
       writecfg_tcp "$TEMP_DSN" "RDSADMIN" "$DB_ADDRESS" "$DB_TCP_IP_PORT" >/dev/null 2>&1
     else
-      # SSL-only — download cert first (sets SSL_CERT_FILE)
+      # SSL-only -- download cert first (sets SSL_CERT_FILE)
       if ! download_pem_file; then
-        log_error "Cannot download SSL cert for $DB_INSTANCE_IDENTIFIER — skipping"
+        log_error "Cannot download SSL cert for $DB_INSTANCE_IDENTIFIER -- skipping"
         continue
       fi
-      # Bootstrap always uses local auth — Kerberos DSNs are written after discovery
+      # Bootstrap always uses local auth -- Kerberos DSNs are written after discovery
       writecfg_ssl_local "$TEMP_DSN" "RDSADMIN" "$DB_ADDRESS" "$SSL_PORT" >/dev/null 2>&1
     fi
 
@@ -798,7 +798,7 @@ configure_dsn() {
     get_all_database_names "$DB_INSTANCE_IDENTIFIER" "$MASTER_USER_NAME" "$MASTER_USER_PASSWORD" "$TEMP_DSN" || true
     log_info "Databases to register: ${DB_NAMES[*]:-<none found>}"
 
-    # Remove temp DSN — final entries written below
+    # Remove temp DSN -- final entries written below
     db2cli writecfg remove -dsn "$TEMP_DSN" >/dev/null 2>&1 || true
 
     # -----------------------------------------------------------------------
@@ -823,7 +823,7 @@ configure_dsn() {
     if [ "$WANT_SSL" = "true" ]; then
       # Cert may already be downloaded in the bootstrap block above; idempotent
       if ! download_pem_file; then
-        log_warning "SSL cert unavailable — skipping SSL entries for $DB_INSTANCE_IDENTIFIER"
+        log_warning "SSL cert unavailable -- skipping SSL entries for $DB_INSTANCE_IDENTIFIER"
       else
         log_info "SSL port: $SSL_PORT"
 
@@ -842,7 +842,7 @@ configure_dsn() {
 
         # --- SSL + Kerberos (domain-joined only) ---
         if [ "${IS_DOMAIN_JOINED:-false}" = "true" ]; then
-          log_info "Domain-joined host — also creating Kerberos SSL DSN entries"
+          log_info "Domain-joined host -- also creating Kerberos SSL DSN entries"
 
           local ssl_krb_admin="RDSAKS${SUFFIX}"
           log_info "Creating SSL+Kerberos DSN: $ssl_krb_admin"
@@ -872,7 +872,7 @@ main() {
   print_all_help | tee "$HOME/CONN_HELP_README.txt" >&2
   log_info "Run 'db2 terminate' then use the commands above (also saved to ~/CONN_HELP_README.txt)"
 
-  # Write instance registry (instance→DSN mapping, no passwords)
+  # Write instance registry (instance->DSN mapping, no passwords)
   local registry="$HOME/.db2instances"
   # Append or create entry for each instance
   touch "$registry"
@@ -923,7 +923,7 @@ main() {
     echo "export MASTER_USER_PASSWORD=$(printf '%q' "${MASTER_USER_PASSWORDS[$last]}")"
   } > "$HOME/.db2env"
   chmod 600 "$HOME/.db2env"
-  log_success "Credentials saved to ~/.db2env — auto-loaded by functions.sh"
+  log_success "Credentials saved to ~/.db2env -- auto-loaded by functions.sh"
   log_success "DSN configuration complete. Connection help saved to ~/CONN_HELP_README.txt"
   # Add source functions.sh to shell profile files if not already there
   local source_line='source ~/functions.sh'

@@ -44,10 +44,10 @@ Which should I use to track new/updated records?
 
 **Recommendation logic**:
 
-- If `updated_at` or `modified_date` exists → Recommend this (captures updates)
-- Else if timestamp column exists → Use creation timestamp
-- Else if auto-incrementing ID → Use ID
-- Else → Recommend full refresh
+- If `updated_at` or `modified_date` exists -> Recommend this (captures updates)
+- Else if timestamp column exists -> Use creation timestamp
+- Else if auto-incrementing ID -> Use ID
+- Else -> Recommend full refresh
 
 ## Determine Load Strategy
 
@@ -192,9 +192,9 @@ print(f"Updated watermark to: {new_watermark}")
 
 ```
 s3://my-glue-watermarks/
-  customers.txt          → "2024-03-12 14:30:00"
-  orders.txt             → "2024-03-12 14:25:00"
-  products.txt           → "2024-03-10 08:00:00"
+  customers.txt          -> "2024-03-12 14:30:00"
+  orders.txt             -> "2024-03-12 14:25:00"
+  products.txt           -> "2024-03-10 08:00:00"
 ```
 
 ### Option B: DynamoDB Table (Robust)

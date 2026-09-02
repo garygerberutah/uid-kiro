@@ -38,4 +38,4 @@ Allow 5-15 minutes for initial log delivery. Verify the CloudWatch Logs role ARN
 
 ### Opt-in region events not appearing
 
-This is normal — events from opt-in regions may take several hours. Wait up to 24 hours before investigating further.
+This is normal -- events from opt-in regions may take several hours. Wait up to 24 hours before investigating further.

@@ -25,7 +25,7 @@ const result = await context.step('process', async () => process(data)); // Line
 
 **ALL code outside steps MUST produce the same result on every replay.**
 
-### ❌ WRONG - Non-Deterministic Outside Steps
+### [NO] WRONG - Non-Deterministic Outside Steps
 
 **TypeScript:**
 
@@ -51,7 +51,7 @@ now = datetime.now()                     # Different datetime each time
 context.step(lambda _: save_data({"id": id}), name='save')
 ```
 
-### ✅ CORRECT - Non-Deterministic Inside Steps
+### [YES] CORRECT - Non-Deterministic Inside Steps
 
 **TypeScript:**
 
@@ -90,7 +90,7 @@ context.step(lambda _: save_data({"id": id}), name='save')
 
 **You CANNOT call durable operations inside a step function.**
 
-### ❌ WRONG - Nested Operations
+### [NO] WRONG - Nested Operations
 
 **TypeScript:**
 
@@ -115,7 +115,7 @@ def process(step_ctx: StepContext):
 context.step(process())
 ```
 
-### ✅ CORRECT - Use Child Context
+### [YES] CORRECT - Use Child Context
 
 **TypeScript:**
 
@@ -145,7 +145,7 @@ context.run_in_child_context(func=process_child, name='process')
 
 **Variables mutated inside steps are NOT preserved across replays.**
 
-### ❌ WRONG - Lost Mutations
+### [NO] WRONG - Lost Mutations
 
 **TypeScript:**
 
@@ -170,7 +170,7 @@ context.step(increment())
 print(counter)  # Always 0 on replay!
 ```
 
-### ✅ CORRECT - Return Values
+### [YES] CORRECT - Return Values
 
 **TypeScript:**
 
@@ -192,7 +192,7 @@ print(counter)  # Correct value
 
 **Side effects outside steps happen on EVERY replay.**
 
-### ❌ WRONG - Repeated Side Effects
+### [NO] WRONG - Repeated Side Effects
 
 **TypeScript:**
 
@@ -214,7 +214,7 @@ update_database(data)                # Updates multiple times!
 context.step(lambda _: process(), name='process')
 ```
 
-### ✅ CORRECT - Side Effects In Steps
+### [YES] CORRECT - Side Effects In Steps
 
 **TypeScript:**
 
@@ -244,11 +244,11 @@ context.step(process())
 ### Pitfall 1: Reading Environment Variables
 
 ```typescript
-// ❌ WRONG if env vars can change
+// [NO] WRONG if env vars can change
 const apiKey = process.env.API_KEY;
 await context.step('call-api', async () => callAPI(apiKey));
 
-// ✅ CORRECT
+// [YES] CORRECT
 const apiKey = await context.step('get-key', async () => process.env.API_KEY);
 await context.step('call-api', async () => callAPI(apiKey));
 ```
@@ -256,13 +256,13 @@ await context.step('call-api', async () => callAPI(apiKey));
 ### Pitfall 2: Array/Object Mutations
 
 ```typescript
-// ❌ WRONG
+// [NO] WRONG
 const items = [];
 await context.step('add-item', async () => {
   items.push(newItem);  // Lost on replay
 });
 
-// ✅ CORRECT
+// [YES] CORRECT
 let items = [];
 items = await context.step('add-item', async () => [...items, newItem]);
 ```
@@ -270,14 +270,14 @@ items = await context.step('add-item', async () => [...items, newItem]);
 ### Pitfall 3: Conditional Logic with Non-Deterministic Values
 
 ```typescript
-// ❌ WRONG
+// [NO] WRONG
 if (Math.random() > 0.5) {  // Different on each replay!
   await context.step('path-a', async () => ...);
 } else {
   await context.step('path-b', async () => ...);
 }
 
-// ✅ CORRECT
+// [YES] CORRECT
 const shouldTakePathA = await context.step('decide', async () => Math.random() > 0.5);
 if (shouldTakePathA) {
   await context.step('path-a', async () => ...);

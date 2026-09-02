@@ -285,19 +285,19 @@ After running validation queries, present results clearly:
 
 ```
 Data Load Validation Report:
-✓ Row count: 1,234,567 rows loaded
-✓ Null checks:
+[OK] Row count: 1,234,567 rows loaded
+[OK] Null checks:
   - customer_id: 0% null (expected: 0%)
   - order_date: 0.1% null (acceptable)
   - amount: 2.3% null (within threshold)
-✓ Duplicates: No duplicate order_ids found
-✓ Value ranges:
+[OK] Duplicates: No duplicate order_ids found
+[OK] Value ranges:
   - order_date: 2023-01-01 to 2024-12-31 (expected)
   - amount: $0.01 to $9,999.99 (valid range)
   - quantity: 1 to 500 (valid range)
-✓ Categorical values:
+[OK] Categorical values:
   - status: pending (45%), completed (50%), cancelled (5%)
-⚠ Warning: email column has 10% null values (target: < 5%)
+[WARNING] Warning: email column has 10% null values (target: < 5%)
 
 Overall: PASS with warnings
 ```

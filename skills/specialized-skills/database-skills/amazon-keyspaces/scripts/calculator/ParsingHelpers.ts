@@ -285,11 +285,11 @@ export const parse_cassandra_schema = (schemaContent: string, datacenter: string
 
 /**
  * Scan a CQL schema dump for features unsupported by Amazon Keyspaces:
- *   - CREATE INDEX        → table-level
- *   - CREATE TRIGGER      → table-level
- *   - CREATE MATERIALIZED VIEW → table-level (attached to the base table)
- *   - CREATE FUNCTION     → keyspace-level (counted globally)
- *   - CREATE AGGREGATE    → keyspace-level (counted globally)
+ *   - CREATE INDEX        -> table-level
+ *   - CREATE TRIGGER      -> table-level
+ *   - CREATE MATERIALIZED VIEW -> table-level (attached to the base table)
+ *   - CREATE FUNCTION     -> keyspace-level (counted globally)
+ *   - CREATE AGGREGATE    -> keyspace-level (counted globally)
  */
 export const parse_cassandra_schema_compatibility = (schemaContent: string): CompatibilityInfo => {
   const result: CompatibilityInfo = {
@@ -349,11 +349,11 @@ export const parse_cassandra_schema_compatibility = (schemaContent: string): Com
  * and detect Amazon Keyspaces compatibility concerns in the query text:
  *
  *   - LWT inside `BEGIN UNLOGGED BATCH` (not supported)
- *   - Aggregate function calls (COUNT / MIN / MAX / SUM / AVG — not supported)
- *   - `USING TTL <n>` per target table (informational — used to populate
+ *   - Aggregate function calls (COUNT / MIN / MAX / SUM / AVG -- not supported)
+ *   - `USING TTL <n>` per target table (informational -- used to populate
  *     has_ttl for pricing when the base schema has no default TTL)
  *
- * UDF usage is intentionally not detected here — `CREATE FUNCTION` in the
+ * UDF usage is intentionally not detected here -- `CREATE FUNCTION` in the
  * schema is the source of truth, surfaced by parse_cassandra_schema_compatibility.
  *
  * Accepts either:
@@ -393,7 +393,7 @@ export const parse_prepared_statements = (content: string): QueryPatternsInfo =>
       result.lwt_in_unlogged_batch.push(issueRef);
     }
 
-    // 2. Aggregations — look in SELECT projection. Simplest: any occurrence
+    // 2. Aggregations -- look in SELECT projection. Simplest: any occurrence
     //    of a supported aggregate name followed by '(' inside a SELECT query.
     //    Guarded with a \b boundary + whitespace-tolerant '(' to avoid
     //    matching column names that happen to contain these words.
@@ -512,7 +512,7 @@ export const isTcoFile = (content: string): boolean => {
   }
 };
 
-// NDJSON (or cqlsh SELECT JSON) output of system.prepared_statements — any
+// NDJSON (or cqlsh SELECT JSON) output of system.prepared_statements -- any
 // line containing a JSON object with both `prepared_id` and `query_string`
 // keys counts as a match.
 export const isPreparedStatementsFile = (content: string): boolean => {
@@ -540,7 +540,7 @@ export const detectFileType = (content: string): CassandraFileType => {
   return 'unknown';
 };
 
-// Classify a set of files (filename → content) into their respective roles.
+// Classify a set of files (filename -> content) into their respective roles.
 export const scanCassandraFiles = (files: Record<string, string>): CassandraFileScan => {
   const result: CassandraFileScan = {
     tablestats: [],

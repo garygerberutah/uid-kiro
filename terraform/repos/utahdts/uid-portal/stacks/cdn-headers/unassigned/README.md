@@ -8,10 +8,10 @@ generated at build time from the same environment variables it uses
 (`ui/src/csp.js`). That one applies today. This module exists for the parts a
 meta tag cannot carry:
 
-- **`frame-ancestors`** — specified to be ignored in a meta CSP. Clickjacking
+- **`frame-ancestors`** -- specified to be ignored in a meta CSP. Clickjacking
   protection has to arrive as a header. This is the one that matters.
 - **Strict-Transport-Security**, **X-Content-Type-Options**, **Referrer-Policy**
-  — not CSP at all.
+  -- not CSP at all.
 
 ## The distributions
 

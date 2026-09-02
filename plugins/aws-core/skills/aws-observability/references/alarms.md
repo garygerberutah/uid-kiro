@@ -30,7 +30,7 @@ Combines states of other alarms with Boolean logic.
 
 - **Rule operators**: `AND`, `OR`, `NOT`, `AT_LEAST(M, STATE, (alarms...))`
 - `AT_LEAST` supports percentages: `AT_LEAST(50%, ALARM, (a1, a2, a3))`
-- **Actions**: SNS, Lambda, SSM — **cannot** perform EC2 or Auto Scaling actions
+- **Actions**: SNS, Lambda, SSM -- **cannot** perform EC2 or Auto Scaling actions
 - **Limits**: max 100 underlying alarms per composite, 150 composites per underlying, 500 rule elements
 - Composite and all underlying alarms must be in the **same account and Region**
 - **Action suppression**: `ActionsSuppressor` alarm can suppress composite alarm actions during known events (deployments, maintenance)
@@ -42,11 +42,11 @@ Monitors OTel metrics using PromQL instant queries with duration-based pending/r
 
 ## Missing data treatment
 
-Four options — the most misunderstood CloudWatch feature.
+Four options -- the most misunderstood CloudWatch feature.
 
 | Value | Behavior | Use when |
 |-------|----------|----------|
-| `missing` (DEFAULT) | All missing → INSUFFICIENT_DATA | EC2 stop/terminate/reboot actions |
+| `missing` (DEFAULT) | All missing -> INSUFFICIENT_DATA | EC2 stop/terminate/reboot actions |
 | `notBreaching` | Missing = within threshold | Error-count metrics (absence = no errors) |
 | `breaching` | Missing = violating threshold | Heartbeat/health-check metrics |
 | `ignore` | Maintain current state | DynamoDB metrics (service overrides default to `ignore`) |
@@ -57,7 +57,7 @@ Four options — the most misunderstood CloudWatch feature.
 
 With `treatMissingData=missing`, the pattern M, M, B, M, M can trigger ALARM even with only 1 breaching datapoint. CloudWatch goes to ALARM when the oldest available breaching datapoint is at least as old as `datapointsToAlarm` and all more recent points are breaching or missing.
 
-**Fix**: For non-sparse metrics, explicitly set `notBreaching` or `breaching` — don't rely on the default.
+**Fix**: For non-sparse metrics, explicitly set `notBreaching` or `breaching` -- don't rely on the default.
 
 ---
 
@@ -65,19 +65,19 @@ With `treatMissingData=missing`, the pattern M, M, B, M, M can trigger ALARM eve
 
 ### Three core settings
 
-1. **Period** — seconds per data point aggregation (valid: 10, 20, 30, or any multiple of 60)
-2. **Evaluation Periods** (N) — number of most recent periods to evaluate
-3. **Datapoints to Alarm** (M) — how many of N must breach
+1. **Period** -- seconds per data point aggregation (valid: 10, 20, 30, or any multiple of 60)
+2. **Evaluation Periods** (N) -- number of most recent periods to evaluate
+3. **Datapoints to Alarm** (M) -- how many of N must breach
 
 ### Evaluation frequency
 
-- Period ≥ 1 min → evaluated **every minute**
-- Period = 10s/20s/30s → evaluated **every 10 seconds**
-- If `EvaluationPeriods × Period > 1 day` → evaluated **once per hour**
+- Period >= 1 min -> evaluated **every minute**
+- Period = 10s/20s/30s -> evaluated **every 10 seconds**
+- If `EvaluationPeriods x Period > 1 day` -> evaluated **once per hour**
 
 ### Evaluation Range
 
-CloudWatch fetches more data points than the configured Evaluation Periods — the actual lookback window is wider than expected.
+CloudWatch fetches more data points than the configured Evaluation Periods -- the actual lookback window is wider than expected.
 
 **Example**: Alarm with 1-day period, 1 evaluation period, `treatMissingData=breaching`:
 
@@ -87,8 +87,8 @@ CloudWatch fetches more data points than the configured Evaluation Periods — t
 
 ### Evaluation period quotas
 
-- Period ≥ 1 hour → max evaluation window: **7 days**
-- Period < 1 hour → max evaluation window: **1 day**
+- Period >= 1 hour -> max evaluation window: **7 days**
+- Period < 1 hour -> max evaluation window: **1 day**
 
 ---
 
@@ -124,7 +124,7 @@ AT_LEAST(50%, ALARM, (a1, a2, a3, a4))
 - Uses `ANOMALY_DETECTION_BAND` function as threshold
 - Band width = anomaly detection threshold value (configurable; higher value = thicker band of expected values)
 - Trains on up to 2 weeks of metric data (works with less, accuracy improves over time)
-- **Cost**: Higher than a regular alarm — see [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) for current anomaly detection alarm rates
+- **Cost**: Higher than a regular alarm -- see [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) for current anomaly detection alarm rates
 - Rate limit: 1,000 ANOMALY_DETECTION_BAND usages in GetMetricData per second
 - Use when: baselines are unknown, workloads are seasonal/variable
 
@@ -134,34 +134,34 @@ AT_LEAST(50%, ALARM, (a1, a2, a3, a4))
 
 | Parameter | Common mistake | Recommendation |
 |-----------|---------------|----------------|
-| `evaluationPeriods` | 1 | **3–5** |
-| `datapointsToAlarm` | 1 | **2–3** (M-of-N) |
+| `evaluationPeriods` | 1 | **3-5** |
+| `datapointsToAlarm` | 1 | **2-3** (M-of-N) |
 | `treatMissingData` | `missing` | **Explicitly choose** based on metric type |
 | `period` | 300s (5 min) | **60s** (1 min) for faster detection |
 | Error rate threshold | 1% | **5%** (then tune down with data) |
-| Latency threshold | 1s | **P99 of baseline + 2×** (data-driven) |
+| Latency threshold | 1s | **P99 of baseline + 2x** (data-driven) |
 
-**WARNING**: Never use `Average` for duration/latency alarms. Average hides tail latency — use `p99` or `p90`. A function averaging 100ms but with p99 at 5s has a serious problem that Average won't catch.
+**WARNING**: Never use `Average` for duration/latency alarms. Average hides tail latency -- use `p99` or `p90`. A function averaging 100ms but with p99 at 5s has a serious problem that Average won't catch.
 
 ---
 
 ## Common mistakes
 
-1. **M=N=1 with 1-minute periods** — Too sensitive. The most recent datapoint may not have full information. Use "1 out of 2" or "1 out of 3" minimum.
+1. **M=N=1 with 1-minute periods** -- Too sensitive. The most recent datapoint may not have full information. Use "1 out of 2" or "1 out of 3" minimum.
 
-2. **Relying on default `missing` treatment** — Explicitly configure for your metric type. Error metrics should use `notBreaching`. Health checks should use `breaching`.
+2. **Relying on default `missing` treatment** -- Explicitly configure for your metric type. Error metrics should use `notBreaching`. Health checks should use `breaching`.
 
-3. **Not understanding Evaluation Range** — Alarms look back further than configured. Dead man switches with multi-day periods are evaluated once per hour, causing significant delay.
+3. **Not understanding Evaluation Range** -- Alarms look back further than configured. Dead man switches with multi-day periods are evaluated once per hour, causing significant delay.
 
-4. **Metric math alarms for EC2 actions** — Alarms based on metric math expressions **cannot** perform EC2 actions (stop, terminate, reboot, recover). Use a simple metric alarm instead.
+4. **Metric math alarms for EC2 actions** -- Alarms based on metric math expressions **cannot** perform EC2 actions (stop, terminate, reboot, recover). Use a simple metric alarm instead.
 
-5. **High-resolution alarms without need** — 10-second evaluation costs more. Each metric in a math expression is billed separately.
+5. **High-resolution alarms without need** -- 10-second evaluation costs more. Each metric in a math expression is billed separately.
 
-6. **Using Average statistic for duration/latency alarms** — Average hides tail latency. A function averaging 100ms with p99 at 5s has a serious problem Average won't catch. Always use `p99` or `p90` via `--extended-statistic p99`.
+6. **Using Average statistic for duration/latency alarms** -- Average hides tail latency. A function averaging 100ms with p99 at 5s has a serious problem Average won't catch. Always use `p99` or `p90` via `--extended-statistic p99`.
 
-7. **Ignoring DynamoDB's default override** — DynamoDB alarms default to `ignore` for missing data, not the global `missing`.
+7. **Ignoring DynamoDB's default override** -- DynamoDB alarms default to `ignore` for missing data, not the global `missing`.
 
-8. **Alarms on INSUFFICIENT_DATA state** — Alarms invoke actions only on state **changes**, except Auto Scaling actions which continue invoking while in the new state.
+8. **Alarms on INSUFFICIENT_DATA state** -- Alarms invoke actions only on state **changes**, except Auto Scaling actions which continue invoking while in the new state.
 
 ---
 

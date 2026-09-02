@@ -10,18 +10,18 @@ Your response MUST follow the template exactly.
 
 Use whichever of these the customer's input supports; they combine.
 
-1. **IaC analysis** — Read infrastructure files and extract cluster metadata.
-2. **Kafka CLI commands** — Display standard Kafka CLI commands for the customer to
+1. **IaC analysis** -- Read infrastructure files and extract cluster metadata.
+2. **Kafka CLI commands** -- Display standard Kafka CLI commands for the customer to
    run on their cluster (`kafka-topics.sh`, `kafka-configs.sh`,
    `kafka-broker-api-versions.sh`). Do NOT generate or offer Python scripts.
-3. **Runtime metrics intake** — Ingest metrics provided by the customer.
-4. **Manual conversation** — Ask the customer for cluster details.
-5. **Target inputs** — Ask the customer whether consumers will use rack-aware
+3. **Runtime metrics intake** -- Ingest metrics provided by the customer.
+4. **Manual conversation** -- Ask the customer for cluster details.
+5. **Target inputs** -- Ask the customer whether consumers will use rack-aware
    (local-AZ) fetching on the target and whether they have a PPA or enterprise
    discount to apply. Record both in the `target` block; record `null` for
    "unknown". Never guess a discount percentage.
 
-FORBIDDEN content — do NOT include any of the following:
+FORBIDDEN content -- do NOT include any of the following:
 
 - Compatibility observations ("not supported by MSK", "should migrate smoothly")
 - Blockers, warnings, or recommendations
@@ -33,7 +33,7 @@ FORBIDDEN content — do NOT include any of the following:
 ## Response Template
 
 ```
-## Discovery Complete — <cluster_name>
+## Discovery Complete -- <cluster_name>
 
 ### Kafka
 - **Version:** <version>
@@ -88,11 +88,11 @@ The following require runtime data that isn't available in IaC:
 These two are choices about the target cluster, not properties of your source, and
 they drive the cost estimate:
 
-1. **Consumer rack affinity** — will your consumers fetch from local-AZ replicas
+1. **Consumer rack affinity** -- will your consumers fetch from local-AZ replicas
    (rack-aware fetching, with `client.rack` set on each consumer and
    `replica.selector.class=RackAwareReplicaSelector` on the cluster), or will they
    fetch from partition leaders in any AZ?
-2. **Negotiated pricing** — does your organization have a Private Pricing Agreement
+2. **Negotiated pricing** -- does your organization have a Private Pricing Agreement
    (PPA), Enterprise Discount Program (EDP), or other negotiated AWS pricing? If so,
    what discount percentage should I apply? Without one I will use public on-demand
    pricing.
@@ -112,7 +112,7 @@ Would you like to proceed to assessment, or provide additional information first
   "straightforward migration", etc.). Only state facts.
 - Do NOT mention Express, MSK, compatibility, blockers, or migration steps. The two
   Target Inputs questions are the sole exception: they may refer to the target
-  cluster, since they are decisions about it. Ask them as written — no compatibility
+  cluster, since they are decisions about it. Ask them as written -- no compatibility
   commentary, no cost figures, no recommendation about which option to pick.
 - ALWAYS ask the two Target Inputs questions unless the user already supplied both
   answers. Record what they said in the `target` block; record `null` for anything
@@ -143,16 +143,16 @@ value cannot be determined, use `null` for strings/numbers, `false` for booleans
 `[]` for arrays, and `{}` for objects.
 
 The output file contains sensitive data (broker addresses, authentication details).
-Treat it accordingly — do not commit to version control or share in public channels.
+Treat it accordingly -- do not commit to version control or share in public channels.
 Do NOT store passwords, private keys, or secret values in this file. For
-`auth_identity`, record only the username or a Secrets Manager ARN reference —
+`auth_identity`, record only the username or a Secrets Manager ARN reference --
 never the password or key material.
 
 Note: `broker_configs` and `topics[].configs` carry the **full** Kafka config
 dump (every config the source exposed), not just non-default values.
 `compatibility.py` filters against per-Kafka-version Apache defaults internally,
 so values matching the default for the source's `kafka.version` produce no
-evidence — only divergences from default are evaluated against Express's
+evidence -- only divergences from default are evaluated against Express's
 constraints.
 
 ### `security` enum values
@@ -160,25 +160,25 @@ constraints.
 `encryption_in_transit` is a closed enum describing how client-broker traffic
 is encrypted on the source:
 
-- `TLS` — clients connect on a TLS-only listener (port 9094 or 9096 typically).
-- `PLAINTEXT` — clients connect on a plaintext listener (port 9092 typically).
-- `TLS_PLAINTEXT` — the cluster exposes both; some clients use TLS, others plaintext.
-- `UNKNOWN` — use when the listener configuration cannot be determined from available IaC or CLI output.
+- `TLS` -- clients connect on a TLS-only listener (port 9094 or 9096 typically).
+- `PLAINTEXT` -- clients connect on a plaintext listener (port 9092 typically).
+- `TLS_PLAINTEXT` -- the cluster exposes both; some clients use TLS, others plaintext.
+- `UNKNOWN` -- use when the listener configuration cannot be determined from available IaC or CLI output.
 
 To determine the value: check the broker's `listeners` / `advertised.listeners`
-config, or look at the `security.protocol` clients use (`SSL` / `SASL_SSL` →
-TLS; `PLAINTEXT` / `SASL_PLAINTEXT` → PLAINTEXT; mix → TLS_PLAINTEXT).
+config, or look at the `security.protocol` clients use (`SSL` / `SASL_SSL` ->
+TLS; `PLAINTEXT` / `SASL_PLAINTEXT` -> PLAINTEXT; mix -> TLS_PLAINTEXT).
 
 `authentication` is a closed enum covering the mechanism the source cluster
 expects from Kafka clients:
 
-- `UNAUTHENTICATED` — no `sasl.mechanism` or `ssl.keystore` configured on clients; the broker allows anonymous connections.
-- `TLS` — clients present X.509 certificates (`ssl.keystore.location` configured); broker has `ssl.client.auth=required`.
-- `SASL_SCRAM` — `sasl.mechanism=SCRAM-SHA-256` or `SCRAM-SHA-512` in client config.
-- `SASL_IAM` — `sasl.mechanism=AWS_MSK_IAM`, or clients use the AWS MSK IAM signer with `sasl.mechanism=OAUTHBEARER` on an existing MSK cluster.
-- `SASL_OAUTHBEARER` — `sasl.mechanism=OAUTHBEARER` with a **non-AWS** token provider (e.g. Keycloak, Okta, custom OAuth server).
-- `OTHER` — any mechanism not covered above (e.g. `GSSAPI`/Kerberos, `PLAIN`, custom callback handlers).
-- `UNKNOWN` — use when the mechanism cannot be determined from available IaC or CLI output.
+- `UNAUTHENTICATED` -- no `sasl.mechanism` or `ssl.keystore` configured on clients; the broker allows anonymous connections.
+- `TLS` -- clients present X.509 certificates (`ssl.keystore.location` configured); broker has `ssl.client.auth=required`.
+- `SASL_SCRAM` -- `sasl.mechanism=SCRAM-SHA-256` or `SCRAM-SHA-512` in client config.
+- `SASL_IAM` -- `sasl.mechanism=AWS_MSK_IAM`, or clients use the AWS MSK IAM signer with `sasl.mechanism=OAUTHBEARER` on an existing MSK cluster.
+- `SASL_OAUTHBEARER` -- `sasl.mechanism=OAUTHBEARER` with a **non-AWS** token provider (e.g. Keycloak, Okta, custom OAuth server).
+- `OTHER` -- any mechanism not covered above (e.g. `GSSAPI`/Kerberos, `PLAIN`, custom callback handlers).
+- `UNKNOWN` -- use when the mechanism cannot be determined from available IaC or CLI output.
 
 To determine the value: check the client's `sasl.mechanism` property, or the
 broker's `sasl.enabled.mechanisms` / `listener.security.protocol.map` config.
@@ -186,7 +186,7 @@ If both `OAUTHBEARER` and the AWS signer library are present, use `SASL_IAM`
 (it's the AWS IAM path). Use `SASL_OAUTHBEARER` only for custom providers.
 
 For how each value is evaluated against MSK Express, see
-[assessment-compatibility.md](./assessment-compatibility.md) (Pillar 4 — Auth).
+[assessment-compatibility.md](./assessment-compatibility.md) (Pillar 4 -- Auth).
 
 Discovery MUST emit one of these exact strings. `compatibility.py`'s
 `validate_input` rejects unrecognized values.
@@ -199,17 +199,17 @@ sizing script.
 
 `rack_affined_consumers`:
 
-- `true` — consumers will fetch from local-AZ replicas (`client.rack` on each
+- `true` -- consumers will fetch from local-AZ replicas (`client.rack` on each
   consumer, `replica.selector.class=RackAwareReplicaSelector` on the cluster).
-- `false` — consumers will fetch from partition leaders in any AZ, or no rack
+- `false` -- consumers will fetch from partition leaders in any AZ, or no rack
   configuration is planned.
-- `null` — the user answered "unknown" or was not asked.
+- `null` -- the user answered "unknown" or was not asked.
 
 `pricing_discount_pct`:
 
-- A number in `[0, 100)` — the discount percentage the user stated (`0` means they
+- A number in `[0, 100)` -- the discount percentage the user stated (`0` means they
   confirmed no negotiated discount).
-- `null` — the user answered "unknown" or was not asked.
+- `null` -- the user answered "unknown" or was not asked.
 
 Record only what the user stated. Do not derive `rack_affined_consumers` from
 `topology.num_azs` or the source's rack configuration, and do not supply a discount
@@ -220,28 +220,28 @@ percentage the user did not give.
 Two different partition numbers come up, and they are not interchangeable. Be
 explicit about which one you are recording.
 
-- **Configured (leader) partitions** — the partition count set on a topic, one
+- **Configured (leader) partitions** -- the partition count set on a topic, one
   leader per partition. This is the `PartitionCount` shown by
   `kafka-topics.sh --describe`, and the number set with `--partitions`. It does
   **not** include replicas.
-- **Total partition replicas** — configured partitions multiplied by the
+- **Total partition replicas** -- configured partitions multiplied by the
   replication factor (leaders + followers). This is the basis AWS uses for
   per-broker partition limits (see `peak_partitions_per_broker` below and the
   MSK Express broker partition quota).
 
 How each contract field is counted:
 
-- `topics[].num_partitions` — the **configured (leader)** count for that topic.
+- `topics[].num_partitions` -- the **configured (leader)** count for that topic.
   Record the per-topic partition count, never a pre-multiplied total.
-- `topics[].replication_factor` — the source topic's replication factor.
-- `metrics.peak_partitions_per_broker` — **total replicas** (leaders +
+- `topics[].replication_factor` -- the source topic's replication factor.
+- `metrics.peak_partitions_per_broker` -- **total replicas** (leaders +
   followers) hosted on the busiest broker, matching the AWS quota basis.
 
 Assessment converts when it needs the total: it multiplies the summed leader count
 by the Express target replication factor (always 3) before passing
 `--num-partitions` to the sizing script (see "Deriving the sizing inputs" in
 [assessment-sizing.md](./assessment-sizing.md)). So you only ever enter leader
-counts in `num_partitions` — do not pre-multiply by RF.
+counts in `num_partitions` -- do not pre-multiply by RF.
 
 **If a user reports a partition number conversationally and it is ambiguous
 which count they mean, ask before recording it:** "Is that the configured

@@ -18,11 +18,11 @@ Provides conversation state persistence for agents deployed on AgentCore Runtime
 
 ### Runtime Integration
 
-The key non-obvious behavior: Runtime passes session IDs to the Memory service automatically when configured. You don't call Memory directly from your agent code — Runtime handles the plumbing.
+The key non-obvious behavior: Runtime passes session IDs to the Memory service automatically when configured. You don't call Memory directly from your agent code -- Runtime handles the plumbing.
 
 **Configuration:**
 
-- Session TTL: how long sessions persist after last activity (default varies). Set to the minimum required for your use case — longer TTLs increase the window of exposure for sensitive conversation data
+- Session TTL: how long sessions persist after last activity (default varies). Set to the minimum required for your use case -- longer TTLs increase the window of exposure for sensitive conversation data
 - Memory types: session memory (conversation history), semantic memory (long-term knowledge)
 - Refer to the latest AWS documentation on AgentCore Memory service configuration for current options
 
@@ -39,7 +39,7 @@ Session has too much accumulated context. Configure memory capacity limits or im
 
 ## Observability (AgentCore-Specific)
 
-Only the AgentCore-specific parts — agents already know generic OTEL/CloudWatch patterns.
+Only the AgentCore-specific parts -- agents already know generic OTEL/CloudWatch patterns.
 
 ### Required Trace Attributes for Evaluations
 
@@ -55,7 +55,7 @@ This is the key non-obvious requirement. AgentCore Evaluations service reads spe
 **Instrumentation:**
 
 - Use AWS Distro for OpenTelemetry (ADOT) collector
-- You MUST use an IAM role (not access keys) for ADOT collector authentication — attach to the ECS task, EC2 instance profile, or pod service account
+- You MUST use an IAM role (not access keys) for ADOT collector authentication -- attach to the ECS task, EC2 instance profile, or pod service account
 - You MUST NOT hardcode AWS credentials in ADOT collector configuration files
 - Configure sampling rate for evaluation (not every invocation needs evaluation)
 - Refer to the latest AWS documentation on AgentCore observability OTEL instrumentation for current attribute names and collector configuration
@@ -77,9 +77,9 @@ AgentCore publishes these metrics automatically (you don't need to instrument):
 - p99 latency > SLA threshold
 - Token usage approaching quota (80%)
 
-Create alarms — first discover the exact namespace (CloudWatch namespaces are case-sensitive):
+Create alarms -- first discover the exact namespace (CloudWatch namespaces are case-sensitive):
 
-1. `aws cloudwatch list-metrics --namespace "Bedrock-AgentCore"` — if no results, try `--namespace "Bedrock-Agentcore"`
+1. `aws cloudwatch list-metrics --namespace "Bedrock-AgentCore"` -- if no results, try `--namespace "Bedrock-Agentcore"`
 2. Use the namespace that returns metrics in subsequent commands:
 
 `aws cloudwatch put-metric-alarm --alarm-name <name> --metric-name <metric> --namespace "<discovered-namespace>" --statistic Average --period 300 --threshold <value> --comparison-operator GreaterThanThreshold --evaluation-periods 3 --dimensions "Name=Resource,Value=<resource-arn>" --alarm-actions "<sns-topic-arn>"`
@@ -96,21 +96,21 @@ Missing required trace attributes. Verify instrumentation includes input, output
 
 **Encryption:**
 
-- Enable KMS encryption at rest for Memory resources — customer-managed keys preferred for compliance workloads (HIPAA, GDPR)
-- Memory data is encrypted in transit via TLS by default — do not disable TLS
+- Enable KMS encryption at rest for Memory resources -- customer-managed keys preferred for compliance workloads (HIPAA, GDPR)
+- Memory data is encrypted in transit via TLS by default -- do not disable TLS
 - Encrypt CloudWatch Logs log groups receiving trace data with a KMS key
 
 **Sensitive data:**
 
 - Session memory stores conversation history which may contain PII, credentials, or business-sensitive data
-- Trace attributes capture user queries and agent responses — treat as sensitive
-- You MUST NOT log raw API keys, secrets, or credentials in trace attributes — sanitize tool call inputs before instrumentation
-- Configure CloudWatch Logs retention limits — do not retain trace data indefinitely
+- Trace attributes capture user queries and agent responses -- treat as sensitive
+- You MUST NOT log raw API keys, secrets, or credentials in trace attributes -- sanitize tool call inputs before instrumentation
+- Configure CloudWatch Logs retention limits -- do not retain trace data indefinitely
 
-**IAM — least privilege:**
+**IAM -- least privilege:**
 
-- Scope Memory permissions to specific actions (`bedrock-agentcore:CreateMemory`, `bedrock-agentcore:GetMemory`) — avoid `bedrock-agentcore:*`
-- Scope CloudWatch permissions to specific alarm and log group ARNs — avoid `cloudwatch:*` or `logs:*`
+- Scope Memory permissions to specific actions (`bedrock-agentcore:CreateMemory`, `bedrock-agentcore:GetMemory`) -- avoid `bedrock-agentcore:*`
+- Scope CloudWatch permissions to specific alarm and log group ARNs -- avoid `cloudwatch:*` or `logs:*`
 - Use IAM roles (not IAM users) for all service access
 
 **Alarm notifications:**

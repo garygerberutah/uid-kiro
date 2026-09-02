@@ -8,7 +8,7 @@ authoritative table shows it in that form.
 
 ---
 
-## PART 1 — UNDERSTAND THE COVERAGE GAP FIRST
+## PART 1 -- UNDERSTAND THE COVERAGE GAP FIRST
 
 Before recommending any metric, determine:
 
@@ -31,7 +31,7 @@ this deployment type. Use the Prometheus /metrics endpoint instead."
 
 ---
 
-## PART 2A — InfluxDB 2: CloudWatch Metric Names (AUTHORITATIVE)
+## PART 2A -- InfluxDB 2: CloudWatch Metric Names (AUTHORITATIVE)
 
 Use these EXACT names when discussing CloudWatch. Format: CloudWatchName.
 
@@ -40,7 +40,7 @@ Use these EXACT names when discussing CloudWatch. Format: CloudWatchName.
 - CPUUtilization
 - MemoryUtilization
 - DiskUtilization
-- VolumeBytesUsed  ← storage consumed on EBS, NOT InfluxDB data size
+- VolumeBytesUsed  <- storage consumed on EBS, NOT InfluxDB data size
 - ReadIOpsPerSec, WriteIOpsPerSec, TotalIOpsPerSec
 - ReadThroughput, WriteThroughput
 
@@ -60,14 +60,14 @@ Use these EXACT names when discussing CloudWatch. Format: CloudWatchName.
 
 ### Read Replica only
 
-- ReplicaLag  ← only available on Read Replica deployments
+- ReplicaLag  <- only available on Read Replica deployments
 
 WRONG names (do NOT use): WriteRequestsTotal, QueryLatency,
 StorageUtilization, influxdb_write_requests, ReadLatency, WriteLatency.
 
 ---
 
-## PART 2B — InfluxDB 2: Prometheus /metrics Endpoint Names (AUTHORITATIVE)
+## PART 2B -- InfluxDB 2: Prometheus /metrics Endpoint Names (AUTHORITATIVE)
 
 Use these EXACT names when discussing the /metrics scrape endpoint.
 These are Prometheus-format names (snake_case, with_total/_seconds/_bytes suffixes).
@@ -94,7 +94,7 @@ WriteLatency, QueryLatency, StorageUtilization, WriteRequestsTotal.
 
 ---
 
-## PART 3A — InfluxDB 3: CloudWatch Metric Names (AUTHORITATIVE)
+## PART 3A -- InfluxDB 3: CloudWatch Metric Names (AUTHORITATIVE)
 
 CloudWatch coverage for InfluxDB 3 is LIMITED to:
 
@@ -103,13 +103,13 @@ CloudWatch coverage for InfluxDB 3 is LIMITED to:
 
 All other monitoring for InfluxDB 3 must use the /metrics endpoint.
 Do NOT tell a customer to find write throughput, query latency, or
-cardinality in CloudWatch for InfluxDB 3 — those are not there.
+cardinality in CloudWatch for InfluxDB 3 -- those are not there.
 
 ---
 
-## PART 3B — InfluxDB 3: Prometheus /metrics Endpoint Names (AUTHORITATIVE)
+## PART 3B -- InfluxDB 3: Prometheus /metrics Endpoint Names (AUTHORITATIVE)
 
-### Tier 1 — Critical (always check these first)
+### Tier 1 -- Critical (always check these first)
 
 | Concern                    | Metric name                                        |
 |----------------------------|----------------------------------------------------|
@@ -123,7 +123,7 @@ cardinality in CloudWatch for InfluxDB 3 — those are not there.
 | Query execution duration   | influxdb_iox_query_log_execute_duration_seconds    |
 | Query max memory           | influxdb_iox_query_log_max_memory                  |
 
-### Tier 2 — Performance Optimization
+### Tier 2 -- Performance Optimization
 
 | Concern                    | Metric name                                        |
 |----------------------------|----------------------------------------------------|
@@ -133,7 +133,7 @@ cardinality in CloudWatch for InfluxDB 3 — those are not there.
 | Object store bytes         | object_store_transfer_bytes_total                  |
 | Replication lag (MAZ only) | influxdb3_replica_ttbr_duration_seconds            |
 
-### Tier 3 — Stability & Health
+### Tier 3 -- Stability & Health
 
 | Concern                    | Metric name                                        |
 |----------------------------|----------------------------------------------------|
@@ -153,14 +153,14 @@ influxdb3_snapshot_bytes_written_total, influxdb3_snapshot_total
   size on disk
 - object_store_transfer_bytes_total = cumulative object store I/O
   (reads + writes combined), NOT current storage used
-- For ACTUAL storage size: query the system table → SELECT * FROM
+- For ACTUAL storage size: query the system table -> SELECT * FROM
   system.parquet_files
 
 ---
 
-## PART 4 — HOW TO GUIDE A CUSTOMER: DECISION TREE
+## PART 4 -- HOW TO GUIDE A CUSTOMER: DECISION TREE
 
-### Path A — Customer wants CloudWatch monitoring (no scraping)
+### Path A -- Customer wants CloudWatch monitoring (no scraping)
 
 Step 1: Confirm engine and deployment type (v2 SAZ/MAZ, v2 Read Replica,
         v3).
@@ -171,13 +171,13 @@ Step 3: For metrics NOT in CloudWatch, tell them explicitly: "This metric
         need to scrape the /metrics endpoint to get it."
 Step 4: For CloudWatch alerting/scaling, direct them to:
         https://docs.aws.amazon.com/timestream/latest/developerguide/timestream-influxdb-cloudwatch.html
-Step 5: ⚠️ WARN about CloudWatch custom metric cost. A misconfigured
+Step 5: [WARNING] WARN about CloudWatch custom metric cost. A misconfigured
         Telegraf sending raw data (not just /metrics) as CloudWatch
         custom metrics can cause unexpectedly high bills.
         Always verify Telegraf is scraping only the /metrics endpoint,
         not forwarding raw write traffic.
 
-### Path B — Customer wants to scrape the /metrics endpoint
+### Path B -- Customer wants to scrape the /metrics endpoint
 
 Step 1: The endpoint is available at: http://`<instance-endpoint>`:8086/metrics
         (InfluxDB 2) or the configured HTTP port (InfluxDB 3).
@@ -188,7 +188,7 @@ Step 3: Use a Prometheus scraper or Telegraf with inputs.prometheus
 Step 4: Use ONLY the metric names from Part 2B (v2) or Part 3B (v3).
 Step 5: To store scraped metrics back into InfluxDB or forward to
         CloudWatch, use outputs.influxdb_v2 or outputs.cloudwatch in
-        Telegraf — but verify output configuration carefully (see Step 5
+        Telegraf -- but verify output configuration carefully (see Step 5
         in Path A warning above).
 Step 6: For InfluxDB 3 storage size specifically, use the SQL system
         table query instead of a /metrics metric:

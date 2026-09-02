@@ -58,7 +58,7 @@ def create_instrumentation(
     Args:
         instrumentation_type: BREAKPOINT or PROBE. PROBE is method/function-level only
             (no line_number) and is not supported for JavaScript. Unlike BREAKPOINT,
-            PROBE has no max_hits cap — it fires on every hit, which makes it suited to
+            PROBE has no max_hits cap -- it fires on every hit, which makes it suited to
             long-running observation/monitoring without worrying about hitting a limit.
             The trade-off: a PROBE never expires on its own, so you must delete it
             explicitly when done.
@@ -103,7 +103,7 @@ def create_instrumentation(
         description: Free-form description stored with the instrumentation. Must be 50 characters or fewer.
         ttl_hours: Optional expiration duration in hours. Converted to an absolute UTC
             timestamp. If omitted, the Application Signals service applies its own default
-            expiration (~24h). Ignored for PROBE — a PROBE does not expire on its own and must be
+            expiration (~24h). Ignored for PROBE -- a PROBE does not expire on its own and must be
             deleted explicitly, so set up cleanup accordingly.
 
     Notes:
@@ -124,12 +124,12 @@ def create_instrumentation(
           `line_number` must be omitted (create rejects a PROBE that sets it).
         - PROBE has no `max_hits` and fires on every hit (unlike BREAKPOINT). This makes
           it suited to long-running observation/monitoring without worrying about a hit
-          limit — but a PROBE does not expire on its own (`ttl_hours` is ignored), so you
+          limit -- but a PROBE does not expire on its own (`ttl_hours` is ignored), so you
           must delete it explicitly when you are done.
         - `capture_arguments` and `capture_locals` reject `["*"]` and empty lists; omit to capture none.
         - `SignalType` is always SNAPSHOT.
         - `description` must be 50 characters or fewer.
-        - Inspect the source file directly before calling this tool — choose `code_unit`,
+        - Inspect the source file directly before calling this tool -- choose `code_unit`,
           `capture_arguments`, and method/class names explicitly.
 
     Returns:
@@ -181,7 +181,7 @@ def create_instrumentation(
         return OpResult(False, capture_locals_error)
 
     # Line-level instrumentation (line_number set) fires mid-function, where only
-    # locals carry data — arguments/return values are call-boundary concepts that
+    # locals carry data -- arguments/return values are call-boundary concepts that
     # do not apply. A line-level config without capture_locals would capture
     # nothing useful, so require it. (JavaScript is always line-level per its
     # location rules, so this requirement always applies to JavaScript.)
@@ -190,7 +190,7 @@ def create_instrumentation(
         return OpResult(
             False,
             "ERROR: line-level instrumentation (line_number set) requires capture_locals.\n"
-            "At a specific line, only local variables carry data — arguments and return "
+            "At a specific line, only local variables carry data -- arguments and return "
             "values apply to method/function-level targets (no line_number).\n"
             "Provide capture_locals=[...] with the local variable names to capture.",
         )

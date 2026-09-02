@@ -40,20 +40,20 @@ The following are supported by SageMaker and AWS but do not have a validated wor
 
 ### Code Generation Rules
 
-- ✅ Use EXACTLY the imports shown in each code template
-- ❌ Do NOT add additional imports even if they seem helpful
-- ❌ Do NOT create variables before they're needed in that section
-- 📋 Copy the code structure precisely - no improvisation
-- 🎯 Follow the minimal code principle strictly
-- ✅ When writing code, make sure the indentation and f strings are correct
+- [YES] Use EXACTLY the imports shown in each code template
+- [NO] Do NOT add additional imports even if they seem helpful
+- [NO] Do NOT create variables before they're needed in that section
+- [PLAN] Copy the code structure precisely - no improvisation
+- [FINDING] Follow the minimal code principle strictly
+- [YES] When writing code, make sure the indentation and f strings are correct
 
 ### User Communication Rules
 
-- ❌ NEVER offer to move on to a downstream reference while training is in progress (logically impossible)
-- ❌ NEVER set ACCEPT_EULA to True without explicit user confirmation in the conversation
-- ✅ Always mention both the number AND title of sections you reference
-- ✅ If user asks how to run (notebook): If `run_cell` is available, offer to run it. Otherwise, tell them to run cells one by one (mention ipykernel requirement).
-- ✅ If user asks how to run (script): Tell them to run with `python3 <script>.py`
+- [NO] NEVER offer to move on to a downstream reference while training is in progress (logically impossible)
+- [NO] NEVER set ACCEPT_EULA to True without explicit user confirmation in the conversation
+- [YES] Always mention both the number AND title of sections you reference
+- [YES] If user asks how to run (notebook): If `run_cell` is available, offer to run it. Otherwise, tell them to run cells one by one (mention ipykernel requirement).
+- [YES] If user asks how to run (script): Tell them to run with `python3 <script>.py`
 
 ---
 
@@ -64,22 +64,22 @@ The following are supported by SageMaker and AWS but do not have a validated wor
 #### 1.1 Directory Setup
 
 1. Identify project directory from conversation context
-   - If unclear (multiple relevant directories exist) → Ask user which folder to use
-   - If no project directory exists → load the **directory-management** reference to set one up
+   - If unclear (multiple relevant directories exist) -> Ask user which folder to use
+   - If no project directory exists -> load the **directory-management** reference to set one up
 
-⏸ Wait for user.
+[PAUSE] Wait for user.
 
 #### 1.2 Select Code Template
 
 Read `references/code_output_guide.md` for output format rules, then read the code template matching the finetuning strategy:
 
-- SFT → `code_templates/sft.py`
-- DPO → `code_templates/dpo.py`
-- RLVR → `code_templates/rlvr.py`
-- RLAIF with built-in rewards → `code_templates/rlaif_builtin.py`
-- RLAIF with custom prompt → `code_templates/rlaif_custom_prompt.py`
+- SFT -> `code_templates/sft.py`
+- DPO -> `code_templates/dpo.py`
+- RLVR -> `code_templates/rlvr.py`
+- RLAIF with built-in rewards -> `code_templates/rlaif_builtin.py`
+- RLAIF with custom prompt -> `code_templates/rlaif_custom_prompt.py`
 
-The template is a Python file where each `# Cell N: Label` comment marks the start of a new section. Split on these markers — everything between one marker and the next becomes one unit of output.
+The template is a Python file where each `# Cell N: Label` comment marks the start of a new section. Split on these markers -- everything between one marker and the next becomes one unit of output.
 
 #### 1.3 Generate Code
 
@@ -104,7 +104,7 @@ The template is a Python file where each `# Cell N: Label` comment marks the sta
      - Lowercase, alphanumeric with hyphens only
      - 1-63 characters
      - Pattern: `[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}`
-     - Example: "Customer Support Chatbot" → `customer-support-chatbot-v1`
+     - Example: "Customer Support Chatbot" -> `customer-support-chatbot-v1`
 
 3. Save notebook
 
@@ -113,8 +113,8 @@ The template is a Python file where each `# Cell N: Label` comment marks the sta
 #### 2.1 Check Reward Function Status
 
 - Ask if user has a reward function already, or would like help creating one.
-  - If user says they have one → Ask for the SageMaker Hub Evaluator ARN. Only proceed to Section 2.3 once the user provides a valid Evaluator ARN. If they don't have it registered as a SageMaker Hub Evaluator, continue to 2.2.
-  - If user says they do not have one → Continue to 2.2
+  - If user says they have one -> Ask for the SageMaker Hub Evaluator ARN. Only proceed to Section 2.3 once the user provides a valid Evaluator ARN. If they don't have it registered as a SageMaker Hub Evaluator, continue to 2.2.
+  - If user says they do not have one -> Continue to 2.2
 
 #### 2.2 Generate Reward Function From Template
 
@@ -134,7 +134,7 @@ Read `references/rlaif_guide.md` and follow its instructions.
 2. Display the license to the user following the phrasing in references/eula_links.md. For OSS models: "This model is licensed under **{License}**. Please review the license terms here: {URL}." For Nova models: "This model is subject to the AWS Service Terms: {URL}."
 3. Check if the selected base model is a Meta/Llama model (model ID starts with `meta-`)
    - **If Meta/Llama**: Tell the user they must read and agree to the EULA before using this model. Ask: "Do you accept the license terms? (yes/no)". If the user confirms, set `ACCEPT_EULA = True` and uncomment `accept_eula=ACCEPT_EULA` in the generated notebook. If the user declines, leave `ACCEPT_EULA = False` and warn that training will fail without acceptance.
-   - **If non-Meta**: Inform the user of the license for their awareness. No code-level action needed — the `ACCEPT_EULA` variable and `accept_eula` parameter should already be omitted from the notebook (see Step 1.3).
+   - **If non-Meta**: Inform the user of the license for their awareness. No code-level action needed -- the `ACCEPT_EULA` variable and `accept_eula` parameter should already be omitted from the notebook (see Step 1.3).
 
 ### 5. Post-Generation
 
@@ -146,9 +146,9 @@ After generating the code, offer to run it. Training can take hours depending on
 
 > "Would you like me to:
 >
-> 1. Leave it to you — run with `python scripts/[script_name]`
+> 1. Leave it to you -- run with `python scripts/[script_name]`
 > 2. Run it and wait until it's done
-> 3. Start it but don't wait — we can check status later"
+> 3. Start it but don't wait -- we can check status later"
 
 - **Option 1:** Done. Wait for user to come back.
 - **Option 2:** Execute the script as-is. `trainer.train(wait=True)` blocks until complete. Report final status.
@@ -156,7 +156,7 @@ After generating the code, offer to run it. Training can take hours depending on
 
 **Checking status:**
 
-- `describe-training-job --training-job-name NAME` → `TrainingJobStatus`, `FailureReason`, `SecondaryStatusTransitions`
+- `describe-training-job --training-job-name NAME` -> `TrainingJobStatus`, `FailureReason`, `SecondaryStatusTransitions`
 - For model package ARN after completion: `list-model-packages --model-package-group-name GROUP_NAME --sort-by CreationTime --sort-order Descending --max-results 1`
 
 **Showing results after completion:**

@@ -1,11 +1,11 @@
-# RDS Proxy for SQL Server — IAM auth and connection pooling
+# RDS Proxy for SQL Server -- IAM auth and connection pooling
 
 RDS Proxy sits between your apps and RDS SQL Server, providing:
 
 - **Connection pooling** at the proxy layer (reduces connection storms from Lambda/ECS/etc.)
-- **IAM authentication** — generate short-lived tokens instead of using passwords directly
-- **Improved resilience** — retain connections during Multi-AZ failovers (up to 66% faster)
-- **Credentials managed by proxy** — apps don't touch DB passwords
+- **IAM authentication** -- generate short-lived tokens instead of using passwords directly
+- **Improved resilience** -- retain connections during Multi-AZ failovers (up to 66% faster)
+- **Credentials managed by proxy** -- apps don't touch DB passwords
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ aws iam create-role \
     }]
   }'
 
-# Permissions — get secret + decrypt
+# Permissions -- get secret + decrypt
 aws iam put-role-policy \
   --role-name rds-proxy-sqlserver-role \
   --policy-name secret-access \
@@ -75,9 +75,9 @@ aws rds create-db-proxy \
 
 Important:
 
-- `--engine-family SQLSERVER` — must specify
-- `IAMAuth: REQUIRED` — clients must use IAM tokens (vs `DISABLED` for password passthrough)
-- `--require-tls` — enforce TLS to the proxy
+- `--engine-family SQLSERVER` -- must specify
+- `IAMAuth: REQUIRED` -- clients must use IAM tokens (vs `DISABLED` for password passthrough)
+- `--require-tls` -- enforce TLS to the proxy
 
 ### 3. Register the DB instance
 
@@ -97,7 +97,7 @@ aws rds describe-db-proxies --db-proxy-name mydb-proxy \
 ### 4. Security groups
 
 - **Proxy SG** (sg-rds-proxy): inbound 1433 from app SG; outbound 1433 to RDS SG
-- **RDS SG**: inbound 1433 from proxy SG (no longer need direct app → RDS path)
+- **RDS SG**: inbound 1433 from proxy SG (no longer need direct app -> RDS path)
 - **App SG**: outbound 1433 to proxy SG
 
 ## Use IAM auth from apps
@@ -220,7 +220,7 @@ aws rds describe-db-proxies --db-proxy-name mydb-proxy \
 - Already-authenticated connections stay valid until idle timeout
 - For connection pools: regenerate the token on reconnect (wrap `getPool()` around token generation)
 
-## Password passthrough (alternative — no IAM)
+## Password passthrough (alternative -- no IAM)
 
 If you want RDS Proxy's pooling benefits without IAM tokens, set `IAMAuth: DISABLED`:
 
@@ -254,7 +254,7 @@ aws rds modify-db-proxy-target-group \
 
 Percentages are of RDS's configured max connections. With MaxConnectionsPercent=80 and RDS max_connections=32000, proxy uses up to 25,600 connections.
 
-## Session pinning — SQL Server specific
+## Session pinning -- SQL Server specific
 
 When a client uses session-state features, the proxy must **pin** the client to a specific backend connection for correctness. Common SQL Server pinning triggers:
 
@@ -271,7 +271,7 @@ AWS/RDS namespace
 DatabaseConnectionsCurrentlySessionPinned
 ```
 
-If pinning is high, review app code for unnecessary session state. Use `TRUNCATE` + temporary tables → permanent tables where possible.
+If pinning is high, review app code for unnecessary session state. Use `TRUNCATE` + temporary tables -> permanent tables where possible.
 
 ## When NOT to use RDS Proxy
 
@@ -279,7 +279,7 @@ If pinning is high, review app code for unnecessary session state. Use `TRUNCATE
 - Apps that make heavy use of session state (can't benefit from pooling due to pinning)
 - Small instances where proxy cost (per-vCPU hourly) outweighs the benefit
 
-Check the [pricing page](https://aws.amazon.com/rds/proxy/pricing/) — for small apps, RDS Proxy is cost-additive; for Lambda-heavy workloads, it prevents connection storms and is usually net-positive.
+Check the [pricing page](https://aws.amazon.com/rds/proxy/pricing/) -- for small apps, RDS Proxy is cost-additive; for Lambda-heavy workloads, it prevents connection storms and is usually net-positive.
 
 ## Monitor
 

@@ -4,7 +4,7 @@ Reference: [Amazon Bedrock LLM-as-Judge Evaluation](https://docs.aws.amazon.com/
 
 ## Allowed Judge Models
 
-The SageMaker Python SDK is the source of truth for which judge models are allowed: when you submit the evaluation job, the SDK validates the judge model and, if it is not supported, raises an error that lists the currently accepted models (and their allowed regions). The table below is a convenience reference that may lag the SDK — do not treat it as exhaustive; rely on the SDK's submit-time validation to confirm a given model is accepted:
+The SageMaker Python SDK is the source of truth for which judge models are allowed: when you submit the evaluation job, the SDK validates the judge model and, if it is not supported, raises an error that lists the currently accepted models (and their allowed regions). The table below is a convenience reference that may lag the SDK -- do not treat it as exhaustive; rely on the SDK's submit-time validation to confirm a given model is accepted:
 
 | Model                          | Model ID                                    | Regions                                         |
 | ------------------------------ | ------------------------------------------- | ----------------------------------------------- |
@@ -16,9 +16,9 @@ The SageMaker Python SDK is the source of truth for which judge models are allow
 | Meta Llama 3.1 70B Instruct    | `meta.llama3-1-70b-instruct-v1:0`           | us-west-2                                       |
 | Mistral Large                  | `mistral.mistral-large-2402-v1:0`           | us-west-2, us-east-1, eu-west-1                 |
 
-This list applies to both built-in and custom metrics — the SDK does not distinguish between them.
+This list applies to both built-in and custom metrics -- the SDK does not distinguish between them.
 
-Source: derived from the SageMaker SDK's internal evaluator allowlist (sagemaker SDK v3). This is an SDK internal — do not import or reference it in generated code; the SDK enforces the allowlist itself at job-submission time.
+Source: derived from the SageMaker SDK's internal evaluator allowlist (sagemaker SDK v3). This is an SDK internal -- do not import or reference it in generated code; the SDK enforces the allowlist itself at job-submission time.
 
 ## Selection Guidance
 

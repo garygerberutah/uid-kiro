@@ -7,7 +7,7 @@ Read and follow the `analyzing-release-readiness` skill for full execution detai
 
 **IMPORTANT: NEVER use `gh` CLI, `glab` CLI, `curl`, or any external tool to fetch PR/MR details. All required fields (repository, prNumber/mergeRequestIid, hostname) MUST be parsed directly from the URL string. The DevOps Agent fetches the content itself.**
 
-## Step 0 — Choose your execution path (DO THIS FIRST)
+## Step 0 -- Choose your execution path (DO THIS FIRST)
 
 Check your available tools. Do you have ALL of these tools?
 
@@ -16,16 +16,16 @@ Check your available tools. Do you have ALL of these tools?
 - `aws_devops_agent__list_journal_records`
 - `aws_devops_agent__get_release_readiness_report`
 
-These tools are NOT deferred/lazy-loaded — if they do not appear in your tool list, they are unavailable. Do NOT search for them via ToolSearch.
+These tools are NOT deferred/lazy-loaded -- if they do not appear in your tool list, they are unavailable. Do NOT search for them via ToolSearch.
 
-- **YES (all present)** → Use the "Remote Server" path below
-- **NO** → Tell the user: "Remote server not configured." Then prompt the user with instructions from the `setup-devops-agent` skill if they intend to set up the connection. If not, mention that you are "proceeding with the AWS CLI fallback." Then use the Fallback (CLI) path below.
+- **YES (all present)** -> Use the "Remote Server" path below
+- **NO** -> Tell the user: "Remote server not configured." Then prompt the user with instructions from the `setup-devops-agent` skill if they intend to set up the connection. If not, mention that you are "proceeding with the AWS CLI fallback." Then use the Fallback (CLI) path below.
 
 ---
 
 ## Common to both paths (see skill: "Gathering execution parameters")
 
-1. If `$ARGUMENTS` contains a URL (github.com or gitlab.com), parse the PR/MR details directly from the URL string — do NOT fetch or inspect the PR via any tool.
+1. If `$ARGUMENTS` contains a URL (github.com or gitlab.com), parse the PR/MR details directly from the URL string -- do NOT fetch or inspect the PR via any tool.
 2. If `$ARGUMENTS` is a repo name or path, use the "Local GitHub/GitLab repo" flow below.
 3. If `$ARGUMENTS` is empty, check the current git repository and use the local flow.
 4. Build the `content` object following the skill's "Gathering execution parameters" section.
@@ -65,7 +65,7 @@ Use this path when the remote server tools are unavailable.
       --region us-east-1
     ```
 
-5. Stream progress — once `IN_PROGRESS`, poll journal records and present updates to the user:
+5. Stream progress -- once `IN_PROGRESS`, poll journal records and present updates to the user:
 
     ```
     aws devops-agent list-journal-records \
@@ -92,7 +92,7 @@ Use this path when the remote server tools are unavailable.
 
     On `FAILED` or `TIMED_OUT`: present the error and suggest next steps. On `CANCELED`: inform the user no report is available.
 
-7. After analysis completes, clean up the review branch (if local flow was used — see below).
+7. After analysis completes, clean up the review branch (if local flow was used -- see below).
 8. To cancel a running job:
 
     ```
@@ -107,7 +107,7 @@ Use this path when the remote server tools are unavailable.
 
 ## Local GitHub/GitLab repo flow (no PR/MR URL provided)
 
-When `$ARGUMENTS` is a repo name/path or empty (steps 2-3 above), execute this flow to prepare the content object. The review agent needs a pushed branch to read from — do NOT shortcut.
+When `$ARGUMENTS` is a repo name/path or empty (steps 2-3 above), execute this flow to prepare the content object. The review agent needs a pushed branch to read from -- do NOT shortcut.
 
 1. **Navigate to the repository directory**: `cd` to the repo root. Ask the user if needed.
 2. **Determine the base branch**: Use `main` unless the user specifies otherwise. Verify:
@@ -121,7 +121,7 @@ When `$ARGUMENTS` is a repo name/path or empty (steps 2-3 above), execute this f
 
    If fetch fails, ask the user to specify the base branch and stop.
 3. **Check for local changes**: Run `git status --short` and `git rev-list --count origin/$BASE_BRANCH..HEAD`:
-   - **Clean AND not ahead**: Nothing to analyze — stop.
+   - **Clean AND not ahead**: Nothing to analyze -- stop.
    - **Has uncommitted changes**: Tell the user what will be committed and pushed. **Do NOT proceed until the user approves.**
    - **Clean but ahead of remote**: Tell the user commits will be pushed. **Do NOT proceed until the user approves.**
 4. **Stash uncommitted changes** (skip if clean):
@@ -146,7 +146,7 @@ When `$ARGUMENTS` is a repo name/path or empty (steps 2-3 above), execute this f
    git commit -m "chore: snapshot for release readiness review"
    ```
 
-   Check for sensitive files before staging — warn user if found.
+   Check for sensitive files before staging -- warn user if found.
 7. **Push**:
 
    ```bash
@@ -155,7 +155,7 @@ When `$ARGUMENTS` is a repo name/path or empty (steps 2-3 above), execute this f
 
 8. **Build the content**: Extract `owner/repo` and hostname from `git remote get-url origin | sed 's|://[^@]*@|://|'`. MANDATORY: Always use the sed command, we cannot expose PAT tokens in the context window!
 9. Set `headBranch` to `$BRANCH_NAME`. Use `githubPrContent` (GitHub) or `gitlabMrContent` (GitLab) as an array.
-10. **After analysis completes** — clean up:
+10. **After analysis completes** -- clean up:
 
    ```bash
    git checkout $ORIGINAL_BRANCH
@@ -165,7 +165,7 @@ When `$ARGUMENTS` is a repo name/path or empty (steps 2-3 above), execute this f
 
    If stash was used: `git stash pop`.
 
-**Important**: Do NOT create a PR/MR — only push the branch.
+**Important**: Do NOT create a PR/MR -- only push the branch.
 
 ---
 

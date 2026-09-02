@@ -2,7 +2,7 @@
 
 ## Overview
 
-Produces structured summaries of active GuardDuty findings — severity distribution, type breakdown, and affected resources. Does NOT perform triage, investigation, or remediation.
+Produces structured summaries of active GuardDuty findings -- severity distribution, type breakdown, and affected resources. Does NOT perform triage, investigation, or remediation.
 
 Works from both standalone accounts and delegated administrator accounts.
 
@@ -29,7 +29,7 @@ Works from both standalone accounts and delegated administrator accounts.
    aws guardduty get-findings-statistics --detector-id <DETECTOR_ID> --groupBy SEVERITY --finding-criteria '{"Criterion":{"service.archived":{"Eq":["false"]}}}'
    ```
 
-   **Severity mapping:** 9.0+ = Critical, 7.0–8.9 = High, 4.0–6.9 = Medium, 1.0–3.9 = Low
+   **Severity mapping:** 9.0+ = Critical, 7.0-8.9 = High, 4.0-6.9 = Medium, 1.0-3.9 = Low
 
 3. List findings sorted by severity (most severe first):
 
@@ -45,7 +45,7 @@ Works from both standalone accounts and delegated administrator accounts.
 
 5. Group findings by:
 
-   - **Attack Sequences first** — findings with type prefix `AttackSequence:` MUST be surfaced in a separate section at the top. These represent correlated multi-step attacks and are the most actionable findings.
+   - **Attack Sequences first** -- findings with type prefix `AttackSequence:` MUST be surfaced in a separate section at the top. These represent correlated multi-step attacks and are the most actionable findings.
    - Severity (CRITICAL, HIGH, MEDIUM, LOW)
    - Type prefix (e.g., Recon:, UnauthorizedAccess:, CryptoCurrency:)
    - Resource type (Instance, AccessKey, S3Bucket, EKSCluster, Lambda, RDSDBInstance)
@@ -119,9 +119,9 @@ Works from both standalone accounts and delegated administrator accounts.
 
 | Symptom | Resolution |
 |---|---|
-| list-findings returns empty | No active findings or all archived — report zero active findings |
+| list-findings returns empty | No active findings or all archived -- report zero active findings |
 | get-findings-statistics unavailable | Use list-findings and count client-side |
-| Only sees own account findings | Not a delegated admin — note: showing single-account view only |
+| Only sees own account findings | Not a delegated admin -- note: showing single-account view only |
 
 ## Output Sensitivity
 

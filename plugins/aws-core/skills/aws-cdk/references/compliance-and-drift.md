@@ -122,18 +122,18 @@ cdk drift
 When drift is detected, resolve it using one of these approaches (in order of
 preference):
 
-1. **Redeploy** — Run `cdk deploy $STACK_NAME` to overwrite the drifted state
+1. **Redeploy** -- Run `cdk deploy $STACK_NAME` to overwrite the drifted state
    with the CDK-defined state. This is the simplest resolution.
 
-2. **Adopt the change** — If the out-of-band change is desired, update the CDK
+2. **Adopt the change** -- If the out-of-band change is desired, update the CDK
    code to match the live state using `Cfn<Resource>PropsMixin` to adopt the drifted
    property values.
 
-3. **Fallback overrides** — If `Cfn<Resource>PropsMixin` is not available for the
+3. **Fallback overrides** -- If `Cfn<Resource>PropsMixin` is not available for the
    resource type, use `addPropertyOverride` or `node.defaultChild` to set the
    property at the L1 level.
 
-4. **Handle deleted resources** — If a resource was deleted outside CDK,
+4. **Handle deleted resources** -- If a resource was deleted outside CDK,
    remove it from the CDK code or re-import it.
 
 Drift SHOULD be prevented proactively using SCPs (Service Control Policies) that
@@ -188,6 +188,6 @@ This exits with a non-zero code when drift is detected, failing the pipeline.
 To adopt `--strict` incrementally on an existing project:
 
 1. Collect current warnings with `cdk synth`.
-2. Triage each warning — determine if it is a real issue or acceptable.
+2. Triage each warning -- determine if it is a real issue or acceptable.
 3. Fix genuine issues; suppress accepted findings with `NagSuppressions`.
 4. Enable `--strict` in CI once all warnings are resolved or suppressed.

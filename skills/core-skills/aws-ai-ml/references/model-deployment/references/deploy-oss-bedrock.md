@@ -50,7 +50,7 @@ Use the IAM role from the training job (extracted in Step 1 of the main workflow
 
 ### Step 4: Confirm Region
 
-Bedrock CMI is available in: us-east-1, us-east-2, us-west-2, eu-central-1 (this matches the AWS Custom Model Import documentation at the time of writing: https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-import-model.html). There is no public API to query CMI region availability, so this may change over time. Note: attempting CMI in an unsupported region does not return a clean "region not supported" error — it typically fails with an access/authorization-style error — so rely on this list plus the linked docs rather than probing.
+Bedrock CMI is available in: us-east-1, us-east-2, us-west-2, eu-central-1 (this matches the AWS Custom Model Import documentation at the time of writing: https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-import-model.html). There is no public API to query CMI region availability, so this may change over time. Note: attempting CMI in an unsupported region does not return a clean "region not supported" error -- it typically fails with an access/authorization-style error -- so rely on this list plus the linked docs rather than probing.
 
 The region was identified in Step 1. Confirm it's in the supported list. If not, tell the user that Bedrock deployment is not supported for this model in this region.
 
@@ -66,7 +66,7 @@ The region was identified in Step 1. Confirm it's in the supported list. If not,
 >
 > Does this look right?"
 
-⏸ Wait for user approval.
+[PAUSE] Wait for user approval.
 
 ### Step 6: Generate Code
 
@@ -74,7 +74,7 @@ Read `../references/code_output_guide.md` for output format rules.
 
 If a project directory already exists (from earlier in the workflow), use it. Otherwise, load the **directory-management** reference to set one up.
 
-⏸ Wait for user.
+[PAUSE] Wait for user.
 
 ## Code Structure
 
@@ -93,7 +93,7 @@ If a project directory already exists (from earlier in the workflow), use it. Ot
 
 ### Cells
 
-Each cell's content comes from `../code_templates/deploy-oss-bedrock.py`, split on the `# Cell N:` comments. Each marker starts a new notebook cell — everything between one marker and the next becomes that cell's content.
+Each cell's content comes from `../code_templates/deploy-oss-bedrock.py`, split on the `# Cell N:` comments. Each marker starts a new notebook cell -- everything between one marker and the next becomes that cell's content.
 
 - **Cell 1**: Setup (pip install)
 - **Cell 2**: Configuration
@@ -106,10 +106,10 @@ Each cell's content comes from `../code_templates/deploy-oss-bedrock.py`, split 
 
 Cell 2:
 
-- `[REGION]` → AWS region
-- `[TRAINING_JOB_NAME]` → SageMaker training job name
-- `[ROLE_ARN]` → IAM role ARN with Bedrock trust policy and S3 read permissions
-- `[MODEL_NAME]` → Name for the imported model
+- `[REGION]` -> AWS region
+- `[TRAINING_JOB_NAME]` -> SageMaker training job name
+- `[ROLE_ARN]` -> IAM role ARN with Bedrock trust policy and S3 read permissions
+- `[MODEL_NAME]` -> Name for the imported model
 
 All other cells have no placeholders.
 
@@ -117,12 +117,12 @@ All other cells have no placeholders.
 
 ```
 To run:
-1. Cell 1 — install/upgrade SageMaker SDK
-2. Cell 2 — configuration and imports
-3. Cell 3 — flattens S3 structure and starts import job via BedrockModelBuilder
-4. Cell 4 — waits for import to complete (typically a few minutes)
-5. Cell 5 — test inference with a sample prompt
-6. Cell 6 — saves the deployment manifest to `manifests/deploy-<name>.json`
+1. Cell 1 -- install/upgrade SageMaker SDK
+2. Cell 2 -- configuration and imports
+3. Cell 3 -- flattens S3 structure and starts import job via BedrockModelBuilder
+4. Cell 4 -- waits for import to complete (typically a few minutes)
+5. Cell 5 -- test inference with a sample prompt
+6. Cell 6 -- saves the deployment manifest to `manifests/deploy-<name>.json`
 
 ```
 
@@ -130,7 +130,7 @@ To run:
 
 - **"Model weights are larger than 200GB"**: Cannot use this pathway.
 - **"No module named 'sagemaker.serve.bedrock_model_builder'"**: Upgrade SDK: `pip install --upgrade 'sagemaker>=3.7.1,<4.0'`
-- **Import starts but uses wrong region**: Known issue — `BedrockModelBuilder` defaults to us-east-1. The notebook code overrides this.
+- **Import starts but uses wrong region**: Known issue -- `BedrockModelBuilder` defaults to us-east-1. The notebook code overrides this.
 - **"Access denied to S3"**: Add S3 read permissions to the IAM role for the model bucket.
 - **"Provided IAM role could not be assumed"**: Ensure role has trust policy for `bedrock.amazonaws.com`.
 
@@ -140,5 +140,5 @@ After the notebook runs successfully, tell the user:
 
 - **Model**: `[MODEL_NAME]` has been imported to Bedrock
 - **How to invoke**: Use the Bedrock `invoke_model` API with the imported model ARN
-- **Billing**: Pay per request — no cost while idle
+- **Billing**: Pay per request -- no cost while idle
 - **Cleanup**: When done, delete the imported model by running `aws bedrock delete-imported-model --model-identifier <model-name>`.

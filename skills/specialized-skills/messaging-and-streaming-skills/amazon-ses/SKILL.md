@@ -1,6 +1,6 @@
 ---
 name: amazon-ses
-description: "Configures Amazon SES V2 for production email sending — including domain identity creation, DKIM/SPF/DMARC authentication, one-shot DNS record presentation, and Route 53 automation — for developers setting up or troubleshooting SES domain verification and deliverability. Applicable when developers need to send emails from their domain via SES, verify a domain identity, configure email authentication, troubleshoot DKIM verification issues, or ensure their sending setup follows best practices. Not for email-address-only verification, Mail Manager inbound routing, SNS, Pinpoint, or WorkMail."
+description: "Configures Amazon SES V2 for production email sending -- including domain identity creation, DKIM/SPF/DMARC authentication, one-shot DNS record presentation, and Route 53 automation -- for developers setting up or troubleshooting SES domain verification and deliverability. Applicable when developers need to send emails from their domain via SES, verify a domain identity, configure email authentication, troubleshoot DKIM verification issues, or ensure their sending setup follows best practices. Not for email-address-only verification, Mail Manager inbound routing, SNS, Pinpoint, or WorkMail."
 version: 1
 ---
 
@@ -11,7 +11,7 @@ version: 1
 
 ## Overview
 
-This skill helps developers and DevOps engineers configure Amazon SES for production email sending. It targets users who are not email authentication experts — guiding them through complete domain setup following AWS best practices without requiring deep knowledge of DKIM, SPF, or DMARC.
+This skill helps developers and DevOps engineers configure Amazon SES for production email sending. It targets users who are not email authentication experts -- guiding them through complete domain setup following AWS best practices without requiring deep knowledge of DKIM, SPF, or DMARC.
 
 ## Routing
 
@@ -21,10 +21,10 @@ This skill helps developers and DevOps engineers configure Amazon SES for produc
 
 ## Security
 
-- Use IAM roles with ephemeral credentials (STS) — never long-lived access keys
+- Use IAM roles with ephemeral credentials (STS) -- never long-lived access keys
 - Scope IAM permissions to specific SES actions per workflow (see reference files for required permissions)
 - Enable CloudTrail for SES API call auditing
-- DMARC `p=none` is monitoring only — plan progression to `p=quarantine` after confirming alignment
+- DMARC `p=none` is monitoring only -- plan progression to `p=quarantine` after confirming alignment
 - Never hardcode credentials, endpoints, or secrets in examples
 
 ## Critical Rules
@@ -35,7 +35,7 @@ This skill helps developers and DevOps engineers configure Amazon SES for produc
 - **MUST** present all DNS records together in one batch
 - **MUST** ask user for preferred MAIL FROM subdomain (do not assume a default)
 - **SHOULD** check if Route 53 hosts the domain and offer automatic DNS creation
-- **SHOULD NOT** claim 72-hour wait — verification typically completes in minutes once DNS propagates
+- **SHOULD NOT** claim 72-hour wait -- verification typically completes in minutes once DNS propagates
 
 ## Additional Resources
 

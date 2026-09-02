@@ -8,15 +8,15 @@ Deterministic procedure for looking up the authoritative schema for a CloudForma
 
 - **resource_type** (required): The full CloudFormation resource type (e.g., `AWS::Lambda::Function`, `AWS::S3::Bucket`, `AWS::DynamoDB::Table`).
 - **focus** (optional): Specific aspect to look up. One of:
-  - `properties` (default) — all properties with types
-  - `required` — only required properties
-  - `return-values` — what `!Ref` and `!GetAtt` return
-  - `property:<PropertyName>` — deep-dive on a single property including nested sub-properties
+  - `properties` (default) -- all properties with types
+  - `required` -- only required properties
+  - `return-values` -- what `!Ref` and `!GetAtt` return
+  - `property:<PropertyName>` -- deep-dive on a single property including nested sub-properties
 
 **Constraints for parameter acquisition:**
 
 - You MUST ask for the resource type upfront if not provided
-- You SHOULD infer the resource type from the user's question when possible (e.g., "what properties does a Lambda function have" → `AWS::Lambda::Function`)
+- You SHOULD infer the resource type from the user's question when possible (e.g., "what properties does a Lambda function have" -> `AWS::Lambda::Function`)
 - You MUST confirm the inferred resource type with the user before looking up if there is any ambiguity
 
 ## Steps
@@ -39,9 +39,9 @@ Derive the authoritative CloudFormation documentation URL from the resource type
 
 - You MUST use the URL pattern: `https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-<service>-<resource>.html`
 - Examples:
-  - `AWS::Lambda::Function` → `aws-resource-lambda-function.html`
-  - `AWS::S3::Bucket` → `aws-resource-s3-bucket.html`
-  - `AWS::DynamoDB::Table` → `aws-resource-dynamodb-table.html`
+  - `AWS::Lambda::Function` -> `aws-resource-lambda-function.html`
+  - `AWS::S3::Bucket` -> `aws-resource-s3-bucket.html`
+  - `AWS::DynamoDB::Table` -> `aws-resource-dynamodb-table.html`
 - For some older resource types the pattern uses `aws-properties-` instead of `aws-resource-` (e.g., `aws-properties-ec2-securitygroup.html`). If the first URL returns a 404, You MUST try the `aws-properties-` variant
 - You MUST NOT guess at schemas from memory because CloudFormation schemas evolve; always consult the authoritative source
 
@@ -127,4 +127,4 @@ Some resource types use `aws-properties-` instead of `aws-resource-` in the URL 
 The Console sometimes exposes additional UI-only fields that do not exist in the CloudFormation schema. The documentation is authoritative for CloudFormation property names.
 
 ### Ambiguous service name
-Some service names are not obvious (e.g., `AWS::IAM::Role` is `iam-role`, but `AWS::EC2::SecurityGroup` is `ec2-securitygroup` — CamelCase words are not split). If the URL derivation fails, search the CloudFormation User Guide for the resource type by its full name.
+Some service names are not obvious (e.g., `AWS::IAM::Role` is `iam-role`, but `AWS::EC2::SecurityGroup` is `ec2-securitygroup` -- CamelCase words are not split). If the URL derivation fails, search the CloudFormation User Guide for the resource type by its full name.

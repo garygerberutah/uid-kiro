@@ -15,11 +15,11 @@ official [Aurora DSQL connectivity tools page](https://docs.aws.amazon.com/auror
 
 Load the relevant file for the specific implementation pattern you need:
 
-- **[examples/connection.md](examples/connection.md)** — Ad-hoc queries with psql, connection management, token generation
-- **[examples/schema.md](examples/schema.md)** — Table creation, index creation, column modifications
-- **[examples/data-operations.md](examples/data-operations.md)** — Basic CRUD, batch processing, concurrent inserts
-- **[examples/migrations.md](examples/migrations.md)** — Migration execution patterns
-- **[examples/patterns.md](examples/patterns.md)** — Multi-tenant isolation, referential integrity, sequences, data serialization
+- **[examples/connection.md](examples/connection.md)** -- Ad-hoc queries with psql, connection management, token generation
+- **[examples/schema.md](examples/schema.md)** -- Table creation, index creation, column modifications
+- **[examples/data-operations.md](examples/data-operations.md)** -- Basic CRUD, batch processing, concurrent inserts
+- **[examples/migrations.md](examples/migrations.md)** -- Migration execution patterns
+- **[examples/patterns.md](examples/patterns.md)** -- Multi-tenant isolation, referential integrity, sequences, data serialization
 
 ## References
 

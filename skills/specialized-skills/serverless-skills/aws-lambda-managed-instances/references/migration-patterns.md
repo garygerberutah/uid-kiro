@@ -63,7 +63,7 @@ Python on LMI uses **process-based isolation**. Each concurrent invocation runs 
 ### Global State (No Changes Needed)
 
 ```python
-# This is SAFE on LMI — each process has its own copy of cache
+# This is SAFE on LMI -- each process has its own copy of cache
 cache = {}
 def handler(event, context):
     cache[event['key']] = compute(event)
@@ -74,10 +74,10 @@ s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 ```
 
-### File I/O (Change Required — `/tmp` is shared across processes)
+### File I/O (Change Required -- `/tmp` is shared across processes)
 
 ```python
-# BEFORE (conflict — all processes share /tmp)
+# BEFORE (conflict -- all processes share /tmp)
 with open('/tmp/data.json', 'w') as f: json.dump(event, f)
 
 # AFTER (request-unique path)
@@ -88,21 +88,21 @@ finally:
     os.unlink(path)
 ```
 
-### Database (Change Required — each process needs pooled connections)
+### Database (Change Required -- each process needs pooled connections)
 
 ```python
-# BEFORE (per-invocation connection — exhausts limits at concurrency)
+# BEFORE (per-invocation connection -- exhausts limits at concurrency)
 def handler(event, context):
     conn = psycopg2.connect(host='...')
 
-# AFTER (pool per process — initialized at module level)
+# AFTER (pool per process -- initialized at module level)
 from psycopg2 import pool
 db_pool = pool.SimpleConnectionPool(1, 3, host=os.environ['DB_HOST'])
 def handler(event, context):
     conn = db_pool.getconn()
     try: return query(conn, event)
     finally: db_pool.putconn(conn)
-# Note: total connections = pool_size × concurrency (e.g., 3 × 16 = 48)
+# Note: total connections = pool_size x concurrency (e.g., 3 x 16 = 48)
 
 # For production: retrieve credentials from Secrets Manager, not environment variables
 # import boto3
@@ -113,7 +113,7 @@ def handler(event, context):
 
 ```python
 # A function using 200 MB per process with default concurrency of 16:
-# Total memory ≈ 200 MB × 16 = 3.2 GB
+# Total memory ~ 200 MB x 16 = 3.2 GB
 # Use 4:1 or 8:1 memory-to-vCPU ratio to accommodate
 # Monitor MemoryUtilization metric and adjust as needed
 ```

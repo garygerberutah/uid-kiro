@@ -40,7 +40,7 @@ def validate_all(**kwargs):
     for k, v in kwargs.items():
         ok, msg = validate(k, v)
         if not ok:
-            errors.append(f"  {k}={v} — {msg}")
+            errors.append(f"  {k}={v} -- {msg}")
     if errors:
         print("Validation FAILED:\n" + "\n".join(errors))
         return False

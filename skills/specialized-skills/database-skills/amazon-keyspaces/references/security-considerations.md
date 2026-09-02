@@ -1,13 +1,13 @@
 # Security considerations
 
-This skill has two operational modes: (1) **advisory** — pricing math is local and input comes from user-provided files, and (2) **mutating** — creating keyspaces/tables and modifying table settings (TTL, PITR, capacity mode) via AWS APIs after user confirmation. Security exposure comes from the capture steps (connecting to the user's Cassandra cluster, reading prepared-statement contents), from how the user eventually connects applications to Amazon Keyspaces, and from the create/modify operations the skill performs on the user's behalf.
+This skill has two operational modes: (1) **advisory** -- pricing math is local and input comes from user-provided files, and (2) **mutating** -- creating keyspaces/tables and modifying table settings (TTL, PITR, capacity mode) via AWS APIs after user confirmation. Security exposure comes from the capture steps (connecting to the user's Cassandra cluster, reading prepared-statement contents), from how the user eventually connects applications to Amazon Keyspaces, and from the create/modify operations the skill performs on the user's behalf.
 
 ## Risks introduced by following the skill
 
-1. **Cluster credentials** — Mode 2 and Mode 3 rely on captures that require connecting to a running Cassandra cluster with `cqlsh` or driver credentials. If the user is already authenticating to their cluster, the skill inherits that posture. The skill never stores or transmits credentials.
-2. **Sensitive query content** — `system.prepared_statements` captures literal bound values (email addresses, customer IDs, account numbers) from real application queries. These files are **sensitive** and must be handled as such.
-3. **Schema disclosure** — `DESCRIBE SCHEMA` includes table names, column names, and data types. Usually not secret, but for regulated workloads the table may indicate the kind of data stored (e.g. `patient_records`, `pii_events`).
-4. **Pricing data staleness** — pricing comes from snapshot JSON files. If the user is making a procurement decision, state the snapshot date and direct them to the live [Keyspaces pricing page](https://aws.amazon.com/keyspaces/pricing/) to confirm.
+1. **Cluster credentials** -- Mode 2 and Mode 3 rely on captures that require connecting to a running Cassandra cluster with `cqlsh` or driver credentials. If the user is already authenticating to their cluster, the skill inherits that posture. The skill never stores or transmits credentials.
+2. **Sensitive query content** -- `system.prepared_statements` captures literal bound values (email addresses, customer IDs, account numbers) from real application queries. These files are **sensitive** and must be handled as such.
+3. **Schema disclosure** -- `DESCRIBE SCHEMA` includes table names, column names, and data types. Usually not secret, but for regulated workloads the table may indicate the kind of data stored (e.g. `patient_records`, `pii_events`).
+4. **Pricing data staleness** -- pricing comes from snapshot JSON files. If the user is making a procurement decision, state the snapshot date and direct them to the live [Keyspaces pricing page](https://aws.amazon.com/keyspaces/pricing/) to confirm.
 
 ## Recommended controls
 
@@ -24,10 +24,10 @@ The skill does not create, read, write, or transmit credentials.
 
 When the user deploys to Keyspaces, recommend least-privilege policies. Typical actions:
 
-- `cassandra:Select` — reads.
-- `cassandra:Modify` — writes (insert, update, delete).
-- `cassandra:Alter`, `cassandra:Create`, `cassandra:Drop` — DDL operations (restrict to DDL roles, not application roles).
-- `cassandra:Restore` — only for backup/restore roles.
+- `cassandra:Select` -- reads.
+- `cassandra:Modify` -- writes (insert, update, delete).
+- `cassandra:Alter`, `cassandra:Create`, `cassandra:Drop` -- DDL operations (restrict to DDL roles, not application roles).
+- `cassandra:Restore` -- only for backup/restore roles.
 
 Resource ARNs follow the pattern:
 
@@ -63,8 +63,8 @@ When capturing `system.prepared_statements`:
 
 - You MUST warn the user that the file may contain PII from literal bound values in queries before they copy it off the cluster or share it with the skill.
 - You SHOULD recommend redacting obviously sensitive columns (tokens, secrets, raw PII) before handing the file to the skill, if the user has time.
-- You MUST NOT echo the raw `query_string` of a flagged statement back in chat when it contains values that look sensitive; surface the `prepared_id` and a short abstract pattern (e.g. "SELECT … FROM users WHERE email = ?") instead.
-- Treat the file as ephemeral — recommend deleting it from `/tmp` after the estimate.
+- You MUST NOT echo the raw `query_string` of a flagged statement back in chat when it contains values that look sensitive; surface the `prepared_id` and a short abstract pattern (e.g. "SELECT ... FROM users WHERE email = ?") instead.
+- Treat the file as ephemeral -- recommend deleting it from `/tmp` after the estimate.
 
 ### Logging
 

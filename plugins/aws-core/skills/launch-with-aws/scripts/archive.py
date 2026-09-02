@@ -484,7 +484,7 @@ def download_github_zip(url: str) -> bytes:
         if err.code in (401, 403, 404):
             raise ArchiveError(
                 f"Could not download {owner}/{repo}. Only public repositories can "
-                "be fetched by URL — for a private repo, clone it locally and pass "
+                "be fetched by URL -- for a private repo, clone it locally and pass "
                 "the local path instead."
             ) from err
         raise ArchiveError(f"GitHub returned {err.code} downloading {owner}/{repo}.") from err

@@ -163,7 +163,7 @@ Standard Iceberg tables are registered in the default Glue Data Catalog. Athena 
 | Athena | `SELECT * FROM <database>.<external_table>` (requires external table in Glue catalog) | Not applicable (raw files) |
 | Spark | `spark.read.format("parquet").load("s3://...")` | `df.write.format("parquet").save("s3://...")` |
 
-No catalog registration needed for Spark reads — point directly at the S3 path. Athena requires an external table definition in the Glue catalog.
+No catalog registration needed for Spark reads -- point directly at the S3 path. Athena requires an external table definition in the Glue catalog.
 
 ## Decision Guide
 

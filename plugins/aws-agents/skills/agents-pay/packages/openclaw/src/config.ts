@@ -111,7 +111,7 @@ export function normalizeConfig(config: Partial<X402Config>): X402Config {
     throw new Error(
       "x402 configuration must set maxPaymentAmountAtomic to an explicit positive " +
         "integer (in the asset's smallest unit, e.g. \"100000\" = 0.10 USDC). " +
-        "This is the PER-PAYMENT ceiling — not the same as the session budget. " +
+        "This is the PER-PAYMENT ceiling -- not the same as the session budget. " +
         "Without it, a single hostile challenge could drain the session budget " +
         "in one transaction.",
     );

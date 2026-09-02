@@ -37,7 +37,7 @@ Quick reference for which commands and features are available in each ElastiCach
 | **ACL (Access Control)** | | | | | | |
 | ACL SETUSER, ACL DELUSER | Yes | Yes | Yes | Yes | Yes | Yes |
 | ACL GETUSER, ACL LIST | Yes | Yes | Yes | Yes | Yes | Yes |
-| ACL DRYRUN | No | Yes | Yes | Yes | Yes | Yes (available from Redis OSS 7.x; verify serverless availability — some ACL commands are restricted on serverless) |
+| ACL DRYRUN | No | Yes | Yes | Yes | Yes | Yes (available from Redis OSS 7.x; verify serverless availability -- some ACL commands are restricted on serverless) |
 | **Pub/Sub** | | | | | | |
 | PUBLISH, SUBSCRIBE | Yes | Yes | Yes | Yes | Yes | Yes |
 | Sharded Pub/Sub (SSUBSCRIBE) | No | Yes | Yes | Yes | Yes | Yes |

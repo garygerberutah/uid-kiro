@@ -6,7 +6,7 @@
 - **Query language**: CQL (Cassandra Query Language)
 - **Compatibility**: Apache Cassandra compatible (CQL, open-source Cassandra drivers)
 - **Serverless**: Yes (on-demand and provisioned capacity)
-- **Serverless type**: Operations — no cluster to manage, create a keyspace and start writing; capacity scales automatically
+- **Serverless type**: Operations -- no cluster to manage, create a keyspace and start writing; capacity scales automatically
 - **Scale to zero**: Yes (on-demand: throughput scales to zero; storage still billed)
 - **VPC required**: No (VPC endpoints supported)
 - **Multi-region**: Multi-Region replication (add/remove Regions on a live keyspace)

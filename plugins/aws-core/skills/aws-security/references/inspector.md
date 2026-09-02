@@ -9,9 +9,9 @@ Amazon Inspector is a vulnerability management service that automatically scans 
 
 Inspector automatically discovers and scans:
 
-- EC2 instances (via SSM agent) — OS package vulnerabilities, network reachability
-- ECR container images — image layer vulnerabilities, mapped to running containers
-- Lambda functions — code vulnerabilities, package vulnerabilities
+- EC2 instances (via SSM agent) -- OS package vulnerabilities, network reachability
+- ECR container images -- image layer vulnerabilities, mapped to running containers
+- Lambda functions -- code vulnerabilities, package vulnerabilities
 
 ## Read-Only APIs
 
@@ -39,10 +39,10 @@ Inspector uses CVSS (Common Vulnerability Scoring System) for package vulnerabil
 | Level | CVSS Score | Description |
 |-------|-----------|-------------|
 | Informational | 0.0 | No exploitable vulnerability |
-| Low | 0.1 – 3.9 | Low-impact vulnerability |
-| Medium | 4.0 – 6.9 | Moderate-impact vulnerability |
-| High | 7.0 – 8.9 | High-impact vulnerability |
-| Critical | 9.0 – 10.0 | Critical-impact vulnerability |
+| Low | 0.1 - 3.9 | Low-impact vulnerability |
+| Medium | 4.0 - 6.9 | Moderate-impact vulnerability |
+| High | 7.0 - 8.9 | High-impact vulnerability |
+| Critical | 9.0 - 10.0 | Critical-impact vulnerability |
 
 ### Other Finding Types
 
@@ -54,7 +54,7 @@ Inspector uses CVSS (Common Vulnerability Scoring System) for package vulnerabil
 **Key notes:**
 
 - Inspector uses the highest available CVSS score (NVD or vendor-provided)
-- Inspector Score may differ from raw CVSS — it incorporates exploitability and fix availability
+- Inspector Score may differ from raw CVSS -- it incorporates exploitability and fix availability
 - ECR findings include both CVSS v2 and v3 scores when available
 
 **Documentation:** https://docs.aws.amazon.com/inspector/latest/user/findings-understanding-severity.html

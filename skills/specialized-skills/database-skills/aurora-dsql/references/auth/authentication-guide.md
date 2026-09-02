@@ -283,7 +283,7 @@ aws sns set-topic-attributes \
 
 # Enable SSE-KMS encryption on the SNS topic. Security-alert payloads
 # (auth-failure metadata, principal ARNs, IP addresses) are sensitive and MUST
-# be encrypted at rest. Use a customer-managed KMS key — AWS-managed
+# be encrypted at rest. Use a customer-managed KMS key -- AWS-managed
 # `alias/aws/sns` works but offers less audit + key-rotation control.
 aws sns set-topic-attributes \
   --topic-arn arn:aws:sns:us-east-1:123456789012:security-alerts \
@@ -304,9 +304,9 @@ aws sns set-topic-attributes \
 
 **ALWAYS prefer scoped database roles over the `admin` role.**
 
-- **ALWAYS** use scoped database roles for application connections — reserve `admin` for initial setup and role management
+- **ALWAYS** use scoped database roles for application connections -- reserve `admin` for initial setup and role management
 - **MUST** create purpose-specific database roles and connect with `dsql:DbConnect`
-- **MUST** place sensitive data (PII, credentials) in dedicated schemas — not `public`
+- **MUST** place sensitive data (PII, credentials) in dedicated schemas -- not `public`
 - **MUST** grant only the minimum privileges each role requires
 - **SHOULD** audit role mappings: `SELECT * FROM sys.iam_pg_role_mappings;`
 

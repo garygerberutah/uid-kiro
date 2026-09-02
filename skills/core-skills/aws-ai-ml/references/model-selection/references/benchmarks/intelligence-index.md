@@ -5,7 +5,7 @@ AA's composite overall quality score. Higher is better.
 **Use this for:** Default ranking when no specific benchmark is a clear match for the use case.
 
 **Source:** Artificial Analysis (artificialanalysis.ai).
-"—" = no data — infer from similar models in the same family, but tell the user you're inferring.
+"--" = no data -- infer from similar models in the same family, but tell the user you're inferring.
 
 |   # | Model                                  | Family      | Score |
 |-----|----------------------------------------|-------------|-------|
@@ -39,6 +39,6 @@ AA's composite overall quality score. Higher is better.
 |  28 | Qwen3 1.7B (mode: reasoning)           | Qwen        |   8.0 |
 |  29 | Qwen3 0.6B (mode: reasoning)           | Qwen        |   6.5 |
 |  30 | Llama 3.2 1B Instruct                  | Meta Llama  |   6.3 |
-|   — | Qwen2.5 14B Instruct                   | Qwen        |     — |
-|   — | Qwen2.5 7B Instruct                    | Qwen        |     — |
-|   — | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     — |
+|   -- | Qwen2.5 14B Instruct                   | Qwen        |     -- |
+|   -- | Qwen2.5 7B Instruct                    | Qwen        |     -- |
+|   -- | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     -- |

@@ -18,7 +18,7 @@ COUNT=$(echo "$ENDPOINTS" | python3 -c "import sys,json; print(len(json.load(sys
 
 if [ "$COUNT" -eq 0 ]; then
   echo ""
-  echo "❌ NO S3 VPC endpoint found for ${VPC_ID}"
+  echo "[NO] NO S3 VPC endpoint found for ${VPC_ID}"
   echo ""
   echo "InfluxDB 3 requires an S3 Gateway Endpoint in private subnets."
   echo "Create one with:"
@@ -34,11 +34,11 @@ if [ "$COUNT" -eq 0 ]; then
   exit 1
 else
   echo ""
-  echo "✅ Found ${COUNT} S3 VPC endpoint(s):"
+  echo "[YES] Found ${COUNT} S3 VPC endpoint(s):"
   echo "$ENDPOINTS" | python3 -c "
 import sys, json
 for ep in json.load(sys.stdin):
-    print(f\"  {ep['Id']} — State: {ep['State']}, Type: {ep['Type']}\")
+    print(f\"  {ep['Id']} -- State: {ep['State']}, Type: {ep['Type']}\")
     if ep.get('RouteTableIds'):
         print(f\"    Route tables: {', '.join(ep['RouteTableIds'])}\")
 "

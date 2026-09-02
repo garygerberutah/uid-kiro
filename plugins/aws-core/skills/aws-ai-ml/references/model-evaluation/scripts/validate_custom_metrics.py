@@ -79,7 +79,7 @@ def validate(raw: str) -> tuple[bool, list[str]]:
     if not isinstance(data, list):
         return False, ["Must be a JSON array of metric definitions."]
     if len(data) == 0:
-        return False, ["Array is empty — need at least one metric."]
+        return False, ["Array is empty -- need at least one metric."]
     if len(data) > 10:
         return False, [f"Too many metrics ({len(data)}). Maximum is 10."]
 
@@ -108,9 +108,9 @@ def main():
     ok, errors = validate(raw)
     if ok:
         count = len(json.loads(raw))
-        print(f"✅ Valid — {count} custom metric{'s' if count != 1 else ''} defined.")
+        print(f"[YES] Valid -- {count} custom metric{'s' if count != 1 else ''} defined.")
     else:
-        print("❌ Validation failed:")
+        print("[NO] Validation failed:")
         for err in errors:
             print(f"  - {err}")
         sys.exit(1)

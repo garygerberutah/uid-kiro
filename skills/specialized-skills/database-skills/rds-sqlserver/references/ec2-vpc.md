@@ -1,4 +1,4 @@
-# EC2 — RDS SQL Server from EC2 in the same VPC
+# EC2 -- RDS SQL Server from EC2 in the same VPC
 
 Simplest connection pattern. EC2 and RDS in the same VPC (or peered VPCs).
 
@@ -9,14 +9,14 @@ Simplest connection pattern. EC2 and RDS in the same VPC (or peered VPCs).
 Two SGs, referenced by ID:
 
 ```bash
-# RDS SG (e.g. sg-rds-sqlserver) — inbound
+# RDS SG (e.g. sg-rds-sqlserver) -- inbound
 aws ec2 authorize-security-group-ingress \
   --group-id sg-rds-sqlserver \
   --protocol tcp --port 1433 \
   --source-group sg-app-ec2 \
   --region us-east-1
 
-# EC2 SG (sg-app-ec2) — outbound is default allow-all,
+# EC2 SG (sg-app-ec2) -- outbound is default allow-all,
 # no change needed unless custom SG
 ```
 
@@ -42,7 +42,7 @@ If it returns the public IP, your VPC has `enableDnsSupport=false` or you've dis
 
 ## Connection examples
 
-### Linux EC2 (Amazon Linux 2023) — Python + pymssql
+### Linux EC2 (Amazon Linux 2023) -- Python + pymssql
 
 ```bash
 sudo yum install -y python3-pip gcc-c++ freetds-devel
@@ -64,12 +64,12 @@ conn = pymssql.connect(
 
 IAM instance profile must have `secretsmanager:GetSecretValue` on the secret ARN (and `kms:Decrypt` if CMK).
 
-### Windows EC2 — .NET
+### Windows EC2 -- .NET
 
 Installed .NET + AWS CLI. Domain-join if using Windows auth (see `ad-kerberos.md`).
 
 ```csharp
-// Use instance profile — AWS SDK picks it up automatically
+// Use instance profile -- AWS SDK picks it up automatically
 var sm = new AmazonSecretsManagerClient();
 var resp = await sm.GetSecretValueAsync(new GetSecretValueRequest {
     SecretId = "rds/sqlserver/app" });
@@ -114,7 +114,7 @@ Minimum for SQL auth + Secrets Manager:
 }
 ```
 
-Do NOT use `rds-db:connect` — that's for IAM auth on Postgres/MySQL, not SQL Server. For IAM auth on SQL Server you need RDS Proxy — see `rds-proxy.md`.
+Do NOT use `rds-db:connect` -- that's for IAM auth on Postgres/MySQL, not SQL Server. For IAM auth on SQL Server you need RDS Proxy -- see `rds-proxy.md`.
 
 ## Multi-AZ failover
 
@@ -146,7 +146,7 @@ From EC2 shell:
 ```bash
 # TCP reachability
 nc -zv mydb.xxxx.us-east-1.rds.amazonaws.com 1433
-# Connection opens → OK
+# Connection opens -> OK
 
 # SQL query
 python3 -c "
@@ -159,4 +159,4 @@ print(cur.fetchone())
 "
 ```
 
-Expected: `(True, 'SQL')` — encrypted + SQL auth.
+Expected: `(True, 'SQL')` -- encrypted + SQL auth.

@@ -1,6 +1,6 @@
 # evals
 
-Set up evaluation for your AgentCore agent — from a single quality check to a full production monitoring pipeline.
+Set up evaluation for your AgentCore agent -- from a single quality check to a full production monitoring pipeline.
 
 ## When to use
 
@@ -10,14 +10,14 @@ Set up evaluation for your AgentCore agent — from a single quality check to a 
 - You want to interpret eval scores you've already run
 - You want to compare agent versions
 
-Not for debugging a specific wrong answer — use the `agents-debug` skill for that.
+Not for debugging a specific wrong answer -- use the `agents-debug` skill for that.
 
 ## Input
 
 `$ARGUMENTS` is optional. If provided, it scopes the skill:
 
 ```
-/evals                          # interactive — asks what you want to set up
+/evals                          # interactive -- asks what you want to set up
 /evals quick                    # run a quick eval on the most recent session
 /evals monitor                  # set up continuous online monitoring
 /evals ci                       # generate a CI/CD quality gate script
@@ -37,32 +37,32 @@ Ask (or infer from `$ARGUMENTS`):
 > 4. Create a custom evaluator for my specific use case
 > 5. Understand eval scores I've already run"
 
-### Step 2: Check prerequisites — and know what actually needs a deploy
+### Step 2: Check prerequisites -- and know what actually needs a deploy
 
 Read `agentcore/agentcore.json` if it exists. Check:
 
-- Is there a deployed runtime? (not always required — see below)
+- Is there a deployed runtime? (not always required -- see below)
 - Are there existing evaluators configured?
 
 **If no project context:** Ask which runtime they want to evaluate. They can use `--runtime-arn` for standalone mode.
 
-**What actually requires a deployed runtime — and what doesn't:**
+**What actually requires a deployed runtime -- and what doesn't:**
 
 | Action | Deploy required? |
 |---|---|
-| Define an evaluator (`agentcore add evaluator`) — LLM-as-judge or custom code | **No.** Writes to `agentcore.json` only. |
+| Define an evaluator (`agentcore add evaluator`) -- LLM-as-judge or custom code | **No.** Writes to `agentcore.json` only. |
 | Author & iterate on LLM-as-judge instructions / rating scale | **No.** Text edits; try them against saved traces or manual fixtures. |
-| Unit-test a custom code evaluator (the `@custom_code_based_evaluator` function) | **No.** Import the function and call it with an `EvaluatorInput` fixture — see Path D below. |
+| Unit-test a custom code evaluator (the `@custom_code_based_evaluator` function) | **No.** Import the function and call it with an `EvaluatorInput` fixture -- see Path D below. |
 | Write / dry-run the CI/CD quality-gate script | **No** for the script itself; deploy only needed if you want the eval call inside to hit production traffic. |
-| **`agentcore run eval` against local-dev traces** | **No.** `agentcore dev` emits OTEL spans to CloudWatch by default — see "Evaluating a local dev run" below. |
+| **`agentcore run eval` against local-dev traces** | **No.** `agentcore dev` emits OTEL spans to CloudWatch by default -- see "Evaluating a local dev run" below. |
 | **`Evaluate` API with hand-constructed spans** (boto3) | **No.** Submit `SessionSpans` directly, no runtime needed at all. |
-| `agentcore run eval` against production-runtime traces | Yes — operates on traces the deployed runtime produced. |
-| `OnDemandEvaluationDatasetRunner` (SDK dataset runner) | Yes — the runner invokes an AgentCore Runtime agent in its pipeline. |
-| Online monitoring (`agentcore add online-eval`) | Yes — continuous ingestion from the deployed runtime. |
+| `agentcore run eval` against production-runtime traces | Yes -- operates on traces the deployed runtime produced. |
+| `OnDemandEvaluationDatasetRunner` (SDK dataset runner) | Yes -- the runner invokes an AgentCore Runtime agent in its pipeline. |
+| Online monitoring (`agentcore add online-eval`) | Yes -- continuous ingestion from the deployed runtime. |
 
-**The local-dev eval loop is a real option.** `agentcore dev` auto-instruments OTEL and ships spans to CloudWatch the same way deployed runtimes do — this isn't a deployed-only feature. You can iterate on evaluators against your own local invocations, with a short round-trip and no AWS CDK churn.
+**The local-dev eval loop is a real option.** `agentcore dev` auto-instruments OTEL and ships spans to CloudWatch the same way deployed runtimes do -- this isn't a deployed-only feature. You can iterate on evaluators against your own local invocations, with a short round-trip and no AWS CDK churn.
 
-**For the dataset runner and online monitoring, deploy is genuinely required.** Those paths invoke or ingest from a live AgentCore Runtime agent — there's no local equivalent.
+**For the dataset runner and online monitoring, deploy is genuinely required.** Those paths invoke or ingest from a live AgentCore Runtime agent -- there's no local equivalent.
 
 **Don't tell the developer to fully deploy before they can make progress on evals.** Definition, authoring, and unit-testing are local. Running `agentcore run eval` is local too, given the prerequisites below.
 
@@ -71,22 +71,22 @@ Read `agentcore/agentcore.json` if it exists. Check:
 Requirements:
 
 1. **AWS credentials available locally** (e.g., `aws sso login` for the account you want spans to land in).
-2. **CloudWatch Transaction Search enabled** on the account. One-time setup — either in the CloudWatch console (Settings → X-Ray traces → Transaction Search) or via:
+2. **CloudWatch Transaction Search enabled** on the account. One-time setup -- either in the CloudWatch console (Settings -> X-Ray traces -> Transaction Search) or via:
 
    ```bash
    aws xray update-trace-segment-destination --destination CloudWatchLogs
    ```
 
 3. **OTEL is already on.** `agentcore dev` auto-instruments with the AWS OpenTelemetry distro by default. If you've passed `--no-traces`, remove it.
-4. **Wait ~10 seconds** after invoking — CloudWatch put-to-get latency is ~10s end-to-end (covers both trace reads and eval queries; it's one ingestion step, not two).
+4. **Wait ~10 seconds** after invoking -- CloudWatch put-to-get latency is ~10s end-to-end (covers both trace reads and eval queries; it's one ingestion step, not two).
 
 The loop:
 
 ```bash
-# Terminal 1 — start local dev with OTEL on (default)
+# Terminal 1 -- start local dev with OTEL on (default)
 agentcore dev
 
-# Terminal 2 — invoke a few times, noting the session ID
+# Terminal 2 -- invoke a few times, noting the session ID
 agentcore dev --invoke "What's the weather in Seattle?" --stream
 # or: agentcore invoke "..." once dev is running
 # Note the session ID from the response / logs.
@@ -98,11 +98,11 @@ agentcore run eval \
   --evaluator "Builtin.Helpfulness"
 ```
 
-The evaluator runs in AWS (it's a managed evaluation service — the model call happens there, not locally), but the **agent run being evaluated happened on your laptop**. This is the fastest iteration loop for tuning an evaluator's instructions or rating scale.
+The evaluator runs in AWS (it's a managed evaluation service -- the model call happens there, not locally), but the **agent run being evaluated happened on your laptop**. This is the fastest iteration loop for tuning an evaluator's instructions or rating scale.
 
 #### Hand-constructed spans (no runtime at all)
 
-For the tightest unit-test loop — or when you want to evaluate a saved snapshot without running the agent — call the `Evaluate` API directly with spans you construct:
+For the tightest unit-test loop -- or when you want to evaluate a saved snapshot without running the agent -- call the `Evaluate` API directly with spans you construct:
 
 ```python
 import boto3
@@ -115,7 +115,7 @@ response = client.evaluate(
         # Minimum shape matches the OTEL span schema for AgentCore traces.
         # Easiest way to produce a fixture: download one real span via
         # `agentcore traces get <traceId> --output trace.json`, then mutate it.
-        {"name": "agent.invoke", "attributes": {"gen_ai.prompt": "What's the weather?", "gen_ai.response.content": "Sunny, 72°F."}},
+        {"name": "agent.invoke", "attributes": {"gen_ai.prompt": "What's the weather?", "gen_ai.response.content": "Sunny, 72 degrees F."}},
     ],
 )
 print(response["evaluatorResults"])
@@ -129,7 +129,7 @@ The full span schema and field list is in the [`Understanding input spans`](http
 
 #### Step A1: Choose an evaluator
 
-Start with built-in evaluators — they require no setup and cover the most common quality dimensions:
+Start with built-in evaluators -- they require no setup and cover the most common quality dimensions:
 
 | Evaluator | Level | What it measures |
 |---|---|---|
@@ -144,7 +144,7 @@ Start with built-in evaluators — they require no setup and cover the most comm
 | `Builtin.ToolSelectionAccuracy` | TOOL_CALL | Did the agent pick the right tool for the task? |
 | `Builtin.GoalSuccessRate` | SESSION | Did the agent complete the user's goal? (supports ground truth) |
 
-**Built-in evaluator names may change.** Check the AgentCore docs for the current list — new evaluators are added across releases.
+**Built-in evaluator names may change.** Check the AgentCore docs for the current list -- new evaluators are added across releases.
 
 **Recommendation:** Start with `Builtin.Helpfulness` for a general quality check. Add `Builtin.GoalSuccessRate` for task completion. Use `Builtin.ToolSelectionAccuracy` when your agent uses tools. Use `Builtin.Correctness` or `Builtin.Faithfulness` when you have ground truth to compare against.
 
@@ -170,11 +170,11 @@ agentcore run eval --evaluator "Builtin.Helpfulness" --days 14
 
 #### Step A3: Interpret the results
 
-Scores are normalized to 0–1:
+Scores are normalized to 0-1:
 
-- **0.8–1.0** — Good. Agent is performing well on this dimension.
-- **0.6–0.8** — Acceptable. Worth monitoring but not urgent.
-- **Below 0.6** — Investigate. Check recent traces for patterns.
+- **0.8-1.0** -- Good. Agent is performing well on this dimension.
+- **0.6-0.8** -- Acceptable. Worth monitoring but not urgent.
+- **Below 0.6** -- Investigate. Check recent traces for patterns.
 
 Results are saved to `agentcore/.cli/eval-runs/`. View history:
 
@@ -202,13 +202,13 @@ agentcore add online-eval \
   --sampling-rate 5
 ```
 
-**Important naming rule:** Config names must use underscores only — no hyphens. `my-monitor` will fail with a validation error; `my_monitor` works.
+**Important naming rule:** Config names must use underscores only -- no hyphens. `my-monitor` will fail with a validation error; `my_monitor` works.
 
 **Sampling rate guidance:**
 
-- `1–5` — Good for production (1–5% of requests evaluated)
-- `10–20` — Good for staging or low-traffic agents
-- `100` — Evaluate every request (dev/testing only, adds latency and cost)
+- `1-5` -- Good for production (1-5% of requests evaluated)
+- `10-20` -- Good for staging or low-traffic agents
+- `100` -- Evaluate every request (dev/testing only, adds latency and cost)
 
 #### Step B3: Deploy to activate
 
@@ -226,7 +226,7 @@ Results stream to CloudWatch Logs:
 /aws/bedrock-agentcore/evaluations/results/<config-id>
 ```
 
-View in the AWS console: CloudWatch → GenAI Observability → Bedrock AgentCore → Evaluations tab.
+View in the AWS console: CloudWatch -> GenAI Observability -> Bedrock AgentCore -> Evaluations tab.
 
 Stream eval logs from the CLI:
 
@@ -250,7 +250,7 @@ Generate a script that runs evals and fails the build if quality drops below a t
 
 ```bash
 #!/bin/bash
-# quality-gate.sh — run after deploy in CI/CD
+# quality-gate.sh -- run after deploy in CI/CD
 
 set -e
 
@@ -268,7 +268,7 @@ result=$(agentcore run eval \
 score=$(echo "$result" | jq -r '.run.results[0].aggregateScore // empty')
 
 if [ -z "$score" ]; then
-  echo "⚠️  No eval data found. Has the agent been invoked recently?"
+  echo "[WARNING]  No eval data found. Has the agent been invoked recently?"
   echo "   Invoke the agent at least once, wait ~10 seconds, then re-run."
   exit 1
 fi
@@ -276,14 +276,14 @@ fi
 echo "Quality score: $score (threshold: $THRESHOLD)"
 
 if awk -v s="$score" -v t="$THRESHOLD" 'BEGIN{exit !(s<t)}'; then
-  echo "❌ Quality gate FAILED: score $score < $THRESHOLD"
+  echo "[NO] Quality gate FAILED: score $score < $THRESHOLD"
   exit 1
 fi
 
-echo "✅ Quality gate PASSED"
+echo "[YES] Quality gate PASSED"
 ```
 
-**Note:** CloudWatch put-to-get latency is **~10 seconds end-to-end** — the same ingestion step unlocks both trace reads and eval queries; there's no extra indexing wait. In CI/CD, invoke the agent as part of your integration tests, then add a short `sleep 10` (or `sleep 15` for headroom) before running the quality gate. The old `sleep 300` pattern from earlier skills/docs is 30× longer than needed now.
+**Note:** CloudWatch put-to-get latency is **~10 seconds end-to-end** -- the same ingestion step unlocks both trace reads and eval queries; there's no extra indexing wait. In CI/CD, invoke the agent as part of your integration tests, then add a short `sleep 10` (or `sleep 15` for headroom) before running the quality gate. The old `sleep 300` pattern from earlier skills/docs is 30x longer than needed now.
 
 For standalone mode (no project context in CI):
 
@@ -299,22 +299,22 @@ agentcore run eval \
 
 ### Path D: Custom evaluator
 
-Use a custom evaluator when built-ins don't cover your specific quality criteria — domain accuracy, tone, format compliance, safety for your use case.
+Use a custom evaluator when built-ins don't cover your specific quality criteria -- domain accuracy, tone, format compliance, safety for your use case.
 
 #### Step D1: Choose the evaluator type
 
-- **LLM-as-a-judge** — An LLM scores each response against your instructions. Most flexible.
-- **Code-based** — A Lambda function scores responses programmatically. Use for deterministic checks (format validation, required fields, etc.).
+- **LLM-as-a-judge** -- An LLM scores each response against your instructions. Most flexible.
+- **Code-based** -- A Lambda function scores responses programmatically. Use for deterministic checks (format validation, required fields, etc.).
 
 #### Step D2: Create an LLM-as-a-judge evaluator
 
 Choose the right level first:
 
-- `SESSION` — evaluate the whole conversation (goal completion, overall quality)
-- `TRACE` — evaluate each individual response (helpfulness, accuracy, tone)
-- `TOOL_CALL` — evaluate tool selection and parameters
+- `SESSION` -- evaluate the whole conversation (goal completion, overall quality)
+- `TRACE` -- evaluate each individual response (helpfulness, accuracy, tone)
+- `TOOL_CALL` -- evaluate tool selection and parameters
 
-Check the AgentCore docs for additional evaluator levels — new levels may be added across releases.
+Check the AgentCore docs for additional evaluator levels -- new levels may be added across releases.
 
 ```bash
 agentcore add evaluator \
@@ -325,7 +325,7 @@ agentcore add evaluator \
   --rating-scale 1-5-quality
 ```
 
-Note: The evaluator model ID above is an example — check the AgentCore docs for current supported evaluator model IDs and cross-region inference profiles.
+Note: The evaluator model ID above is an example -- check the AgentCore docs for current supported evaluator model IDs and cross-region inference profiles.
 
 **Placeholder rules by level:**
 
@@ -337,10 +337,10 @@ Note: The evaluator model ID above is an example — check the AgentCore docs fo
 
 **Rating scale presets** (pass as literal strings to `--rating-scale`):
 
-- `1-5-quality` — Poor/Fair/Good/Very Good/Excellent (default)
-- `1-3-simple` — Low/Medium/High
-- `pass-fail` — Pass/Fail
-- `good-neutral-bad` — Good/Neutral/Bad
+- `1-5-quality` -- Poor/Fair/Good/Very Good/Excellent (default)
+- `1-3-simple` -- Low/Medium/High
+- `pass-fail` -- Pass/Fail
+- `good-neutral-bad` -- Good/Neutral/Bad
 
 **Custom rating scale:**
 
@@ -380,11 +380,11 @@ def handler(evaluator_input: EvaluatorInput, context) -> EvaluatorOutput:
     return EvaluatorOutput(value=0.0, label="Fail", reasoning="Response did not match expected format")
 ```
 
-The decorator handles parsing the raw Lambda event, extracting trace/span IDs, and serializing the response — write your check against typed `EvaluatorInput` and return a typed `EvaluatorOutput`.
+The decorator handles parsing the raw Lambda event, extracting trace/span IDs, and serializing the response -- write your check against typed `EvaluatorInput` and return a typed `EvaluatorOutput`.
 
 #### Step D3.5: Unit-test the evaluator locally before deploying
 
-The `@custom_code_based_evaluator` function is a plain Python function. Import it directly and exercise the logic with fixtures — no deploy, no AWS credentials needed:
+The `@custom_code_based_evaluator` function is a plain Python function. Import it directly and exercise the logic with fixtures -- no deploy, no AWS credentials needed:
 
 ```python
 # test_evaluator.py
@@ -393,7 +393,7 @@ from lambda_function import handler  # the decorated function above
 
 def _fake_input(response_text: str) -> EvaluatorInput:
     # Construct the minimum EvaluatorInput shape the handler reads.
-    # Use a saved real trace for higher-fidelity fixtures — download one via
+    # Use a saved real trace for higher-fidelity fixtures -- download one via
     # `agentcore traces get <traceId> --output trace.json` after a single deploy+invoke.
     return EvaluatorInput(
         session_spans=[{"attributes": {"gen_ai.response.content": response_text}}],
@@ -410,7 +410,7 @@ def test_rejects_free_text():
     assert "did not match" in (out.reasoning or "").lower()
 ```
 
-Run with `pytest test_evaluator.py`. Iterate the logic until the fixtures pass. Only **then** deploy — the deploy step is about wiring the Lambda into AgentCore, not about debugging the check.
+Run with `pytest test_evaluator.py`. Iterate the logic until the fixtures pass. Only **then** deploy -- the deploy step is about wiring the Lambda into AgentCore, not about debugging the check.
 
 For **LLM-as-judge** evaluators, there's no equivalent unit-test surface (the model call happens in the eval service), but you can iterate on the instructions against saved traces by dry-running the prompt in Bedrock console or in a one-off script before `agentcore add evaluator`.
 
@@ -429,7 +429,7 @@ agentcore run eval --evaluator ResponseQuality --days 7
 
 ### "No spans found for session"
 
-- Wait ~10 seconds after invoking the agent — CloudWatch put-to-get is ~10s end-to-end (there's no separate eval-indexing step beyond that)
+- Wait ~10 seconds after invoking the agent -- CloudWatch put-to-get is ~10s end-to-end (there's no separate eval-indexing step beyond that)
 - Check that observability was enabled when the agent was deployed
 - Extend the lookback: `--days 14` or `--days 30`
 
@@ -451,7 +451,7 @@ agentcore run eval --evaluator ResponseQuality --days 7
 
 ## Cross-region inference (data residency)
 
-Both built-in and LLM-as-judge evaluators use **cross-region inference** by default. The data being evaluated stays in your primary region, but the inference call that runs the judge model may execute in another AWS region within the same geography (e.g., `us-east-1` → `us-east-2`/`us-west-2`; EU stays in EU).
+Both built-in and LLM-as-judge evaluators use **cross-region inference** by default. The data being evaluated stays in your primary region, but the inference call that runs the judge model may execute in another AWS region within the same geography (e.g., `us-east-1` -> `us-east-2`/`us-west-2`; EU stays in EU).
 
 There's no extra cost, and logs don't include the inference region. But if data-residency rules require pinning inference to a single region:
 
@@ -459,24 +459,24 @@ There's no extra cost, and logs don't include the inference region. But if data-
 - **Custom LLM-as-judge evaluators:** pin the model by choosing a region-specific model ID for `--model` instead of a cross-region inference profile ID. Check the docs for current single-region model IDs in your region.
 - **Code-based evaluators:** not affected. The Lambda runs wherever you deployed it.
 
-See [cross-region inference](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/cross-region-inference.html) for the current geography/region mapping rather than baking it in here — it expands across releases.
+See [cross-region inference](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/cross-region-inference.html) for the current geography/region mapping rather than baking it in here -- it expands across releases.
 
 ## When to use the dataset runner vs. `agentcore run eval`
 
-Two different tools for two different workflows — developers confuse them.
+Two different tools for two different workflows -- developers confuse them.
 
 | You want to... | Tool | Where it runs |
 |---|---|---|
 | Evaluate one session or trace from a recent run | `agentcore run eval --session-id <id>` | CLI, against CloudWatch-ingested spans |
 | Evaluate *everything* from the last N days and track score drift | `agentcore run eval --days 7` | CLI, against CloudWatch |
-| Run a curated benchmark / regression suite (20–500 scenarios, CI/CD) | `OnDemandEvaluationDatasetRunner` (SDK) | Your Python process, orchestrates invoke + wait + evaluate |
+| Run a curated benchmark / regression suite (20-500 scenarios, CI/CD) | `OnDemandEvaluationDatasetRunner` (SDK) | Your Python process, orchestrates invoke + wait + evaluate |
 | Check that every production invocation meets quality thresholds | `agentcore add online-eval` | Platform, continuous sampling |
 
-**Use `agentcore run eval`** when you're iterating on an evaluator, investigating a specific regression, or running a quality gate against recent traffic. It's fast, cheap, and doesn't invoke the agent itself — it only scores existing traces.
+**Use `agentcore run eval`** when you're iterating on an evaluator, investigating a specific regression, or running a quality gate against recent traffic. It's fast, cheap, and doesn't invoke the agent itself -- it only scores existing traces.
 
 **Use `OnDemandEvaluationDatasetRunner`** when you have a dataset of scenarios with expected responses / trajectories / assertions and you want to run them as a batch. The runner **invokes the agent** for each scenario, waits for telemetry ingestion (default 180 seconds, paid once per run not per scenario), then evaluates. This requires a deployed runtime. Typical use: regression pack in CI before promoting a new version.
 
-**Use online eval** for continuous production monitoring at a sampling rate — not the same as a benchmark.
+**Use online eval** for continuous production monitoring at a sampling rate -- not the same as a benchmark.
 
 ## Output
 

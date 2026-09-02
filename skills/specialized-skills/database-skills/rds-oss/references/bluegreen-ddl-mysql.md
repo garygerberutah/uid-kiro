@@ -18,7 +18,7 @@ Blue/Green uses binlog replication (ROW format) to keep green in sync with blue.
 | Operation | Why It Breaks | What To Do |
 |-----------|---------------|------------|
 | MODIFY COLUMN (type change) | Row format changes. Binlog events can't be applied. | Apply DDL, then switchover immediately. Do NOT wait. |
-| CHANGE COLUMN (rename + type) | Same as MODIFY — row format mismatch. | Apply DDL, then switchover. |
+| CHANGE COLUMN (rename + type) | Same as MODIFY -- row format mismatch. | Apply DDL, then switchover. |
 | ADD COLUMN ... AFTER col | Column position changes. Binlog column index mismatch. | Use ADD COLUMN at end instead, or switchover immediately. |
 | RENAME TABLE | Binlog references old table name. | Switchover immediately after rename. |
 | RENAME COLUMN | Binlog uses column index, but metadata mismatch can cause issues. | Switchover immediately. |
@@ -33,7 +33,7 @@ Blue/Green uses binlog replication (ROW format) to keep green in sync with blue.
 
 ## Foreign Key Handling
 
-Blue/Green handles foreign keys natively — no need to drop/recreate them as with gh-ost. DDL on tables with foreign keys works as expected on the green environment.
+Blue/Green handles foreign keys natively -- no need to drop/recreate them as with gh-ost. DDL on tables with foreign keys works as expected on the green environment.
 
 ## Best Practice
 

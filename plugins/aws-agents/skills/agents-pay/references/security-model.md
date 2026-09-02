@@ -1,14 +1,14 @@
 # agents-pay security model
 
 The threat model, and how each control is enforced. Read this before changing
-anything in `scripts/` — several behaviors that look over-cautious are load-bearing.
+anything in `scripts/` -- several behaviors that look over-cautious are load-bearing.
 
 ## Scope: this is the run-time skill
 
 Worth stating before anything else, because there is an adjacent skill that looks like
 it does the same job.
 
-| | `agents-build` → `references/payments.md` | `agents-pay` (this skill) |
+| | `agents-build` -> `references/payments.md` | `agents-pay` (this skill) |
 |---|---|---|
 | Question | "How do I give the agent I am **building** the ability to pay?" | "This agent needs to pay for this **now**" |
 | When | Build time, in a product being shipped | Run time, in the session at hand |
@@ -43,7 +43,7 @@ What that costs, concretely:
 |---|---|---|
 | Per-payment ceiling | enforced | **absent** |
 | Origin allowlist and SSRF vetting | enforced | **absent** |
-| Derived idempotency token | enforced | **absent** — random per call |
+| Derived idempotency token | enforced | **absent** -- random per call |
 | Only the vetted `accepts` entry reaches the signer | enforced | **absent** |
 | Proof kept out of model context | enforced | depends on the integration |
 | Session creation kept off the runtime role | enforced | **`auto_session=True` requires it** |
@@ -61,13 +61,13 @@ explicit `payment_session_id` so budget still comes from a human.
 
 | Component | Trusted? | Holds credentials? | Who runs it |
 |---|---|---|---|
-| Operator at a terminal | Yes — the root of authority | Yes (via the CLI wizard) | Human |
+| Operator at a terminal | Yes -- the root of authority | Yes (via the CLI wizard) | Human |
 | `agents_pay_admin.py` | Yes | Only transiently, from the human | Human |
-| `~/.agents-pay/config.json` | Yes — the authorization record | No | Written by human, read by runtime |
-| `x402_policy.py` | Yes — the decision point | No | In-process, runtime |
-| `x402_fetch.py` | Yes — transport | No (proof is transient) | In-process, runtime |
-| The model / agent loop | **No** | No | — |
-| Publisher HTTP response | **No** — hostile input | No | — |
+| `~/.agents-pay/config.json` | Yes -- the authorization record | No | Written by human, read by runtime |
+| `x402_policy.py` | Yes -- the decision point | No | In-process, runtime |
+| `x402_fetch.py` | Yes -- transport | No (proof is transient) | In-process, runtime |
+| The model / agent loop | **No** | No | -- |
+| Publisher HTTP response | **No** -- hostile input | No | -- |
 
 The model is inside the threat model, not outside it. The controls hold when hostile
 model input reaches the registered payment tools. Unrestricted code execution under
@@ -88,10 +88,10 @@ Two design rules apply throughout this skill:
 
 | Capability | Here | Security property |
 |---|---|---|
-| `get_paid_content` | `x402_fetch(url)` — agent tool | Same capability, now behind the policy gate |
-| `get_payment_session_status` | `payment_session_status()` — agent tool | Unchanged in spirit: read-only, cannot mint budget |
+| `get_paid_content` | `x402_fetch(url)` -- agent tool | Same capability, now behind the policy gate |
+| `get_payment_session_status` | `payment_session_status()` -- agent tool | Unchanged in spirit: read-only, cannot mint budget |
 | Browser payment | `prepare_browser_payment(url)` + `attach_browser_payment(handle, url)` | The model receives an opaque single-use handle; trusted glue redeems it |
-| Create a payment session | `agents_pay_admin.py new-session` — human at a TTY | A runtime that can mint sessions has no cumulative bound |
+| Create a payment session | `agents_pay_admin.py new-session` -- human at a TTY | A runtime that can mint sessions has no cumulative bound |
 | Provision infrastructure | `agentcore` CLI wizard + `agents_pay_admin.py init-config` | Provider secrets never enter tool parameters, and setup does not exist at runtime |
 
 The browser flow is worth stating plainly, because it is the one case where a
@@ -108,7 +108,7 @@ for trusted glue, not for the model's tool set.
 | Challenge validation | Strict schema, configured scheme and network, exact asset contract, explicit recipient mode, canonical positive amount under `max_per_payment_usd`, and resource/origin checks are enforced before signing. Conflicting `amount` and `maxAmountRequired` aliases are refused; the signer receives one version-canonical amount field. The normal mode requires `payTo` in `allowed_recipients`; the explicit `allow_any_recipient: true` mode delegates beneficiary choice to the publisher. |
 | Secret handling | No script accepts a secret argument. Provider credentials go only to the `agentcore` CLI wizard; signing happens inside AgentCore Payments. `preflight` rejects credential-shaped environment variables. |
 | Network protection | `assert_public_https_url()` and `assert_public_ip()` require HTTPS and reject loopback, RFC1918, link-local, metadata, multicast, reserved, unspecified, CGNAT, and v4-mapped forms. `_PinnedResolverTransport` connects to the vetted address; redirects are refused and bodies are capped. |
-| Content isolation | Paid bodies are withheld from model-visible output by default. The runtime returns status, content type, byte count, and SHA-256 hash. An operator may opt in to body return by setting `return_body: true` in the config file (OS-account-bound, 0600); when enabled, content is capped at 10 KiB and marked `untrusted: true`. Authorisation never reads content. The OpenClaw plugin (`get_paid_content`) mirrors this: an optional `returnBody: true` plugin-config field (default unset/false, same behaviour as today) opts a single installation in to the same capped, `untrusted`-marked body return — set per operator, not model-controllable. |
+| Content isolation | Paid bodies are withheld from model-visible output by default. The runtime returns status, content type, byte count, and SHA-256 hash. An operator may opt in to body return by setting `return_body: true` in the config file (OS-account-bound, 0600); when enabled, content is capped at 10 KiB and marked `untrusted: true`. Authorisation never reads content. The OpenClaw plugin (`get_paid_content`) mirrors this: an optional `returnBody: true` plugin-config field (default unset/false, same behaviour as today) opts a single installation in to the same capped, `untrusted`-marked body return -- set per operator, not model-controllable. |
 | Idempotency | `derive_client_token()` hashes session, origin, path, network, asset, recipient, and amount. It excludes a publisher nonce so retries reuse the same authorisation. |
 | Role separation | Session creation exists only in `agents_pay_admin.py new-session`, which refuses without a TTY and has no `--yes` flag. The human uses **ManagementRole** and the agent uses **ProcessPaymentRole** with no session writes. |
 | Proof isolation | `x402_fetch` holds the proof locally for one request. The browser path returns an opaque single-use handle bound to one origin and path, and output carries a redacted receipt only. |
@@ -121,7 +121,7 @@ for trusted glue, not for the model's tool set.
 
 - **Cumulative ceiling.** A per-session budget plus human-only session
   creation bounds spend per session and forces a human into the loop between
-  sessions. It is not a *service-side* cumulative ceiling across sessions — that
+  sessions. It is not a *service-side* cumulative ceiling across sessions -- that
   requires support in AgentCore Payments, outside a skill's reach. An operator who
   approves ten sessions has authorized ten budgets.
 - **Dependency pinning.** A skill folder cannot ship a Python lockfile that the
@@ -159,7 +159,7 @@ They were separate at first, which forced the operator to hand-copy identifiers
 between steps. Merging them removed that, but it also bought a control worth
 naming.
 
-**The session ID is a spending credential** — it names the budget being drawn
+**The session ID is a spending credential** -- it names the budget being drawn
 down. `runtime_config_path()` resolves `.agents-pay/config.json` from the OS
 account and ignores `HOME`, `AGENTS_PAY_CONFIG`, and `X402_POLICY_FILE`.
 `resolve_resource()` then reads the **config file first and the environment
@@ -208,7 +208,7 @@ Because they bound different things:
 
 | Bound | Scope | Set by |
 |---|---|---|
-| Session budget | **Cumulative** — total spend before a human must re-approve | `new-session`, typed approval |
+| Session budget | **Cumulative** -- total spend before a human must re-approve | `new-session`, typed approval |
 | `max_per_payment_usd` | **Per transaction** | the policy section |
 
 With only the session budget, a hostile merchant returns one challenge for the
@@ -225,8 +225,8 @@ holds in the account:
 
 | Role | Holds | Must NOT hold |
 |---|---|---|
-| **ManagementRole** — the human | Create/Get/Delete instrument and session | `ProcessPayment` (explicit `Deny`) |
-| **ProcessPaymentRole** — the agent | `ProcessPayment`, Get instrument/balance/session | Any session **write** |
+| **ManagementRole** -- the human | Create/Get/Delete instrument and session | `ProcessPayment` (explicit `Deny`) |
+| **ProcessPaymentRole** -- the agent | `ProcessPayment`, Get instrument/balance/session | Any session **write** |
 
 **The agent must have neither the ManagementRole nor the ability to run
 `agents_pay_admin.py`.** If it has both, it can mint a fresh budget whenever it
@@ -234,7 +234,7 @@ exhausts one and the per-session cap bounds nothing.
 
 The TTY requirement on `new-session` is defence in depth, not the boundary. An
 agent running as the operator's own user in an interactive terminal could still
-drive it — IAM is what actually stops that, which is why the runtime role must
+drive it -- IAM is what actually stops that, which is why the runtime role must
 exclude `CreatePaymentSession`.
 
 ## Validate one document, sign another

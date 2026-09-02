@@ -6,34 +6,34 @@
 
 ---
 
-## ⚠️ TOP HALLUCINATIONS — DO NOT WRITE THESE
+## [WARNING] TOP HALLUCINATIONS -- DO NOT WRITE THESE
 
 These are the most common mistakes observed in actual test runs. **Memorize these substitutions before generating any command:**
 
-| ❌ NEVER WRITE | ✅ ALWAYS WRITE |
+| [NO] NEVER WRITE | [YES] ALWAYS WRITE |
 |---|---|
 | `aws resiliencehubv2 start-assessment` | `aws resiliencehubv2 start-failure-mode-assessment` |
 | `aws resiliencehubv2 list-findings` | `aws resiliencehubv2 list-failure-mode-findings` |
 | `aws resiliencehubv2 list-service-findings` | `aws resiliencehubv2 list-failure-mode-findings` |
 | `aws resiliencehubv2 update-finding` | `aws resiliencehubv2 update-failure-mode-finding` |
 | `aws resiliencehubv2 describe-assessment` | `aws resiliencehubv2 list-failure-mode-assessments` |
-| `aws resiliencehubv2 create-input-source` (with `--resource-configuration '{"monitoring":{...}}'`) | `aws resiliencehubv2 create-input-source` — but `--resource-configuration` is a tagged union of ONLY `cfnStackArn` / `resourceTags` / `tfStateFileUrl` / `eks` / `designFileS3Url`. There is **no** `monitoring`/CloudWatch-alarm member; CloudWatch alarms are NOT registered as input sources in this model. |
+| `aws resiliencehubv2 create-input-source` (with `--resource-configuration '{"monitoring":{...}}'`) | `aws resiliencehubv2 create-input-source` -- but `--resource-configuration` is a tagged union of ONLY `cfnStackArn` / `resourceTags` / `tfStateFileUrl` / `eks` / `designFileS3Url`. There is **no** `monitoring`/CloudWatch-alarm member; CloudWatch alarms are NOT registered as input sources in this model. |
 | `aws resiliencehub list-apps` (v1) | `aws resiliencehubv2 list-services` |
 | `aws:fis:inject-api-unavailable` (missing suffix) | `aws:fis:inject-api-unavailable-error` (the real FIS action ends in `-error`) |
 | `update-routing-control-state` (singular, two calls for failover) | `update-routing-control-states` (plural, one atomic call with `--update-routing-control-state-entries`) |
-| `--reportType FAILURE_MODE` (camelCase) | `--report-type FAILURE_MODE` (kebab-case — standard CLI; `FAILURE_MODE` is the ONLY valid value) |
+| `--reportType FAILURE_MODE` (camelCase) | `--report-type FAILURE_MODE` (kebab-case -- standard CLI; `FAILURE_MODE` is the ONLY valid value) |
 | `aws resiliencehubv2 create-assumption --category ...` | `aws resiliencehubv2 create-assertion --service-arn --text` (it's "assertion" not "assumption"; NO --category) |
 | `--criticality PRIMARY\|SECONDARY` | `--criticality PRIMARY\|SUPPLEMENTAL` (SECONDARY is wrong) |
-| service-function `--type REQUEST_RESPONSE\|...` | (no such parameter — service functions have name, criticality, description only) |
-| `register-delegated-administrator` | (does NOT exist — use `--permission-model` on create-service for cross-account) |
+| service-function `--type REQUEST_RESPONSE\|...` | (no such parameter -- service functions have name, criticality, description only) |
+| `register-delegated-administrator` | (does NOT exist -- use `--permission-model` on create-service for cross-account) |
 
-**Memory aid:** Resilience Hub v2 assessment APIs **always** include the words `failure-mode` (start-failure-mode-assessment, list-failure-mode-findings, update-failure-mode-finding). If you typed `start-assessment` or `list-findings` — STOP, you have it wrong.
+**Memory aid:** Resilience Hub v2 assessment APIs **always** include the words `failure-mode` (start-failure-mode-assessment, list-failure-mode-findings, update-failure-mode-finding). If you typed `start-assessment` or `list-findings` -- STOP, you have it wrong.
 
-**Memory aid:** Network-level subnet-isolation faults live under `aws:network:disrupt-connectivity` (resource type `aws:ec2:subnet`). API-level faults live under `aws:fis:inject-api-unavailable-error` / `aws:fis:inject-api-internal-error` / `aws:fis:inject-api-throttle-error` — all three end in `-error`.
+**Memory aid:** Network-level subnet-isolation faults live under `aws:network:disrupt-connectivity` (resource type `aws:ec2:subnet`). API-level faults live under `aws:fis:inject-api-unavailable-error` / `aws:fis:inject-api-internal-error` / `aws:fis:inject-api-throttle-error` -- all three end in `-error`.
 
 ---
 
-## FIS Action Selection — Match Failure Scenario to Action
+## FIS Action Selection -- Match Failure Scenario to Action
 
 Models often pick a real but wrong FIS action. Use this scenario-to-action map:
 
@@ -54,25 +54,25 @@ Models often pick a real but wrong FIS action. Use this scenario-to-action map:
 
 **Rule of thumb:** if the failure is a **service or API** symptom, look under `aws:fis:inject-api-*`. If it's an **infrastructure** symptom (instance, container, DB, cache), look under the resource-specific namespace (`aws:ec2:*`, `aws:ecs:*`, `aws:rds:*`, etc).
 
-> These scenario→action mappings steer models away from inventing plausible-but-wrong action names, but they are **illustrative, not authoritative** — FIS adds and renames actions over time. **Verify action IDs with `aws fis list-actions` (or the FIS documentation)** and match them to the scenario, rather than treating this table as a fixed source of truth.
+> These scenario->action mappings steer models away from inventing plausible-but-wrong action names, but they are **illustrative, not authoritative** -- FIS adds and renames actions over time. **Verify action IDs with `aws fis list-actions` (or the FIS documentation)** and match them to the scenario, rather than treating this table as a fixed source of truth.
 
 ---
 
-## NGRH v2 Parameter Names — Don't Hallucinate Flags
+## NGRH v2 Parameter Names -- Don't Hallucinate Flags
 
 Common parameter mistakes:
 
-| ❌ NEVER write | ✅ Use exactly |
+| [NO] NEVER write | [YES] Use exactly |
 |---|---|
 | `--policy-name` | `--name` (when creating); the policy is identified by `--policy-arn` after creation |
-| `--tier` (on policy) | (no such flag — encode tier in the policy `--name` like "tier-1-critical") |
-| `--data-location-constraint` | (no such flag — DR approach is encoded in `--multi-az` and `--multi-region` structs) |
+| `--tier` (on policy) | (no such flag -- encode tier in the policy `--name` like "tier-1-critical") |
+| `--data-location-constraint` | (no such flag -- DR approach is encoded in `--multi-az` and `--multi-region` structs) |
 | `--rto` / `--rpo` (top-level on policy) | Nested: `--multi-az rtoInMinutes=N,rpoInMinutes=N,disasterRecoveryApproach=...` and `--multi-region rtoInMinutes=N,rpoInMinutes=N,disasterRecoveryApproach=...` |
 | `--app-arn` (any v2 command) | `--service-arn` (v2 calls these "services", not "apps") |
 
 ---
 
-## ARC Routing Control Safety Rules — Assertion vs Gating
+## ARC Routing Control Safety Rules -- Assertion vs Gating
 
 | Use case | Rule type |
 |---|---|
@@ -86,7 +86,7 @@ Common parameter mistakes:
 
 ---
 
-## ARC Failover — The Atomic API
+## ARC Failover -- The Atomic API
 
 | Use case | Use exactly |
 |---|---|
@@ -97,21 +97,21 @@ Common parameter mistakes:
 
 ---
 
-## v1 Namespace Drift — Hard Constraint
+## v1 Namespace Drift -- Hard Constraint
 
 NEVER use the `aws resiliencehub` (v1) namespace except for migration via the v2 import APIs:
 
-- ✅ Migrating: `aws resiliencehubv2 import-app --v1-app-arn ARN`
-- ✅ Migrating: `aws resiliencehubv2 import-policy --v1-policy-arn ARN`
-- ❌ Anything else with `aws resiliencehub` (no `v2`)
+- [YES] Migrating: `aws resiliencehubv2 import-app --v1-app-arn ARN`
+- [YES] Migrating: `aws resiliencehubv2 import-policy --v1-policy-arn ARN`
+- [NO] Anything else with `aws resiliencehub` (no `v2`)
 
 **Don't reference v1 commands as "discovery steps" or "to find existing apps."** Use `aws resiliencehubv2 list-services` instead.
 
 ---
 
-## ARC Readiness Checks — Out of Scope
+## ARC Readiness Checks -- Out of Scope
 
-ARC (Application Recovery Controller) covers routing controls, safety rules, zonal shift, and zonal autoshift. Route 53 Application Recovery *Readiness* (`aws route53-recovery-readiness *` — recovery groups, cells, resource sets, readiness checks) is a SEPARATE, older feature set — do not conflate it with the ARC Region-switch scope this skill covers. Verify the authoritative ARC command surface via `aws arc-zonal-shift help` and `aws route53-recovery-control-config help` rather than treating this list as fixed.
+ARC (Application Recovery Controller) covers routing controls, safety rules, zonal shift, and zonal autoshift. Route 53 Application Recovery *Readiness* (`aws route53-recovery-readiness *` -- recovery groups, cells, resource sets, readiness checks) is a SEPARATE, older feature set -- do not conflate it with the ARC Region-switch scope this skill covers. Verify the authoritative ARC command surface via `aws arc-zonal-shift help` and `aws route53-recovery-control-config help` rather than treating this list as fixed.
 
 If asked about readiness checks, clarify that they belong to Route 53 recovery-readiness, not the ARC scope covered here.
 
@@ -135,7 +135,7 @@ For monitoring/alarms/dashboards, **always recommend the companion AWS Observabi
 
 ### System / User Journey
 
-- `create-system --name --description [--no-sharing-enabled]`  (NO --dependency-discovery here — it lives on create-service)
+- `create-system --name --description [--no-sharing-enabled]`  (NO --dependency-discovery here -- it lives on create-service)
 - `get-system --system-arn` / `update-system --system-arn ...` / `list-systems` / `delete-system --system-arn`
 - `create-user-journey --system-arn --name --policy-arn --description`
 - `list-user-journeys --system-arn` / `update-user-journey --system-arn --user-journey-id ...` / `delete-user-journey --system-arn --user-journey-id`
@@ -143,20 +143,20 @@ For monitoring/alarms/dashboards, **always recommend the companion AWS Observabi
 ### Service
 
 - `create-service --name --regions '["us-east-1","us-west-2"]' --associated-systems '[{"systemArn":"...","userJourneyIds":["..."]}]' --policy-arn --permission-model invokerRoleName=ROLE --dependency-discovery ENABLED`  (--permission-model REQUIRED; invoker role needs ~60-90s to become assumable)
-- `get-service --service-arn` (returns assessmentStatus, dependencyDiscovery, reportConfiguration, etc. — there is NO estimatedAssessmentCost field)
+- `get-service --service-arn` (returns assessmentStatus, dependencyDiscovery, reportConfiguration, etc. -- there is NO estimatedAssessmentCost field)
 - `update-service --service-arn ...`
 - `list-services` (use `--account-id` to filter cross-account)
 - `delete-service --service-arn`
 
 ### Input Source (resource discovery)
 
-- `create-input-source --service-arn --resource-configuration '{...}'`  (tagged union — provide EXACTLY ONE top-level key)
+- `create-input-source --service-arn --resource-configuration '{...}'`  (tagged union -- provide EXACTLY ONE top-level key)
   - CFN: `'{"cfnStackArn":"arn:aws:cloudformation:..."}'`
-  - Tags: `'{"resourceTags":[{"key":"service","values":["checkout"]}]}'`  (a LIST of `{key, values[]}` — note `values` is plural; 1–10 tags)
-  - Terraform: `'{"tfStateFileUrl":"s3://..."}'`  (top-level string — there is NO `terraformSource` wrapper). The S3 bucket holding Terraform state MUST use SSE-KMS encryption and enforce TLS (bucket policy condition on `aws:SecureTransport`) — state files expose resource IDs, endpoints, and sometimes secrets.
+  - Tags: `'{"resourceTags":[{"key":"service","values":["checkout"]}]}'`  (a LIST of `{key, values[]}` -- note `values` is plural; 1-10 tags)
+  - Terraform: `'{"tfStateFileUrl":"s3://..."}'`  (top-level string -- there is NO `terraformSource` wrapper). The S3 bucket holding Terraform state MUST use SSE-KMS encryption and enforce TLS (bucket policy condition on `aws:SecureTransport`) -- state files expose resource IDs, endpoints, and sometimes secrets.
   - EKS: `'{"eks":{"clusterArn":"...","namespaces":["..."]}}'`  (union key is `eks`; `clusterArn` + `namespaces` (required list))
   - Design file (S3): `'{"designFileS3Url":"s3://..."}'`
-  - NOTE: provide EXACTLY ONE top-level key. Verify the accepted union members via `aws resiliencehubv2 create-input-source help` — illustratively `resourceTags`, `cfnStackArn`, `tfStateFileUrl`, `eks`, `designFileS3Url` (in particular there is no `monitoring`/CloudWatch-alarm member, a common wrong guess).
+  - NOTE: provide EXACTLY ONE top-level key. Verify the accepted union members via `aws resiliencehubv2 create-input-source help` -- illustratively `resourceTags`, `cfnStackArn`, `tfStateFileUrl`, `eks`, `designFileS3Url` (in particular there is no `monitoring`/CloudWatch-alarm member, a common wrong guess).
 - `list-input-sources --service-arn`
 - `delete-input-source --service-arn --input-source-id`
 
@@ -184,13 +184,13 @@ For monitoring/alarms/dashboards, **always recommend the companion AWS Observabi
 - `update-assertion --service-arn --assertion-id --text "..."`
 - `delete-assertion --service-arn --assertion-id`
 - `create-report --service-arn --report-type FAILURE_MODE` (`--report-type` is kebab-case; `FAILURE_MODE` is the ONLY valid value)
-- `list-reports --service-arn` (returns `reportOutput.s3ReportOutput.s3ObjectKey` on SUCCEEDED). The S3 bucket receiving reports MUST have SSE-KMS encryption, a bucket policy enforcing TLS (`aws:SecureTransport`), and least-privilege access — assessment reports reveal architectural weaknesses and failure modes.
+- `list-reports --service-arn` (returns `reportOutput.s3ReportOutput.s3ObjectKey` on SUCCEEDED). The S3 bucket receiving reports MUST have SSE-KMS encryption, a bucket policy enforcing TLS (`aws:SecureTransport`), and least-privilege access -- assessment reports reveal architectural weaknesses and failure modes.
 
 ### Multi-Account
 
-- There is NO `register-delegated-administrator` operation. Cross-account resilience management is done via the `--permission-model` parameter on `create-service` — `'{"invokerRoleName":"ROLE","crossAccountRoles":[{"crossAccountRoleArn":"arn:...","externalId":"..."}]}'`. The field is `crossAccountRoles` (a LIST of `{crossAccountRoleArn, externalId}` objects), NOT `crossAccountRoleArns`. Combine with AWS Organizations cross-account IAM roles. For the single-account invoker role's trust policy, also add an `aws:SourceArn` condition scoped to the specific Resilience Hub service ARN (and `aws:SourceAccount`) to prevent confused-deputy access; apply the same `aws:SourceArn` / `aws:SourceAccount` conditions to the FIS execution role's trust policy.
+- There is NO `register-delegated-administrator` operation. Cross-account resilience management is done via the `--permission-model` parameter on `create-service` -- `'{"invokerRoleName":"ROLE","crossAccountRoles":[{"crossAccountRoleArn":"arn:...","externalId":"..."}]}'`. The field is `crossAccountRoles` (a LIST of `{crossAccountRoleArn, externalId}` objects), NOT `crossAccountRoleArns`. Combine with AWS Organizations cross-account IAM roles. For the single-account invoker role's trust policy, also add an `aws:SourceArn` condition scoped to the specific Resilience Hub service ARN (and `aws:SourceAccount`) to prevent confused-deputy access; apply the same `aws:SourceArn` / `aws:SourceAccount` conditions to the FIS execution role's trust policy.
 
-### v1 → v2 Migration (only acceptable v1 reference)
+### v1 -> v2 Migration (only acceptable v1 reference)
 
 - `import-app --v1-app-arn ARN`
 - `import-policy --v1-policy-arn ARN`
@@ -210,17 +210,17 @@ For monitoring/alarms/dashboards, **always recommend the companion AWS Observabi
 
 ## Canonical ARC Operations
 
-### Routing Controls (aws route53-recovery-control-config — control plane)
+### Routing Controls (aws route53-recovery-control-config -- control plane)
 
 - `create-cluster --cluster-name`
 - `create-control-panel --cluster-arn --control-panel-name`
 - `create-routing-control --cluster-arn --control-panel-arn --routing-control-name`
-- `create-safety-rule --assertion-rule '{"Name":...,"ControlPanelArn":...,"AssertedControls":[...],"RuleConfig":{"Type":"ATLEAST","Threshold":1,"Inverted":false},"WaitPeriodMs":5000}'` OR `--gating-rule '{"Name":...,"ControlPanelArn":...,"GatingControls":[...],"TargetControls":[...],"RuleConfig":{...},"WaitPeriodMs":0}'` — Name/ControlPanelArn are PascalCase fields INSIDE the rule JSON, not separate flags
+- `create-safety-rule --assertion-rule '{"Name":...,"ControlPanelArn":...,"AssertedControls":[...],"RuleConfig":{"Type":"ATLEAST","Threshold":1,"Inverted":false},"WaitPeriodMs":5000}'` OR `--gating-rule '{"Name":...,"ControlPanelArn":...,"GatingControls":[...],"TargetControls":[...],"RuleConfig":{...},"WaitPeriodMs":0}'` -- Name/ControlPanelArn are PascalCase fields INSIDE the rule JSON, not separate flags
 - `list-routing-controls --control-panel-arn`
 - `list-safety-rules --control-panel-arn`
 - `describe-routing-control --routing-control-arn`
 
-### Routing Control State (aws route53-recovery-cluster — data plane, atomic)
+### Routing Control State (aws route53-recovery-cluster -- data plane, atomic)
 
 - **Failover (preferred):** `update-routing-control-states --update-routing-control-state-entries '[{...},{...}]'`
 - Single-control: `update-routing-control-state --routing-control-arn ARN --routing-control-state On|Off` (rarely correct)

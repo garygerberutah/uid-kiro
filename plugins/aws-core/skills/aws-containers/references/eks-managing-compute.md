@@ -12,13 +12,13 @@ Amazon EKS managed node groups support Amazon EC2 Auto Scaling warm pools. A war
 
 Key considerations:
 
-- Always configure warm pools through the EKS API (`create-nodegroup` or `update-nodegroup-config`), not the EC2 Auto Scaling API directly — manual changes conflict with EKS management. EKS manages the pool via the `AWSServiceRoleForAmazonEKSNodegroup` service-linked role.
+- Always configure warm pools through the EKS API (`create-nodegroup` or `update-nodegroup-config`), not the EC2 Auto Scaling API directly -- manual changes conflict with EKS management. EKS manages the pool via the `AWSServiceRoleForAmazonEKSNodegroup` service-linked role.
 - Configuration parameters: `enabled`, `maxGroupPreparedCapacity` (max combined instances across the warm pool and ASG), `minSize` (default `0`), `poolState` (default `Stopped`), and `reuseOnScaleIn` (return instances to the pool on scale-in instead of terminating them; default `false`).
-- Custom AMIs are not supported — you must use EKS-optimized AMIs.
+- Custom AMIs are not supported -- you must use EKS-optimized AMIs.
 - With Bottlerocket AMIs, the `Hibernated` pool state and `reuseOnScaleIn` are not supported; use `Stopped` or `Running` only.
 - The `Hibernated` pool state is only supported on specific instance types (see the EC2 hibernation prerequisites).
 - Updating warm pool settings doesn't affect instances already in the pool; new settings apply only to instances entering the pool afterward. Set `enabled=false` to disable the pool.
-- Cost: a warm pool that isn't needed adds unnecessary cost. Size it to your scaling patterns — a starting point is 10–20% of expected peak capacity.
+- Cost: a warm pool that isn't needed adds unnecessary cost. Size it to your scaling patterns -- a starting point is 10-20% of expected peak capacity.
 - Ensure your VPC has enough IP addresses for both the ASG and warm pool instances.
 - Not all instance types, AMIs, or configurations are supported; review the EC2 Auto Scaling warm pool prerequisites and limitations first.
 

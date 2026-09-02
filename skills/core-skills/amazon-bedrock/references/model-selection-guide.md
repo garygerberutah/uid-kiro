@@ -21,7 +21,7 @@ Agents consistently get these wrong. Four patterns:
 
 Always look up current model IDs: `aws bedrock list-foundation-models --region <region>` and `aws bedrock list-inference-profiles --region <region>`, or refer to the latest [Bedrock supported models](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html).
 
-**Critical**: Some models do not support on-demand invocation with base model IDs and require an inference profile ID instead. Before using a model, check `aws bedrock list-inference-profiles --region <region>` — if an inference profile exists for the model, use the inference profile ID. If you get `ValidationException: on-demand throughput isn't supported`, switch to the inference profile ID.
+**Critical**: Some models do not support on-demand invocation with base model IDs and require an inference profile ID instead. Before using a model, check `aws bedrock list-inference-profiles --region <region>` -- if an inference profile exists for the model, use the inference profile ID. If you get `ValidationException: on-demand throughput isn't supported`, switch to the inference profile ID.
 
 ## Model Access Provisioning
 
@@ -35,8 +35,8 @@ Most serverless models are automatically available without manual enablement. Us
 
 **Access control**: Use IAM policies (`bedrock:InvokeModel` scoped to specific resource ARNs) and SCPs to control which models can be used. Use `bedrock:ListFoundationModels` for listing models and `bedrock:GetFoundationModel` for getting details about a specific model. The IAM Resource ARN format depends on the model ID type:
 
-- Inference profile ID → `arn:aws:bedrock:<region>:<account-id>:inference-profile/<profile-id>`
-- Base model ID → `arn:aws:bedrock:<region>::foundation-model/``<model-id>```
+- Inference profile ID -> `arn:aws:bedrock:<region>:<account-id>:inference-profile/<profile-id>`
+- Base model ID -> `arn:aws:bedrock:<region>::foundation-model/``<model-id>```
 - These are different ARN formats and are not interchangeable. See [Bedrock IAM resource types](https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonbedrock.html#amazonbedrock-resources-for-iam-policies)
 - For least-privilege policies scoped to specific inference profiles, you MUST include BOTH the inference profile ARN (`arn:aws:bedrock:<region>:<account-id>:inference-profile/<profile-id>`) AND the foundation model ARN with a wildcard region (`arn:aws:bedrock:*::foundation-model/<model-id>`), because the request may be routed to any region in the profile -- otherwise `bedrock:InvokeModel` calls fail with `AccessDeniedException`. See [Prerequisites for inference profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-prereq.html)
 
@@ -44,14 +44,14 @@ Most serverless models are automatically available without manual enablement. Us
 Some AWS accounts (especially Organizations with European billing/SEPA) get this error when subscribing to Marketplace models. This is an account billing issue, not a Bedrock issue.
 
 - Workaround: temporarily set a VISA/credit card as default payment method
-- Alternative: per AWS re:Post user reports, adding USD payment profiles in the organization management account (Billing → Payment Preferences → Payment profiles) for service providers ending with "- Marketplace" may resolve the issue
+- Alternative: per AWS re:Post user reports, adding USD payment profiles in the organization management account (Billing -> Payment Preferences -> Payment profiles) for service providers ending with "- Marketplace" may resolve the issue
 - Contact AWS Support if the issue persists
 
 ## Selection Criteria
 
 List models with capabilities: `aws bedrock list-foundation-models --region <region>`
 
-Quick defaults (verify current availability — new models are added frequently, check `aws bedrock list-foundation-models --region <region>` or the [Bedrock supported models page](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html)):
+Quick defaults (verify current availability -- new models are added frequently, check `aws bedrock list-foundation-models --region <region>` or the [Bedrock supported models page](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html)):
 
 - **General purpose / reasoning**: Claude Sonnet
 - **Fast + cheap**: Claude Haiku or Nova Micro
@@ -59,7 +59,7 @@ Quick defaults (verify current availability — new models are added frequently,
 - **Multilingual**: Cohere Command or Claude
 - **Code generation**: Claude Sonnet or Llama
 
-Decision framework — choose based on:
+Decision framework -- choose based on:
 
 | Criterion | What to Check |
 |-----------|--------------|
@@ -72,7 +72,7 @@ Decision framework — choose based on:
 
 ## Embedding Models for Knowledge Bases
 
-This is a non-obvious choice that affects KB quality. The table below shows common options — additional embedding models (including multimodal embeddings) are available. Check `aws bedrock list-foundation-models --by-output-modality EMBEDDING --region <region>` for the current list.
+This is a non-obvious choice that affects KB quality. The table below shows common options -- additional embedding models (including multimodal embeddings) are available. Check `aws bedrock list-foundation-models --by-output-modality EMBEDDING --region <region>` for the current list.
 
 | Model | Dimensions | Best For |
 |-------|-----------|----------|
@@ -94,4 +94,4 @@ Refer to the latest AWS documentation on Bedrock embedding models for current op
 | Service tiers (on-demand) | Priority (fastest, premium price) / Standard (default) / Flex (discounted, may queue) | Match latency and cost to workload needs |
 | Reserved tier | Dedicated capacity reservation (1 or 3 month commitment, 99.5% uptime target) | Mission-critical apps that cannot tolerate downtime |
 
-Refer to the latest AWS documentation on Bedrock pricing for current rates and discount percentages. Pricing changes without notice — do not hardcode pricing assumptions.
+Refer to the latest AWS documentation on Bedrock pricing for current rates and discount percentages. Pricing changes without notice -- do not hardcode pricing assumptions.

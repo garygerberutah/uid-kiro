@@ -2,7 +2,7 @@
 
 Guides safe deletion of a SageMaker Managed MLflow app with appropriate warnings.
 
-> **IMPORTANT:** Use only `sagemaker:DeleteMlflowApp`. Do NOT use `DeleteMlflowTrackingServer` (legacy) — that API is deprecated.
+> **IMPORTANT:** Use only `sagemaker:DeleteMlflowApp`. Do NOT use `DeleteMlflowTrackingServer` (legacy) -- that API is deprecated.
 
 ## Step 1: Identify Target App
 
@@ -14,10 +14,10 @@ Guides safe deletion of a SageMaker Managed MLflow app with appropriate warnings
 Use `aws-mcp` to call `sagemaker:DescribeMlflowApp` to get the app's current status.
 
 - **Status is ACTIVE:** proceed to Step 3
-- **Status is CREATING:** inform user — "This app is still being created. Wait until it's active before deleting."
-- **Status is DELETING:** inform user — "This app is already being deleted."
+- **Status is CREATING:** inform user -- "This app is still being created. Wait until it's active before deleting."
+- **Status is DELETING:** inform user -- "This app is already being deleted."
 - **Status is FAILED:** proceed to Step 3 (failed apps can be deleted to clean up)
-- **Any other status:** inform user — "This app is not in a deletable state ({status})."
+- **Any other status:** inform user -- "This app is not in a deletable state ({status})."
 
 ## Step 3: Destructive Action Warning
 

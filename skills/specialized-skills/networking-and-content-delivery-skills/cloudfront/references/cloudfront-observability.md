@@ -47,9 +47,9 @@ observability). Fall back to the AWS CLI otherwise.
 **Constraints:**
 
 - You MUST explain standard logs are comprehensive and arrive minutes later with no CloudFront
-  charge for log delivery (customer pays only for the destination — S3 storage, CloudWatch Logs
+  charge for log delivery (customer pays only for the destination -- S3 storage, CloudWatch Logs
   ingestion/storage, or Firehose delivery; CloudWatch Logs bills a per-event included byte allowance
-  with overage charged per byte — direct the customer to the current Amazon CloudWatch Logs pricing
+  with overage charged per byte -- direct the customer to the current Amazon CloudWatch Logs pricing
   page for the exact allowance and rates rather than quoting a fixed number, which can change);
   real-time logs arrive within seconds, are sampled
   at a rate you set, and are best-effort with a CloudFront per-line charge plus the Kinesis data
@@ -73,7 +73,7 @@ Customers often ask for data CloudFront already logs, then build extra tooling t
   the edge result type and cache hit or miss, the origin response and origin errors, the time
   taken, the viewer TLS protocol and cipher, and, for multi-tenant distributions, the distribution
   tenant identifier the request belonged to (enabling per-tenant dashboards and alerting)
-- You MUST highlight field selection as configurable in both standard and real-time logs — customers
+- You MUST highlight field selection as configurable in both standard and real-time logs -- customers
   choose exactly which fields to include, reducing storage costs and simplifying analysis
 
 ## Querying at rest with Athena and Parquet

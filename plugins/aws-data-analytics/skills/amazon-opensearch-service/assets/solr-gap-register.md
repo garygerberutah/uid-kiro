@@ -15,18 +15,18 @@ Use this table verbatim in section **6. Feature Gap Register** of [report-templa
 
 ## Severity + Lane vocabulary
 
-Severity values MUST come from the canonical rubric in [compatibility-rubric.md](../references/compatibility-rubric.md) §1 — BLOCKING / HIGH / MEDIUM / LOW only. Lane values MUST come from §2 of the same file — `migration-specific` (the migration plan already includes the remediation) or `risk-blocker` (the customer must act). Only `risk-blocker` rows deduct from the Compatibility readiness weight.
+Severity values MUST come from the canonical rubric in [compatibility-rubric.md](../references/compatibility-rubric.md) Section 1 -- BLOCKING / HIGH / MEDIUM / LOW only. Lane values MUST come from Section 2 of the same file -- `migration-specific` (the migration plan already includes the remediation) or `risk-blocker` (the customer must act). Only `risk-blocker` rows deduct from the Compatibility readiness weight.
 
 ## Effort tiers
 
-- **S** — small; isolated change, mechanical translation or config update.
-- **M** — medium; touches multiple components or requires re-indexing.
-- **L** — large; usually requires design review, custom code, or behavior validation.
+- **S** -- small; isolated change, mechanical translation or config update.
+- **M** -- medium; touches multiple components or requires re-indexing.
+- **L** -- large; usually requires design review, custom code, or behavior validation.
 
 ## Constraints
 
 - You MUST keep the column order exactly as shown because downstream tooling parses the table by column position.
 - You MUST NOT remove a row to "simplify" the report because every flagged finding belongs in the register, even LOW-level, and removed rows hide findings.
 - You MUST use the BLOCKING / HIGH / MEDIUM / LOW vocabulary in the Severity column. You MUST NOT use the legacy Breaking / Warning / Info labels because the canonical rubric in [compatibility-rubric](../references/compatibility-rubric.md) uses the four-tier vocabulary, and mixed labels will confuse the agent's downstream consumer.
-- You MUST use the `migration-specific` / `risk-blocker` vocabulary in the Lane column. The Lane is what the FULL_ASSESSMENT §7 split routes by, and what the readiness scoring uses to decide if a row deducts from Compatibility (only `risk-blocker` rows deduct).
+- You MUST use the `migration-specific` / `risk-blocker` vocabulary in the Lane column. The Lane is what the FULL_ASSESSMENT Section 7 split routes by, and what the readiness scoring uses to decide if a row deducts from Compatibility (only `risk-blocker` rows deduct).
 - You MUST link every row's "OpenSearch alternative" cell to the relevant reference file when one exists.

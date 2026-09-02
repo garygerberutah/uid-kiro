@@ -48,7 +48,7 @@ For the MSF architecture overview, KPU resource model, and AWS service integrati
 
 **Resource Limits**:
 
-- Maximum parallelism per application: ParallelismPerKPU × KPU limit (default KPU limit is 64; request increase via Service Quotas)
+- Maximum parallelism per application: ParallelismPerKPU x KPU limit (default KPU limit is 64; request increase via Service Quotas)
 - Maximum memory per KPU: 4 GB (1 vCPU, 4 GB memory, 50 GB storage per KPU)
 - Maximum number of applications per account: 50 (adjustable through AWS support)
 - Checkpoint interval minimum: 1 second (configured via Managed Service for Apache Flink console, not application code)
@@ -102,7 +102,7 @@ KinesisStreamsSink<ProcessedRecord> kdsSink =
         // IMPORTANT: true ensures the job fails on write errors, letting Flink's
         // checkpoint/restart mechanism retry rather than silently dropping records.
         // Use false only for best-effort delivery where availability is prioritized
-        // over data completeness — but be aware that failed records are lost.
+        // over data completeness -- but be aware that failed records are lost.
         .setFailOnError(true)
         .setMaxBatchSize(500)
         .setMaxInFlightRequests(50)

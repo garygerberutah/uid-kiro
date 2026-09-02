@@ -85,7 +85,7 @@ jobs:
               .join('\n');
 
             const body = [
-              '⚠️ **PR closed automatically.**',
+              '[WARNING] **PR closed automatically.**',
               '',
               'SKILL.md frontmatter contains fields that are not permitted in this public repository:',
               '',

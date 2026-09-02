@@ -74,12 +74,12 @@ def main():
         print(f"FAIL: Connection failed after {elapsed:.2f}s")
         print(f"  ORA-{error.code}: {error.message}")
         hints = {
-            12170: "TNS connect timeout — check security groups, VPC routing, endpoint",
-            12541: "No listener — check endpoint and port are correct",
-            1017: "Invalid username/password — check credentials",
-            12514: "Listener does not know of service — check service name",
-            12505: "Listener does not know of SID — try SERVICE_NAME instead of SID",
-            28000: "Account is locked — unlock the user in the database",
+            12170: "TNS connect timeout -- check security groups, VPC routing, endpoint",
+            12541: "No listener -- check endpoint and port are correct",
+            1017: "Invalid username/password -- check credentials",
+            12514: "Listener does not know of service -- check service name",
+            12505: "Listener does not know of SID -- try SERVICE_NAME instead of SID",
+            28000: "Account is locked -- unlock the user in the database",
         }
         if error.code in hints:
             print(f"  Hint: {hints[error.code]}")
@@ -99,7 +99,7 @@ def main():
         print(f"  Session user: {row[2]}")
     except oracledb.DatabaseError as e:
         (error,) = e.args
-        print(f"FAIL: Query failed — ORA-{error.code}: {error.message}")
+        print(f"FAIL: Query failed -- ORA-{error.code}: {error.message}")
     print()
 
     print("--- Encryption Status ---")
@@ -130,10 +130,10 @@ def main():
                 if "encryption" in str(banner[0]).lower() or "crypto" in str(banner[0]).lower():
                     print("  PASS: Encryption is active (NNE or SSL)")
         else:
-            print("  INFO: No encryption banners found — connection may be unencrypted")
+            print("  INFO: No encryption banners found -- connection may be unencrypted")
     except oracledb.DatabaseError as e:
         (error,) = e.args
-        print(f"  WARN: Cannot check encryption — ORA-{error.code}: {error.message}")
+        print(f"  WARN: Cannot check encryption -- ORA-{error.code}: {error.message}")
         print("  (This may require additional privileges)")
     print()
 
@@ -154,7 +154,7 @@ def main():
         print(f"  Client host:  {row[2]}")
     except oracledb.DatabaseError as e:
         (error,) = e.args
-        print(f"  WARN: Cannot check auth info — ORA-{error.code}")
+        print(f"  WARN: Cannot check auth info -- ORA-{error.code}")
     print()
 
     conn.close()

@@ -302,7 +302,7 @@ class SingleTenantUserIdTests(unittest.TestCase):
 
     One installation = one payer. Requiring --user-id at every step invited a
     mismatch between create-instrument and new-session, which yields a session that
-    cannot spend the instrument — a confusing failure with no clear error.
+    cannot spend the instrument -- a confusing failure with no clear error.
     """
 
     @classmethod
@@ -561,8 +561,8 @@ class SsrfTests(unittest.TestCase):
             "192.168.1.1",        # RFC1918
             "172.16.0.1",         # RFC1918
             "169.254.169.254",    # cloud metadata
-            "100.64.0.1",         # CGNAT — not caught by is_private
-            "224.0.0.1",          # multicast — not caught by is_private
+            "100.64.0.1",         # CGNAT -- not caught by is_private
+            "224.0.0.1",          # multicast -- not caught by is_private
             "0.0.0.0",            # unspecified
             "::1",                # v6 loopback
             "fd00::1",            # v6 unique-local
@@ -582,7 +582,7 @@ class SsrfTests(unittest.TestCase):
     def test_origin_must_be_allowlisted(self):
         """A resolvable but unapproved origin is refused by the allowlist.
 
-        Uses example.com because it actually resolves — otherwise the DNS check
+        Uses example.com because it actually resolves -- otherwise the DNS check
         fires first and we would not be testing the allowlist at all.
         """
         with self.assertRaises(pol.PolicyError) as ctx:
@@ -615,7 +615,7 @@ class IdempotencyTests(unittest.TestCase):
         """The retry path re-fetches the 402, so the nonce may be fresh each time.
 
         Mixing the nonce into the token would give every attempt a different
-        token — converting the retry this function protects into a second real
+        token -- converting the retry this function protects into a second real
         payment, and letting a hostile publisher force double charges by
         rotating nonces. Two separately fetched challenges for the same purchase
         must derive the SAME token.
@@ -639,7 +639,7 @@ class IdempotencyTests(unittest.TestCase):
         self.assertNotEqual(base, first)
 
     def test_token_is_stable_across_process_restart(self):
-        """Derived, not random — so a restart mid-purchase cannot double-charge."""
+        """Derived, not random -- so a restart mid-purchase cannot double-charge."""
         expected = self._token()
         for _ in range(5):
             self.assertEqual(self._token(), expected)
@@ -696,7 +696,7 @@ class IdempotencyTests(unittest.TestCase):
         invert resolve_resource()'s documented config-file-first precedence.
 
         Before this fix, omitting `session_id` fell through to a bare
-        `os.environ.get("PAYMENT_SESSION_ID", "")` unconditionally — bypassing
+        `os.environ.get("PAYMENT_SESSION_ID", "")` unconditionally -- bypassing
         config.json entirely for any caller using this path. Passing `policy=`
         now correctly prefers the config file, matching resolve_resource().
         """
@@ -1044,7 +1044,7 @@ class SafeMethodTests(unittest.TestCase):
 class HarnessCliTests(unittest.TestCase):
     """The CLI is the interface a harness actually uses, so its contract is tested.
 
-    Claude Code, Codex, Cursor, Kiro and OpenClaw run shell commands — they do not
+    Claude Code, Codex, Cursor, Kiro and OpenClaw run shell commands -- they do not
     import Python and build an agent object. Exit codes matter because a harness
     branches on them without parsing JSON.
     """
@@ -1098,7 +1098,7 @@ runpy.run_path(str(cli), run_name="__main__")
         )
 
     def test_refusal_exits_2_not_1(self):
-        """A refusal is a decision, not a fault — a harness must be able to tell."""
+        """A refusal is a decision, not a fault -- a harness must be able to tell."""
         r = self._run("https://169.254.169.254/latest/meta-data/")
         self.assertEqual(r.returncode, 2)
         self.assertTrue(json.loads(r.stdout)["refused"])
@@ -1231,7 +1231,7 @@ class SessionStatusTests(unittest.TestCase):
 
         A hardcoded fallback here would silently override a region resolved from
         config.json, the environment, or boto3's own session/profile resolution
-        whenever none of those apply — forcing a real payment manager lookup
+        whenever none of those apply -- forcing a real payment manager lookup
         (which lives in the operator's actual deployment region) against the
         wrong AWS region and producing a confusing manager-not-found error.
         """

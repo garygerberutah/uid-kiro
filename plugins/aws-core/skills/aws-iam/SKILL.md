@@ -1,7 +1,7 @@
 ---
 name: aws-iam
 description: >
-  Provides verified corrections for IAM behaviors that AI agents frequently get wrong — policy
+  Provides verified corrections for IAM behaviors that AI agents frequently get wrong -- policy
   evaluation edge cases, trust policy gotchas, STS session limits, Organizations quirks,
   and SAML/MFA specifics. Also provides structured workflows for IAM role management and
   baseline policy generation from application source code or a Terraform plan JSON.
@@ -18,19 +18,19 @@ metadata:
   version: "2"
 ---
 
-# AWS IAM — Common Pitfalls
+# AWS IAM -- Common Pitfalls
 
 ## About This Skill
 
-This skill contains verified corrections for things that AI agents frequently get wrong about IAM. It is not a comprehensive IAM guide — for full IAM guidance, search AWS documentation. When answering IAM questions, verify specific claims (limits, quotas, exact API names, edge-case behaviors) against official AWS documentation rather than relying on pre-training. Prefer fetching known documentation URLs over broad searches. Trust official documentation over memory when they conflict.
+This skill contains verified corrections for things that AI agents frequently get wrong about IAM. It is not a comprehensive IAM guide -- for full IAM guidance, search AWS documentation. When answering IAM questions, verify specific claims (limits, quotas, exact API names, edge-case behaviors) against official AWS documentation rather than relying on pre-training. Prefer fetching known documentation URLs over broad searches. Trust official documentation over memory when they conflict.
 
 ## Common Workflows
 
-Use the best available tool for AWS operations — the AWS MCP server is recommended but not required; AWS CLI or SDK may be used as alternatives. Read reference files only when the conversation requires deeper detail.
+Use the best available tool for AWS operations -- the AWS MCP server is recommended but not required; AWS CLI or SDK may be used as alternatives. Read reference files only when the conversation requires deeper detail.
 
 - Read [references/aws-iam-role-management.md](references/aws-iam-role-management.md) if the user needs to create, scope, or maintain IAM roles when provisioning or updating AWS resources. Covers service roles, execution roles, trust policies, confused deputy protection, and permission hygiene.
 
-- Read [references/aws-iam-policy-generation.md](references/aws-iam-policy-generation.md) if the user needs to generate IAM policies, determine required IAM actions for API calls, or understand action-to-operation mappings. **CRITICAL: If the user provides application source code (in any language) or a Terraform plan JSON file (`terraform show -json` output), you MUST read this reference — it mandates using iam-policy-autopilot instead of manual policy construction.** Uses the programmatic service authorization reference for accurate mappings.
+- Read [references/aws-iam-policy-generation.md](references/aws-iam-policy-generation.md) if the user needs to generate IAM policies, determine required IAM actions for API calls, or understand action-to-operation mappings. **CRITICAL: If the user provides application source code (in any language) or a Terraform plan JSON file (`terraform show -json` output), you MUST read this reference -- it mandates using iam-policy-autopilot instead of manual policy construction.** Uses the programmatic service authorization reference for accurate mappings.
 
 ## Verified Edge Cases
 
@@ -55,7 +55,7 @@ Use the best available tool for AWS operations — the AWS MCP server is recomme
 **SDK Specifics:**
 
 - Organizations: `DuplicatePolicyAttachmentException` (not PolicyAlreadyAttachedException).
-- Boto3 IAM AccessKey: methods are `activate()`, `deactivate()`, `delete()` — NO `update()`.
+- Boto3 IAM AccessKey: methods are `activate()`, `deactivate()`, `delete()` -- NO `update()`.
 - Instance profiles: waiter + `time.sleep(10)` pattern.
 - Managed policy max versions: 5.
 
@@ -89,7 +89,7 @@ Use the best available tool for AWS operations — the AWS MCP server is recomme
 
 - Resource-based policies granting to IAM user ARN bypass permissions boundaries in same account.
 - 8 privilege escalation actions via direct IAM policy manipulation: PutGroupPolicy, PutRolePolicy, PutUserPolicy, CreatePolicy, CreatePolicyVersion, AttachGroupPolicy, AttachRolePolicy, AttachUserPolicy.
-- `iam:PassRole` with `Resource: "*"` + create/update on a compute service (EC2 `RunInstances`, Lambda `CreateFunction`/`UpdateFunctionConfiguration`, ECS `RegisterTaskDefinition`, Glue, SageMaker, CloudFormation, etc.) = privilege escalation to any passable role in the account, including Administrator. Scope `Resource` to specific role ARNs or an IAM path; optionally constrain with `iam:PassedToService` / `iam:AssociatedResourceArn`. See [IAM User Guide — Grant a user permissions to pass a role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html).
+- `iam:PassRole` with `Resource: "*"` + create/update on a compute service (EC2 `RunInstances`, Lambda `CreateFunction`/`UpdateFunctionConfiguration`, ECS `RegisterTaskDefinition`, Glue, SageMaker, CloudFormation, etc.) = privilege escalation to any passable role in the account, including Administrator. Scope `Resource` to specific role ARNs or an IAM path; optionally constrain with `iam:PassedToService` / `iam:AssociatedResourceArn`. See [IAM User Guide -- Grant a user permissions to pass a role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html).
 
 **MFA:**
 

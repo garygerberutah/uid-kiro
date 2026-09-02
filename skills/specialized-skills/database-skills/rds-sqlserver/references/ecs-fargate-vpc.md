@@ -1,12 +1,12 @@
-# ECS / Fargate — RDS SQL Server
+# ECS / Fargate -- RDS SQL Server
 
 Container tasks connecting to RDS SQL Server in the same VPC (or peered).
 
 ## Networking
 
-- Tasks use `awsvpc` networking mode — each task gets an ENI in a subnet
+- Tasks use `awsvpc` networking mode -- each task gets an ENI in a subnet
 - Task SG inbound: none required (outbound-only for DB connections)
-- Task SG outbound: allow 1433 → RDS SG, 443 → Secrets Manager / STS
+- Task SG outbound: allow 1433 -> RDS SG, 443 -> Secrets Manager / STS
 - RDS SG inbound: 1433 from task SG (by SG ID)
 
 ```bash
@@ -20,10 +20,10 @@ For Fargate in private subnets without internet access, create VPC endpoints for
 
 - `com.amazonaws.<region>.secretsmanager`
 - `com.amazonaws.<region>.ecr.dkr` and `com.amazonaws.<region>.ecr.api` (for ECR image pulls)
-- `com.amazonaws.<region>.s3` (gateway — for ECR image layers)
+- `com.amazonaws.<region>.s3` (gateway -- for ECR image layers)
 - `com.amazonaws.<region>.logs` (CloudWatch Logs)
 
-## Secrets injection — two approaches
+## Secrets injection -- two approaches
 
 ### Approach 1: Inject at container start (recommended)
 
@@ -101,7 +101,7 @@ Approach 2 handles rotation better: app can re-fetch after an 18456 error. Appro
 ## Windows auth on Fargate
 
 - **Windows containers on Fargate**: gMSA (Group Managed Service Account) is supported
-- **Linux containers**: must manage Kerberos tickets explicitly — mount keytab or KRB5CCNAME
+- **Linux containers**: must manage Kerberos tickets explicitly -- mount keytab or KRB5CCNAME
 
 ### gMSA for Windows containers
 
@@ -128,7 +128,7 @@ For long-running tasks, use a proper pool:
 - .NET: ADO.NET built-in (`Max Pool Size=20`)
 - Node.js: `mssql` built-in (`pool: { max: 10 }`)
 
-Pool size should be tuned to ECS task count × concurrent requests per task. RDS can handle thousands of connections but each one costs memory.
+Pool size should be tuned to ECS task count x concurrent requests per task. RDS can handle thousands of connections but each one costs memory.
 
 ## Full Fargate task definition (Python + pymssql)
 
@@ -175,7 +175,7 @@ Pool size should be tuned to ECS task count × concurrent requests per task. RDS
 }
 ```
 
-## Service — with ALB
+## Service -- with ALB
 
 ```bash
 aws ecs create-service \

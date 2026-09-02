@@ -16,7 +16,7 @@ with `Action: Activate`. See [agent-install-ec2.md](agent-install-ec2.md) Step 4
 
 This does NOT apply to command-line installs (yum/apt-get). Agents installed
 via command-line begin publishing as soon as the package is installed and the
-IAM policy is attached — no activation step is needed.
+IAM policy is attached -- no activation step is needed.
 
 ## Stopping and starting the agent
 
@@ -41,7 +41,7 @@ sudo journalctl -f -u network-flow-monitor.service | grep -i HTTP
 
 Any status code other than 200 indicates an error.
 
-### HTTP 403 — Missing/insufficient IAM permissions
+### HTTP 403 -- Missing/insufficient IAM permissions
 
 ```json
 {
@@ -55,7 +55,7 @@ Any status code other than 200 indicates an error.
 
 **Fix:** Attach `CloudWatchNetworkFlowMonitorAgentPublishPolicy` to the instance role. See [agent-permissions.md](agent-permissions.md).
 
-### Connection error — Network connectivity issue
+### Connection error -- Network connectivity issue
 
 ```json
 {

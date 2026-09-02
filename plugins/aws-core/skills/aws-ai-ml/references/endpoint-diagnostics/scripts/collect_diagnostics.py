@@ -41,7 +41,7 @@ class TimeRange:
     """Time window for data collection. Use factory methods to construct.
 
     Either specify an absolute window (start + end) or a relative lookback
-    (minutes from now). Do not mix — if start is set, minutes is ignored.
+    (minutes from now). Do not mix -- if start is set, minutes is ignored.
     """
 
     start: datetime | None = None
@@ -292,7 +292,7 @@ def collect_endpoint_diagnostics(
                 "Variant name unavailable; skipped instance-level metrics (CPU/Memory/GPU)"
             )
 
-        # Warn if multiple variants exist — metrics are only for the first
+        # Warn if multiple variants exist -- metrics are only for the first
         variants = endpoint_status.get("production_variants", [])
         if len(variants) > 1:
             variant_names = [v["name"] for v in variants]
@@ -312,7 +312,7 @@ def collect_endpoint_diagnostics(
     except ClientError as e:
         errors.append(f"GetMetricData failed: {e.response['Error']['Message']}")
 
-    # Step 3: FilterLogEvents — use a wider window for logs
+    # Step 3: FilterLogEvents -- use a wider window for logs
     try:
         log_group = f"/aws/sagemaker/Endpoints/{endpoint_name}"
         if time_range.start is not None:

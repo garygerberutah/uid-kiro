@@ -18,7 +18,7 @@ The most common Cognito failures, by symptom, with root cause and fix.
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | `NotAuthorizedException: Unable to verify secret hash` | Client secret set on a public (SPA/mobile) client | Recreate the app client with no secret, or compute `SECRET_HASH` in a server-side client |
-| `InvalidParameterException: Auth flow not enabled` | The flow isn't in the client's explicit auth flows | Add e.g. `ALLOW_USER_SRP_AUTH` / `ALLOW_REFRESH_TOKEN_AUTH` (note: `ALLOW_REFRESH_TOKEN_AUTH` is incompatible with refresh-token rotation — with rotation on, use `GetTokensFromRefreshToken` instead) |
+| `InvalidParameterException: Auth flow not enabled` | The flow isn't in the client's explicit auth flows | Add e.g. `ALLOW_USER_SRP_AUTH` / `ALLOW_REFRESH_TOKEN_AUTH` (note: `ALLOW_REFRESH_TOKEN_AUTH` is incompatible with refresh-token rotation -- with rotation on, use `GetTokensFromRefreshToken` instead) |
 | Password auth rejected | `ALLOW_USER_PASSWORD_AUTH` disabled (good default) | Use SRP; enable password auth only for migration/server flows |
 
 ## Tokens & sessions
@@ -34,7 +34,7 @@ The most common Cognito failures, by symptom, with root cause and fix.
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | TOTP enrollment fails | Software MFA not enabled on the pool | `set-user-pool-mfa-config --software-token-mfa-configuration Enabled=true` |
-| Users stuck `UNCONFIRMED` | Verification code expired, never entered, or went to spam | Prefer `resend-confirmation-code` so each user re-verifies via `confirm-sign-up` — this proves email ownership. `admin-confirm-sign-up` flips the status instantly but confirms the account **without verifying the email**, leaving the attribute unverified (risky when email drives password reset / account linking); reserve it for trusted or migrated accounts and set the attribute verified separately only when ownership is established another way. |
+| Users stuck `UNCONFIRMED` | Verification code expired, never entered, or went to spam | Prefer `resend-confirmation-code` so each user re-verifies via `confirm-sign-up` -- this proves email ownership. `admin-confirm-sign-up` flips the status instantly but confirms the account **without verifying the email**, leaving the attribute unverified (risky when email drives password reset / account linking); reserve it for trusted or migrated accounts and set the attribute verified separately only when ownership is established another way. |
 | Sign-up blocked unexpectedly | Pre sign-up trigger returned an error | Inspect the trigger's logic/logs; it halts the sign-up on error |
 
 ## Federation
@@ -59,5 +59,5 @@ The most common Cognito failures, by symptom, with root cause and fix.
 
 ## Authoritative sources
 
-- [Amazon Cognito user pools — Developer Guide](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html)
+- [Amazon Cognito user pools -- Developer Guide](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html)
 - [Managed login & federation error responses (redirect/token errors)](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-userpools-server-contract-reference.html)

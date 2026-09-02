@@ -18,7 +18,7 @@ language-specific [DSQL Connector](https://docs.aws.amazon.com/aurora-dsql/lates
 
 The wrapper rejects multi-statement input, dollar-quoted strings, and SQL comment markers in
 `--command` (a single trailing semicolon is accepted). For multi-statement scripts (BEGIN/COMMIT
-blocks, migration files, GUC experiments), use `--script PATH` instead — it runs a SQL file
+blocks, migration files, GUC experiments), use `--script PATH` instead -- it runs a SQL file
 through `psql -f` with `ON_ERROR_STOP=1` and no semicolon guard. In application code, build SQL
 with [`safe_query.build()`](../scripts/safe_query.py) and execute via your driver.
 
@@ -27,7 +27,7 @@ with [`safe_query.build()`](../scripts/safe_query.py) and execute via your drive
 ```python
 from safe_query import build, regex, ident, TENANT_SLUG
 
-# Simple SELECT — user-supplied tenant_id goes through a validator
+# Simple SELECT -- user-supplied tenant_id goes through a validator
 sql = build(
     "SELECT * FROM {tbl} WHERE tenant_id = {tid} LIMIT 10",
     tbl=ident("entities"),
@@ -40,7 +40,7 @@ sql = build(
     "SELECT tenant_id, COUNT(*) as count FROM objectives GROUP BY tenant_id",
 )
 
-# Join query — declare e/o as table aliases after each ident() expansion
+# Join query -- declare e/o as table aliases after each ident() expansion
 sql = build(
     "SELECT e.entity_id, e.name, o.title "
     "FROM {e} e INNER JOIN {o} o ON e.entity_id = o.entity_id "
@@ -74,17 +74,17 @@ developer's source code. F-string interpolation is the primary SQL-injection vec
   transaction, so chaining DDL across one invocation is forbidden.
 - **CREATE INDEX ASYNC** is required; synchronous index creation is not supported.
 - **Atomic commit/rollback.** Multi-statement DML inside a single transaction commits or rolls
-  back as a unit — open the transaction explicitly with `BEGIN;`/`COMMIT;` when feeding multiple
+  back as a unit -- open the transaction explicitly with `BEGIN;`/`COMMIT;` when feeding multiple
   statements through a driver.
 
 **Examples (driver-side, using `safe_query` to compose the statements):**
 
 ```python
-# Create table with index — TWO transactions, in order
+# Create table with index -- TWO transactions, in order
 conn.execute("CREATE TABLE IF NOT EXISTS entities (...)")           # tx 1: DDL
 conn.execute("CREATE INDEX ASYNC idx_entities_tenant ON entities(tenant_id)")  # tx 2: DDL
 
-# Insert rows — build each statement with safe_query.
+# Insert rows -- build each statement with safe_query.
 from safe_query import build, allow, regex, literal, UUID, TENANT_SLUG
 
 with conn.transaction():
@@ -124,7 +124,7 @@ conn.execute(sql)                                                   # tx 2
 
 **Use for:** understanding table structure, planning migrations, exploring the database.
 
-DSQL supports the standard PostgreSQL `information_schema` and `pg_catalog` views — no
+DSQL supports the standard PostgreSQL `information_schema` and `pg_catalog` views -- no
 DSQL-specific helper is needed.
 
 **List tables in the public schema:**

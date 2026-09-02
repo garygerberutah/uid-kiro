@@ -30,7 +30,7 @@ Choose partitions based on query access patterns, not data structure.
 
 **Time-series** (events, logs, metrics):
 
-- High/medium-volume (≥100K rows/day): `PARTITIONED BY (event_date)` with identity transform
+- High/medium-volume (>=100K rows/day): `PARTITIONED BY (event_date)` with identity transform
 - Low-volume (<100K rows/day): partition by month transform
 
 **Multi-tenant**: `PARTITIONED BY (tenant_id)`, add date if high volume per tenant.
@@ -78,5 +78,5 @@ Bucket default can be changed with `aws s3tables put-table-bucket-storage-class`
 | "Namespace not found" | Namespaces must exist before tables. Create with `aws s3tables create-namespace`. |
 | Table not visible in Athena | Run `aws glue get-catalog --catalog-id s3tablescatalog`. If missing, follow Step 5 in SKILL.md. If present, check execution context format in `athena-ddl-path.md`. |
 | Write operations fail | Verify IAM role has `s3tables:PutTableData` and `s3tables:UpdateTableMetadataLocation`. |
-| `AccessDeniedException` despite correct IAM policy | `s3tablescatalog` may be in Lake Formation mode. Check with `aws glue get-catalog --catalog-id s3tablescatalog` — if `CreateDatabaseDefaultPermissions` is empty, the catalog is in LF mode. Migrate with `aws glue update-catalog` using `OverwriteChildResourcePermissionsWithDefault: Accept`. WARNING: this propagates to ALL child resources and removes existing LF grants. You MUST confirm with user. Search AWS docs for `"Change access control from Lake Formation to IAM"`. |
+| `AccessDeniedException` despite correct IAM policy | `s3tablescatalog` may be in Lake Formation mode. Check with `aws glue get-catalog --catalog-id s3tablescatalog` -- if `CreateDatabaseDefaultPermissions` is empty, the catalog is in LF mode. Migrate with `aws glue update-catalog` using `OverwriteChildResourcePermissionsWithDefault: Accept`. WARNING: this propagates to ALL child resources and removes existing LF grants. You MUST confirm with user. Search AWS docs for `"Change access control from Lake Formation to IAM"`. |
 | Shell escaping errors with `--catalog-input` JSON | Save JSON to a file and use `--catalog-input file://catalog-input.json` instead of inline JSON. |

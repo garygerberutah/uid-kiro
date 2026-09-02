@@ -42,4 +42,4 @@ Here's what we've selected:
 
 ## References
 
-- `references/finetune_technique_selection_guide.md` — Technique guidance (SFT/DPO/RLVR/RLAIF)
+- `references/finetune_technique_selection_guide.md` -- Technique guidance (SFT/DPO/RLVR/RLAIF)

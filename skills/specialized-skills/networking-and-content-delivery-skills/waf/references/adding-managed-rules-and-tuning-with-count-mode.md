@@ -199,7 +199,7 @@ and switches to Block, then surfaces the console link.
 #### Example output
 
 ```
-Added Core Rule Set (700 WCU) and Known Bad Inputs (200 WCU) in Count mode — 900 WCUs used (within the 1,500 base-price tier; web ACL max is 5,000).
+Added Core Rule Set (700 WCU) and Known Bad Inputs (200 WCU) in Count mode -- 900 WCUs used (within the 1,500 base-price tier; web ACL max is 5,000).
 Reviewed matches, overrode CrossSiteScripting_BODY to Count for the API path false positive.
 Switched the rest to Block.
 Open the web ACL and confirm the rules and actions:

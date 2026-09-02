@@ -1,4 +1,4 @@
-# Connection Auth — SQL Auth, Secrets Manager, Credentials
+# Connection Auth -- SQL Auth, Secrets Manager, Credentials
 
 ## Overview
 
@@ -13,7 +13,7 @@ Authentication options on RDS SQL Server:
 
 For Windows auth details, see `ad-kerberos.md`. For IAM auth via RDS Proxy, see `rds-proxy.md`.
 
-## SQL auth — master user
+## SQL auth -- master user
 
 During RDS provisioning, a master user is created:
 
@@ -30,7 +30,7 @@ aws rds create-db-instance \
 
 The master user has `processadmin`, `securityadmin`, `dbcreator`, and `serveradmin` roles. It does NOT have `sysadmin` (SA) because RDS restricts that.
 
-## SQL auth — application users
+## SQL auth -- application users
 
 Best practice: don't use the master user for applications. Create scoped logins:
 
@@ -62,7 +62,7 @@ To disable for a login (not recommended):
 ALTER LOGIN app_user WITH CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF;
 ```
 
-## Secrets Manager — storing credentials
+## Secrets Manager -- storing credentials
 
 Store credentials as a JSON secret matching the RDS format:
 
@@ -95,8 +95,8 @@ aws secretsmanager rotate-secret \
 
 Two rotation strategies:
 
-- **Single-user rotation** — same login, rotate password. Simple. Apps must handle reconnect on 18456.
-- **Alternating-users rotation** — two logins (`app_user_a`, `app_user_b`). Rotate one while the other is in use. Zero-downtime but more complex setup.
+- **Single-user rotation** -- same login, rotate password. Simple. Apps must handle reconnect on 18456.
+- **Alternating-users rotation** -- two logins (`app_user_a`, `app_user_b`). Rotate one while the other is in use. Zero-downtime but more complex setup.
 
 For alternating users, create both logins first:
 
@@ -167,16 +167,16 @@ const c = JSON.parse(SecretString);
 
 ## Caching secrets
 
-Don't call `GetSecretValue` on every DB call — it's an AWS API call with latency and cost.
+Don't call `GetSecretValue` on every DB call -- it's an AWS API call with latency and cost.
 
 - **Lambda**: cache at module scope. Re-fetch on 18456.
 - **ECS/EC2/EKS**: cache in memory with TTL (5-30 min), OR use the Secrets Manager caching library:
   - Python: `aws-secretsmanager-caching`
   - Java: `com.amazonaws:aws-secretsmanager-caching-java`
   - .NET: `AWSSDK.SecretsManager.Caching`
-  - Node.js: custom — set a 15-min cache + refresh on failure
+  - Node.js: custom -- set a 15-min cache + refresh on failure
 
-### Handling rotation — reconnect on 18456
+### Handling rotation -- reconnect on 18456
 
 When a secret rotates, existing pool connections fail with `18456` on the next use. Handle it:
 
@@ -193,7 +193,7 @@ def handle_error(exception_context):
         exception_context.chained_exception = None
 ```
 
-Or simpler: set `pool_recycle` to the rotation interval (e.g. 30 days × 0.9 = recycle every 27 days).
+Or simpler: set `pool_recycle` to the rotation interval (e.g. 30 days x 0.9 = recycle every 27 days).
 
 ## IAM policy for apps
 
@@ -220,9 +220,9 @@ Minimum permissions:
 }
 ```
 
-The `kms:ViaService` condition scopes KMS decrypt to Secrets Manager calls — defense in depth.
+The `kms:ViaService` condition scopes KMS decrypt to Secrets Manager calls -- defense in depth.
 
-## Parameter Store (SSM) — alternative for non-rotating secrets
+## Parameter Store (SSM) -- alternative for non-rotating secrets
 
 For config values and non-credential secrets, AWS Systems Manager Parameter Store is cheaper than Secrets Manager (free for standard parameters).
 
@@ -233,7 +233,7 @@ aws ssm put-parameter --name "/app/db/username" \
   --value "app_user" --type SecureString
 ```
 
-Not recommended for passwords you want rotated — Parameter Store doesn't have built-in rotation like Secrets Manager does.
+Not recommended for passwords you want rotated -- Parameter Store doesn't have built-in rotation like Secrets Manager does.
 
 ## Verify auth is working
 
@@ -247,4 +247,4 @@ FROM sys.dm_exec_connections
 WHERE session_id = @@SPID;
 ```
 
-For SQL auth, `auth_scheme` will be `SQL`. `KERBEROS` / `NTLM` indicates Windows auth — see `ad-kerberos.md`.
+For SQL auth, `auth_scheme` will be `SQL`. `KERBEROS` / `NTLM` indicates Windows auth -- see `ad-kerberos.md`.

@@ -132,10 +132,10 @@ def run_preflight(host, port, password=None, use_tls=False, username=None):
     info["cluster_mode"] = bool(cluster_enabled)
     if cluster_enabled:
         findings.append({"check": "Cluster mode", "status": "INFO",
-                         "detail": "Cluster mode enabled — target must also be cluster mode enabled"})
+                         "detail": "Cluster mode enabled -- target must also be cluster mode enabled"})
     else:
         findings.append({"check": "Cluster mode", "status": "INFO",
-                         "detail": "Standalone or replica mode — can target cluster mode disabled or enabled"})
+                         "detail": "Standalone or replica mode -- can target cluster mode disabled or enabled"})
 
     # Connected replicas
     connected_replicas = server_info.get("connected_slaves", 0)
@@ -164,7 +164,7 @@ def run_preflight(host, port, password=None, use_tls=False, username=None):
 
         if len(db_info) > 1:
             findings.append({"check": "Multiple databases", "status": "WARN",
-                             "detail": f"{len(db_info)} databases in use — ElastiCache cluster mode uses only db0. Plan key migration."})
+                             "detail": f"{len(db_info)} databases in use -- ElastiCache cluster mode uses only db0. Plan key migration."})
     except Exception:
         info["total_keys"] = "unknown"
 
@@ -212,13 +212,13 @@ def run_preflight(host, port, password=None, use_tls=False, username=None):
                                          "detail": str(compat["note"])})
                 else:
                     findings.append({"check": f"Module: {mod_name}", "status": "WARN",
-                                     "detail": f"Unknown module '{mod_name}' — verify compatibility with ElastiCache"})
+                                     "detail": f"Unknown module '{mod_name}' -- verify compatibility with ElastiCache"})
     except redis.ResponseError:
         info["modules"] = []
         findings.append({"check": "Modules", "status": "INFO",
                          "detail": "MODULE LIST not available (may be restricted or old version)"})
 
-    # Commandstats — check for restricted command usage
+    # Commandstats -- check for restricted command usage
     cmdstats = {}
     try:
         cmdstats = r.info("commandstats")

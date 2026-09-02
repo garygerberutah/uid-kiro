@@ -3,7 +3,7 @@ Description: >
   MSK Express load-test simulation. Deploys a VPC, an MSK Express cluster (IAM auth,
   TLS in transit), an auto-sized EC2 client fleet, SSM documents for the two vended
   tests (End-to-End Latency, Broker Restart Under Load), and a CloudWatch dashboard.
-  Cluster sizing and fleet counts come from scripts/simulation_load_test_config.py — do NOT edit
+  Cluster sizing and fleet counts come from scripts/simulation_load_test_config.py -- do NOT edit
   this template by hand. To resize, tear down and redeploy with new parameters.
 
 Parameters:
@@ -270,7 +270,7 @@ Resources:
           - Effect: Allow
             Action: [kafka:GetBootstrapBrokers, kafka:DescribeCluster, kafka:DescribeClusterV2, kafka:ListNodes]
             Resource: !Ref MskCluster
-          # Broker Restart Under Load test — scoped to this cluster only.
+          # Broker Restart Under Load test -- scoped to this cluster only.
           - Effect: Allow
             Action: kafka:RebootBroker
             Resource: !Ref MskCluster

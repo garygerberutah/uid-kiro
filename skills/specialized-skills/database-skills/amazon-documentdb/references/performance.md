@@ -1,6 +1,6 @@
-# DocumentDB — Performance Tuner
+# DocumentDB -- Performance Tuner
 
-Two modes: **reactive** (user has a slow query — diagnose and fix) and **proactive** (general performance review). Both produce concrete index commands and query rewrites you execute against the user's cluster.
+Two modes: **reactive** (user has a slow query -- diagnose and fix) and **proactive** (general performance review). Both produce concrete index commands and query rewrites you execute against the user's cluster.
 
 **Operator verification:** Before suggesting query rewrites that use specific aggregation operators, verify support by calling `web_fetch(url="https://docs.aws.amazon.com/documentdb/latest/developerguide/mongo-apis.html")` and searching the content.
 
@@ -37,7 +37,7 @@ db.runCommand({
 
 ### Step 3: Apply the fix
 
-**COLLSCAN -> create a missing index (ESR rule — equality first, sort, then range):**
+**COLLSCAN -> create a missing index (ESR rule -- equality first, sort, then range):**
 
 ```javascript
 // Query: db.orders.find({ userId, status })
@@ -53,10 +53,10 @@ db.orders.createIndex({ userId: 1, createdAt: -1, price: 1 })
 **Aggregation pipeline not using an index -> put `$match` first:**
 
 ```javascript
-// BAD — $project before $match destroys indexed field paths
+// BAD -- $project before $match destroys indexed field paths
 [{ $project: { total: ... } }, { $match: { total: { $gt: 100 } } }]
 
-// GOOD — $match first on indexed fields, compute derived fields after
+// GOOD -- $match first on indexed fields, compute derived fields after
 [{ $match: { price: { $gt: 10 } } }, { $project: { total: ... } }]
 ```
 
@@ -97,9 +97,9 @@ db.collection.aggregate([{ $indexStats: {} }])   // unused since last restart
 
 Look for:
 
-- **Redundant indexes** — `{a:1}` and `{a:1, b:1}` on the same collection. The single-field is covered by the compound; drop it.
-- **Compound indexes with > 3 fields** — most filtering uses the first 1–3 fields; extras add write overhead.
-- **Multikey indexes on large arrays** — each element is a separate index entry; storage bloat.
+- **Redundant indexes** -- `{a:1}` and `{a:1, b:1}` on the same collection. The single-field is covered by the compound; drop it.
+- **Compound indexes with > 3 fields** -- most filtering uses the first 1-3 fields; extras add write overhead.
+- **Multikey indexes on large arrays** -- each element is a separate index entry; storage bloat.
 
 ### Step 3: Check anti-patterns
 
@@ -119,9 +119,9 @@ Look for:
 
 Organize findings by severity:
 
-- **Critical** — COLLSCAN on large collections, long-running queries blocking GC
-- **Warning** — redundant indexes, high-cardinality sorts without index
-- **Improvement** — missing projections, pipeline ordering
+- **Critical** -- COLLSCAN on large collections, long-running queries blocking GC
+- **Warning** -- redundant indexes, high-cardinality sorts without index
+- **Improvement** -- missing projections, pipeline ordering
 
 For each finding, give the exact fix command.
 
@@ -131,7 +131,7 @@ For each finding, give the exact fix command.
 |---|---|
 | `CPUUtilization` | High = COLLSCANs, complex aggregations, connection spikes |
 | `DatabaseConnections` | Current connection count |
-| `DatabaseConnectionsLimit` | Max allowed — alert when approaching |
+| `DatabaseConnectionsLimit` | Max allowed -- alert when approaching |
 | `LongestRunningGCProcess` | > 1800s = long query blocking GC |
 | `AvailableMVCCIds` | Low = risk of read-only mode |
 | `BufferCacheHitRatio` | Low = queries hitting disk; scale up or add indexes |

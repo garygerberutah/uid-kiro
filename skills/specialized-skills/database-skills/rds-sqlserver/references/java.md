@@ -1,4 +1,4 @@
-# Java — mssql-jdbc
+# Java -- mssql-jdbc
 
 Use the official Microsoft JDBC driver `com.microsoft.sqlserver:mssql-jdbc`. There is no other JDBC driver that is maintained for SQL Server on AWS.
 
@@ -16,9 +16,9 @@ Use the official Microsoft JDBC driver `com.microsoft.sqlserver:mssql-jdbc`. The
 
 Match the `jreN` suffix to your runtime:
 
-- `jre8` — Java 8
-- `jre11` — Java 11
-- `jre17` — Java 17/21
+- `jre8` -- Java 8
+- `jre11` -- Java 11
+- `jre17` -- Java 17/21
 
 ### Gradle
 
@@ -81,7 +81,7 @@ java -Djavax.net.ssl.trustStore=/path/to/rds-truststore.jks \
      -jar app.jar
 ```
 
-Or programmatically in code (less common). Without this, `trustServerCertificate=false` will fail — see `encryption.md`.
+Or programmatically in code (less common). Without this, `trustServerCertificate=false` will fail -- see `encryption.md`.
 
 ## Windows auth (Kerberos)
 
@@ -156,7 +156,7 @@ config.setMaximumPoolSize(10);
 config.setMinimumIdle(2);
 config.setConnectionTimeout(30000);
 config.setIdleTimeout(600000);
-config.setMaxLifetime(1800000);              // 30 min — handles Multi-AZ failover
+config.setMaxLifetime(1800000);              // 30 min -- handles Multi-AZ failover
 config.setConnectionTestQuery("SELECT 1");
 config.setValidationTimeout(5000);
 
@@ -182,14 +182,14 @@ Spring Boot: use `spring-cloud-aws-starter-secrets-manager` to bind secrets to `
 
 ## ECS Fargate
 
-Lambda-style credential caching (outside the handler) isn't applicable — ECS tasks are long-running. Use HikariCP + Secrets Manager resolver pattern:
+Lambda-style credential caching (outside the handler) isn't applicable -- ECS tasks are long-running. Use HikariCP + Secrets Manager resolver pattern:
 
 ```java
 // Fetch secret once at startup
 DbCreds creds = fetchSecret("rds/sqlserver/app");
 HikariDataSource ds = buildPool(creds);
 
-// On rotation, the pool's connectionTestQuery will fail — HikariCP evicts
+// On rotation, the pool's connectionTestQuery will fail -- HikariCP evicts
 // and creates fresh connections. But the secret value must be re-fetched.
 // Consider wrapping in a resilience4j CircuitBreaker or setting `maxLifetime`
 // shorter than the rotation interval.

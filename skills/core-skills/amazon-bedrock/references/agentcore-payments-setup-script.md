@@ -43,7 +43,7 @@ RESOURCE_PREFIX = "paymentspoc"              # prefix for all resource names
 
 # Read credentials from environment variables (NOT from file directly).
 # Run `source .env.payments` in your terminal before executing this script.
-# Do NOT pass credentials through the agent — they must stay local.
+# Do NOT pass credentials through the agent -- they must stay local.
 
 # For Coinbase:
 COINBASE_API_KEY_ID = os.environ.get("COINBASE_API_KEY_ID", "")
@@ -283,23 +283,23 @@ Environment variables for your agent:
 
 print("\nMANUAL STEPS REQUIRED:\n")
 
-# Step 1: Delegation — provider-specific
+# Step 1: Delegation -- provider-specific
 if PROVIDER == "CoinbaseCDP":
-    print(f"""1. DELEGATION — Grant the agent permission to spend from the wallet:
+    print(f"""1. DELEGATION -- Grant the agent permission to spend from the wallet:
    Visit: {redirect_url}
    Log in with: {END_USER_EMAIL}
    Grant permissions to the wallet address: {wallet_address}
 """)
 elif PROVIDER == "StripePrivy":
-    print(f"""1. DELEGATION — Enable delegation on the embedded wallet:
+    print(f"""1. DELEGATION -- Enable delegation on the embedded wallet:
    a. Set up a frontend using the Privy frontend SDK:
       https://github.com/privy-io/aws-agentcore-sdk
    b. Log in with the end user email: {END_USER_EMAIL}
    c. Approve delegation for the wallet address: {wallet_address}
 """)
 
-# Step 2: Funding — same for both providers
-print(f"""2. FUNDING — Send testnet USDC to the wallet:
+# Step 2: Funding -- same for both providers
+print(f"""2. FUNDING -- Send testnet USDC to the wallet:
    Go to: https://faucet.circle.com/
    Select: Base Sepolia
    Paste wallet address: {wallet_address}
@@ -311,5 +311,5 @@ print(f"""2. FUNDING — Send testnet USDC to the wallet:
 - Tell the developer to run `source .env.payments` before executing the script
 - Print the summary to the developer
 - Tell them to complete the **two manual steps** (delegation + funding) for the provider they chose
-- Do NOT reference the other provider's flow — only show steps for the provider in use
+- Do NOT reference the other provider's flow -- only show steps for the provider in use
 - Wait for them to confirm before proceeding to Step 5 (wiring)

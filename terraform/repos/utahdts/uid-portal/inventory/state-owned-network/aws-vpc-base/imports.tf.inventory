@@ -1,4 +1,4 @@
-# HISTORICAL INVENTORY ONLY — these import blocks are intentionally inert.
+# HISTORICAL INVENTORY ONLY -- these import blocks are intentionally inert.
 import {
   to = aws_vpc.main
   id = "vpc-05d3e6ccb65d2d11c"

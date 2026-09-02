@@ -2,7 +2,7 @@
 
 ## Overview
 
-Deterministic procedure for deploying CloudFormation stacks using **Express mode** — a deployment mode that completes stack operations as soon as resource configuration is applied, giving immediate confirmation to proceed to the next iteration. Resources continue becoming ready to serve traffic in the background.
+Deterministic procedure for deploying CloudFormation stacks using **Express mode** -- a deployment mode that completes stack operations as soon as resource configuration is applied, giving immediate confirmation to proceed to the next iteration. Resources continue becoming ready to serve traffic in the background.
 
 Express mode works with all existing CloudFormation templates and requires no template changes. It is recommended for development workflows where you iterate frequently and need fast deployment confirmation.
 
@@ -85,7 +85,7 @@ Prepare the template for the operation.
 
 **Constraints:**
 
-- If the template is small (≤ 51,200 bytes) and provided as content or a local file, You MAY pass it inline via `--template-body`
+- If the template is small (<= 51,200 bytes) and provided as content or a local file, You MAY pass it inline via `--template-body`
 - If the template exceeds 51,200 bytes, You MUST upload it to S3 and use `--template-url` because `--template-body` has a size limit
 - If the template is already at an S3 URL, You MUST use `--template-url` directly
 - This step does not apply to `DELETE` operations
@@ -102,7 +102,7 @@ Run the stack operation with the `--deployment-config` parameter set to Express 
 - You MUST include `--capabilities` if the template creates IAM resources
 - You MUST NOT use `aws cloudformation deploy` because it does not support `--deployment-config`. Use `create-stack`, `update-stack`, or `delete-stack` instead.
 
-> **Note:** When using `call_aws`, pass the template content inline in the `TemplateBody` parameter — the `file://` syntax is AWS CLI-specific and does not work with `call_aws`.
+> **Note:** When using `call_aws`, pass the template content inline in the `TemplateBody` parameter -- the `file://` syntax is AWS CLI-specific and does not work with `call_aws`.
 
 **Create a stack:**
 
@@ -176,7 +176,7 @@ When the user is deploying with the AWS CDK, Express mode is activated with the 
 - You MUST use `cdk deploy --express` to deploy with Express mode
 - To re-enable rollback: `cdk deploy --express --rollback`
 - Express mode applies to all CloudFormation deployments triggered by CDK, including multi-stack deployments
-- You MUST NOT recommend `cdk deploy --hotswap` as a substitute for Express mode — they are different capabilities:
+- You MUST NOT recommend `cdk deploy --hotswap` as a substitute for Express mode -- they are different capabilities:
   - Express mode: full infrastructure changes through CloudFormation, no drift introduced
   - CDK hotswap: code-only changes via direct service APIs, introduces drift (bypasses CloudFormation)
 
@@ -199,11 +199,11 @@ Guide the user on what to expect after Express mode completes.
 
 The following are NOT supported with Express mode. You MUST inform the user if their scenario involves any of these:
 
-- **Custom resources** (`AWS::CloudFormation::CustomResource` and `Custom::*`) — these follow default completion behavior even when Express mode is active
-- **StackSets** — Express mode is not supported for StackSet operations
-- **AWS SAM** — not supported
-- **`aws cloudformation deploy` CLI command** — does not support `--deployment-config`; use `create-stack` or `update-stack` instead
-- **Account-level default** — Express mode is activated per stack operation; there is no account-wide setting
+- **Custom resources** (`AWS::CloudFormation::CustomResource` and `Custom::*`) -- these follow default completion behavior even when Express mode is active
+- **StackSets** -- Express mode is not supported for StackSet operations
+- **AWS SAM** -- not supported
+- **`aws cloudformation deploy` CLI command** -- does not support `--deployment-config`; use `create-stack` or `update-stack` instead
+- **Account-level default** -- Express mode is activated per stack operation; there is no account-wide setting
 
 ## Examples
 
@@ -230,7 +230,7 @@ Background stabilization (route propagation, NAT gateway activation) continues.
 ```
 $ cdk deploy --express
 
- ✅  MyDevStack
+ [YES]  MyDevStack
 
 Express mode: stack completed when resource configuration was applied.
 Outputs:
@@ -262,7 +262,7 @@ The `--deployment-config` parameter requires a CLI version that supports Express
 The `aws cloudformation deploy` command does not support `--deployment-config`. Use `create-stack` or `update-stack` directly. In CDK, use `cdk deploy --express`.
 
 ### Custom resources do not complete faster
-Custom resources always follow default completion behavior regardless of Express mode. This is by design — custom resources define their own completion logic.
+Custom resources always follow default completion behavior regardless of Express mode. This is by design -- custom resources define their own completion logic.
 
 ### StackSets error with Express mode
 Express mode is not supported for StackSet operations. Remove `--deployment-config` when working with StackSets.

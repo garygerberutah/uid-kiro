@@ -5,7 +5,7 @@
  * Parses Cassandra diagnostic files and outputs a Keyspaces pricing estimate
  * as JSON (same shape as calculate.js), suitable for piping to generate-pdf.js.
  *
- * Imports directly from ParsingHelpers.ts and PricingFormulas.ts — no duplication.
+ * Imports directly from ParsingHelpers.ts and PricingFormulas.ts -- no duplication.
  *
  * Usage:
  *   npx ts-node --require tsconfig-paths/register --project tsconfig.scripts.json \
@@ -51,7 +51,7 @@ import {
 
 const regionsMap: Record<string, string> = require('../assets/data/regions.json');
 
-// ─── CLI arg parsing ──────────────────────────────────────────────────────────
+// --- CLI arg parsing ----------------------------------------------------------
 
 interface Args {
   region: string;
@@ -105,7 +105,7 @@ function resolveArgsFromDir(dir: string, args: Args): void {
   if (!args.prepared && scan.prepared) args.prepared = scan.prepared;
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+// --- Main ---------------------------------------------------------------------
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
@@ -120,7 +120,7 @@ function main() {
     process.exit(1);
   }
 
-  // ── Parse files using ParsingHelpers.ts ──────────────────────────────────
+  // -- Parse files using ParsingHelpers.ts ----------------------------------
 
   const tablestats = parse_nodetool_tablestats(fs.readFileSync(args.tablestats, 'utf8'));
   
@@ -165,12 +165,12 @@ function main() {
     ? new Set(Object.keys(queryPatterns.ttl_tables))
     : undefined;
 
-  // Convert SchemaInfo → NodePayload schema shape (drop 'class' and 'tables', keep 'datacenters')
+  // Convert SchemaInfo -> NodePayload schema shape (drop 'class' and 'tables', keep 'datacenters')
   const nodeSchema = schema
     ? Object.fromEntries(Object.entries(schema).map(([ks, v]) => [ks, { datacenters: v.datacenters }]))
     : undefined;
 
-  // ── Build Samples structure for PricingFormulas.ts ────────────────────────
+  // -- Build Samples structure for PricingFormulas.ts ------------------------
 
   const samples: Samples = {};
   for (const [dc, nodes] of nodesByDc.entries()) {
@@ -185,7 +185,7 @@ function main() {
     }
   }
 
-  // ── Aggregate using PricingFormulas.ts ────────────────────────────────────
+  // -- Aggregate using PricingFormulas.ts ------------------------------------
 
   const cassandraSet = buildCassandraLocalSet(samples, statusData, { preparedTtlTables });
 
@@ -199,16 +199,16 @@ function main() {
     estimateResults[dc] = aggregates;
   }
 
-  // ── Price using calculatePricingEstimate from PricingFormulas.ts ──────────
+  // -- Price using calculatePricingEstimate from PricingFormulas.ts ----------
 
   const longRegion = regionsMap[args.region] ?? args.region;
   const datacenters: DatacenterRef[] = dcNames.map(name => ({ name, nodeCount: statusData.get(name) ?? 0 }));
   const regions: Record<string, string> = Object.fromEntries(dcNames.map(dc => [dc, longRegion]));
 
   const pricing: PricingEstimateResult | null = calculatePricingEstimate(datacenters, regions, estimateResults);
-  if (!pricing) { console.error('Failed to calculate pricing — check region and input files.'); process.exit(1); }
+  if (!pricing) { console.error('Failed to calculate pricing -- check region and input files.'); process.exit(1); }
 
-  // ── Build summary output (same shape as calculate.js) ────────────────────
+  // -- Build summary output (same shape as calculate.js) --------------------
 
   const {
     reads_on_demand: sumOdRead, writes_on_demand: sumOdWrite,

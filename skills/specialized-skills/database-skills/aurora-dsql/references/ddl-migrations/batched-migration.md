@@ -99,5 +99,5 @@ SELECT table_name FROM information_schema.tables
 WHERE table_name IN ('target_table', 'target_table_new');
 ```
 
-- **Both tables exist:** Original safe → `DROP TABLE IF EXISTS target_table_new` and restart
+- **Both tables exist:** Original safe -> `DROP TABLE IF EXISTS target_table_new` and restart
 - **Only new table exists:** Verify count, then complete rename

@@ -21,7 +21,7 @@ Network Flow Monitor agents are lightweight software that publish performance
 metrics (latency, packet loss) to the Network Flow Monitor backend, enabling
 monitoring of network path health between workloads.
 
-**Works best with** the [AWS MCP server](https://docs.aws.amazon.com/aws-mcp/) — enables running SSM commands, attaching IAM policies, and validating agent status directly. All guidance also works with standard AWS CLI access.
+**Works best with** the [AWS MCP server](https://docs.aws.amazon.com/aws-mcp/) -- enables running SSM commands, attaching IAM policies, and validating agent status directly. All guidance also works with standard AWS CLI access.
 
 ## Routing
 
@@ -38,7 +38,7 @@ monitoring of network path health between workloads.
 |------|---------|
 | [agent-install-ec2.md](references/agent-install-ec2.md) | End-to-end Network Flow Monitor agent installation via SSM Distributor, activation, verification |
 | [agent-permissions.md](references/agent-permissions.md) | IAM policy setup for Network Flow Monitor agent metric publishing |
-| [troubleshooting.md](references/troubleshooting.md) | Error → cause → fix for Network Flow Monitor agent issues (HTTP 403, missing metrics, connectivity) |
+| [troubleshooting.md](references/troubleshooting.md) | Error -> cause -> fix for Network Flow Monitor agent issues (HTTP 403, missing metrics, connectivity) |
 
 ## Supported versions
 

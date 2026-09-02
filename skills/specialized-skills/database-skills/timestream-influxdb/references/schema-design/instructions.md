@@ -26,8 +26,8 @@ measurement,tag1=val1,tag2=val2 field1=1.0,field2="text" timestamp
 
 Ask: "Will I filter or GROUP BY this column frequently?"
 
-- **Yes** → Tag (indexed, fast lookups)
-- **No** → Field (not indexed by default, stores the actual measurements)
+- **Yes** -> Tag (indexed, fast lookups)
+- **No** -> Field (not indexed by default, stores the actual measurements)
 
 **Cardinality rule:** The product of all unique tag value combinations = series cardinality.
 
@@ -45,7 +45,7 @@ Ask: "Will I filter or GROUP BY this column frequently?"
 **Table design:**
 
 - One table per logical measurement type (e.g., `cpu`, `memory`, `http_requests`)
-- Avoid mega-tables with hundreds of fields — split by domain
+- Avoid mega-tables with hundreds of fields -- split by domain
 - Use meaningful table names (they map to SQL table names)
 
 **Partition templates:**
@@ -57,7 +57,7 @@ Ask: "Will I filter or GROUP BY this column frequently?"
 **Deduplication and uniqueness:**
 
 - InfluxDB 3 deduplicates on: all tags + timestamp (the "primary key")
-- Two points with identical tags and timestamp → last write wins
+- Two points with identical tags and timestamp -> last write wins
 - To preserve both: add a distinguishing tag or use different timestamps
 
 **Field indexing (V3):**
@@ -90,14 +90,14 @@ For typical HTTP request log schemas, use these as default **tags** (low-to-mode
 
 - `method` (~10 values: GET, POST, etc.)
 - `status_code` (~20 values: 200, 404, 500, etc.)
-- `endpoint` (the request path — typically <500 unique paths in a well-normalized API; commonly filtered/grouped in error queries)
+- `endpoint` (the request path -- typically <500 unique paths in a well-normalized API; commonly filtered/grouped in error queries)
 
 Note on `endpoint` cardinality: if the application logs raw paths with embedded IDs (e.g., `/users/123` instead of `/users/:id`), normalize the path before ingestion. The default classification is **tag**.
 
 ### Canonical field examples
 
 - `response_time_ms`, `bytes_sent` (numeric measurements)
-- `user_agent`, `request_id` (unbounded cardinality — never tags)
+- `user_agent`, `request_id` (unbounded cardinality -- never tags)
 
 ### 6. Example Schemas
 

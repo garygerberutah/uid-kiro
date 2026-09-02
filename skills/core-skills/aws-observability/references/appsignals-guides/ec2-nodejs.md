@@ -40,8 +40,8 @@ Read the UserData script and look for the application startup command. This is t
 
 **If you see:**
 
-- `docker run` or `docker start` → Docker deployment
-- `node`, `npm start`, `yarn start`, or similar → Non-Docker deployment
+- `docker run` or `docker start` -> Docker deployment
+- `node`, `npm start`, `yarn start`, or similar -> Non-Docker deployment
 
 **If unclear:**
 
@@ -49,8 +49,8 @@ Read the UserData script and look for the application startup command. This is t
 
 **Critical distinction:** Where does the Node.js process run?
 
-- **Docker:** Node.js runs inside a container → Modify Dockerfile
-- **Non-Docker:** Node.js runs directly on EC2 → Modify UserData
+- **Docker:** Node.js runs inside a container -> Modify Dockerfile
+- **Non-Docker:** Node.js runs directly on EC2 -> Modify UserData
 
 ### Step 2: Extract Placeholder Values
 
@@ -110,14 +110,14 @@ Determine if the Node.js application uses CommonJS or ESM module format. This af
 
 **Check the application's package.json file:**
 
-- Look for `"type": "module"` → **ESM format**
-- Look for `"type": "commonjs"` or no type field → **CommonJS format** (default)
+- Look for `"type": "module"` -> **ESM format**
+- Look for `"type": "commonjs"` or no type field -> **CommonJS format** (default)
 
 **Alternative checks:**
 
-- If the main application file has `.mjs` extension → **ESM format**
-- If the main application file has `.cjs` extension → **CommonJS format**
-- If `.js` extension → Depends on package.json type field
+- If the main application file has `.mjs` extension -> **ESM format**
+- If the main application file has `.cjs` extension -> **CommonJS format**
+- If `.js` extension -> Depends on package.json type field
 
 **If unclear:**
 
@@ -330,13 +330,13 @@ CMD ["node", "--import", "@aws/aws-distro-opentelemetry-node-autoinstrumentation
 
 **2. Add environment variables to docker run command in UserData:**
 
-**Container networking — match the customer's existing setup (minimal change).** The example below uses `--network host` with `localhost:4316` endpoints. That pairing is one option, not a hard requirement — the right choice depends on how the container already reaches the host-installed CloudWatch Agent. Don't change the customer's networking model just to instrument; instead pick the variant that fits theirs:
+**Container networking -- match the customer's existing setup (minimal change).** The example below uses `--network host` with `localhost:4316` endpoints. That pairing is one option, not a hard requirement -- the right choice depends on how the container already reaches the host-installed CloudWatch Agent. Don't change the customer's networking model just to instrument; instead pick the variant that fits theirs:
 
 - **Already using `--network host`** (or willing to): keep it, and the `localhost:4316` / `localhost:2000` endpoints in the example work as-is. Trade-off: host networking shares the host's network namespace (no container isolation), though the agent's ports can stay bound to loopback, unreachable off-host. For production, it is recommended to restrict the OTLP `4316` / proxy `2000` ports via EC2 security groups / host firewall and to avoid co-locating untrusted containers; this guide does not apply those controls, so assess and configure them for your environment.
-- **Using a bridge/default network:** don't add `--network host`. Point the endpoints at the host instead — `host.docker.internal:4316`/`:2000` (add `--add-host=host.docker.internal:host-gateway` on Linux) or the bridge gateway IP. This requires the CloudWatch Agent to listen on a non-loopback address, so it is recommended to restrict those ports with security groups / host firewall.
-- **Option 2 — CloudWatch Agent as a sidecar container** (most isolated): run the agent as another container on the same user-defined Docker network and target it by name (e.g. `cwagent:4316`). Nothing binds to host interfaces. This is the same model the ECS guides use; choose it if the customer prefers full container isolation over a host-installed agent.
+- **Using a bridge/default network:** don't add `--network host`. Point the endpoints at the host instead -- `host.docker.internal:4316`/`:2000` (add `--add-host=host.docker.internal:host-gateway` on Linux) or the bridge gateway IP. This requires the CloudWatch Agent to listen on a non-loopback address, so it is recommended to restrict those ports with security groups / host firewall.
+- **Option 2 -- CloudWatch Agent as a sidecar container** (most isolated): run the agent as another container on the same user-defined Docker network and target it by name (e.g. `cwagent:4316`). Nothing binds to host interfaces. This is the same model the ECS guides use; choose it if the customer prefers full container isolation over a host-installed agent.
 
-Find the existing `docker run` command in UserData. Replace it with (this shows the `--network host` example — adapt per the networking variant you chose above):
+Find the existing `docker run` command in UserData. Replace it with (this shows the `--network host` example -- adapt per the networking variant you chose above):
 
 ```typescript
 instance.userData.addCommands(
@@ -436,7 +436,7 @@ instance.userData.addCommands(
 Once deployed, you can verify Application Signals is working by:
 
 - Opening the AWS CloudWatch Console
-- Navigating to Application Signals → Services
+- Navigating to Application Signals -> Services
 - Looking for your service (named: {{SERVICE_NAME}})
 - Checking that traces and metrics are being collected
 

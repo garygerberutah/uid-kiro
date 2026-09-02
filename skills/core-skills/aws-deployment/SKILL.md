@@ -11,7 +11,7 @@ metadata:
 
 ## Critical Warnings
 
-**CodeConnections PENDING trap**: Connections created via CLI/CloudFormation remain `PENDING` indefinitely — MUST complete OAuth in the AWS Console. No API-only path exists.
+**CodeConnections PENDING trap**: Connections created via CLI/CloudFormation remain `PENDING` indefinitely -- MUST complete OAuth in the AWS Console. No API-only path exists.
 
 **Cross-account triple requirement**: Cross-account deploys need ALL THREE: (1) KMS key policy granting target account (use key ID, not alias), (2) S3 bucket policy for target account, (3) cross-account IAM role with trust policy. Missing any one = cryptic `Access Denied`.
 
@@ -19,13 +19,13 @@ metadata:
 
 **CodeBuild VPC without NAT**: Builds in VPC subnets without NAT gateway hang at `DOWNLOAD_SOURCE` silently. Private subnets MUST have NAT gateway or VPC endpoints.
 
-**CodeConnections IAM**: Use `codeconnections:` prefix for API calls and IAM policy Actions. Resource ARNs must match exactly — new resources use `codeconnections` prefix, existing resources may use `codestar-connections` prefix. Specify both in Resource if you have mixed-age resources.
+**CodeConnections IAM**: Use `codeconnections:` prefix for API calls and IAM policy Actions. Resource ARNs must match exactly -- new resources use `codeconnections` prefix, existing resources may use `codestar-connections` prefix. Specify both in Resource if you have mixed-age resources.
 
 **UseConnection is over-permissive**: `codeconnections:UseConnection` grants access to ALL repositories the connection can reach. MUST specify condition keys (`codeconnections:FullRepositoryId`, `codeconnections:ProviderAction`, `codeconnections:BranchName`) to limit CodeBuild to only the required repository.
 
 ## How These Services Compose
 
-CodeConnections → CodeBuild → CodeDeploy, orchestrated by CodePipeline.
+CodeConnections -> CodeBuild -> CodeDeploy, orchestrated by CodePipeline.
 
 | Layer | Service | Role |
 |-------|---------|------|
@@ -53,12 +53,12 @@ Default: V2 pipeline type with QUEUED execution mode. Use PARALLEL only when exe
 
 | Task | Action | Reference |
 |------|--------|-----------|
-| Pipeline from GitHub to ECS | Create connection → CodeBuild Docker stage → CodeDeploy ECS blue/green | [codepipeline](references/codepipeline.md), [codedeploy](references/codedeploy.md) |
+| Pipeline from GitHub to ECS | Create connection -> CodeBuild Docker stage -> CodeDeploy ECS blue/green | [codepipeline](references/codepipeline.md), [codedeploy](references/codedeploy.md) |
 | Pipeline stuck at source | Check connection status; if PENDING, complete OAuth in AWS Console | [troubleshooting](references/troubleshooting.md) |
 | Build timing out | Check VPC/NAT, increase `timeoutInMinutes`, verify Docker privileged mode | [codebuild](references/codebuild.md) |
 | Deploy to another account | Configure KMS + S3 bucket policy + cross-account role, add `RoleArn` to action | [codepipeline](references/codepipeline.md) |
 | Roll back failed deployment | Auto-rollback on alarm/failure; manual: `stop-deployment --auto-rollback-enabled` | [codedeploy](references/codedeploy.md) |
-| Lambda canary deployment | CodeBuild packages → CodeDeploy Lambda with canary traffic shifting | [codedeploy](references/codedeploy.md) |
+| Lambda canary deployment | CodeBuild packages -> CodeDeploy Lambda with canary traffic shifting | [codedeploy](references/codedeploy.md) |
 
 ## Troubleshooting
 
@@ -75,7 +75,7 @@ Default: V2 pipeline type with QUEUED execution mode. Use PARALLEL only when exe
 
 ## Security
 
-- MUST store secrets in Secrets Manager or Parameter Store; reference via CodeBuild `type: SECRETS_MANAGER` — MUST NOT embed in buildspec as PLAINTEXT
+- MUST store secrets in Secrets Manager or Parameter Store; reference via CodeBuild `type: SECRETS_MANAGER` -- MUST NOT embed in buildspec as PLAINTEXT
 - MUST use customer-managed KMS keys for cross-account artifact encryption (default encryption does not support cross-account)
 - SHOULD scope CodeBuild/CodeDeploy service roles to specific resource ARNs; MUST NOT use `*` for `s3:GetObject` or `kms:Decrypt`
 - MUST use CodeConnections (not personal access tokens) for source connections; OAuth tokens cannot be rotated automatically

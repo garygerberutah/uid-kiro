@@ -1,4 +1,4 @@
-# Auth — Backend
+# Auth -- Backend
 
 > **Prerequisites:** Backend defined in `amplify/backend.ts` with `defineBackend({ auth, data })`.
 
@@ -90,7 +90,7 @@ password-based login in the same `defineAuth` configuration.
 
 ## Social Login
 
-Use `secret()` for OAuth client secrets — hardcoding credentials exposes
+Use `secret()` for OAuth client secrets -- hardcoding credentials exposes
 them in source control.
 
 ```typescript
@@ -154,10 +154,10 @@ export const auth = defineAuth({
 });
 ```
 
-**SAML** is NOT supported in `defineAuth` — the `ExternalProviderSpecificFactoryProps` type has no `saml` property. The lower-level `auth-construct` package supports SAML, but it was never wired up to the high-level API. Use CDK escape hatches via `backend.auth.resources` to configure SAML providers:
+**SAML** is NOT supported in `defineAuth` -- the `ExternalProviderSpecificFactoryProps` type has no `saml` property. The lower-level `auth-construct` package supports SAML, but it was never wired up to the high-level API. Use CDK escape hatches via `backend.auth.resources` to configure SAML providers:
 
 ```typescript
-// In backend.ts — SAML requires CDK-level configuration
+// In backend.ts -- SAML requires CDK-level configuration
 const { cfnUserPool } = backend.auth.resources.cfnResources;
 // Configure SAML identity provider via CfnUserPoolIdentityProvider
 ```
@@ -207,11 +207,11 @@ table.grantWriteData(postConfirmFn);
 postConfirmFn.addEnvironment('TABLE_NAME', table.tableName);
 ```
 
-1. **Separate DynamoDB table** — create via CDK (not `defineData`) to avoid stack coupling.
+1. **Separate DynamoDB table** -- create via CDK (not `defineData`) to avoid stack coupling.
 
 ## Guest (Unauthenticated) Access
 
-Guest access is **enabled by default** in Amplify Gen2 — the Cognito Identity Pool is created with `allowUnauthenticatedIdentities: true` automatically.
+Guest access is **enabled by default** in Amplify Gen2 -- the Cognito Identity Pool is created with `allowUnauthenticatedIdentities: true` automatically.
 
 To use guest access in your data models, set `defaultAuthorizationMode` to `'iam'` and add `allow.guest()` authorization rules:
 
@@ -247,20 +247,20 @@ cfnIdentityPool.allowUnauthenticatedIdentities = false;
 
 - **Trigger not registered (silent no-op):** Defining a trigger function
   with `defineFunction` but NOT adding it to `triggers: {}` in `defineAuth`
-  causes a **silent no-op** — the function deploys but never fires.
+  causes a **silent no-op** -- the function deploys but never fires.
   Both define AND register: `triggers: { preSignUp, postConfirmation }`.
 - **Hardcoded secrets:** Using string literals instead of `secret()` for
   OAuth credentials exposes them in source control.
-- **Missing scopes:** Social providers default to minimal scopes — add
+- **Missing scopes:** Social providers default to minimal scopes -- add
   `'email'`, `'profile'` explicitly or user attributes won't populate.
 - **Google attribute mapping:** The Google claim `name` maps to Cognito
   `fullname` (NOT `name`). The `attributeMapping` values are plain strings,
   NOT objects: `{ email: 'email', fullname: 'name' }`.
 - **MFA method mismatch:** Enabling `sms: true` in MFA requires a phone
-  number attribute on the user pool — add `phone_number` to user attributes.
+  number attribute on the user pool -- add `phone_number` to user attributes.
   Similarly, `email: true` in MFA requires an email attribute on the user pool.
 - **Secrets in CI/CD:** For branch environments, manage secrets through the
-  **Amplify console** (App settings → Environment variables → Secrets).
+  **Amplify console** (App settings -> Environment variables -> Secrets).
   The `ampx sandbox secret` command only works for local sandbox environments.
 
 ## Links

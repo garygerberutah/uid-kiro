@@ -61,9 +61,9 @@ def render_client_error(
 ) -> str:
     """Render a tool-tailored failure block for a botocore ``ClientError``.
 
-    Tools share the same skeleton — ``Failed to {action}``, an ``Error:`` line,
+    Tools share the same skeleton -- ``Failed to {action}``, an ``Error:`` line,
     an attempted-values block, and ``POSSIBLE CAUSES`` / ``TROUBLESHOOTING``
-    numbered sections — but each tool tunes the labels and bullet content.
+    numbered sections -- but each tool tunes the labels and bullet content.
     This helper takes those bullets as parameters so each call site can keep
     its CLI-era wording without re-implementing the skeleton.
 
@@ -138,7 +138,7 @@ def translate_aws_error(
             f"Error: TimeoutError - {exc}\n"
             f"{attempted}"
             "\nTROUBLESHOOTING:\n"
-            "1. Retry the request — the AWS endpoint did not respond within the socket timeout\n"
+            "1. Retry the request -- the AWS endpoint did not respond within the socket timeout\n"
             "2. Check network connectivity\n"
         )
 

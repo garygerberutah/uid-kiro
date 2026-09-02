@@ -2,12 +2,12 @@
 
 ## Where rates come from
 
-The [Braket pricing page](https://aws.amazon.com/braket/pricing/), [AWS Pricing API](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/price-changes.html), and the [bulk price list](https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBraket/current/index.csv) are the authoritative sources for current rates — either is acceptable.
+The [Braket pricing page](https://aws.amazon.com/braket/pricing/), [AWS Pricing API](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/price-changes.html), and the [bulk price list](https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBraket/current/index.csv) are the authoritative sources for current rates -- either is acceptable.
 See the [AWS Pricing API](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/price-changes.html) for more details about how pricing information is organized with AWS.
 Note that the regions supported by the Pricing API are unrelated to the regions Braket supports.
 
 Quote a specific number only if you have read it this session from one of those sources.
-If you cannot reach any of them, give the link and the pricing model only — never a number, and never a placeholder such as `$0.00` standing in for a rate you did not look up.
+If you cannot reach any of them, give the link and the pricing model only -- never a number, and never a placeholder such as `$0.00` standing in for a rate you did not look up.
 
 ## Pricing model by resource
 
@@ -36,7 +36,7 @@ aws pricing get-products --service-code AmazonBraket --region us-east-1 \
 
 The price list contains retired devices, so you should check a device's status before attempting to use it.
 
-### On-demand simulators — by duration
+### On-demand simulators -- by duration
 On-demand simulators bill by **simulation duration** only with a **minimum charge per task**, under a single `productFamily = "Simulator Task"` (per minute).
 Simulators are absent from `devicename` and share that one family, so they are identified by the `usagetype` suffix instead.
 
@@ -53,21 +53,21 @@ aws pricing get-products --service-code AmazonBraket --region us-east-1 \
     --filters 'Type=TERM_MATCH,Field=usagetype,Value=<usagetype-from-previous-command>'
 ```
 
-### Local simulators — free
+### Local simulators -- free
 `LocalSimulator` backends in the Braket SDK run on your own machine/instance at no additional charge.
 
-### Hybrid jobs — instance + tasks
+### Hybrid jobs -- instance + tasks
 A hybrid job bills **classical instance time** (`productFamily = "Braket Managed Jobs Instance"`, per minute) and job storage (`productFamily = "Braket Managed Jobs Volume"`, GB-month) **plus** any quantum task charges. A task on an on-demand simulator inside a job bills under `productFamily = "Braket Managed Jobs Simulator Task"` (per minute).
 Classical instance rates can be found in the Hybrid Jobs tab of the Braket pricing page.
-An **embedded** simulator inside the job incurs no separate task charge — only the instance time.
+An **embedded** simulator inside the job incurs no separate task charge -- only the instance time.
 
-### Reservations (Braket Direct) — hourly
+### Reservations (Braket Direct) -- hourly
 Reserved device access is billed **hourly** (1-hour increments) instead of per-task/per-shot, under `productFamily = "Quantum Reservation"` (per hour).
 During a reservation, tasks and jobs submitted WITH the reservation ARN incur no additional charge.
 Other resources, like S3 buckets, managed notebook compute, or tasks submitted WITHOUT the reservation ARN are billed at on-demand rates.
 Learn more about [Braket Direct reservations](https://docs.aws.amazon.com/braket/latest/developerguide/braket-reservations.html).
 
-### Managed notebooks — SageMaker-billed
+### Managed notebooks -- SageMaker-billed
 A Braket managed notebook is a SageMaker notebook instance, so compute and storage are billed by SageMaker.
 Refer to SageMaker documentation for further details.
 

@@ -54,9 +54,9 @@ DNS Firewall evaluates in a fixed order and stops at the first match:
      type match that rule.
    When a match occurs the resolver applies the rule's action and stops. All three actions are
    terminating:
-   - **Allow** — permit the query, stop inspecting.
-   - **Alert** — permit the query, log an alert, stop inspecting.
-   - **Block** — block the query, respond per the block mode (`NODATA`, `NXDOMAIN`, or
+   - **Allow** -- permit the query, stop inspecting.
+   - **Alert** -- permit the query, log an alert, stop inspecting.
+   - **Block** -- block the query, respond per the block mode (`NODATA`, `NXDOMAIN`, or
      `OVERRIDE`), log the block, stop inspecting.
 
 Because every action halts inspection, a broad Allow or Alert in a higher-priority group prevents
@@ -221,7 +221,7 @@ Advanced rules whose contents you cannot enumerate.
 **Constraints:**
 
 - You MUST walk the rules in combined order (association priority, then rule priority within the
-  group) and stop at the first rule that matches `{domain}` AND the query type — by exact name,
+  group) and stop at the first rule that matches `{domain}` AND the query type -- by exact name,
   by a parent wildcard in its domain list, or by detection for an Advanced rule. A rule with a
   Qtype filter that does not match the query's type is skipped even if the domain matches
 - You MUST report that rule as the effective one, with its action (`ALLOW`, `ALERT`, or `BLOCK`
@@ -264,7 +264,7 @@ Advanced rules whose contents you cannot enumerate.
 ```
 Effective rule for ads.example.com on vpc-0abc123:
 - Rule group "corp-allowlist" (association priority 100), rule "allow-partners" (rule priority 10)
-  ACTION: ALLOW — matches ads.example.com, halts inspection.
+  ACTION: ALLOW -- matches ads.example.com, halts inspection.
 Shadowed (never reached):
 - Rule group "threat-block" (association priority 200), rule "block-adtech" (rule priority 10)
   would BLOCK/NXDOMAIN, but the ALLOW above wins.

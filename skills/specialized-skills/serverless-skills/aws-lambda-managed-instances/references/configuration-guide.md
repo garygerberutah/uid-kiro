@@ -2,10 +2,10 @@
 
 ## Instance Type Decision Tree
 
-- **CPU-intensive** (encoding, ML, compression) → C-series, 2:1 ratio, concurrency=1/vCPU
-- **Memory-intensive** (caching, large datasets) → R-series, 8:1 ratio
-- **Network-intensive** (streaming, data transfer) → Use AllowedInstanceTypes for n-suffix types, 4:1 ratio
-- **General/balanced** (web APIs, microservices) → M-series, 4:1 ratio, default concurrency
+- **CPU-intensive** (encoding, ML, compression) -> C-series, 2:1 ratio, concurrency=1/vCPU
+- **Memory-intensive** (caching, large datasets) -> R-series, 8:1 ratio
+- **Network-intensive** (streaming, data transfer) -> Use AllowedInstanceTypes for n-suffix types, 4:1 ratio
+- **General/balanced** (web APIs, microservices) -> M-series, 4:1 ratio, default concurrency
 
 Architecture: ARM (Graviton, g-suffix) for price-performance. x86 (i=Intel, a=AMD) when dependencies require it.
 
@@ -38,15 +38,15 @@ Min: 2 GB / 1 vCPU. Max: 32 GB. Memory must align with ratio multiples.
 | .NET | 32 | Keep | 1 per vCPU |
 | Python | 16 | Keep | 1 per vCPU |
 
-Total capacity = MinExecutionEnvironments × PerExecutionEnvironmentMaxConcurrency
+Total capacity = MinExecutionEnvironments x PerExecutionEnvironmentMaxConcurrency
 
 ## Capacity Provider Scaling Controls
 
 | Control | Default | Guidance |
 |---------|---------|----------|
 | MinExecutionEnvironments | 3 | Increase for baseline capacity; never below 3 |
-| MaxExecutionEnvironments | — | Set based on cost budget |
-| MaxVCpuCount | 400 | Optional but recommended — set explicitly to control cost ceiling |
+| MaxExecutionEnvironments | -- | Set based on cost budget |
+| MaxVCpuCount | 400 | Optional but recommended -- set explicitly to control cost ceiling |
 | TargetResourceUtilization | ~50% headroom | Raise for cost savings (less burst tolerance) |
 | AllowedInstanceTypes | All | Restrict only for specific hardware needs |
 | ExcludedInstanceTypes | None | Exclude expensive types in dev/test |
@@ -57,7 +57,7 @@ Total capacity = MinExecutionEnvironments × PerExecutionEnvironmentMaxConcurren
 - **CPU < 20%**: increase concurrency for better utilization
 - **Throttle rate (429s) > 1%**: increase MinExecutionEnvironments or reduce utilization target
 - **Memory > 90%**: increase memory or reduce concurrency
-- **ExecutionEnvironmentConcurrency near limit**: saturation — reduce concurrency or scale out
+- **ExecutionEnvironmentConcurrency near limit**: saturation -- reduce concurrency or scale out
 
 ## CloudWatch Metrics Dimensions
 

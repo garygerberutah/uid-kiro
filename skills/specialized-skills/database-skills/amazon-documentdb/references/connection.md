@@ -1,9 +1,9 @@
-# DocumentDB — Connection and Cluster Setup
+# DocumentDB -- Connection and Cluster Setup
 
 Workflow for reaching a working DocumentDB connection. Two entry points:
 
-- **A. New cluster** — no cluster yet, create with serverless defaults
-- **B. Existing cluster** — can't connect, need driver config, or want TLS/VPC diagnosis
+- **A. New cluster** -- no cluster yet, create with serverless defaults
+- **B. Existing cluster** -- can't connect, need driver config, or want TLS/VPC diagnosis
 
 Ask one question to route: "Do you already have a DocumentDB cluster, or are we starting from scratch?"
 
@@ -13,15 +13,15 @@ Ask one question to route: "Do you already have a DocumentDB cluster, or are we 
 - Existing cluster: cluster id, region, the error message
 - Programming language (Python, Node, Java, Go, C#, Ruby)
 
-**Recommend serverless on 8.0** (`db.serverless`) — auto-scales, costs up to 90% less when idle, and supports all 8.0 features (`$vectorSearch`, Zstd compression). Suggest a fixed instance class only for sustained 24/7 high throughput. Never recommend Elastic Clusters (a separate sharding product lacking transactions, change streams, and many operators).
+**Recommend serverless on 8.0** (`db.serverless`) -- auto-scales, costs up to 90% less when idle, and supports all 8.0 features (`$vectorSearch`, Zstd compression). Suggest a fixed instance class only for sustained 24/7 high throughput. Never recommend Elastic Clusters (a separate sharding product lacking transactions, change streams, and many operators).
 
-## Workflow — Entry Point A (new cluster)
+## Workflow -- Entry Point A (new cluster)
 
 ### Step 1: Launch everything in parallel
 
-DocumentDB instance creation takes ~7 minutes. **Do not create resources sequentially** — run these three tracks at the same time.
+DocumentDB instance creation takes ~7 minutes. **Do not create resources sequentially** -- run these three tracks at the same time.
 
-**Track A — DocumentDB cluster + instance.** You MUST run these exact commands — serverless is mandatory unless the user said "provisioned" or "instance-based":
+**Track A -- DocumentDB cluster + instance.** You MUST run these exact commands -- serverless is mandatory unless the user said "provisioned" or "instance-based":
 
 ```bash
 aws docdb create-db-cluster \
@@ -41,13 +41,13 @@ aws docdb create-db-instance \
   --region <region>
 ```
 
-Do NOT substitute `db.t3.medium`, `db.r5.large`, or any other instance class — `db.serverless` is the only correct value here.
+Do NOT substitute `db.t3.medium`, `db.r5.large`, or any other instance class -- `db.serverless` is the only correct value here.
 
-For production, prefer `--manage-master-user-password` over the inline `--master-user-password` shown above — DocumentDB generates the password into Secrets Manager with rotation (the two flags are mutually exclusive). Retrieve it via `aws secretsmanager get-secret-value --secret-id <MasterUserSecret-arn>` when building the connection string in Step 3.
+For production, prefer `--manage-master-user-password` over the inline `--master-user-password` shown above -- DocumentDB generates the password into Secrets Manager with rotation (the two flags are mutually exclusive). Retrieve it via `aws secretsmanager get-secret-value --secret-id <MasterUserSecret-arn>` when building the connection string in Step 3.
 
-**Track B — Access from outside the VPC** (local dev or admin access — pick one option):
+**Track B -- Access from outside the VPC** (local dev or admin access -- pick one option):
 
-**Option 1 (preferred): SSM Session Manager port forwarding** — no SSH key, IAM-controlled.
+**Option 1 (preferred): SSM Session Manager port forwarding** -- no SSH key, IAM-controlled.
 
 Prerequisites: SSM Agent on EC2 (pre-installed on AL2023), IAM role with `AmazonSSMManagedInstanceCore`, Session Manager plugin installed locally.
 
@@ -66,15 +66,15 @@ aws ssm start-session --target $INSTANCE_ID \
 
 Add inbound TCP 27017 on DocumentDB SG from the bastion's SG.
 
-**Option 2 (fallback): SSH bastion + tunnel** — use when SSM is not available.
+**Option 2 (fallback): SSH bastion + tunnel** -- use when SSM is not available.
 
 Launch a t3.micro in a public subnet with a key pair and SG allowing SSH from your IP only. Add inbound TCP 27017 on DocumentDB SG from the bastion SG.
 
-**Track C — Download TLS cert:** `curl -s https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem -o global-bundle.pem`
+**Track C -- Download TLS cert:** `curl -s https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem -o global-bundle.pem`
 
 ### Step 2: Poll the DocumentDB instance until available
 
-Don't use `aws docdb wait` — not present in all CLI versions. Use a polling loop:
+Don't use `aws docdb wait` -- not present in all CLI versions. Use a polling loop:
 
 ```bash
 for i in $(seq 1 20); do
@@ -87,7 +87,7 @@ done
 
 ### Step 3: Build the connection string
 
-All five parameters are required — DocumentDB rejects or behaves incorrectly without them:
+All five parameters are required -- DocumentDB rejects or behaves incorrectly without them:
 
 ```
 mongodb://adminuser:<password>@<endpoint>:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false
@@ -102,9 +102,9 @@ mongodb://adminuser:<password>@<endpoint>:27017/?tls=true&tlsCAFile=global-bundl
 
 The string above uses the **primary (master) user**, which is always password-based.
 
-**IAM authentication is also supported** for application / non-admin users (not the primary user) on cluster version 5.0+. It is password-less — connections use short-lived STS tokens — suiting Lambda/ECS/EC2 workloads that run with an IAM role. Trade-offs: requires instance-based 5.0+, a `MONGODB-AWS`-capable driver (`pip install 'pymongo[aws]'`; Node.js >= 6.13.1), and an STS dependency at connect time (watch STS throttling at high connection rates).
+**IAM authentication is also supported** for application / non-admin users (not the primary user) on cluster version 5.0+. It is password-less -- connections use short-lived STS tokens -- suiting Lambda/ECS/EC2 workloads that run with an IAM role. Trade-offs: requires instance-based 5.0+, a `MONGODB-AWS`-capable driver (`pip install 'pymongo[aws]'`; Node.js >= 6.13.1), and an STS dependency at connect time (watch STS throttling at high connection rates).
 
-Create an IAM-backed user as the master user in the `$external` database, then connect with `authSource=$external&authMechanism=MONGODB-AWS` (no credentials in the URI — the driver fetches them from the attached role):
+Create an IAM-backed user as the master user in the `$external` database, then connect with `authSource=$external&authMechanism=MONGODB-AWS` (no credentials in the URI -- the driver fetches them from the attached role):
 
 ```javascript
 use $external;
@@ -135,7 +135,7 @@ ssh -i <key-pair-name>.pem \
   ec2-user@<bastion-public-ip> -N -f
 ```
 
-Then connect the same way — mongosh needs `--tlsAllowInvalidHostnames` because the hostname resolves to `127.0.0.1`, not the cluster endpoint.
+Then connect the same way -- mongosh needs `--tlsAllowInvalidHostnames` because the hostname resolves to `127.0.0.1`, not the cluster endpoint.
 
 Expected: `{ ok: 1 }`.
 
@@ -143,7 +143,7 @@ Expected: `{ ok: 1 }`.
 
 Read `references/connection-drivers.md` and substitute the actual endpoint, password, and database name.
 
-## Workflow — Entry Point B (existing cluster)
+## Workflow -- Entry Point B (existing cluster)
 
 ### Diagnostic commands (always run first)
 
@@ -164,8 +164,8 @@ nc -zv <cluster-endpoint> 27017
 | `connection refused`, timeout after 5000ms | SG missing inbound TCP 27017. Add rule from app SG; if outside VPC, set up tunnel |
 | `SSL handshake failed`, `certificate verify failed` | Download RDS bundle; verify `tlsCAFile` path |
 | `not master` / `not primary` | Add `replicaSet=rs0` to the connection string |
-| `Server selection timed out after 30000ms` | Bad cert path or unreachable endpoint — re-run `nc -zv` |
-| `getaddrinfo failed` | Wrong endpoint — run `describe-db-clusters` to get the correct one |
+| `Server selection timed out after 30000ms` | Bad cert path or unreachable endpoint -- re-run `nc -zv` |
+| `getaddrinfo failed` | Wrong endpoint -- run `describe-db-clusters` to get the correct one |
 | Intermittent write errors under load | Add `retryWrites=false` |
 
 ### VPC checklist
@@ -186,7 +186,7 @@ Check the `tls` parameter in the cluster's parameter group (`enabled` default, `
 
 ## Serverless constraints
 
-- **Supported on engine 5.0.0 and 8.0.0** — not 3.6 or 4.0
+- **Supported on engine 5.0.0 and 8.0.0** -- not 3.6 or 4.0
 - Supported with Global Clusters
 - DCU scaling in 0.5 increments via `MinCapacity` / `MaxCapacity`
 - Verify regional availability: `aws docdb describe-orderable-db-instance-options --region <r> --db-instance-class db.serverless --engine docdb`

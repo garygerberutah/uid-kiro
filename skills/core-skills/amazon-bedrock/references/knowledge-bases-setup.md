@@ -17,17 +17,17 @@ when a user wants to build a RAG application.
 ## Parameters
 
 - **kb_name** (required): Name for the Knowledge Base
-- **data_source_type** (required): `s3` | `web_crawler` | `confluence` | `sharepoint` | `salesforce` | `custom` — additional types may be available, check `aws bedrock-agent create-data-source help` for current options
+- **data_source_type** (required): `s3` | `web_crawler` | `confluence` | `sharepoint` | `salesforce` | `custom` -- additional types may be available, check `aws bedrock-agent create-data-source help` for current options
 - **s3_bucket** (required if S3): S3 bucket containing source documents
 - **s3_prefix** (optional): Prefix to scope documents within the bucket
-- **chunking_strategy** (optional): `fixed_size` | `semantic` | `hierarchical` | `none` — see Step 2 for guidance
-- **vector_store** (optional): `opensearch_serverless` | `aurora_postgresql` | `pinecone` | `redis` | `mongo_db_atlas` | `neptune_analytics` | `opensearch_managed_cluster` | `s3_vectors` — see Step 3 for guidance
+- **chunking_strategy** (optional): `fixed_size` | `semantic` | `hierarchical` | `none` -- see Step 2 for guidance
+- **vector_store** (optional): `opensearch_serverless` | `aurora_postgresql` | `pinecone` | `redis` | `mongo_db_atlas` | `neptune_analytics` | `opensearch_managed_cluster` | `s3_vectors` -- see Step 3 for guidance
 - **embedding_model** (optional): Default `amazon.titan-embed-text-v2:0`
 
 **Constraints for parameter acquisition:**
 
 - You MUST verify all required parameters (`kb_name`, `data_source_type`, and data source details) are provided. If any are missing, ask for them upfront in a single prompt.
-- If all required parameters are provided, proceed to Step 1 — do not ask the user to confirm what they already specified.
+- If all required parameters are provided, proceed to Step 1 -- do not ask the user to confirm what they already specified.
 - For optional parameters not specified by the user, you SHOULD select reasonable values based on the guidance in Steps 2 and 3, you MUST inform the user what you chose and why, and proceed
 
 ## Steps
@@ -50,7 +50,7 @@ when a user wants to build a RAG application.
 - You MUST verify the embedding model is accessible: `aws bedrock list-foundation-models --region <region>`
 - You MUST NOT proceed if the data source is empty
 - For non-S3 data sources, You MUST verify additional permissions:
-  - **SharePoint**: **App-Only authentication is recommended** (OAuth 2.0 is not recommended per AWS docs). Configure APP permissions via the SharePoint App-Only grant flow — no Microsoft Graph API permissions needed. Security Defaults and MFA do not need to be disabled for App-Only. See the [SharePoint connector docs](https://docs.aws.amazon.com/bedrock/latest/userguide/sharepoint-data-source-connector.html) for current requirements.
+  - **SharePoint**: **App-Only authentication is recommended** (OAuth 2.0 is not recommended per AWS docs). Configure APP permissions via the SharePoint App-Only grant flow -- no Microsoft Graph API permissions needed. Security Defaults and MFA do not need to be disabled for App-Only. See the [SharePoint connector docs](https://docs.aws.amazon.com/bedrock/latest/userguide/sharepoint-data-source-connector.html) for current requirements.
   - **Confluence**: Supports Basic auth (API token) or OAuth 2.0 (client credentials). Basic requires space read permissions. OAuth 2.0 requires additional scope configuration. See the [Confluence connector docs](https://docs.aws.amazon.com/bedrock/latest/userguide/confluence-data-source-connector.html) for current requirements.
   - **Salesforce**: Connected app with appropriate OAuth scopes
   - **Web Crawler**: URL scope configuration, robots.txt compliance
@@ -72,8 +72,8 @@ when a user wants to build a RAG application.
 
 - If documents contain tables or complex figures, You MUST recommend enabling **advanced parsing (FM-based)** because standard chunking breaks tables across chunks, destroying structure
 - You MUST NOT use default chunking for documents with complex tables or figures
-- You MUST warn the user that the chunking strategy cannot be changed after data source creation — this choice is irreversible (the data source must be deleted and recreated to change chunking)
-- You MUST inform the user which chunking strategy you are using before creating the data source — the chunking configuration cannot be changed after data source creation (you must delete and recreate the data source to change it)
+- You MUST warn the user that the chunking strategy cannot be changed after data source creation -- this choice is irreversible (the data source must be deleted and recreated to change chunking)
+- You MUST inform the user which chunking strategy you are using before creating the data source -- the chunking configuration cannot be changed after data source creation (you must delete and recreate the data source to change it)
 - Refer to the latest AWS documentation on Bedrock Knowledge Base chunking strategies for current configuration parameters
 
 ### 3. Select and Configure Vector Store
@@ -85,16 +85,16 @@ when a user wants to build a RAG application.
 
 | Vector Store | Best When | Setup Complexity |
 |-------------|-----------|-----------------|
-| S3 Vectors | Simplest setup, AWS-managed, no infrastructure to configure | Low — Bedrock can auto-create |
-| OpenSearch Serverless | No existing vector DB, most use cases, need advanced filtering | Medium — create collection + index |
-| Aurora PostgreSQL | Already using Aurora, cost-sensitive | Medium — enable pgvector extension |
-| Pinecone | Already using Pinecone | Low — create index + store API key in Secrets Manager |
-| Redis Enterprise Cloud | Need lowest latency | Medium — create cluster with vector search module |
-| MongoDB Atlas | Already using MongoDB | Medium — create vector index + store credentials in Secrets Manager |
-| Neptune Analytics | Graph-based RAG use cases | Medium — create graph + configure |
-| OpenSearch Managed Cluster | Existing self-managed OpenSearch | Medium — configure domain + index |
+| S3 Vectors | Simplest setup, AWS-managed, no infrastructure to configure | Low -- Bedrock can auto-create |
+| OpenSearch Serverless | No existing vector DB, most use cases, need advanced filtering | Medium -- create collection + index |
+| Aurora PostgreSQL | Already using Aurora, cost-sensitive | Medium -- enable pgvector extension |
+| Pinecone | Already using Pinecone | Low -- create index + store API key in Secrets Manager |
+| Redis Enterprise Cloud | Need lowest latency | Medium -- create cluster with vector search module |
+| MongoDB Atlas | Already using MongoDB | Medium -- create vector index + store credentials in Secrets Manager |
+| Neptune Analytics | Graph-based RAG use cases | Medium -- create graph + configure |
+| OpenSearch Managed Cluster | Existing self-managed OpenSearch | Medium -- configure domain + index |
 
-Additional vector stores may be available — refer to the latest [AWS documentation on KB vector store setup](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-setup.html) for current options.
+Additional vector stores may be available -- refer to the latest [AWS documentation on KB vector store setup](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-setup.html) for current options.
 
 - Refer to the latest AWS documentation on Bedrock Knowledge Base vector store setup for configuration steps
 - If using S3 Vectors:
@@ -104,25 +104,25 @@ Additional vector stores may be available — refer to the latest [AWS documenta
   - You MUST create a VECTORSEARCH type collection
   - You MUST verify the data access policy includes the Bedrock service role ARN
   - You MUST verify vector index field names (vector field, text field, metadata field) match the KB creation request
-  - Creation sequence matters — You MUST follow this exact order: create collection → create vector index with correct field mappings → then create KB. Creating the KB before the vector index is ready causes cryptic configuration errors.
+  - Creation sequence matters -- You MUST follow this exact order: create collection -> create vector index with correct field mappings -> then create KB. Creating the KB before the vector index is ready causes cryptic configuration errors.
 - If using Pinecone:
   - You MUST verify the API key is valid and not regenerated since storage in Secrets Manager
   - Index dimensions MUST match the embedding model dimensions
 - You MUST NOT proceed to KB creation until the vector store is fully configured and accessible
-- For vector stores that require credentials (Pinecone, Redis, MongoDB Atlas, and Aurora PostgreSQL via RDS Data API), credentials MUST be stored in AWS Secrets Manager — never pass credentials directly. The KB service role needs `secretsmanager:GetSecretValue` permission on the secret ARN.
+- For vector stores that require credentials (Pinecone, Redis, MongoDB Atlas, and Aurora PostgreSQL via RDS Data API), credentials MUST be stored in AWS Secrets Manager -- never pass credentials directly. The KB service role needs `secretsmanager:GetSecretValue` permission on the secret ARN.
 
 ### 4. Create IAM Service Role and Knowledge Base
 
 **Constraints:**
 
-- You MUST NOT skip the IAM role — KB creation will fail without it
+- You MUST NOT skip the IAM role -- KB creation will fail without it
 - You MUST create the role and ALL policies BEFORE calling `create-knowledge-base`
-- After creating the IAM role, you MUST allow time for IAM propagation before using it in `create-knowledge-base`. If you get an error indicating Bedrock cannot assume the role, retry with exponential backoff up to 3 attempts. IAM role creation is eventually consistent — newly created roles may not be immediately assumable by AWS services (see [IAM eventual consistency](https://docs.aws.amazon.com/IAM/latest/UserGuide/troubleshoot_general.html#troubleshoot_general_eventual-consistency))
+- After creating the IAM role, you MUST allow time for IAM propagation before using it in `create-knowledge-base`. If you get an error indicating Bedrock cannot assume the role, retry with exponential backoff up to 3 attempts. IAM role creation is eventually consistent -- newly created roles may not be immediately assumable by AWS services (see [IAM eventual consistency](https://docs.aws.amazon.com/IAM/latest/UserGuide/troubleshoot_general.html#troubleshoot_general_eventual-consistency))
 - For the full and latest set of permissions for all vector store types, refer to [Create a service role for Amazon Bedrock Knowledge Bases](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html)
 
 #### Step 4a: Create the IAM service role
 
-Trust policy allows `bedrock.amazonaws.com` to assume the role with confused deputy protection (source: [AWS docs — KB trust relationship](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html#kb-permissions-trust)):
+Trust policy allows `bedrock.amazonaws.com` to assume the role with confused deputy protection (source: [AWS docs -- KB trust relationship](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html#kb-permissions-trust)):
 
 ```bash
 aws iam create-role \
@@ -143,7 +143,7 @@ aws iam create-role \
 
 #### Step 4b: Attach model invocation permissions
 
-Source: [AWS docs — KB model permissions](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html#kb-permissions-access-models)
+Source: [AWS docs -- KB model permissions](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html#kb-permissions-access-models)
 
 ```bash
 aws iam put-role-policy \
@@ -175,7 +175,7 @@ Attach permissions matching the data source type selected in Step 1:
 - **S3**: `s3:ListBucket` and `s3:GetObject` on the bucket
 - **Confluence, SharePoint, Salesforce**: `secretsmanager:GetSecretValue` for the credentials secret
 
-Refer to [AWS docs — KB data source permissions](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html#kb-permissions-access-ds) for the exact policy for each data source type.
+Refer to [AWS docs -- KB data source permissions](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html#kb-permissions-access-ds) for the exact policy for each data source type.
 
 #### Step 4d: Attach vector store permissions
 
@@ -186,7 +186,7 @@ Attach permissions matching the vector store selected in Step 3:
 - **Aurora PostgreSQL**: `rds:DescribeDBClusters`, `rds-data:BatchExecuteStatement`, `rds-data:ExecuteStatement` on the cluster ARN
 - **Other vector stores** (Neptune, Pinecone, Redis, MongoDB): see docs
 
-Refer to [AWS docs — KB service role permissions](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html) for the exact policy JSON for each vector store type.
+Refer to [AWS docs -- KB service role permissions](https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html) for the exact policy JSON for each vector store type.
 
 #### Step 4e: Create the Knowledge Base
 
@@ -208,12 +208,12 @@ aws bedrock-agent create-knowledge-base \
 **Constraints:**
 
 - You MUST create the data source: `aws bedrock-agent create-data-source --knowledge-base-id <kb-id> --name <name> --data-source-configuration '...'`
-- You MUST inform the user which chunking strategy you are using before creating the data source — the chunking configuration cannot be changed after data source creation (you must delete and recreate the data source to change it)
+- You MUST inform the user which chunking strategy you are using before creating the data source -- the chunking configuration cannot be changed after data source creation (you must delete and recreate the data source to change it)
 - For S3 data sources:
   - The KB service role MUST have `s3:GetObject` and `s3:ListBucket` on the bucket
   - You MUST specify the chunking configuration from Step 2
 - You MUST configure the data source with the chunking strategy selected in Step 2
-- You MUST NOT assume the data source is ready immediately — it needs ingestion
+- You MUST NOT assume the data source is ready immediately -- it needs ingestion
 
 ### 6. Run Initial Ingestion
 
@@ -250,10 +250,10 @@ These are KB-creation-specific security controls. For general Bedrock security, 
 
 Knowledge bases support customer-managed KMS keys at multiple encryption points. For HIPAA/GDPR workloads, You MUST recommend customer-managed KMS for all applicable points:
 
-1. **Transient data during ingestion** — data is temporarily stored during chunking/embedding. Encrypt by adding `kms:GenerateDataKey` and `kms:Decrypt` permissions for your KMS key to the KB service role
-2. **Vector store encryption** — OpenSearch Serverless collections and S3 Vectors support KMS encryption at creation time
-3. **S3 source data encryption** — if source documents in S3 are encrypted with a customer-managed KMS key, the KB service role needs `kms:Decrypt` permission with `kms:ViaService` condition for `s3.<region>.amazonaws.com`
-4. **Session encryption during retrieval** — encrypt `RetrieveAndGenerate` session data via `--session-configuration '{"kmsKeyArn":"<kms-key-arn>"}'` (covered in [KB retrieval reference](knowledge-bases-retrieval.md))
+1. **Transient data during ingestion** -- data is temporarily stored during chunking/embedding. Encrypt by adding `kms:GenerateDataKey` and `kms:Decrypt` permissions for your KMS key to the KB service role
+2. **Vector store encryption** -- OpenSearch Serverless collections and S3 Vectors support KMS encryption at creation time
+3. **S3 source data encryption** -- if source documents in S3 are encrypted with a customer-managed KMS key, the KB service role needs `kms:Decrypt` permission with `kms:ViaService` condition for `s3.<region>.amazonaws.com`
+4. **Session encryption during retrieval** -- encrypt `RetrieveAndGenerate` session data via `--session-configuration '{"kmsKeyArn":"<kms-key-arn>"}'` (covered in [KB retrieval reference](knowledge-bases-retrieval.md))
 
 Amazon Bedrock uses TLS encryption for communication with third-party data source connectors and vector stores where the provider supports TLS. Refer to the latest [AWS documentation on KB encryption](https://docs.aws.amazon.com/bedrock/latest/userguide/encryption-kb.html).
 

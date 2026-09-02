@@ -89,7 +89,7 @@ Connect to Aurora DSQL using psql with automatic IAM authentication.
 - Defaults to `sslmode=verify-full` against the OS trust store (`PGSSLROOTCERT=system`)
 - Uses `admin` user by default (override with `--user` or `$DB_USER`)
 - `--ai-model MODEL_ID` appends model identifier to PostgreSQL `application_name` for connection tracking
-- `--skip-cert-verify` downgrades to `sslmode=require` (encrypt only — vulnerable to MITM; do NOT use in production)
+- `--skip-cert-verify` downgrades to `sslmode=require` (encrypt only -- vulnerable to MITM; do NOT use in production)
 
 ---
 
@@ -131,7 +131,7 @@ Two Python modules under `scripts/` back Workflow 4a (Rubric-Critical SQL constr
 
 ### safe_query.py
 
-Builds DSQL SQL strings with validator-enforced interpolation — the canonical defense against
+Builds DSQL SQL strings with validator-enforced interpolation -- the canonical defense against
 SQL injection on raw-SQL paths (`psql -c`, shell pipelines, dynamic identifiers). See
 [input-validation.md](input-validation.md) for the full pattern.
 
@@ -148,7 +148,7 @@ python3 scripts/safe_query.py    # runs the embedded _selftest()
 ### tenant_query.py
 
 Demonstrates the canonical multi-tenant `SELECT` pattern using `safe_query.build()` + a
-driver-supplied cursor. Illustrative example, not a runtime dependency — useful as a template
+driver-supplied cursor. Illustrative example, not a runtime dependency -- useful as a template
 when building tenant-scoped queries in application code.
 
 ---

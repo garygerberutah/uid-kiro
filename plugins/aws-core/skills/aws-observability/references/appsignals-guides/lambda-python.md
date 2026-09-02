@@ -11,18 +11,18 @@ If you cannot determine a value (such as AWS Region): Ask the user for clarifica
 
 ## Region-Specific Layer ARNs
 
-The ADOT Lambda layer ARN is region-specific, and its **layer version changes over time**. Do **not** hardcode a version from this guide — look up the current value from the source of truth, which lists **all supported regions and the latest layer version**:
+The ADOT Lambda layer ARN is region-specific, and its **layer version changes over time**. Do **not** hardcode a version from this guide -- look up the current value from the source of truth, which lists **all supported regions and the latest layer version**:
 
 - Source of truth: https://raw.githubusercontent.com/aws-otel/aws-otel.github.io/refs/heads/main/src/config/lambdaLayerArns.js
 - (Backup / human-readable: https://github.com/aws-otel/aws-otel.github.io/blob/main/src/config/lambdaLayerArns.js)
 
-ARN format — fill in `<REGION>` and `<LAYER_VERSION>` (the latest version for that region from the source above):
+ARN format -- fill in `<REGION>` and `<LAYER_VERSION>` (the latest version for that region from the source above):
 
 ```
 arn:aws:lambda:<REGION>:<ACCOUNT_ID>:layer:AWSOpenTelemetryDistroPython:<LAYER_VERSION>
 ```
 
-A few sample regions (illustrative — confirm the current `<LAYER_VERSION>` and account ID from the source of truth, and use it for **any** supported region, not just these):
+A few sample regions (illustrative -- confirm the current `<LAYER_VERSION>` and account ID from the source of truth, and use it for **any** supported region, not just these):
 
 ```
 us-east-1:      arn:aws:lambda:us-east-1:615299751070:layer:AWSOpenTelemetryDistroPython:<LAYER_VERSION>
@@ -176,7 +176,7 @@ environment {
 
 **Verification:**
 
-- Open AWS CloudWatch Console → Application Signals → Services
+- Open AWS CloudWatch Console -> Application Signals -> Services
 - Look for your Lambda function service
 
 **Troubleshooting**

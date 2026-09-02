@@ -5,22 +5,22 @@ The CRUD and status operation functions (in ``di_crud_tools`` / ``di_status_tool
 return a human-readable string for both success and failure and never raise. That
 text is what the agent reads. But the entry script (``di_instrumentation.py``) also
 needs to derive a process exit code from each operation, and historically it did so
-by *string-matching* the rendered prose ("Failed to ...", "DELETE ERRORS:", etc.) —
+by *string-matching* the rendered prose ("Failed to ...", "DELETE ERRORS:", etc.) --
 wording owned by several other modules. Rewording any renderer could silently flip a
 real failure to exit 0.
 
 ``OpResult`` separates the two concerns that the bare string conflated:
 
-* ``ok``   — the STATUS channel. Drives the process exit code (``0`` if ``ok`` else
+* ``ok``   -- the STATUS channel. Drives the process exit code (``0`` if ``ok`` else
              ``1``). Set by each operation at the point where success vs. failure is
              actually known (the ``except GatewayError`` site, the early ``ERROR:``
              return, the success render).
-* ``text`` — the PRESENTATION channel. The rendered human string, unchanged from
+* ``text`` -- the PRESENTATION channel. The rendered human string, unchanged from
              before; the entry script prints it verbatim.
 
 ``ok`` is about whether the *operation* succeeded, NOT about the AWS instrumentation
 lifecycle state. A ``check-status`` call that successfully reports a breakpoint in the
-ERROR state is ``OpResult(ok=True, ...)`` — the query succeeded; the breakpoint's
+ERROR state is ``OpResult(ok=True, ...)`` -- the query succeeded; the breakpoint's
 status being ERROR is content in ``text``.
 
 This module imports nothing so the entry script and both tools modules can import it

@@ -1,4 +1,4 @@
-# Cell 0 [markdown]: Model Deployment — SageMaker
+# Cell 0 [markdown]: Model Deployment -- SageMaker
 
 # Cell 1: Setup
 
@@ -24,8 +24,8 @@ ENDPOINT_NAME = "[ENDPOINT_NAME]"
 ADAPTER_IC_NAME = f"{ENDPOINT_NAME}-adapter"
 # NOTE FOR AGENT: Only include the ACCEPT_EULA line below for Meta/Llama models.
 # For all other models (Apache 2.0, MIT, Qwen License, etc.) remove the ACCEPT_EULA
-# variable and the model_builder.accept_eula line entirely — they do not apply.
-ACCEPT_EULA = [ACCEPT_EULA]  # Meta/Llama only — remove this line for non-Meta models
+# variable and the model_builder.accept_eula line entirely -- they do not apply.
+ACCEPT_EULA = [ACCEPT_EULA]  # Meta/Llama only -- remove this line for non-Meta models
 
 # Cell 3: Build Model
 
@@ -41,7 +41,7 @@ model_builder = ModelBuilder(
 model_builder.set_deployment_config(instance_type=INSTANCE_TYPE)
 # NOTE FOR AGENT: Only include model_builder.accept_eula for Meta/Llama models.
 # Remove this line for all other models.
-model_builder.accept_eula = ACCEPT_EULA  # Meta/Llama only — remove for non-Meta models
+model_builder.accept_eula = ACCEPT_EULA  # Meta/Llama only -- remove for non-Meta models
 model = model_builder.build(model_name=ENDPOINT_NAME)
 print(f"Model: {model.model_arn}")
 

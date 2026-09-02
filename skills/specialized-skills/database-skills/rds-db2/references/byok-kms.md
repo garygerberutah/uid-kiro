@@ -1,8 +1,8 @@
-# RDS for Db2 — Bring Your Own Key (BYOK) Reference
+# RDS for Db2 -- Bring Your Own Key (BYOK) Reference
 
 > **Source:** `04-db2-client/bring-your-own-key/bring-your-own-kms-key-for-rds-for-db2.md`
 > (blog DBBLOG-5188). Commands and option names are reproduced from that source; no secret
-> values, credentials, or customer IDs are included — replace every `<placeholder>`.
+> values, credentials, or customer IDs are included -- replace every `<placeholder>`.
 
 ---
 
@@ -11,7 +11,7 @@
 RDS for Db2 encrypts at rest with AWS KMS. BYOK lets you import your own key material into a
 customer-managed KMS key so you control the key, meet key-management compliance, keep a CloudTrail
 audit trail, and reuse the same key material across Regions for disaster recovery. Always create
-the instance encrypted (encryption at rest cannot be added in place — see migration below).
+the instance encrypted (encryption at rest cannot be added in place -- see migration below).
 
 Prerequisites: AWS CLI, OpenSSL, `jq`, and a valid IBM Customer ID + Site ID for BYOL.
 
@@ -88,8 +88,8 @@ aws kms create-alias --region $DR_REGION \
 
 The principal creating the instance needs, on the key:
 
-- `kms:CreateGrant` — lets RDS create a grant to use the key
-- `kms:DescribeKey` — lets RDS read key metadata
+- `kms:CreateGrant` -- lets RDS create a grant to use the key
+- `kms:DescribeKey` -- lets RDS read key metadata
 
 Use a least-privilege IAM policy (no `*FullAccess`); trust the account root in the key policy and
 let RDS use the grant created at instance creation. Inspect grants with
@@ -134,7 +134,7 @@ group with IBM IDs.
 
 ## 8. Encrypt an existing (unencrypted) instance
 
-Encryption cannot be toggled in place — re-encrypt through a snapshot:
+Encryption cannot be toggled in place -- re-encrypt through a snapshot:
 
 ```bash
 # 1) snapshot the unencrypted DB

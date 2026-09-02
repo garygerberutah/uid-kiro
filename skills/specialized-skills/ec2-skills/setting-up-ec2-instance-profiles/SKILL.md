@@ -26,11 +26,11 @@ Verify the instance ID and region are correct. List instances with `aws ec2 desc
 
 ### Instance already has a profile
 
-The procedure handles replacement — it will prompt before disassociating the existing profile.
+The procedure handles replacement -- it will prompt before disassociating the existing profile.
 
 ### Credentials not available after attachment
 
-Instance profile propagation can take 30–60 seconds. Applications may need a restart to pick up new credentials.
+Instance profile propagation can take 30-60 seconds. Applications may need a restart to pick up new credentials.
 
 ### Access denied errors
 

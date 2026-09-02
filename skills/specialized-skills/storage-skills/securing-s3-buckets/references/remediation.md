@@ -7,7 +7,7 @@ aws s3api put-public-access-block \
   --bucket <bucket-name> \
   --public-access-block-configuration \
   BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
-# WARNING: Do NOT delete the entire bucket policy — it may contain critical controls (HTTPS enforcement, VPC restrictions, etc.).
+# WARNING: Do NOT delete the entire bucket policy -- it may contain critical controls (HTTPS enforcement, VPC restrictions, etc.).
 # Instead, surgically remove only the offending public-grant statement(s):
 # 1. Review the current policy:
 aws s3api get-bucket-policy --bucket <bucket-name> --output text | jq .
@@ -29,7 +29,7 @@ aws s3api put-bucket-encryption \
   --server-side-encryption-configuration \
   '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"},"BucketKeyEnabled":true,"BlockedEncryptionTypes":{"EncryptionType":["SSE-C"]}}]}'
 # Re-encrypt existing objects
-# ⚠️ WARNING: --metadata-directive REPLACE without --metadata drops all user-defined metadata.
+# [WARNING] WARNING: --metadata-directive REPLACE without --metadata drops all user-defined metadata.
 #    Before running, verify no objects carry custom metadata:
 #      aws s3api head-object --bucket <bucket-name> --key <sample-key>
 #    If objects have custom metadata, use a per-object script that reads
@@ -49,7 +49,7 @@ aws s3api put-bucket-encryption \
 
 ## Using AWS Managed Key (aws/s3)
 
-You MUST apply a least-privilege key policy — do NOT create a key without `--policy file://key-policy.json`. See [encryption.md § Least-Privilege KMS Key Policy Template](encryption.md#least-privilege-kms-key-policy-template) for the full template.
+You MUST apply a least-privilege key policy -- do NOT create a key without `--policy file://key-policy.json`. See [encryption.md Section Least-Privilege KMS Key Policy Template](encryption.md#least-privilege-kms-key-policy-template) for the full template.
 
 ```bash
 # 1. Save the key-policy.json template from encryption.md (replace placeholders)
@@ -73,9 +73,9 @@ aws s3api put-bucket-encryption \
 
 ## Missing Logging
 
-Enable either S3 server access logging or CloudTrail data events — one is sufficient.
+Enable either S3 server access logging or CloudTrail data events -- one is sufficient.
 
-**Option A — S3 Server Access Logging** (no per-request charge; you pay only for log file storage in S3):
+**Option A -- S3 Server Access Logging** (no per-request charge; you pay only for log file storage in S3):
 
 ```bash
 aws s3api put-bucket-logging \
@@ -84,7 +84,7 @@ aws s3api put-bucket-logging \
   '{"LoggingEnabled":{"TargetBucket":"<logging-bucket>","TargetPrefix":"<bucket-name>/"}}'
 ```
 
-**Option B — CloudTrail Data Events** (per-event charge applies; provides full IAM principal attribution, logs anonymous requests and AccessDenied failures, and supports real-time alerting):
+**Option B -- CloudTrail Data Events** (per-event charge applies; provides full IAM principal attribution, logs anonymous requests and AccessDenied failures, and supports real-time alerting):
 
 ```bash
 # IMPORTANT: use the trail's home region, not the bucket's region
@@ -114,9 +114,9 @@ aws iam simulate-principal-policy \
 
 Diagnosis order:
 
-1. IAM user/role policy — `simulate-principal-policy`
-2. Bucket policy — `get-bucket-policy`
-3. Block Public Access — `get-public-access-block`
+1. IAM user/role policy -- `simulate-principal-policy`
+2. Bucket policy -- `get-bucket-policy`
+3. Block Public Access -- `get-public-access-block`
 4. VPC endpoint policy (if applicable)
 5. SCPs/RCPs (if AWS Organizations)
 6. CloudTrail logs for detailed error context

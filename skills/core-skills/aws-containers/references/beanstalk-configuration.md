@@ -72,7 +72,7 @@ web: gunicorn myapp.wsgi --bind 0.0.0.0:5000
 ```
 
 For worker environments, the Procfile defines the HTTP server that receives
-SQS daemon POST requests (not a queue consumer like Celery — EB Workers use
+SQS daemon POST requests (not a queue consumer like Celery -- EB Workers use
 HTTP, not a message broker SDK).
 
 ## Environment Properties and Secrets
@@ -92,7 +92,7 @@ option_settings:
 The `environmentsecrets` namespace requires a minimum platform version for compatibility, see [the relevant documentation](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/AWSHowTo.secrets.env-vars.html) for details.
 
 Never hardcode secrets in `.ebextensions/` or source code. Provision databases
-and secrets as separate resources — not coupled to the EB environment lifecycle.
+and secrets as separate resources -- not coupled to the EB environment lifecycle.
 
 See [Environment secrets](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/AWSHowTo.secrets.env-vars.html)
 for supported secret sources.
@@ -136,9 +136,9 @@ for ALB health check configuration.
 
 When migrating from Heroku/Render/Railway, audit for these patterns:
 
-- `DATABASE_URL` → Provision RDS/Aurora separately, pass via environment secrets
-- `REDIS_URL` → Provision ElastiCache, pass endpoint via environment properties
-- Add-on env vars (e.g., `SENDGRID_API_KEY`) → Store in Secrets Manager
-- `PORT` → See Reverse Proxy Port section above; set if app doesn't use 5000
-- `Procfile` → Works as-is (same format)
-- Explicit AWS credentials → Remove; use IAM instance profile instead
+- `DATABASE_URL` -> Provision RDS/Aurora separately, pass via environment secrets
+- `REDIS_URL` -> Provision ElastiCache, pass endpoint via environment properties
+- Add-on env vars (e.g., `SENDGRID_API_KEY`) -> Store in Secrets Manager
+- `PORT` -> See Reverse Proxy Port section above; set if app doesn't use 5000
+- `Procfile` -> Works as-is (same format)
+- Explicit AWS credentials -> Remove; use IAM instance profile instead

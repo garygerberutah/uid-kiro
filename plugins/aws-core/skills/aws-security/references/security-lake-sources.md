@@ -53,7 +53,7 @@ Works from both standalone and delegated administrator accounts.
    aws cloudwatch get-metric-statistics --namespace AWS/SecurityLake --metric-name ProcessedSize --dimensions Name=Source,Value=<SOURCE_NAME> --start-time <7-days-ago> --end-time <now> --period 86400 --statistics Sum
    ```
 
-   Repeat for each source. Shows total stored bytes per source per day — useful for identifying sources that stopped ingesting.
+   Repeat for each source. Shows total stored bytes per source per day -- useful for identifying sources that stopped ingesting.
 
 ## Workflow B: Subscriber & Exception Overview
 
@@ -90,7 +90,7 @@ Works from both standalone and delegated administrator accounts.
 
 6. MUST report total subscriber count and access type breakdown.
 
-7. MUST report exception count — zero exceptions is healthy.
+7. MUST report exception count -- zero exceptions is healthy.
 
 8. SHOULD note subscribers in non-ACTIVE status.
 
@@ -98,7 +98,7 @@ Works from both standalone and delegated administrator accounts.
 
 - MUST NOT perform data queries against Security Lake
 - MUST NOT modify configuration, subscribers, or sources
-- MUST NOT query CloudWatch metrics by default — only if user explicitly asks about volume
+- MUST NOT query CloudWatch metrics by default -- only if user explicitly asks about volume
 - MUST present data as-is in structured tables
 - SHOULD handle AccessDeniedException gracefully
 
@@ -109,8 +109,8 @@ Works from both standalone and delegated administrator accounts.
 | get-data-lake-sources returns empty | Security Lake not enabled or no sources configured |
 | AccessDeniedException | Caller is not Security Lake delegated admin or not enabled |
 | UnauthorizedException | Same as above |
-| Subscriber DEACTIVATED | Note in summary — may have been disabled |
-| High exception count | Summarize by account/region — may indicate rollout issues |
+| Subscriber DEACTIVATED | Note in summary -- may have been disabled |
+| High exception count | Summarize by account/region -- may indicate rollout issues |
 
 ## Output Sensitivity
 

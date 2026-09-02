@@ -59,7 +59,7 @@ evaluator = CustomScorerEvaluator(
     mlflow_experiment_name=MLFLOW_EXPERIMENT_NAME,
 )
 
-print("✅ Starting custom scorer evaluation...")
+print("[YES] Starting custom scorer evaluation...")
 print(f"Model: {MODEL}")
 print(f"Dataset: {DATASET}")
 print(f"Evaluator: {EVALUATOR}")
@@ -67,7 +67,7 @@ print(f"Evaluate base model: {EVALUATE_BASE}")
 
 execution = evaluator.evaluate()
 
-print(f"\n✅ Evaluation job started!")
+print(f"\n[YES] Evaluation job started!")
 print(f"Job ARN: {execution.arn}")
 print(f"Job Name: {execution.name}")
 print(f"Status: {execution.status.overall_status}")

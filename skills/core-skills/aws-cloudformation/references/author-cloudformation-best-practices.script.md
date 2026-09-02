@@ -8,9 +8,9 @@ Deterministic procedure for applying CloudFormation authoring best practices to 
 
 - **template_content** (required): The CloudFormation template as a YAML or JSON string or a file path.
 - **strictness** (optional, default: "recommended"): Which rule tiers to enforce. One of:
-  - `critical` — only rules that prevent security incidents or deployment failures
-  - `recommended` (default) — critical + widely-agreed best practices
-  - `strict` — recommended + opinionated improvements
+  - `critical` -- only rules that prevent security incidents or deployment failures
+  - `recommended` (default) -- critical + widely-agreed best practices
+  - `strict` -- recommended + opinionated improvements
 
 **Constraints for parameter acquisition:**
 
@@ -111,7 +111,7 @@ No external tools required. This SOP is purely analytical.
 
 **Constraints:**
 
-- You SHOULD note exported outputs and remind the user that exports create cross-stack coupling — confirm each export has a known consumer. Single-template analysis cannot determine whether an export is consumed by another stack, so this is advisory rather than a hard failure.
+- You SHOULD note exported outputs and remind the user that exports create cross-stack coupling -- confirm each export has a known consumer. Single-template analysis cannot determine whether an export is consumed by another stack, so this is advisory rather than a hard failure.
 - You SHOULD recommend adding a `Description` to every output
 
 ### 10. Present Findings
@@ -120,7 +120,7 @@ Report the checklist results.
 
 **Constraints:**
 
-- You MUST group findings by severity: Critical (security, will-fail-deployment) → Recommended → Strict
+- You MUST group findings by severity: Critical (security, will-fail-deployment) -> Recommended -> Strict
 - You MUST provide the specific template change for each finding
 - You MUST show line numbers where applicable
 - You SHOULD respect the `strictness` parameter and suppress findings below the selected tier
@@ -148,20 +148,20 @@ Resources:
 
 Critical:
 
-1. DataBucket — public access not blocked
+1. DataBucket -- public access not blocked
    Add: PublicAccessBlockConfiguration with all four blocks true
    Add: BucketEncryption with SSEAlgorithm AES256 or aws:kms
 
-2. DataBucket — no DeletionPolicy on a stateful resource
+2. DataBucket -- no DeletionPolicy on a stateful resource
    Add: DeletionPolicy: Retain and UpdateReplacePolicy: Retain
 
 Recommended:
 
-3. Parameters.Environment — String parameter without AllowedValues
+3. Parameters.Environment -- String parameter without AllowedValues
    Change: AllowedValues: [prod, staging, dev]
    Why: constrains to valid environments; cfn-lint will validate
 
-4. DataBucket.BucketName — hardcoded ("acme-data-prod")
+4. DataBucket.BucketName -- hardcoded ("acme-data-prod")
    Change: use !Sub "${AWS::StackName}-data" or omit the name
    Why: hardcoded names prevent multiple deployments and block replacement
 ```

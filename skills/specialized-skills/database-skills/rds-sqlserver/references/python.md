@@ -1,4 +1,4 @@
-# Python — pymssql and pyodbc
+# Python -- pymssql and pyodbc
 
 Two Python drivers for RDS SQL Server. `pymssql` is simpler for pure SQL-auth workloads. `pyodbc` is required when you need Kerberos/Windows auth.
 
@@ -24,12 +24,12 @@ creds = json.loads(sm.get_secret_value(SecretId="rds/sqlserver/app")["SecretStri
 
 conn = pymssql.connect(
     server=creds["host"],
-    port="1433",                 # string, NOT int — common bug
+    port="1433",                 # string, NOT int -- common bug
     user=creds["username"],
     password=creds["password"],
     database=creds["dbname"],
     tds_version="7.3",           # 7.3 for SQL Server 2008-2019, 7.4 for 2022+
-    encryption="require",        # not "request" — see below
+    encryption="require",        # not "request" -- see below
     login_timeout=10,
 )
 ```
@@ -40,7 +40,7 @@ conn = pymssql.connect(
 |---|---|
 | `port="1433"` must be a string | Passing `port=1433` (int) silently fails with "connection refused" on some versions |
 | Use `server=`, NOT `host=` | If both set, `host=` wins silently |
-| `tds_version` is mandatory | Default negotiation can pick TDS 4.2 → fails on modern RDS |
+| `tds_version` is mandatory | Default negotiation can pick TDS 4.2 -> fails on modern RDS |
 | `encryption="require"` not `"request"` | `"request"` is opportunistic and can fall back to cleartext |
 | No native connection pool | Use SQLAlchemy or DBUtils for pooling |
 | No Kerberos support | Use pyodbc for AD auth |
@@ -60,7 +60,7 @@ conn = pymssql.connect(
     tds_version="7.3",
     encryption="require",
 )
-# pymssql on Linux uses the system CA bundle — put global-bundle.pem in
+# pymssql on Linux uses the system CA bundle -- put global-bundle.pem in
 # /etc/ssl/certs/ or set SSL_CERT_FILE env var
 ```
 
@@ -71,7 +71,7 @@ For strict validation set `SSL_CERT_FILE=/path/to/global-bundle.pem` before conn
 ### Install
 
 ```bash
-# Linux — install Microsoft ODBC Driver 18
+# Linux -- install Microsoft ODBC Driver 18
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | \
   sudo tee /etc/apt/sources.list.d/mssql-release.list
@@ -101,7 +101,7 @@ import pyodbc
 # Connect to the CNAME, NOT the RDS endpoint
 conn = pyodbc.connect(
     "Driver={ODBC Driver 18 for SQL Server};"
-    "Server=database-1.corp.example.com,1433;"   # CNAME — Kerberos needs this
+    "Server=database-1.corp.example.com,1433;"   # CNAME -- Kerberos needs this
     "Database=mydb;"
     "Trusted_Connection=Yes;"
     "Encrypt=Yes;"
@@ -161,7 +161,7 @@ def handler(event, context):
     conn.close()
 ```
 
-For Lambda-level pooling, use RDS Proxy — see `rds-proxy.md`.
+For Lambda-level pooling, use RDS Proxy -- see `rds-proxy.md`.
 
 ## Verify the connection
 

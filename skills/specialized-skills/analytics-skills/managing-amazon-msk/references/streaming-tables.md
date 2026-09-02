@@ -1,4 +1,4 @@
-# Streaming Tables — Iceberg (S3 Tables) Delivery
+# Streaming Tables -- Iceberg (S3 Tables) Delivery
 
 Streaming Tables for Amazon MSK Express brokers delivers topic data from Express brokers to Apache Iceberg tables in S3 Table buckets. Serverless, no connector management, minutes-level data freshness, and auto-scaling throughput. Freshness bounds and the per-channel throughput ceiling are in [Amazon MSK Data Delivery quotas](https://docs.aws.amazon.com/msk/latest/developerguide/limits.html#msk-data-delivery-quota).
 
@@ -8,18 +8,18 @@ Each record is delivered exactly once by the delivery pipeline. Streaming tables
 
 Check Streaming Tables documentation for constraints. Some key constraints are:
 
-- Streaming Tables is ONLY available on **Express brokers** — Standard brokers and MSK Serverless are NOT supported
-- Data freshness is bounded and not adjustable, and the tightest freshness setting requires a minimum sustained uncompressed throughput per channel — get both from [Amazon MSK Data Delivery quotas](https://docs.aws.amazon.com/msk/latest/developerguide/limits.html#msk-data-delivery-quota). Low-throughput topics must use a looser freshness setting
-- Streaming Tables is **append-only** — does not support CDC, upserts, or deletes
+- Streaming Tables is ONLY available on **Express brokers** -- Standard brokers and MSK Serverless are NOT supported
+- Data freshness is bounded and not adjustable, and the tightest freshness setting requires a minimum sustained uncompressed throughput per channel -- get both from [Amazon MSK Data Delivery quotas](https://docs.aws.amazon.com/msk/latest/developerguide/limits.html#msk-data-delivery-quota). Low-throughput topics must use a looser freshness setting
+- Streaming Tables is **append-only** -- does not support CDC, upserts, or deletes
 - Streaming Tables Iceberg destination supports **JSON input only** (plain JSON or GSR-serialized JSON) - does not support Avro/Protobuf input
 - **Schema evolution is not supported**
-- Streaming Tables creates its own Iceberg tables — it cannot write to **existing** Iceberg tables
-- **No backfill** — only records produced AFTER Streaming Tables is enabled are delivered
+- Streaming Tables creates its own Iceberg tables -- it cannot write to **existing** Iceberg tables
+- **No backfill** -- only records produced AFTER Streaming Tables is enabled are delivered
 
 If the user needs any of the above functionality, recommend **Managed Service for Apache Flink** instead. Streaming Tables are the most cost-effective way
 to deliver data to Iceberg tables on S3 Tables, so if it can be used it should be preferred in general.
 
-**Broker-type routing (Express vs Standard/Serverless).** Streaming Tables and Data Delivery are **Express-only**. On **Standard or Serverless** clusters they are not available — to move topic data into S3 / an Iceberg lakehouse there, use one of: the [Amazon Data Firehose MSK-source integration](https://docs.aws.amazon.com/msk/latest/developerguide/integrations-kinesis-data-firehose.html) (fully managed; delivers to Amazon S3 or to Apache Iceberg tables in self-managed S3 or S3 Tables), a self-managed Kafka Connect S3 sink connector, or Managed Service for Apache Flink. On Express, prefer Streaming Tables / Data Delivery over all three.
+**Broker-type routing (Express vs Standard/Serverless).** Streaming Tables and Data Delivery are **Express-only**. On **Standard or Serverless** clusters they are not available -- to move topic data into S3 / an Iceberg lakehouse there, use one of: the [Amazon Data Firehose MSK-source integration](https://docs.aws.amazon.com/msk/latest/developerguide/integrations-kinesis-data-firehose.html) (fully managed; delivers to Amazon S3 or to Apache Iceberg tables in self-managed S3 or S3 Tables), a self-managed Kafka Connect S3 sink connector, or Managed Service for Apache Flink. On Express, prefer Streaming Tables / Data Delivery over all three.
 
 ## Prerequisites
 
@@ -35,7 +35,7 @@ to deliver data to Iceberg tables on S3 Tables, so if it can be used it should b
 | `JSON` | Plain JSON. You provide a GSR schema ARN in channel config. | Producer writes plain JSON; schema managed externally |
 | `JSON_SCHEMA_GSR` | GSR-serialized JSON with schema ID embedded per record. | Producer uses GSR serializer library |
 
-> For `JSON_SCHEMA_GSR`, do NOT provide `schemaRegistryArn` or `schemaArn` in the source configuration — the schema ID is embedded in each record.
+> For `JSON_SCHEMA_GSR`, do NOT provide `schemaRegistryArn` or `schemaArn` in the source configuration -- the schema ID is embedded in each record.
 
 ## Schema Requirements
 
@@ -55,16 +55,16 @@ to deliver data to Iceberg tables on S3 Tables, so if it can be used it should b
 | `integer` | exceeds 32-bit | `long` |
 | `number` | with `multipleOf` | `decimal(38, scale)` |
 | `number` | plain | `double` |
-| `boolean` | — | `boolean` |
+| `boolean` | -- | `boolean` |
 | `object` | named properties | `struct` |
 | `object` | `additionalProperties` | `map<string, V>` |
-| `array` | — | `list<E>` |
+| `array` | -- | `list<E>` |
 
 **Schema behavior:**
 
-- Extra fields in source data → silently dropped
-- Missing optional fields → written as `null`
-- Missing required fields → record sent to DLQ
+- Extra fields in source data -> silently dropped
+- Missing optional fields -> written as `null`
+- Missing required fields -> record sent to DLQ
 - Nesting limit: 16 levels max
 - Partition column is automatically treated as required
 
@@ -176,7 +176,7 @@ to deliver data to Iceberg tables on S3 Tables, so if it can be used it should b
 }
 ```
 
-**Statement notes:** `S3TablesActions` required. `CloudWatchLogsAccess` required whenever CloudWatch Logs delivery logging is enabled (the default) — without it the service role cannot write delivery logs and failures stay invisible; swap for `s3:PutObject` (log bucket) or `firehose:PutRecord`/`firehose:PutRecordBatch` if you route delivery logs to S3 or Firehose instead. `DLQBucketAccess` required. `GlueSchemaRegistryAccess` required (for `JSON` input, only `glue:GetSchemaVersion` needed; for `JSON_SCHEMA_GSR`, include all). `KMSAccess` covers the S3 Tables destination (scoped via `kms:ViaService: s3tables.REGION.amazonaws.com`). `KMSAccessDLQ` is required when the DLQ bucket uses SSE-KMS — the DLQ is a regular S3 bucket, so its key must be reached via `kms:ViaService: s3.REGION.amazonaws.com`; without this statement the service role gets `AccessDenied` writing failed records to an SSE-KMS DLQ. Both KMS statements are recommended for production — omit only if the corresponding bucket relies on SSE-S3 (AES-256) default encryption. SSE-KMS (or at minimum SSE-S3) should always be enabled on both delivery and DLQ buckets.
+**Statement notes:** `S3TablesActions` required. `CloudWatchLogsAccess` required whenever CloudWatch Logs delivery logging is enabled (the default) -- without it the service role cannot write delivery logs and failures stay invisible; swap for `s3:PutObject` (log bucket) or `firehose:PutRecord`/`firehose:PutRecordBatch` if you route delivery logs to S3 or Firehose instead. `DLQBucketAccess` required. `GlueSchemaRegistryAccess` required (for `JSON` input, only `glue:GetSchemaVersion` needed; for `JSON_SCHEMA_GSR`, include all). `KMSAccess` covers the S3 Tables destination (scoped via `kms:ViaService: s3tables.REGION.amazonaws.com`). `KMSAccessDLQ` is required when the DLQ bucket uses SSE-KMS -- the DLQ is a regular S3 bucket, so its key must be reached via `kms:ViaService: s3.REGION.amazonaws.com`; without this statement the service role gets `AccessDenied` writing failed records to an SSE-KMS DLQ. Both KMS statements are recommended for production -- omit only if the corresponding bucket relies on SSE-S3 (AES-256) default encryption. SSE-KMS (or at minimum SSE-S3) should always be enabled on both delivery and DLQ buckets.
 
 **Cross-account:** If S3 Table bucket is in another account, the bucket owner must attach a table bucket policy granting the service role access.
 
@@ -230,34 +230,34 @@ aws kafka create-channel \
     }'
 ```
 
-**GSR-serialized input** — same command but the topic entry uses `"RecordConverter": {"ValueConverter": "JSON_SCHEMA_GSR"}` and omits `RecordSchema` (the schema ID is embedded per-record).
+**GSR-serialized input** -- same command but the topic entry uses `"RecordConverter": {"ValueConverter": "JSON_SCHEMA_GSR"}` and omits `RecordSchema` (the schema ID is embedded per-record).
 
 **Compression:** Iceberg Parquet output is compressed with `ZSTD` by default; `SNAPPY` is also supported via the `CompressionType` field.
 
 ## Delivery Logging
 
-**Always enable at least one logging destination** on the channel. Without it, delivery errors (`AccessDenied` on S3 Tables / DLQ, schema-mapping failures, GSR access denials, KMS `Decrypt` failures) are invisible — the only visible symptom is missing rows in Iceberg. Logging is also a prerequisite for [streaming-tables-troubleshooting.md](streaming-tables-troubleshooting.md).
+**Always enable at least one logging destination** on the channel. Without it, delivery errors (`AccessDenied` on S3 Tables / DLQ, schema-mapping failures, GSR access denials, KMS `Decrypt` failures) are invisible -- the only visible symptom is missing rows in Iceberg. Logging is also a prerequisite for [streaming-tables-troubleshooting.md](streaming-tables-troubleshooting.md).
 
-The `--logging-info` field on `aws kafka create-channel` accepts three independent destinations — any subset can be enabled at once:
+The `--logging-info` field on `aws kafka create-channel` accepts three independent destinations -- any subset can be enabled at once:
 
 | Destination | JSON key | Required fields | When to use |
 |---|---|---|---|
-| CloudWatch Logs | `CloudWatchLogs` | `Enabled`, `LogGroup` (must exist before create-channel) | Default choice — interactive querying via Logs Insights, alarms on log patterns |
+| CloudWatch Logs | `CloudWatchLogs` | `Enabled`, `LogGroup` (must exist before create-channel) | Default choice -- interactive querying via Logs Insights, alarms on log patterns |
 | Amazon S3 | `S3` | `Enabled`, `Bucket`, `Prefix` (optional) | Long-term retention, Athena/downstream analysis |
 | Firehose | `Firehose` | `Enabled`, `DeliveryStream` | Fan-out to OpenSearch / Splunk / third-party SIEMs |
 
 **Log group prerequisite:** MSK does not auto-create the CloudWatch log group. Create it in advance with `aws logs create-log-group --log-group-name "<name>"` and, for production, set a retention policy (`aws logs put-retention-policy --log-group-name "<name>" --retention-in-days 30`). Passing a nonexistent log group to `create-channel` returns a validation error.
 
-**IAM:** The service role must be able to write to whichever destinations are enabled — for CloudWatch Logs: `logs:CreateLogStream`, `logs:PutLogEvents` on the target log group; for S3: `s3:PutObject` on the log bucket/prefix (plus `kms:GenerateDataKey` if SSE-KMS); for Firehose: `firehose:PutRecord`, `firehose:PutRecordBatch` on the delivery stream.
+**IAM:** The service role must be able to write to whichever destinations are enabled -- for CloudWatch Logs: `logs:CreateLogStream`, `logs:PutLogEvents` on the target log group; for S3: `s3:PutObject` on the log bucket/prefix (plus `kms:GenerateDataKey` if SSE-KMS); for Firehose: `firehose:PutRecord`, `firehose:PutRecordBatch` on the delivery stream.
 
-**Encryption:** Enable SSE-KMS on the CloudWatch log group (via `aws logs associate-kms-key`) and the S3 log bucket — delivery error records may contain payload fragments and topic names.
+**Encryption:** Enable SSE-KMS on the CloudWatch log group (via `aws logs associate-kms-key`) and the S3 log bucket -- delivery error records may contain payload fragments and topic names.
 
 **Logging is set at channel creation and is not updatable.** `aws kafka update-channel` only accepts `--iceberg-destination-update` and `--s3-destination-update` with a single field (`DataFreshnessInSeconds`). To change logging destinations, delete and recreate the channel.
 
 ## Verify and Query
 
 ```bash
-# Check channel state (wait for ACTIVE) — both --cluster-arn and --channel-arn are required
+# Check channel state (wait for ACTIVE) -- both --cluster-arn and --channel-arn are required
 aws kafka describe-channel \
     --cluster-arn "arn:aws:kafka:REGION:ACCOUNT_ID:cluster/CLUSTER/ID" \
     --channel-arn "CHANNEL_ARN"
@@ -291,20 +291,20 @@ For details on Lake Formation permissions with S3 Tables, see the [Athena S3 Tab
 
 ## Monitoring
 
-Streaming Tables emits its own CloudWatch metrics in the `AWS/Kafka` namespace with dimensions `ClusterName`, `ChannelName`, `Topic`. Recommended alarms — `DeliveryToIceberg.DataFreshness` (or `DeliveryToS3.DataFreshness` for S3 destinations) above the configured freshness interval, `FailedRowCount` (Iceberg) / `FailedRecordCount` (S3) > 0, and `DLQDeliverySuccess` > 0. Full metric list, alarm patterns, and troubleshooting steps live in [streaming-tables-troubleshooting.md](streaming-tables-troubleshooting.md). Do not fall back to generic Express cluster health metrics or DIY S3-bucket-object alarms for Streaming Tables — the channel-scoped metrics above are the correct primitives.
+Streaming Tables emits its own CloudWatch metrics in the `AWS/Kafka` namespace with dimensions `ClusterName`, `ChannelName`, `Topic`. Recommended alarms -- `DeliveryToIceberg.DataFreshness` (or `DeliveryToS3.DataFreshness` for S3 destinations) above the configured freshness interval, `FailedRowCount` (Iceberg) / `FailedRecordCount` (S3) > 0, and `DLQDeliverySuccess` > 0. Full metric list, alarm patterns, and troubleshooting steps live in [streaming-tables-troubleshooting.md](streaming-tables-troubleshooting.md). Do not fall back to generic Express cluster health metrics or DIY S3-bucket-object alarms for Streaming Tables -- the channel-scoped metrics above are the correct primitives.
 
 ## Throughput and Freshness
 
 The freshness range, the default freshness, and the minimum throughput required to sustain the tightest freshness setting are published quotas. Read them from [Amazon MSK Data Delivery quotas](https://docs.aws.amazon.com/msk/latest/developerguide/limits.html#msk-data-delivery-quota) before advising a customer on a freshness value. The tradeoff behind the throughput floor is explained in [Key concepts](https://docs.aws.amazon.com/msk/latest/developerguide/msk-data-delivery-concepts.html): the service needs enough accumulated data per interval for efficient delivery and inline compaction, so lower-throughput topics need a looser freshness setting.
 
-Only one throughput floor is published — the one paired with the minimum freshness interval. Do not present a per-interval throughput table by scaling that figure across the rest of the freshness range; those values are not documented. For a topic below the floor, tell the customer to loosen freshness without quoting a specific required rate.
+Only one throughput floor is published -- the one paired with the minimum freshness interval. Do not present a per-interval throughput table by scaling that figure across the rest of the freshness range; those values are not documented. For a topic below the floor, tell the customer to loosen freshness without quoting a specific required rate.
 
 ## Table Maintenance
 
 Enable S3 Tables automated maintenance: **compaction**, **snapshot expiration**, **unreferenced file cleanup**. Optionally enable **record expiration** for TTL-based deletion.
 
-- Iceberg table format version: 2, Parquet output. Check the current Iceberg version via `aws kafka describe-channel --cluster-arn <arn> --channel-arn <arn>` response or AWS documentation — it may be upgraded over time.
-- Table is managed — read-only from your perspective (do not modify schema or write directly)
+- Iceberg table format version: 2, Parquet output. Check the current Iceberg version via `aws kafka describe-channel --cluster-arn <arn> --channel-arn <arn>` response or AWS documentation -- it may be upgraded over time.
+- Table is managed -- read-only from your perspective (do not modify schema or write directly)
 
 ## Quotas
 
@@ -323,7 +323,7 @@ Adjustable quotas are raised through the [Service Quotas console](https://consol
 - Enable server-side encryption (SSE-KMS or SSE-S3) on both delivery (S3 Tables) and DLQ buckets
 - Enable S3 bucket access logging on the DLQ bucket
 - Apply S3 bucket policies to restrict access to authorized principals only
-- DLQ contents may include sensitive customer data (PII, financial data) — restrict access and enable encryption
+- DLQ contents may include sensitive customer data (PII, financial data) -- restrict access and enable encryption
 - Enable CloudWatch Logs encryption for log groups that receive Streaming Tables delivery logs
 - Regularly audit IAM role policies and cross-account trust relationships
 - Use VPC endpoints for S3 where applicable to keep traffic off the public internet

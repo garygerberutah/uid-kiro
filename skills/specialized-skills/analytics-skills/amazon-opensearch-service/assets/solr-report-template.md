@@ -5,7 +5,7 @@ You MUST use this structure exactly when emitting the final Solr-to-OpenSearch m
 ## Required sections
 
 ```markdown
-# Solr → Amazon OpenSearch Migration Assessment
+# Solr -> Amazon OpenSearch Migration Assessment
 
 **Generated:** <ISO 8601 timestamp>
 **Source:** Apache Solr <version>, <SolrCloud | standalone>, <num collections>
@@ -15,8 +15,8 @@ You MUST use this structure exactly when emitting the final Solr-to-OpenSearch m
 ## 1. Executive Summary
 
 - Migration complexity: **Low | Medium | High** (with one-line justification)
-- Top 3 items to flag: <bulleted, one line each — frame items with a known remediation as **migration specifics** (the path already handles them); reserve **risk** framing for items with no clean fix, capacity-plan implications, or target-choice constraints>
-- Recommended target: <OpenSearch Service | OpenSearch Serverless NextGen> — one-sentence reason
+- Top 3 items to flag: <bulleted, one line each -- frame items with a known remediation as **migration specifics** (the path already handles them); reserve **risk** framing for items with no clean fix, capacity-plan implications, or target-choice constraints>
+- Recommended target: <OpenSearch Service | OpenSearch Serverless NextGen> -- one-sentence reason
 
 ## 2. Schema Mapping
 
@@ -42,7 +42,7 @@ For each representative Solr query the user provided:
 ## 4. Analyzer & Synonyms
 
 - Custom analyzers ported: `<count>`
-- Synonyms: `<file or inline>` — managed via `<synonym graph filter | search-time | index-time>`
+- Synonyms: `<file or inline>` -- managed via `<synonym graph filter | search-time | index-time>`
 - Language stack: `<list>`
 
 ## 5. Sizing Recommendation
@@ -55,7 +55,7 @@ For each representative Solr query the user provided:
 
 - Primary shards: `<n>`
 - Replicas: `<n>`
-- JVM heap: `<GB>` (Amazon OpenSearch Service auto-sets heap based on instance class — record the service-managed value rather than capping manually)
+- JVM heap: `<GB>` (Amazon OpenSearch Service auto-sets heap based on instance class -- record the service-managed value rather than capping manually)
 - Index management policy: `<ISM JSON or summary>`
 
 ## 6. Feature Gap Register
@@ -73,24 +73,24 @@ See [`references/security.md`](../references/security.md) for the canonical reco
 
 ## 8. Migration Plan
 
-Phase plan describing the migration approach (e.g. assess → provision → PoC → schema + query rebuild → reindex → dual-write → cutover → decommission). Use phasing as a sequencing concept; do NOT include calendar duration, engineer-week effort, or owner-role columns as required outputs. Timeline and resourcing are intentionally excluded from the suite.
+Phase plan describing the migration approach (e.g. assess -> provision -> PoC -> schema + query rebuild -> reindex -> dual-write -> cutover -> decommission). Use phasing as a sequencing concept; do NOT include calendar duration, engineer-week effort, or owner-role columns as required outputs. Timeline and resourcing are intentionally excluded from the suite.
 
 | Phase | Goal | Tooling | Exit criterion |
 |---|---|---|---|
 | Assess | Confirm gaps and finalize target topology | this report | sign-off |
 | Provision | Stand up domain + IaC + security + tooling | CloudFormation / Migration Assistant for Amazon OpenSearch Service on EKS | target reachable |
 | PoC + spike | Prove the weakest readiness dimension (required if YELLOW) | sample restore | approach confirmed |
-| Schema + query rebuild | Review Migration Assistant for Amazon OpenSearch Service mappings; re-implement query layer + relevance | Migration Assistant for Amazon OpenSearch Service metadata + OpenSearch DSL | top-N parity ≥ 95% |
+| Schema + query rebuild | Review Migration Assistant for Amazon OpenSearch Service mappings; re-implement query layer + relevance | Migration Assistant for Amazon OpenSearch Service metadata + OpenSearch DSL | top-N parity >= 95% |
 | Reindex | Move data | OpenSearch Migration Assistant for Amazon OpenSearch Service Solr backfill (Historical Data Migration) | parity sample passes |
 | Dual-write / delta-close | Validate live traffic on both | application changes | error rate within SLO |
 | Cutover | Flip read traffic | client config | rollback rehearsed |
-| Decommission | Retire Solr | — | data retained per policy |
+| Decommission | Retire Solr | -- | data retained per policy |
 
-**Commitment:** readiness-tier gated — GREEN = committable; YELLOW = after the PoC/spike; RED = spike only.
+**Commitment:** readiness-tier gated -- GREEN = committable; YELLOW = after the PoC/spike; RED = spike only.
 
 ## 9. Sizing Inputs for AWS Pricing Calculator
 
-- Compute inputs: <instance type, count, region — plug into <https://calculator.aws>>
+- Compute inputs: <instance type, count, region -- plug into <https://calculator.aws>>
 - Storage inputs: <total GB, storage type (gp3 / OR1 / UltraWarm / Cold)>
 - Cost-saving levers: <UltraWarm threshold, ISM rollover, instance right-sizing>
 
@@ -102,7 +102,7 @@ You MUST confirm these items with the user before locking the plan.
 
 ## 11. References
 
-You MUST cite every reference file consulted plus any AWS docs fetched live. For the canonical retrieval recipe (tool → URL, with browser/CLI fallbacks), see [`knowledge-retrieval.md`](../references/assessment-knowledge-retrieval.md).
+You MUST cite every reference file consulted plus any AWS docs fetched live. For the canonical retrieval recipe (tool -> URL, with browser/CLI fallbacks), see [`knowledge-retrieval.md`](../references/assessment-knowledge-retrieval.md).
 
 ```
 

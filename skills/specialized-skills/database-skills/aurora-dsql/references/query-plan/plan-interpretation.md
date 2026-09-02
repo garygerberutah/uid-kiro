@@ -44,15 +44,15 @@ DSQL stores all table data in B-Tree structures. Secondary indexes are also B-Tr
 
 ## Layered Plan Structure
 
-A logical scan decomposes into a Storage Scan, which itself has a B-Tree Scan child — not two siblings. Index Scan adds a **second, parallel** Storage Lookup branch (its own B-Tree Lookup child) for columns the index does not cover.
+A logical scan decomposes into a Storage Scan, which itself has a B-Tree Scan child -- not two siblings. Index Scan adds a **second, parallel** Storage Lookup branch (its own B-Tree Lookup child) for columns the index does not cover.
 
 **Full Scan (single branch):**
 
 ```
 Full Scan (btree-table) on tablename
-  Filter: col_a = 'v'              ← query processor filter (post-transfer)
+  Filter: col_a = 'v'              <- query processor filter (post-transfer)
   -> Storage Scan on tablename
-       Filters: col_b = 'v'        ← storage filter (pre-transfer)
+       Filters: col_b = 'v'        <- storage filter (pre-transfer)
        -> B-Tree Scan on tablename
 ```
 
@@ -63,18 +63,18 @@ Index Scan using idx on tablename
   Index Cond: col_a = 'v'
   -> Storage Scan on idx
        -> B-Tree Scan on tablename
-  -> Storage Lookup on tablename   ← separate branch for non-covered columns
+  -> Storage Lookup on tablename   <- separate branch for non-covered columns
        -> B-Tree Lookup on tablename
 ```
 
-A child's timing and row counts roll up into its parent's totals — not into a sibling branch.
+A child's timing and row counts roll up into its parent's totals -- not into a sibling branch.
 
 ## Calculating Node Duration
 
 DSQL follows the standard PostgreSQL EXPLAIN convention: `actual time` is reported **per iteration**, not cumulative. The node's total wall-clock time is:
 
 ```
-Node Duration = actual_time_end × loops
+Node Duration = actual_time_end x loops
 ```
 
 Where:
@@ -90,9 +90,9 @@ An estimation error exists when estimated rows diverge significantly from actual
 
 | Error Magnitude | Classification                                            |
 | --------------- | --------------------------------------------------------- |
-| 2x–5x           | Minor — note but low priority                             |
-| 5x–50x          | Significant — investigate statistics                      |
-| 50x+            | Severe — likely correlated predicates or stale statistics |
+| 2x-5x           | Minor -- note but low priority                             |
+| 5x-50x          | Significant -- investigate statistics                      |
+| 50x+            | Severe -- likely correlated predicates or stale statistics |
 
 Calculate error ratio: `actual_rows / estimated_rows` (or inverse if estimate is higher).
 
@@ -111,16 +111,16 @@ Flag when a Nested Loop's outer input has a significant estimation error:
 
 ```
 Nested Loop (est: N rows, actual: M rows)
-├── [Outer] Hash Join / Scan (est: X, actual: Y where Y >> X)
-└── [Inner] Index Scan (per-loop cost × Y loops)
++-- [Outer] Hash Join / Scan (est: X, actual: Y where Y >> X)
++-- [Inner] Index Scan (per-loop cost x Y loops)
 ```
 
-**Explanation:** The planner chose Nested Loop expecting X iterations on the inner side. With Y actual iterations (where Y >> X), total inner-side cost = per-loop cost × Y. A Hash Join or Merge Join would have been more efficient at this cardinality.
+**Explanation:** The planner chose Nested Loop expecting X iterations on the inner side. With Y actual iterations (where Y >> X), total inner-side cost = per-loop cost x Y. A Hash Join or Merge Join would have been more efficient at this cardinality.
 
 **Quantify:**
 
-- Expected total inner time: per-loop time × estimated outer rows
-- Actual total inner time: per-loop time × actual outer rows
+- Expected total inner time: per-loop time x estimated outer rows
+- Actual total inner time: per-loop time x actual outer rows
 - Amplification factor: actual / estimated
 
 ## Post-Scan Filter Selectivity
@@ -133,15 +133,15 @@ Filter Selectivity = Rows Removed by Filter / (Rows Removed by Filter + Actual R
 
 | Selectivity | Interpretation                                   |
 | ----------- | ------------------------------------------------ |
-| <10%        | Minimal waste — filter removes few rows          |
-| 10%–50%     | Moderate — consider composite index              |
-| >50%        | High waste — strong candidate for index pushdown |
+| <10%        | Minimal waste -- filter removes few rows          |
+| 10%-50%     | Moderate -- consider composite index              |
+| >50%        | High waste -- strong candidate for index pushdown |
 
 For nodes inside loops, calculate total filter waste:
 
 ```
-Total rows scanned = (Actual Rows + Rows Removed) × loops
-Total rows filtered = Rows Removed × loops
+Total rows scanned = (Actual Rows + Rows Removed) x loops
+Total rows filtered = Rows Removed x loops
 ```
 
 ## Hash Table Resizing
@@ -159,10 +159,10 @@ Flag the build-side estimation error and trace it to the source scan node.
 When a Storage Lookup has a high loop count:
 
 ```
-Total I/O operations = actual_rows × loops
+Total I/O operations = actual_rows x loops
 ```
 
-Flag when total I/O operations exceed 10,000. Each Storage Lookup involves a point read from the storage layer — high loop counts with even modest per-loop rows create significant cumulative I/O.
+Flag when total I/O operations exceed 10,000. Each Storage Lookup involves a point read from the storage layer -- high loop counts with even modest per-loop rows create significant cumulative I/O.
 
 ## Anomalous Values
 
@@ -178,10 +178,10 @@ Detect physically impossible row counts in DSQL plan nodes:
 **Action:**
 
 - Flag as a potential DSQL reporting bug
-- Verify query results are correct (they typically are — only EXPLAIN output is affected)
+- Verify query results are correct (they typically are -- only EXPLAIN output is affected)
 - Include in support request template
 
-These anomalous values do not affect query correctness — only diagnostic output accuracy.
+These anomalous values do not affect query correctness -- only diagnostic output accuracy.
 
 ## Projections and Row Width
 

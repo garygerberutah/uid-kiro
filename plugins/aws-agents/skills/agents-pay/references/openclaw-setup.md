@@ -11,7 +11,7 @@ For background on AgentCore Payments, see the
 
 Pick a stable `userId` before provisioning any payment resources. This identity
 must be used consistently across `create-instrument`, `new-session`, and your
-OpenClaw plugin config — a mismatch means the session cannot spend the
+OpenClaw plugin config -- a mismatch means the session cannot spend the
 instrument.
 
 ```bash
@@ -64,8 +64,8 @@ python scripts/agents_pay_admin.py setup-openclaw \
   --project-dir "$AGENTCORE_PROJECT_DIR"
 ```
 
-The wizard walks through: user identity → network → recipients → spend limits →
-instrument creation → delegation/funding → session approval → generates your
+The wizard walks through: user identity -> network -> recipients -> spend limits ->
+instrument creation -> delegation/funding -> session approval -> generates your
 OpenClaw config JSON ready to paste.
 
 ## Manual Setup

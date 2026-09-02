@@ -26,7 +26,7 @@ from typing import Any, Dict, List, Optional, Union  # For type hints
 
 
 # =========================================================================================
-# SECTION 1: Helper function — content normalization
+# SECTION 1: Helper function -- content normalization
 # =========================================================================================
 # Nova messages use content as a string, a list of {"type":"text","text":"..."} chunks,
 # or a dict with a "text" key. This helper normalizes all forms to a plain string.
@@ -60,7 +60,7 @@ def content_to_text(content: Any) -> str:
 
 
 # =========================================================================================
-# SECTION 2: Helper function — ground truth extraction
+# SECTION 2: Helper function -- ground truth extraction
 # =========================================================================================
 # Nova reference_answer can be a dict with flexible keys (answer, label, sentiment, etc.),
 # a JSON string, or a plain string.
@@ -103,7 +103,7 @@ def coerce_ground_truth(ground_truth: Union[str, Dict[str, Any], Any]) -> Option
 
 
 # =========================================================================================
-# SECTION 3: Helper function — number extraction
+# SECTION 3: Helper function -- number extraction
 # =========================================================================================
 # TODO: UPDATE or REMOVE the helper function as per YOUR use case
 # Note the below lines of code are examples and will not work for your use case
@@ -150,7 +150,7 @@ def extract_number(text: str) -> Optional[float]:
 
 
 # =========================================================================================
-# SECTION 4: Helper function — reasoning quality
+# SECTION 4: Helper function -- reasoning quality
 # =========================================================================================
 # TODO: UPDATE or REMOVE the helper function as per YOUR use case
 # Note the below lines of code are examples and will not work for your use case
@@ -210,7 +210,7 @@ def compute_reasoning_quality(response: str) -> float:
 
 
 # =========================================================================================
-# SECTION 5: Helper function — answer extraction
+# SECTION 5: Helper function -- answer extraction
 # =========================================================================================
 # TODO: UPDATE or REMOVE the helper function as per YOUR use case
 # Note the below lines of code are examples and will not work for your use case

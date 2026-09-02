@@ -163,7 +163,7 @@ the session does not come up.
 
 - You MUST create the matching virtual interface type with the MTU set at creation. For a private
   virtual interface, target either a Direct Connect gateway (many VPCs, cross-Region, or
-  cross-account) or a virtual private gateway (a single VPC) — use the parameter that matches the
+  cross-account) or a virtual private gateway (a single VPC) -- use the parameter that matches the
   customer's target, not both.
 
   Via a Direct Connect gateway:

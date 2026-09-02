@@ -4,14 +4,14 @@ description: |
   Gets AWS credentials for CLI/SDK access via `aws login`. Activates when a developer needs to authenticate to AWS for local development, when an AWS operation fails due to missing or expired credentials, or when someone asks about setting up AWS access. Triggers: "set up AWS", "configure AWS", "aws login", "get credentials", "authenticate", "session expired", "token expired", "no credentials", "AccessDeniedException" with no configured credentials.
 ---
 
-# Sign In — Get CLI/SDK Credentials
+# Sign In -- Get CLI/SDK Credentials
 
 Help developers get AWS credentials for local development using `aws login`. This provides short-term, auto-rotating credentials that refresh every 15 minutes and remain valid for up to 12 hours.
 
 **Important:**
 
-- You MUST run `aws login` and `aws --version` in the user's local shell — NOT via MCP/API tools.
-- You MUST ask the user for confirmation before running `aws login`. Do not tell the user to run the command themselves — ask if YOU should run it (e.g., "Ready for me to run `aws login`?" or "Shall I proceed with `aws login`?"). Wait for their response before proceeding.
+- You MUST run `aws login` and `aws --version` in the user's local shell -- NOT via MCP/API tools.
+- You MUST ask the user for confirmation before running `aws login`. Do not tell the user to run the command themselves -- ask if YOU should run it (e.g., "Ready for me to run `aws login`?" or "Shall I proceed with `aws login`?"). Wait for their response before proceeding.
 
 ## Prerequisites
 
@@ -29,21 +29,21 @@ If the CLI is not installed or is below 2.32.0, inform the user and ask if they'
 
 ### Lead with the recommendation
 
-In your first response, always tell the user that `aws login` is the fix — explain that it provides short-term, auto-rotating credentials and that it requires AWS CLI 2.32.0 or later. Do not stop at "let me check your CLI version" — name the remediation up front so the user knows where this is going, then describe the precondition checks you'll run before invoking it.
+In your first response, always tell the user that `aws login` is the fix -- explain that it provides short-term, auto-rotating credentials and that it requires AWS CLI 2.32.0 or later. Do not stop at "let me check your CLI version" -- name the remediation up front so the user knows where this is going, then describe the precondition checks you'll run before invoking it.
 
 ### Precondition checks (run silently before asking confirmation)
 
 Run these via the local shell to inform your plan. Report what you find, but do not gate the recommendation on user-supplied output:
 
-1. `aws --version` — confirm the CLI is 2.32.0 or later. If not installed or too old, point the user to the [AWS CLI installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and stop.
-2. `aws sts get-caller-identity` — check current credentials.
+1. `aws --version` -- confirm the CLI is 2.32.0 or later. If not installed or too old, point the user to the [AWS CLI installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and stop.
+2. `aws sts get-caller-identity` -- check current credentials.
    - **Succeeds**: Show the user their Account and Arn. Ask whether to keep these or set up different credentials. If they want to switch, recommend `aws login --profile <name>` so the existing default isn't overwritten.
    - **Fails** (missing or expired): proceed with `aws login` on the default profile.
-3. *(Only if Step 2 succeeded and the user wants different credentials)* `aws configure list` — if `access_key` starts with `AKIA`, explain that long-term access keys are less secure (never expire, persist on disk as secrets, grant indefinite access if leaked) and that `aws login` provides short-term credentials that auto-rotate every 15 minutes, expire automatically, and require no manual rotation.
+3. *(Only if Step 2 succeeded and the user wants different credentials)* `aws configure list` -- if `access_key` starts with `AKIA`, explain that long-term access keys are less secure (never expire, persist on disk as secrets, grant indefinite access if leaked) and that `aws login` provides short-term credentials that auto-rotate every 15 minutes, expire automatically, and require no manual rotation.
 
 ### Confirm and run aws login
 
-Once preconditions are clear, ask the user for confirmation specifically for the `aws login` invocation — and only there. Do not tell the user to run the command themselves; ask if you should run it (e.g., "Ready for me to run `aws login`?" or "Shall I proceed with `aws login --profile staging`?"). Wait for their response, then run `aws login` (or `aws login --profile <name>`).
+Once preconditions are clear, ask the user for confirmation specifically for the `aws login` invocation -- and only there. Do not tell the user to run the command themselves; ask if you should run it (e.g., "Ready for me to run `aws login`?" or "Shall I proceed with `aws login --profile staging`?"). Wait for their response, then run `aws login` (or `aws login --profile <name>`).
 
 ### Verify
 
@@ -65,7 +65,7 @@ The IAM identity needs the `SignInLocalDevelopmentAccess` managed policy attache
 
 ### GovCloud or China regions
 
-`aws login` is not available in AWS GovCloud (US) or AWS China regions. Do not mention this exception proactively — only relevant if the user explicitly states they are in one of these partitions.
+`aws login` is not available in AWS GovCloud (US) or AWS China regions. Do not mention this exception proactively -- only relevant if the user explicitly states they are in one of these partitions.
 
 ## Users With Existing `aws sso login` Workflows
 
@@ -85,11 +85,11 @@ When offering it, explain that long-term access keys are less secure: they persi
 
 ## When NOT to Use This Skill
 
-- User is setting up CI/CD credentials — they need IAM roles or OIDC federation, not `aws login`
+- User is setting up CI/CD credentials -- they need IAM roles or OIDC federation, not `aws login`
 
 ## Key Points
 
-- Do not front-load troubleshooting — keep the initial response simple and address errors only if they occur
+- Do not front-load troubleshooting -- keep the initial response simple and address errors only if they occur
 - `aws login` works with root users, IAM users and federation with IAM
 
 ## Additional Resources

@@ -43,14 +43,14 @@ graph LR
 
 ## Severity Scoring
 
-GuardDuty uses a numeric 0–10 scale mapped to severity levels:
+GuardDuty uses a numeric 0-10 scale mapped to severity levels:
 
 | Level | Score Range | Description |
 |-------|------------|-------------|
-| Low | 1.0 – 3.9 | Suspicious activity that did not compromise resources |
-| Medium | 4.0 – 6.9 | Suspicious activity deviating from normal behavior |
-| High | 7.0 – 8.9 | Resource compromised and actively used for unauthorized purposes |
-| Critical | 9.0 – 10.0 | Attack Sequences — correlated multi-step attacks across multiple signals |
+| Low | 1.0 - 3.9 | Suspicious activity that did not compromise resources |
+| Medium | 4.0 - 6.9 | Suspicious activity deviating from normal behavior |
+| High | 7.0 - 8.9 | Resource compromised and actively used for unauthorized purposes |
+| Critical | 9.0 - 10.0 | Attack Sequences -- correlated multi-step attacks across multiple signals |
 
 **Key notes:**
 
@@ -62,7 +62,7 @@ GuardDuty uses a numeric 0–10 scale mapped to severity levels:
 
 ## Service Notes
 
-- **EKS_RUNTIME_MONITORING**: Legacy feature flag — only relevant for customers who enabled it before unified RUNTIME_MONITORING. Treat as edge case.
+- **EKS_RUNTIME_MONITORING**: Legacy feature flag -- only relevant for customers who enabled it before unified RUNTIME_MONITORING. Treat as edge case.
 - **GuardDuty Malware Protection for S3**: On-demand scanning (not continuous like EC2 malware scanning). Checked via `list-malware-protection-plans`.
 
 ## Output Sensitivity

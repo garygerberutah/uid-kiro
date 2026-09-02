@@ -1,4 +1,4 @@
-# RDS for Oracle — Java
+# RDS for Oracle -- Java
 
 Use the Oracle JDBC Thin driver `ojdbc11.jar` (Java 11+). No Oracle Client required.
 
@@ -61,7 +61,7 @@ import com.zaxxer.hikari.HikariDataSource;
 HikariConfig cfg = new HikariConfig();
 cfg.setJdbcUrl("jdbc:oracle:thin:@mydb.xxxxxxxxxxxx.us-east-1.rds.amazonaws.com:1521/ORCL");
 cfg.setUsername("dbadmin");
-// Password is fetched from AWS Secrets Manager at runtime; see connection-auth.md section (b) — via AWS Secrets Manager
+// Password is fetched from AWS Secrets Manager at runtime; see connection-auth.md section (b) -- via AWS Secrets Manager
 cfg.setPassword("<from-secrets-manager>");
 cfg.setMaximumPoolSize(10);
 cfg.setMinimumIdle(2);
@@ -177,7 +177,7 @@ rm -f /tmp/cert-*.pem
 | Medium | 2 | 2 | 10 |
 | High | 5 | 5 | 20 |
 
-`max` ≤ RDS `max_connections` / number of app instances. For auto-scaled ECS/EKS, budget for the scale-out ceiling.
+`max` <= RDS `max_connections` / number of app instances. For auto-scaled ECS/EKS, budget for the scale-out ceiling.
 
 ## Error handling
 
@@ -186,9 +186,9 @@ try (Connection conn = DriverManager.getConnection(url, user, password)) {
   /* ... */
 } catch (SQLException e) {
   switch (e.getErrorCode()) {
-    case 12170: System.err.println("TNS connect timeout — check SGs and network"); break;
+    case 12170: System.err.println("TNS connect timeout -- check SGs and network"); break;
     case 1017:  System.err.println("Invalid username/password"); break;
-    case 12541: System.err.println("No listener — check RDS endpoint/port"); break;
+    case 12541: System.err.println("No listener -- check RDS endpoint/port"); break;
     case 12514: System.err.println("Service name mismatch"); break;
     default:    System.err.println("ORA-" + e.getErrorCode() + ": " + e.getMessage());
   }

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Produces structured summaries of Amazon Inspector findings — severity distribution, finding type breakdown, and affected resources. Does NOT perform remediation prioritization or patching recommendations.
+Produces structured summaries of Amazon Inspector findings -- severity distribution, finding type breakdown, and affected resources. Does NOT perform remediation prioritization or patching recommendations.
 
 Works from both standalone accounts and delegated administrator accounts.
 
@@ -106,9 +106,9 @@ Works from both standalone accounts and delegated administrator accounts.
 
 | Symptom | Resolution |
 |---|---|
-| list-finding-aggregations returns empty | No active findings — report zero findings |
-| Only sees own account | Not a delegated admin — note: single-account view only |
-| ACCOUNT aggregation shows one entry | Standalone account — use Workflow A |
+| list-finding-aggregations returns empty | No active findings -- report zero findings |
+| Only sees own account | Not a delegated admin -- note: single-account view only |
+| ACCOUNT aggregation shows one entry | Standalone account -- use Workflow A |
 
 ## Output Sensitivity
 

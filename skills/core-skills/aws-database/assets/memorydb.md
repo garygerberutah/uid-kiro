@@ -14,5 +14,5 @@
 - **Time to first query**: 5-10 min (VPC + cluster creation)
 - **Key features**: Microsecond reads / single-digit ms writes, Multi-AZ durable transactional log, vector search (HNSW, single-digit ms at 99%+ recall), JSON document support, data tiering (memory + SSD for nearly 5x capacity at 60% lower cost), 160M+ requests/sec per cluster, 100+ TB storage, sharding, ACLs
 - **Limitations**: No scale to zero, VPC required, provisioned capacity only, in-memory cost scales with data size, Multi-Region excludes data tiering and vector search
-- **Best for**: Workloads requiring multi-region active-active writes (strongly consistent within region, eventually consistent cross-region) — the capability that distinguishes MemoryDB from ElastiCache
+- **Best for**: Workloads requiring multi-region active-active writes (strongly consistent within region, eventually consistent cross-region) -- the capability that distinguishes MemoryDB from ElastiCache
 - **Not for**: Single-region workloads (ElastiCache offers the same durability, vector search, and microsecond latency at lower cost with a Serverless option), large analytical datasets, relational data with JOINs, workloads needing scale-to-zero cost efficiency

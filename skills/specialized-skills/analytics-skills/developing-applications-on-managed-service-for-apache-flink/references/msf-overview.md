@@ -29,7 +29,7 @@ Managed Service for Apache Flink abstracts away the complexity of managing Flink
 
 ### Key Components
 
-1. **Flink Applications**: Your stream processing logic packaged as JAR files, developed using Kiro IDE
+1. **Flink Applications**: Your stream processing logic packaged as JAR files and maintained in your development environment
 2. **KPU Configuration**: Kinesis Processing Units providing standardized resource allocation (1 vCPU, 4GB memory per KPU)
 3. **Service-Level Configuration**: Managed Service for Apache Flink-managed settings for checkpoints, savepoints, parallelism, and infrastructure
 4. **Application Configuration**: User-controlled runtime parameters, business logic settings, and connector configurations
@@ -39,7 +39,7 @@ Managed Service for Apache Flink abstracts away the complexity of managing Flink
 
 **Kinesis Processing Units (KPUs)**:
 
-- **You do not pick instance types or manage TaskManagers directly.** MSF abstracts both away — KPU is the only resource unit you configure. Selecting EC2 instance types is not a setting you can change, including via the console. Custom CPU/memory ratios per KPU also are not configurable in MSF.
+- **You do not pick instance types or manage TaskManagers directly.** MSF abstracts both away -- KPU is the only resource unit you configure. Selecting EC2 instance types is not a setting you can change, including via the console. Custom CPU/memory ratios per KPU also are not configurable in MSF.
 - Each KPU provides exactly 1 vCPU and 4 GB of memory (standardized resource allocation), plus 50 GB of running application storage.
 - Managed Service for Apache Flink automatically scales KPUs based on application throughput and backpressure metrics
 - You configure `Parallelism` (total task slots) and `ParallelismPerKPU` (slots per KPU) at the service level; MSF derives `Allocated KPUs = Parallelism / ParallelismPerKPU`

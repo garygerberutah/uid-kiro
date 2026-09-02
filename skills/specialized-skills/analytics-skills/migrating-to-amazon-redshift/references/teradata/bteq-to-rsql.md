@@ -1,4 +1,4 @@
-# BTEQ → RSQL Conversion Guide
+# BTEQ -> RSQL Conversion Guide
 
 ## Command mapping
 
@@ -8,8 +8,8 @@
 | .LOGOFF / .QUIT | \q | Disconnect / exit |
 | .QUIT N | \exit N | Exit with return code |
 | .RUN FILE=path | \i path | Include/run file |
-| .IMPORT VARTEXT 'delim' FILE=path | COPY table FROM 's3://…' IAM_ROLE 'arn' DELIMITER 'delim' | Load via S3 |
-| .EXPORT [REPORT] FILE=path | UNLOAD ('SELECT …') TO 's3://…' | Export via S3 |
+| .IMPORT VARTEXT 'delim' FILE=path | COPY table FROM 's3://...' IAM_ROLE 'arn' DELIMITER 'delim' | Load via S3 |
+| .EXPORT [REPORT] FILE=path | UNLOAD ('SELECT ...') TO 's3://...' | Export via S3 |
 | .IF ERRORCODE <> 0 THEN .GOTO label | \if :ERROR <> 0 / \echo / \exit N / \endif | Error handling |
 | .IF ACTIVITYCOUNT = 0 THEN .GOTO label | \if :ACTIVITYCOUNT = 0 / \echo / \exit 1 / \endif | Row-count check |
 | .IF ERRORLEVEL > 0 | -- commented out | No direct equivalent |
@@ -17,7 +17,7 @@
 | .SET WIDTH n | -- (not needed) | RSQL handles width |
 | DATABASE dbname; | SET search_path TO schema; | Schema context |
 | BT; / ET; | BEGIN; / COMMIT; | Transaction control |
-| LOGON … (bare, no dot) | -- commented out | Remove bare LOGON |
+| LOGON ... (bare, no dot) | -- commented out | Remove bare LOGON |
 
 ## Key patterns
 
@@ -32,7 +32,7 @@
 
 -- RSQL
 \if :ERROR <> 0
-  \echo "Error — jumping to ERROR_HANDLER"
+  \echo "Error -- jumping to ERROR_HANDLER"
   \exit 12
 \endif
 ```
@@ -90,7 +90,7 @@ export PGPORT="5439"
 export PGDATABASE="mydb"
 export PGSSLMODE="verify-full"   # enforce TLS; never let the connection fall back to cleartext
 
-# Ephemeral IAM-based credentials (preferred over static passwords). One API call —
+# Ephemeral IAM-based credentials (preferred over static passwords). One API call --
 # each call mints new credentials. No eval; parse fields explicitly.
 read -r PGUSER PGPASSWORD < <(aws redshift get-cluster-credentials-with-iam \
   --cluster-identifier my-cluster --db-name mydb \
@@ -105,21 +105,21 @@ rsql -f converted_script.sql || { echo "Script failed"; exit 1; }
 
 ## Data migration utilities
 
-- **Teradata Parallel Transporter (TPT)** — parallel unload from Teradata.
-- **AWS SCT extractor agents** — automate extraction, scale horizontally.
-- **Teradata Vantage** — unload directly to S3, then COPY into Redshift.
+- **Teradata Parallel Transporter (TPT)** -- parallel unload from Teradata.
+- **AWS SCT extractor agents** -- automate extraction, scale horizontally.
+- **Teradata Vantage** -- unload directly to S3, then COPY into Redshift.
 - For large volumes consider AWS Direct Connect or Snowball.
 
 ## Rules
 
-- `.LOGON` → DSN-based connection; `.IMPORT` → COPY from S3; `.EXPORT` → UNLOAD to S3.
+- `.LOGON` -> DSN-based connection; `.IMPORT` -> COPY from S3; `.EXPORT` -> UNLOAD to S3.
 - Comment out `.GOTO`, `.LABEL`, `.IF ERRORLEVEL` (no equivalent).
-- `DATABASE` → `SET search_path`; `BT`/`ET` → `BEGIN`/`COMMIT`.
+- `DATABASE` -> `SET search_path`; `BT`/`ET` -> `BEGIN`/`COMMIT`.
 - Apply SQL-level conversions to embedded SQL within the script.
 
 ## Validation caveat (no TTU host)
 
-BTEQ/TTU is **Linux/Windows only — not macOS**, so on many operator hosts you **cannot execute
+BTEQ/TTU is **Linux/Windows only -- not macOS**, so on many operator hosts you **cannot execute
 the source BTEQ** to capture a Teradata baseline. In that case, validate the converted RSQL **on
 the Redshift side**: run it against the target and reconcile results to the migrated base tables
 (row counts / aggregates) rather than diffing against Teradata BTEQ output. Record in the report

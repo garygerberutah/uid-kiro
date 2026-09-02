@@ -62,11 +62,11 @@ By default (`JOB_MANAGED`), the `KinesisStreamsSource` automatically registers t
 
 ## Source Parallelism and Shard Count
 
-Source parallelism should ideally match or exceed the Kinesis shard count when using EFO for optimal throughput. If parallelism is less than the shard count, some subtasks handle multiple shards — this still works but reduces the throughput benefit of EFO. If parallelism exceeds the shard count, idle subtasks will block watermark generation unless `withIdleness()` is configured on the `WatermarkStrategy`.
+Source parallelism should ideally match or exceed the Kinesis shard count when using EFO for optimal throughput. If parallelism is less than the shard count, some subtasks handle multiple shards -- this still works but reduces the throughput benefit of EFO. If parallelism exceeds the shard count, idle subtasks will block watermark generation unless `withIdleness()` is configured on the `WatermarkStrategy`.
 
 | Scenario | Parallelism vs Shards | Effect |
 |---|---|---|
-| Parallelism = shard count | 1:1 mapping | Optimal — each subtask gets dedicated 2 MB/s |
+| Parallelism = shard count | 1:1 mapping | Optimal -- each subtask gets dedicated 2 MB/s |
 | Parallelism < shard count | Some subtasks handle multiple shards | Works but reduces per-shard throughput isolation |
 | Parallelism > shard count | Idle subtasks | Requires `withIdleness()` or watermarks stall |
 
@@ -74,8 +74,8 @@ Source parallelism should ideally match or exceed the Kinesis shard count when u
 
 When Managed Service for Apache Flink auto-scaling adjusts KPU count, the total parallelism changes. This affects EFO consumers:
 
-- Scaling up increases parallelism, potentially creating idle subtasks if parallelism exceeds shard count — ensure `withIdleness()` is set
-- Scaling down reduces parallelism, causing subtasks to handle more shards — EFO still provides dedicated throughput per shard but each subtask processes more data
+- Scaling up increases parallelism, potentially creating idle subtasks if parallelism exceeds shard count -- ensure `withIdleness()` is set
+- Scaling down reduces parallelism, causing subtasks to handle more shards -- EFO still provides dedicated throughput per shard but each subtask processes more data
 - During scaling events, the EFO consumer subscription is re-established automatically; expect brief transient errors in logs (this is normal)
 - Set Managed Service for Apache Flink auto-scaling min KPU to ensure parallelism never drops below shard count for optimal EFO throughput
 
@@ -89,7 +89,7 @@ When Managed Service for Apache Flink auto-scaling adjusts KPU count, the total 
 **Throughput exceptions (`SubscribeToShard` failures)**:
 
 - Each EFO consumer gets dedicated 2 MB/s per shard. If you see throughput errors, verify the consumer is properly registered (`ACTIVE` status) using `aws kinesis describe-stream-consumer`.
-- Transient `SubscribeToShard` errors are expected — subscriptions last 5 minutes and are automatically re-acquired.
+- Transient `SubscribeToShard` errors are expected -- subscriptions last 5 minutes and are automatically re-acquired.
 
 **IAM permissions for EFO**:
 The Managed Service for Apache Flink application's IAM execution role needs these additional permissions beyond standard Kinesis read access:
@@ -110,7 +110,7 @@ The Managed Service for Apache Flink application's IAM execution role needs thes
 }
 ```
 
-Note the consumer resource ARN (`stream/*/consumer/*`) — `SubscribeToShard` and `DescribeStreamConsumer` require permissions on the consumer resource, not just the stream.
+Note the consumer resource ARN (`stream/*/consumer/*`) -- `SubscribeToShard` and `DescribeStreamConsumer` require permissions on the consumer resource, not just the stream.
 
 **Retry strategy tuning**:
 If `DescribeStreamConsumer` calls fail during startup (common when the consumer was just registered and is still in `CREATING` state), tune the dedicated retry strategy:

@@ -1,7 +1,7 @@
 ---
 name: agents-harden
 description: >
-  Use when preparing your agent for production — IAM scoping, inbound
+  Use when preparing your agent for production -- IAM scoping, inbound
   auth (JWT, SigV4), secrets management, cold start optimization, session
   lifecycle, rate limiting, input validation, and quota guidance. Triggers
   on: "production checklist", "harden agent", "production ready", "secure
@@ -10,10 +10,10 @@ description: >
   "rate limit", "security audit of outbound API calls", "gateway target
   audit for production", "restrict who can call", "lock down endpoint",
   "only our app can call".
-  Not for Cedar tool-restriction policies — use agents-connect. Not
-  for quality measurement — use agents-optimize. Not for outbound
-  credential storage or API key wiring — use agents-connect. Not for
-  A2A agent-to-agent auth — use agents-build. Cold start observation
+  Not for Cedar tool-restriction policies -- use agents-connect. Not
+  for quality measurement -- use agents-optimize. Not for outbound
+  credential storage or API key wiring -- use agents-connect. Not for
+  A2A agent-to-agent auth -- use agents-build. Cold start observation
   and diagnosis (not optimization) routes to agents-debug.
 allowed-tools: Read Grep Glob Bash
 metadata:
@@ -25,7 +25,7 @@ metadata:
 
 # harden
 
-Prepare your AgentCore agent for production — security, reliability, and performance.
+Prepare your AgentCore agent for production -- security, reliability, and performance.
 
 ## When to use
 
@@ -111,13 +111,13 @@ Replace the resource ARN with the specific model(s) your agent uses.
 }
 ```
 
-**Runtime resource-based policies** (API-only): For fine-grained control over which principals can invoke your runtime — beyond what IAM roles and JWT auth provide — use `PutAgentRuntimeResourcePolicy` via boto3. This is not exposed in the CLI or `agentcore.json`. Use the `awsknowledge` MCP server if available to look up the current API shape.
+**Runtime resource-based policies** (API-only): For fine-grained control over which principals can invoke your runtime -- beyond what IAM roles and JWT auth provide -- use `PutAgentRuntimeResourcePolicy` via boto3. This is not exposed in the CLI or `agentcore.json`. Use the `awsknowledge` MCP server if available to look up the current API shape.
 
 ---
 
 ## Shell Access: Scope `InvokeAgentRuntimeCommand` separately
 
-If your project uses `InvokeAgentRuntimeCommand` (see [`agents-build/references/integrate.md`](../agents-build/references/integrate.md)), audit its IAM permissions separately from `InvokeAgentRuntime`. The two actions have different blast radii: `InvokeAgentRuntimeCommand` is arbitrary shell execution inside a live microVM with the runtime's full execution role — callers can read/write the filesystem, reach any network resource the agent can reach, and access the execution role's credentials.
+If your project uses `InvokeAgentRuntimeCommand` (see [`agents-build/references/integrate.md`](../agents-build/references/integrate.md)), audit its IAM permissions separately from `InvokeAgentRuntime`. The two actions have different blast radii: `InvokeAgentRuntimeCommand` is arbitrary shell execution inside a live microVM with the runtime's full execution role -- callers can read/write the filesystem, reach any network resource the agent can reach, and access the execution role's credentials.
 
 **Check which principals have the permission:**
 
@@ -133,9 +133,9 @@ aws iam get-policy-version \
   --query 'PolicyVersion.Document'
 ```
 
-Alternatively, use the IAM console: **IAM → Policies → Filter by type: Customer managed** → search for `InvokeAgentRuntimeCommand` in the policy JSON editor.
+Alternatively, use the IAM console: **IAM -> Policies -> Filter by type: Customer managed** -> search for `InvokeAgentRuntimeCommand` in the policy JSON editor.
 
-**Separate IAM policy for command callers** — keep this distinct from the policy granting `InvokeAgentRuntime`:
+**Separate IAM policy for command callers** -- keep this distinct from the policy granting `InvokeAgentRuntime`:
 
 ```json
 {
@@ -157,7 +157,7 @@ aws events put-rule \
   --state ENABLED
 ```
 
-**If commands are constructed from user input anywhere in calling code:** validate before passing — reject strings containing `&&`, `;`, `$(...)`, backticks, `|`, or other shell metacharacters.
+**If commands are constructed from user input anywhere in calling code:** validate before passing -- reject strings containing `&&`, `;`, `$(...)`, backticks, `|`, or other shell metacharacters.
 
 ---
 
@@ -173,9 +173,9 @@ agentcore status --runtime <AgentName> --json | jq '.runtimes[0].authorizerConfi
 
 **Options:**
 
-`AWS_IAM` (default) — callers must sign requests with SigV4. Good for internal services and AWS-native clients.
+`AWS_IAM` (default) -- callers must sign requests with SigV4. Good for internal services and AWS-native clients.
 
-`CUSTOM_JWT` — callers present a JWT from your identity provider. Good for web/mobile apps and external clients.
+`CUSTOM_JWT` -- callers present a JWT from your identity provider. Good for web/mobile apps and external clients.
 
 ```bash
 agentcore add agent \
@@ -188,7 +188,7 @@ agentcore add agent \
 
 > [!WARNING]
 > Never use `--authorizer-type NONE` in production. It allows unauthenticated access
-> to your agent — anyone with the endpoint URL can invoke it. Always use AWS_IAM or
+> to your agent -- anyone with the endpoint URL can invoke it. Always use AWS_IAM or
 > CUSTOM_JWT. If you see NONE in production, change it immediately.
 
 ### Choosing `allowedClients` vs `allowedAudience`
@@ -197,15 +197,15 @@ This is the most common JWT misconfiguration. The right choice depends on what's
 
 **Decode a sample token** (at your IdP or with `jwt.io`) and look at the payload:
 
-- Token has a `client_id` claim, no `aud` claim → configure **`allowedClients`** on the runtime
-- Token has an `aud` claim → configure **`allowedAudience`** on the runtime
-- Token has both → use `allowedAudience`. The `aud` claim is the standard OIDC audience field; use that as the primary check.
+- Token has a `client_id` claim, no `aud` claim -> configure **`allowedClients`** on the runtime
+- Token has an `aud` claim -> configure **`allowedAudience`** on the runtime
+- Token has both -> use `allowedAudience`. The `aud` claim is the standard OIDC audience field; use that as the primary check.
 
-If you pick the wrong one, invocations return 403 even with a valid token — the runtime is validating against a claim the token doesn't have.
+If you pick the wrong one, invocations return 403 even with a valid token -- the runtime is validating against a claim the token doesn't have.
 
-### Issuer ↔ discovery URL prefix requirement
+### Issuer <-> discovery URL prefix requirement
 
-AgentCore enforces the OIDC discovery spec (RFC 8414 §3): the `issuer` value in the discovery document must be a URL prefix of the discovery endpoint.
+AgentCore enforces the OIDC discovery spec (RFC 8414 Section 3): the `issuer` value in the discovery document must be a URL prefix of the discovery endpoint.
 
 That means if your discovery URL is `https://qa.example.com/.well-known/openid-configuration`, the `issuer` field in that document must start with `https://qa.example.com`. If the document advertises an issuer like `https://example.com` (no subdomain), validation fails.
 
@@ -213,25 +213,25 @@ Some enterprise IdPs (PingFederate, Paylocity, some Keycloak setups) host the di
 
 Fix options:
 
-1. **Align the IdP's discovery endpoint with its issuer** — serve discovery from the same origin as the issuer.
-2. **Point the runtime at the actual discovery URL domain** — configure the runtime's discovery URL with the subdomain that matches the token's issuer.
+1. **Align the IdP's discovery endpoint with its issuer** -- serve discovery from the same origin as the issuer.
+2. **Point the runtime at the actual discovery URL domain** -- configure the runtime's discovery URL with the subdomain that matches the token's issuer.
 
 ### Debugging JWT auth failures
 
 When invocations fail with 403, narrow down which check is failing.
 
-**`Authorization method mismatch`** — the runtime's auth type and the request's auth type don't match. Two cases:
+**`Authorization method mismatch`** -- the runtime's auth type and the request's auth type don't match. Two cases:
 
-- The runtime is configured for `AWS_IAM` (or no authorizer) but the caller is sending a Bearer token → reconfigure the runtime for `CUSTOM_JWT`, or have the caller use SigV4.
-- The runtime is configured for `CUSTOM_JWT` but the caller's request is being SigV4-signed → likely the SDK or environment is injecting SigV4 headers alongside the Bearer token. Check for `X-Amz-Date`, `X-Amz-Security-Token`, or `Authorization: AWS4-HMAC-SHA256` in the outbound request. Remove the SigV4 path and send only the Bearer token.
+- The runtime is configured for `AWS_IAM` (or no authorizer) but the caller is sending a Bearer token -> reconfigure the runtime for `CUSTOM_JWT`, or have the caller use SigV4.
+- The runtime is configured for `CUSTOM_JWT` but the caller's request is being SigV4-signed -> likely the SDK or environment is injecting SigV4 headers alongside the Bearer token. Check for `X-Amz-Date`, `X-Amz-Security-Token`, or `Authorization: AWS4-HMAC-SHA256` in the outbound request. Remove the SigV4 path and send only the Bearer token.
 
-**`Invalid inbound token`** (or similar) — the token was rejected by the JWT validator. Walk through these in order:
+**`Invalid inbound token`** (or similar) -- the token was rejected by the JWT validator. Walk through these in order:
 
-1. **Issuer ↔ discovery URL prefix** (above) — verify the token's `iss` claim matches the discovery URL's origin
-2. **`allowedClients` vs `allowedAudience`** — is the runtime configured for the right claim for your token format?
-3. **JWKS reachability** — can AgentCore reach the `jwks_uri` listed in the discovery document? It must be publicly reachable.
-4. **Token expired** — decode the token, check `exp` against now
-5. **Signing algorithm support** — some IdPs sign with algorithms (PS256, ES384, etc.) that aren't universally supported. Check your IdP's supported algorithms and switch to RS256 if compatibility is the issue.
+1. **Issuer <-> discovery URL prefix** (above) -- verify the token's `iss` claim matches the discovery URL's origin
+2. **`allowedClients` vs `allowedAudience`** -- is the runtime configured for the right claim for your token format?
+3. **JWKS reachability** -- can AgentCore reach the `jwks_uri` listed in the discovery document? It must be publicly reachable.
+4. **Token expired** -- decode the token, check `exp` against now
+5. **Signing algorithm support** -- some IdPs sign with algorithms (PS256, ES384, etc.) that aren't universally supported. Check your IdP's supported algorithms and switch to RS256 if compatibility is the issue.
 
 Only after ruling all of those out should you treat it as a service-side issue.
 
@@ -280,7 +280,7 @@ def invoke(payload, context):
     if len(prompt) > 10000:
         return {"error": "Prompt exceeds maximum length (10,000 characters)"}
 
-    # Sanitize — strip control characters, excessive whitespace
+    # Sanitize -- strip control characters, excessive whitespace
     prompt = " ".join(prompt.split())
 
     # Proceed with validated input
@@ -295,7 +295,7 @@ def invoke(payload, context):
 - Numeric inputs are within expected ranges
 - User-provided IDs (actor_id, session_id) match expected formats
 
-**Rate limiting:** AgentCore Runtime has built-in invocation rate limits (default 25 TPS per agent — see [`references/limits.md`](references/limits.md)). For application-level rate limiting (per-user, per-tenant), implement it in your calling application or API Gateway layer, not in the agent code itself. The agent should assume it's already been rate-limited by the time a request reaches it.
+**Rate limiting:** AgentCore Runtime has built-in invocation rate limits (default 25 TPS per agent -- see [`references/limits.md`](references/limits.md)). For application-level rate limiting (per-user, per-tenant), implement it in your calling application or API Gateway layer, not in the agent code itself. The agent should assume it's already been rate-limited by the time a request reaches it.
 
 ---
 
@@ -338,13 +338,13 @@ async def call_downstream(data: dict, *, access_token: str) -> dict:
 
 The decorator fetches from Secrets Manager at call time and handles caching/refresh. Credentials registered this way are encrypted at rest and rotated without a redeploy.
 
-**Local dev:** `agentcore/.env.local` (gitignored) is read by `agentcore dev` so the decorator resolves locally. This file is **not** uploaded to runtime on deploy — production credentials live in the credential provider.
+**Local dev:** `agentcore/.env.local` (gitignored) is read by `agentcore dev` so the decorator resolves locally. This file is **not** uploaded to runtime on deploy -- production credentials live in the credential provider.
 
 ---
 
 ## Tool surface: Prefer Gateway targets over direct HTTP in agent code
 
-A related audit — for every external service the agent calls, ask whether it should be a Gateway target instead of a direct HTTP call buried in agent code. Gateway's credential providers inject auth at the edge (so the agent process never sees the secret), the tool catalog is policy-enforceable, and a leaked traceback/log line from agent code can't exfiltrate credentials that never reached it.
+A related audit -- for every external service the agent calls, ask whether it should be a Gateway target instead of a direct HTTP call buried in agent code. Gateway's credential providers inject auth at the edge (so the agent process never sees the secret), the tool catalog is policy-enforceable, and a leaked traceback/log line from agent code can't exfiltrate credentials that never reached it.
 
 ```bash
 # Find direct outbound HTTP calls in agent code
@@ -357,9 +357,9 @@ For each hit, decide:
 |---|---|
 | Calls an external REST API the agent treats as a tool | Front as a Gateway target (`agentcore add gateway-target --type open-api-schema` or `api-gateway`). Load [`agents-connect/SKILL.md`](../agents-connect/SKILL.md) Path C. |
 | Calls an MCP server directly | Front as a Gateway target (`--type mcp-server`). Load [`agents-connect/SKILL.md`](../agents-connect/SKILL.md) Path A. |
-| Calls an AWS service (S3, DynamoDB, etc.) — not appropriate to match this row, should be `boto3` | Migrate from `requests`/`httpx` to the `boto3` client, using the runtime's execution role for IAM. No credential needed. |
-| Calls a streaming service (SSE-with-live-output, WebSocket, WebRTC) | OK to keep direct — Gateway doesn't front these yet. Confirm any auth uses `@requires_*`, not `os.getenv`. |
-| Calls another agent via A2A | OK to keep direct — A2A is HTTP-by-design. Confirm it uses `@requires_access_token` for the bearer token. |
+| Calls an AWS service (S3, DynamoDB, etc.) -- not appropriate to match this row, should be `boto3` | Migrate from `requests`/`httpx` to the `boto3` client, using the runtime's execution role for IAM. No credential needed. |
+| Calls a streaming service (SSE-with-live-output, WebSocket, WebRTC) | OK to keep direct -- Gateway doesn't front these yet. Confirm any auth uses `@requires_*`, not `os.getenv`. |
+| Calls another agent via A2A | OK to keep direct -- A2A is HTTP-by-design. Confirm it uses `@requires_access_token` for the bearer token. |
 | Calls a measured latency hot path and the team chose it | OK, but confirm measurement exists and auth uses `@requires_*`. |
 
 If the hit fits none of the "OK to keep direct" rows, open a ticket to convert it to a Gateway target. Gateway targets can be added without a code change in the agent for most framework integrations (MCP tool discovery handles binding).
@@ -374,7 +374,7 @@ AgentCore enables X-Ray tracing and CloudWatch logging automatically. Verify:
 agentcore status --runtime <AgentName> --json | jq '.runtimes[0].observabilityConfig'
 ```
 
-**CloudWatch dashboard:** AWS Console → CloudWatch → GenAI Observability → Bedrock AgentCore
+**CloudWatch dashboard:** AWS Console -> CloudWatch -> GenAI Observability -> Bedrock AgentCore
 
 **Log retention:** By default, logs are retained indefinitely. Set a retention policy for cost control:
 
@@ -427,21 +427,21 @@ See `agents-build` (loads [`references/vpc.md`](../agents-build/references/vpc.m
 
 ## Initialization time: Optimize cold start performance
 
-Slow agent initialization causes timeouts, 424 errors, and poor user experience — especially on first invocation after a period of inactivity. Everything the agent does before it's ready to handle a request adds to the time users wait.
+Slow agent initialization causes timeouts, 424 errors, and poor user experience -- especially on first invocation after a period of inactivity. Everything the agent does before it's ready to handle a request adds to the time users wait.
 
 ### Where cold start time actually goes
 
-A typical cold start for a new environment takes around 20–30 seconds. The breakdown, roughly:
+A typical cold start for a new environment takes around 20-30 seconds. The breakdown, roughly:
 
-- **Container image pull** — dominates for Container builds. A 100 MB image takes a few seconds; a 500 MB image can take 15+ seconds.
-- **Application startup** — your code's import time, framework init, module-level setup. Usually 5–10 seconds, can be much more if you're loading models or opening connections at import.
-- **Platform overhead** (microVM boot, network attach, container start) — sub-second to a couple of seconds.
+- **Container image pull** -- dominates for Container builds. A 100 MB image takes a few seconds; a 500 MB image can take 15+ seconds.
+- **Application startup** -- your code's import time, framework init, module-level setup. Usually 5-10 seconds, can be much more if you're loading models or opening connections at import.
+- **Platform overhead** (microVM boot, network attach, container start) -- sub-second to a couple of seconds.
 
 The two you control are image size and application startup. Optimizing either one directly reduces time to first response.
 
 ### Session reuse is the highest-leverage optimization
 
-Same-session requests route to an existing initialized environment — no cold start. The first request per session pays the cold-start cost; every subsequent request on that session is fast.
+Same-session requests route to an existing initialized environment -- no cold start. The first request per session pays the cold-start cost; every subsequent request on that session is fast.
 
 Concrete patterns:
 
@@ -465,11 +465,11 @@ Every MB of deployment package adds to cold-start time.
 Don't load large models, connect to databases, or initialize MCP clients at module import time. Every second spent in module import is a second the agent can't respond to requests.
 
 ```python
-# ❌ Slow — runs at import time, before the agent can handle requests
+# [NO] Slow -- runs at import time, before the agent can handle requests
 import heavy_library
 client = heavy_library.Client(config)
 
-# ✅ Fast — defers until first request
+# [YES] Fast -- defers until first request
 _client = None
 def get_client():
     global _client
@@ -483,14 +483,14 @@ def get_client():
 
 The skill previously recommended CodeZip over Container when possible. That's an oversimplification. Here's the real trade-off:
 
-- **CodeZip:** simpler to iterate on, smaller surface area. Cold start includes code download + extract — a ~95 MB package adds around 1.3 seconds of platform download before application startup even begins.
+- **CodeZip:** simpler to iterate on, smaller surface area. Cold start includes code download + extract -- a ~95 MB package adds around 1.3 seconds of platform download before application startup even begins.
 - **Container:** you control the full image, needed for custom system dependencies. Larger images cost more per cold start, but you can optimize aggressively with multi-stage builds.
 
 Neither wins universally. Both benefit the same way from session reuse and from keeping the package small. If your traffic pattern has lots of bursty cold sessions, invest in shrinking whichever deployment artifact you're using. If your traffic pattern reuses sessions, the deployment type matters much less.
 
 ### For Lambda targets behind Gateway
 
-Use provisioned concurrency on the Lambda function to eliminate Lambda cold starts. This is separate from Runtime initialization — it's the Lambda itself that adds latency on first invocation of a cold Lambda.
+Use provisioned concurrency on the Lambda function to eliminate Lambda cold starts. This is separate from Runtime initialization -- it's the Lambda itself that adds latency on first invocation of a cold Lambda.
 
 ---
 
@@ -514,10 +514,10 @@ Don't leave defaults for production. Pick values that match how your workload ac
 
 | Workload | `idleRuntimeSessionTimeout` | `maxLifetime` | Reasoning |
 |---|---|---|---|
-| Interactive chat / support agent | 600–900s (default) | 3600–7200s | Users pause to read/think. Reclaim fast after they leave. |
-| Request/reply API with no follow-up | 60–120s | 1800s | Each call is self-contained — release the VM quickly. |
+| Interactive chat / support agent | 600-900s (default) | 3600-7200s | Users pause to read/think. Reclaim fast after they leave. |
+| Request/reply API with no follow-up | 60-120s | 1800s | Each call is self-contained -- release the VM quickly. |
 | Batch processing, one session per job | 120s | match job length + buffer | Idle gap between items in the batch is small; reclaim aggressively between jobs. |
-| Background / long-running tasks (use `add_async_task`) | 120–300s | up to 28800s (8h) | Async task API keeps the VM alive during tracked work; idle timeout applies between tasks. |
+| Background / long-running tasks (use `add_async_task`) | 120-300s | up to 28800s (8h) | Async task API keeps the VM alive during tracked work; idle timeout applies between tasks. |
 
 **Trade-offs at a glance:**
 
@@ -560,7 +560,7 @@ Edit the runtime's entry in `agentcore/agentcore.json`:
 
 Then `agentcore deploy` to apply. The CLI and CDK handle the underlying `UpdateAgentRuntime` call for you.
 
-If you prefer the CLI, `agentcore add agent ... --idle-timeout 120 --max-lifetime 3600` writes the same fields into `agentcore.json`. The file is the source of truth — every field in it has IDE autocomplete via the `$schema` URL at the top of the file (`https://schema.agentcore.aws.dev/v1/agentcore.json`).
+If you prefer the CLI, `agentcore add agent ... --idle-timeout 120 --max-lifetime 3600` writes the same fields into `agentcore.json`. The file is the source of truth -- every field in it has IDE autocomplete via the `$schema` URL at the top of the file (`https://schema.agentcore.aws.dev/v1/agentcore.json`).
 
 Lower timeout = faster VM reclamation = more headroom under `maxVms`. Too low = environments get reclaimed mid-conversation, causing the next turn to cold-start.
 
@@ -568,12 +568,12 @@ Lower timeout = faster VM reclamation = more headroom under `maxVms`. Too low = 
 
 ### Diagnosing `maxVms` problems
 
-If you hit `ServiceQuotaExceededException: maxVms limit exceeded`, don't request a quota increase first. CloudWatch's concurrent-sessions metric is not the same as live VM count — idle environments count against the quota until reclaimed.
+If you hit `ServiceQuotaExceededException: maxVms limit exceeded`, don't request a quota increase first. CloudWatch's concurrent-sessions metric is not the same as live VM count -- idle environments count against the quota until reclaimed.
 
 Work through this order:
 
 1. Add `StopRuntimeSession` after each logical request completes
-2. Audit session-ID generation — are you creating a new ID per request that should reuse one?
+2. Audit session-ID generation -- are you creating a new ID per request that should reuse one?
 3. Lower `idleRuntimeSessionTimeout` if your sessions are short-lived
 4. Only then, if you've done all of the above and still hit the limit, request an increase
 
@@ -583,7 +583,7 @@ See [`references/limits.md`](references/limits.md) for the increase-request work
 
 ## Long-running background tasks
 
-If your agent fires off work that outlives the `/invocations` response — background processing, async jobs, long tool chains — a fire-and-forget pattern isn't enough. The environment can be reclaimed at `idleRuntimeSessionTimeout` even while your background task is still running, because the runtime considers the session idle once the invocation response is sent.
+If your agent fires off work that outlives the `/invocations` response -- background processing, async jobs, long tool chains -- a fire-and-forget pattern isn't enough. The environment can be reclaimed at `idleRuntimeSessionTimeout` even while your background task is still running, because the runtime considers the session idle once the invocation response is sent.
 
 ### Use the SDK's async task API to signal "still busy"
 
@@ -602,7 +602,7 @@ def invoke(payload, context):
     # Kick off the work (in a thread, asyncio, etc.)
     start_background_work(task_id, payload)
 
-    # Return the invocation response — the task is still tracked
+    # Return the invocation response -- the task is still tracked
     return {"status": "processing", "taskId": task_id}
 
 
@@ -611,7 +611,7 @@ def start_background_work(task_id, payload):
         # Long-running work here
         do_the_work(payload)
     finally:
-        # Mark the task complete when done — this releases the "busy" signal
+        # Mark the task complete when done -- this releases the "busy" signal
         app.complete_async_task(task_id)
 
 if __name__ == "__main__":
@@ -620,7 +620,7 @@ if __name__ == "__main__":
 
 While at least one registered task is active, the runtime sees the environment as busy and doesn't reclaim it at `idleRuntimeSessionTimeout`. `maxLifetime` (default 8 hours) still applies as a hard ceiling.
 
-Check the bedrock-agentcore SDK docs for your language for the equivalent API — the TypeScript SDK has an analogous pattern.
+Check the bedrock-agentcore SDK docs for your language for the equivalent API -- the TypeScript SDK has an analogous pattern.
 
 ### Alternatives when async task API isn't an option
 
@@ -632,12 +632,12 @@ Check the bedrock-agentcore SDK docs for your language for the equivalent API �
 
 ## Quotas and limits
 
-If you're hitting throttling, `ServiceQuotaExceededException`, or any other quota-related error — or you're about to launch and want to make sure quotas won't block you — load [`references/limits.md`](references/limits.md).
+If you're hitting throttling, `ServiceQuotaExceededException`, or any other quota-related error -- or you're about to launch and want to make sure quotas won't block you -- load [`references/limits.md`](references/limits.md).
 
 That reference covers:
 
 - Which quota each error maps to
-- Mitigations to try before requesting an increase (critical — most "quota" errors are actually session-lifecycle issues)
+- Mitigations to try before requesting an increase (critical -- most "quota" errors are actually session-lifecycle issues)
 - How to request an increase through the Service Quotas console (the edge case where a direct Support case is needed is rare)
 - A copy-paste justification template with everything a reviewer needs to approve
 
@@ -679,7 +679,7 @@ Observability
 Performance
 [ ] Agent initialization time measured and optimized
 [ ] Deployment package size under 200 MB (target under 100 MB)
-[ ] Dependencies audited — no unused packages
+[ ] Dependencies audited -- no unused packages
 [ ] Heavy initialization deferred to request time
 [ ] Session reuse strategy chosen for multi-turn / batch workloads
 [ ] `StopRuntimeSession` called after work completes where applicable

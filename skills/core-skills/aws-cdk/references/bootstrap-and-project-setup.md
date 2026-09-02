@@ -102,7 +102,7 @@ cdk bootstrap aws://$ACCOUNT_ID/$REGION --template $TEMPLATE_PATH
 
 ### Bootstrap Constraints
 
-- Deleting the `CDKToolkit` stack MUST NOT be done — it breaks all deployments
+- Deleting the `CDKToolkit` stack MUST NOT be done -- it breaks all deployments
   in that account/region pair.
 - Termination protection SHOULD be enabled on the `CDKToolkit` stack.
 - Bootstrap MUST be re-run when upgrading to a CDK version that requires a newer
@@ -114,7 +114,7 @@ cdk bootstrap aws://$ACCOUNT_ID/$REGION --template $TEMPLATE_PATH
 
 ### Prerequisites
 
-- Node.js ≥ 20 MUST be installed.
+- Node.js >= 20 MUST be installed.
 
 ### Initialize Project
 
@@ -126,11 +126,11 @@ cdk init app --language typescript
 
 ```
 $PROJECT_ROOT/
-├── bin/          # Entry point (App instantiation)
-├── lib/          # Stack and construct definitions
-├── cdk.json      # CDK configuration
-├── package.json
-└── tsconfig.json
++-- bin/          # Entry point (App instantiation)
++-- lib/          # Stack and construct definitions
++-- cdk.json      # CDK configuration
++-- package.json
++-- tsconfig.json
 ```
 
 ### Configure tsx
@@ -145,7 +145,7 @@ The `cdk.json` `app` field SHOULD use `tsx` instead of `ts-node` for faster star
 
 ### Linting
 
-Projects MUST enforce strict typing — `any` MUST NOT be used. Configure with:
+Projects MUST enforce strict typing -- `any` MUST NOT be used. Configure with:
 
 - `eslint` + `prettier`
 - `eslint-plugin-awscdk` for CDK-specific rules
@@ -175,8 +175,8 @@ cdk list           # List all stacks in the app
 
 ### Prerequisites
 
-- Node.js ≥ 20 MUST be installed.
-- Python ≥ 3.9 MUST be installed.
+- Node.js >= 20 MUST be installed.
+- Python >= 3.9 MUST be installed.
 
 ### Initialize Project
 
@@ -210,7 +210,7 @@ cdk doctor          # Check for potential problems
 ## Version Management Best Practices
 
 - **Commit lockfiles** (`package-lock.json` / `poetry.lock` / `Pipfile.lock`). Unlocked builds drift and lose determinism.
-- **For CDK applications**, use **caret (`^`) ranges** for `aws-cdk-lib` and `constructs` in `dependencies` — this is the officially recommended approach. The lockfile provides reproducibility; the caret range lets `npm update` pull compatible fixes and features.
+- **For CDK applications**, use **caret (`^`) ranges** for `aws-cdk-lib` and `constructs` in `dependencies` -- this is the officially recommended approach. The lockfile provides reproducibility; the caret range lets `npm update` pull compatible fixes and features.
 
   ```json
   {
@@ -223,19 +223,19 @@ cdk doctor          # Check for potential problems
 
   Teams that prefer exact pinning for stricter reproducibility SHOULD pair it with automated upgrade tooling (Dependabot, Renovate) to avoid falling behind.
 - **For construct libraries**, declare `aws-cdk-lib` and `constructs` as `peerDependencies` (caret, widest compatible) and as `devDependencies` at the oldest supported exact version.
-- **Experimental / alpha modules** (e.g. `@aws-cdk/aws-*-alpha`) SHOULD use exact versions — their APIs can change between releases without SemVer guarantees.
+- **Experimental / alpha modules** (e.g. `@aws-cdk/aws-*-alpha`) SHOULD use exact versions -- their APIs can change between releases without SemVer guarantees.
 - **Automate upgrades**: a weekly job that bumps `aws-cdk-lib`, runs `cdk synth` to catch breaking changes, deploys to a test environment, and opens a PR on success.
 
 ### CLI and Library Are Separate Release Tracks
 
-The CDK CLI (`aws-cdk`) and the library (`aws-cdk-lib`) are **independent packages on different release tracks — their version numbers do NOT align**. A CLI at `2.1001.x` paired with a library at `2.200.x` is normal. The compatibility contract is one-way: a newer CLI can read assemblies produced by older libraries, but an older CLI CANNOT read assemblies produced by newer libraries. The mismatch surfaces as:
+The CDK CLI (`aws-cdk`) and the library (`aws-cdk-lib`) are **independent packages on different release tracks -- their version numbers do NOT align**. A CLI at `2.1001.x` paired with a library at `2.200.x` is normal. The compatibility contract is one-way: a newer CLI can read assemblies produced by older libraries, but an older CLI CANNOT read assemblies produced by newer libraries. The mismatch surfaces as:
 
 ```
 This CDK CLI is not compatible with the CDK library used by your application.
 (Cloud assembly schema version mismatch)
 ```
 
-The fix is to upgrade the CLI to a specific newer version. You MUST install `aws-cdk` as a dev dependency at an **exact** version and invoke it via `npx cdk`; you MUST NOT use `aws-cdk@latest` anywhere — it is non-deterministic, so a broken release can reach your pipeline instantly.
+The fix is to upgrade the CLI to a specific newer version. You MUST install `aws-cdk` as a dev dependency at an **exact** version and invoke it via `npx cdk`; you MUST NOT use `aws-cdk@latest` anywhere -- it is non-deterministic, so a broken release can reach your pipeline instantly.
 
 ```json
 {
@@ -254,4 +254,4 @@ Bump the pinned CLI version regularly (Dependabot / Renovate), on the same caden
 
 ### Feature Flags
 
-`cdk.json`'s `context` object carries CDK feature flags — per-release opt-ins to behaviour changes. When upgrading `aws-cdk-lib`, review new flags and adopt them incrementally (inspect via `cdk flags --unstable=flags`). Do not flip everything to recommended in one commit.
+`cdk.json`'s `context` object carries CDK feature flags -- per-release opt-ins to behaviour changes. When upgrading `aws-cdk-lib`, review new flags and adopt them incrementally (inspect via `cdk flags --unstable=flags`). Do not flip everything to recommended in one commit.

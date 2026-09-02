@@ -31,7 +31,7 @@ The `endpoint-diagnostics` skill requires these permissions:
 
 ## Scoping Notes
 
-- **sagemaker:DescribeEndpoint** — Scope to specific endpoint(s) by replacing `ENDPOINT_NAME` with the actual name, or use `*` for all endpoints in the account.
-- **cloudwatch:GetMetricData** — Cannot be resource-scoped; `*` is required.
-- **logs:FilterLogEvents** — Scoped to SageMaker endpoint log groups. The trailing `:*` is required by IAM for log group actions.
-- **Graceful degradation** — If any permission is missing, the skill continues collecting data from the other APIs and reports the permission error.
+- **sagemaker:DescribeEndpoint** -- Scope to specific endpoint(s) by replacing `ENDPOINT_NAME` with the actual name, or use `*` for all endpoints in the account.
+- **cloudwatch:GetMetricData** -- Cannot be resource-scoped; `*` is required.
+- **logs:FilterLogEvents** -- Scoped to SageMaker endpoint log groups. The trailing `:*` is required by IAM for log group actions.
+- **Graceful degradation** -- If any permission is missing, the skill continues collecting data from the other APIs and reports the permission error.

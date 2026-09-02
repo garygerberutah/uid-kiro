@@ -5,19 +5,19 @@ Snapshot data captured by a breakpoint lives in CloudWatch Logs
 is the recipe for analyzing what they return.
 
 > **Reminder:** the snapshot log group (`/aws/service-events/{service}`) **must be encrypted
-> at rest** with a KMS CMK (`aws logs associate-kms-key`) before capturing — captured snapshots
+> at rest** with a KMS CMK (`aws logs associate-kms-key`) before capturing -- captured snapshots
 > may contain credentials, PII, or secrets. See Security Considerations in
 > `dynamic-instrumentation.md`.
 
 ## Retrieval commands
 
 Both require a host with `python3` + `boto3`. Region resolves as `--region` flag > `AWS_REGION` >
-`AWS_DEFAULT_REGION` > `us-east-1` default (the same precedence as `di_instrumentation.py`) — it
+`AWS_DEFAULT_REGION` > `us-east-1` default (the same precedence as `di_instrumentation.py`) -- it
 MUST be the same region the breakpoint was created in, or searches return
 empty even when the breakpoint is ACTIVE. Pass arguments via `--json-file` (or `--json -` on
 stdin) so values stay off the shell command line.
 
-- **Discover the snapshot structure first** (Step 3 rule — always do this before searching).
+- **Discover the snapshot structure first** (Step 3 rule -- always do this before searching).
   Write the arguments to a file, then:
 
   ```bash
@@ -28,7 +28,7 @@ stdin) so values stay off the shell command line.
   ```
 
   Returns one nearby snapshot as JSON plus per-attribute `field_documentation`. Read the
-  field paths from this sample — they are authoritative; do not rely on canned paths that may
+  field paths from this sample -- they are authoritative; do not rely on canned paths that may
   be stale.
 
 - **Search a batch** near a status-event timestamp, narrowing with `custom_filters` when you
@@ -52,7 +52,7 @@ stdin) so values stay off the shell command line.
 
 Large results are written to a file (use `--out`, or redirect stdout). Parse the file with
 `jq`/`python` and extract only the fields you need. **Do not** retype values you see in tool
-output into a script literal — a single mistyped `orderId`/`paymentRef` silently corrupts the
+output into a script literal -- a single mistyped `orderId`/`paymentRef` silently corrupts the
 aggregation.
 
 > **Encryption at rest for the saved file.** `--out` already restricts the file to owner-only
@@ -61,7 +61,7 @@ aggregation.
 > world-readable shared temp directories, and delete it as soon as analysis is done.
 
 The retrieval output is JSON. Snapshot records are under `results[*]`, each with an
-`@message` that is itself a JSON string — `json.loads` it again to reach `body.captures.*`.
+`@message` that is itself a JSON string -- `json.loads` it again to reach `body.captures.*`.
 The parser already extracts the common debugging fields; key ones from a parsed snapshot:
 
 | Field | Meaning |
@@ -81,4 +81,4 @@ Write the jq/python against the **actual field paths from your live sample snaps
 a domain identifier (e.g. `orderId`), and surface anomalies (duplicates, outliers). When
 combining results from multiple queries, deduplicate by snapshot `id` before aggregating.
 
-After analysis, do not retain the saved snapshot file — it may contain PII/secrets.
+After analysis, do not retain the saved snapshot file -- it may contain PII/secrets.

@@ -2,7 +2,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-"""Launch with AWS — CLI entry point.
+"""Launch with AWS -- CLI entry point.
 
 Subcommands mirror the migration workflow steps. Each prints JSON to stdout
 on success, exits non-zero with error message on stderr on failure.
@@ -68,7 +68,7 @@ def _default_repo_name(source: str) -> str:
     return os.path.basename(cleaned) or "uploaded-app"
 
 
-# ── Subcommands ──────────────────────────────────────────────────────────
+# -- Subcommands ----------------------------------------------------------
 
 
 def cmd_auth_start() -> None:
@@ -106,7 +106,7 @@ def cmd_create_launch(source: str, name: str | None = None) -> None:
 
     github = parse_github_url(source)
     if github:
-        # GitHub URL — pass as gitHub source directly.
+        # GitHub URL -- pass as gitHub source directly.
         launch_source = {"gitHub": {"repositoryUrl": source}}
     elif urlparse(source).scheme in ("http", "https"):
         _fail(
@@ -115,7 +115,7 @@ def cmd_create_launch(source: str, name: str | None = None) -> None:
         )
         return
     else:
-        # Local directory — zip, upload, then pass as s3Upload source.
+        # Local directory -- zip, upload, then pass as s3Upload source.
         archive = zip_local_repo(source, display_name)
         target = api.create_upload_url()
         api.put_archive(target["uploadUrl"], archive)
@@ -199,7 +199,7 @@ def cmd_get_launch_download_url(launch_id: str) -> None:
     _ok({"downloadUrl": download_url})
 
 
-# ── CLI dispatcher ───────────────────────────────────────────────────────
+# -- CLI dispatcher -------------------------------------------------------
 
 # (func, min_required_args)
 from typing import Any, Callable

@@ -248,9 +248,9 @@ resource "aws_cloudwatch_dashboard" "this" {
         type = "text", x = 0, y = 0, width = 24, height = 2,
         properties = {
           markdown = join("\n", [
-            "# UID Portal API — ${var.name_prefix}",
+            "# UID Portal API -- ${var.name_prefix}",
             "API Gateway HTTP APIs, Python 3.13 Lambdas, Aurora PostgreSQL via RDS Proxy.",
-            "Runbook: `docs/apigw-migration/04-runbook.md` · Alerts: `${var.alert_topic_name}`",
+            "Runbook: `docs/apigw-migration/04-runbook.md` / Alerts: `${var.alert_topic_name}`",
           ])
         }
       },
@@ -292,7 +292,7 @@ resource "aws_cloudwatch_dashboard" "this" {
       {
         type = "metric", x = 0, y = 8, width = 12, height = 6,
         properties = {
-          title  = "Authorizer — the critical path for every protected route"
+          title  = "Authorizer -- the critical path for every protected route"
           region = var.region
           view   = "timeSeries"
           period = 300

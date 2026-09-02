@@ -52,15 +52,15 @@ resources unless the replacement is intentional and data has been backed up.
 
 Resource replacement is typically caused by:
 
-1. **Construct ID changes** — Renaming a construct or moving it to a different
+1. **Construct ID changes** -- Renaming a construct or moving it to a different
    scope changes its CloudFormation logical ID, which CloudFormation treats as
    a delete + create.
 
-2. **Immutable CloudFormation properties** — Certain resource properties cannot
+2. **Immutable CloudFormation properties** -- Certain resource properties cannot
    be updated in place (e.g., DynamoDB table name, RDS engine). Changing these
    forces replacement.
 
-3. **Hardcoded physical names** — If a resource has a hardcoded physical name
+3. **Hardcoded physical names** -- If a resource has a hardcoded physical name
    and the logical ID changes, CloudFormation cannot create the new resource
    because the name is already taken, causing a deployment failure.
 
@@ -73,30 +73,30 @@ replacement. It is currently an unstable feature.
 
 ### Workflow
 
-1. **Deploy a baseline** — Ensure the current state is deployed and clean.
+1. **Deploy a baseline** -- Ensure the current state is deployed and clean.
 
    ```bash
    cdk deploy $STACK_NAME
    ```
 
-2. **Edit the code** — Perform moves and renames only. MUST NOT change resource
+2. **Edit the code** -- Perform moves and renames only. MUST NOT change resource
    properties in the same step.
 
-3. **Run refactor** — Generate the resource mapping:
+3. **Run refactor** -- Generate the resource mapping:
 
    ```bash
    cdk refactor --unstable=refactor
    ```
 
-4. **Confirm the mapping** — Review the proposed logical ID mappings.
+4. **Confirm the mapping** -- Review the proposed logical ID mappings.
 
-5. **Deploy** — Apply the refactoring:
+5. **Deploy** -- Apply the refactoring:
 
    ```bash
    cdk deploy $STACK_NAME
    ```
 
-6. **Deploy property changes separately** — Any property changes MUST be made
+6. **Deploy property changes separately** -- Any property changes MUST be made
    and deployed in a subsequent step, after the refactor deploy succeeds.
 
 ### Resolving Ambiguity
@@ -108,7 +108,7 @@ ambiguity.
 ### Constraints
 
 - Refactoring MUST stay within the same environment (account + region).
-- Only moves and renames are supported — property changes MUST NOT be combined
+- Only moves and renames are supported -- property changes MUST NOT be combined
   with refactoring in the same deployment.
 
 ---
@@ -131,7 +131,7 @@ the child construct ID to preserve the original logical ID:
 // Before: resource defined directly in the stack
 new s3.Bucket(this, 'MyBucket', { ... });
 
-// After: extracted into a construct — use 'Default' to keep the same logical ID
+// After: extracted into a construct -- use 'Default' to keep the same logical ID
 class MyConstruct extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
@@ -156,7 +156,7 @@ const bucket = new s3.Bucket(this, 'NewId', { ... });
 (bucket.node.defaultChild as s3.CfnBucket).overrideLogicalId('$ORIGINAL_LOGICAL_ID');
 ```
 
-This approach SHOULD be used sparingly — it creates a maintenance burden and
+This approach SHOULD be used sparingly -- it creates a maintenance burden and
 bypasses CDK's automatic ID generation.
 
 ### Lock Logical IDs with Unit Tests
@@ -189,10 +189,10 @@ new s3.Bucket(this, 'DataBucket', {
 
 A defense-in-depth approach SHOULD be used for stateful resources:
 
-1. **RETAIN removal policy** — Prevents data loss on stack deletion.
-2. **Dedicated stack** — Isolates stateful resources from frequently changing
+1. **RETAIN removal policy** -- Prevents data loss on stack deletion.
+2. **Dedicated stack** -- Isolates stateful resources from frequently changing
    application stacks.
-3. **Logical ID unit tests** — Catches accidental renames before deployment.
-4. **`cdk diff` review** — MUST be reviewed before every production deployment.
-5. **No hardcoded physical names** — Avoids name-collision failures during
+3. **Logical ID unit tests** -- Catches accidental renames before deployment.
+4. **`cdk diff` review** -- MUST be reviewed before every production deployment.
+5. **No hardcoded physical names** -- Avoids name-collision failures during
    replacement.

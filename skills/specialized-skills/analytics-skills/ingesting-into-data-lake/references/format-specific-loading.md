@@ -266,7 +266,7 @@ with open('downloaded-sample.avro', 'rb') as f:
 | `map<string, T>` | `MAP<STRING, T>` | Direct mapping |
 | `record` | `STRUCT` | Nested structure |
 | `union [null, T]` | Nullable `T` | Avro nullable pattern |
-| `union [T1, T2, ...]` | `STRING` | Multiple types → JSON string |
+| `union [T1, T2, ...]` | `STRING` | Multiple types -> JSON string |
 
 ### Handling Avro Union Types
 
@@ -309,12 +309,12 @@ df_with_union = source_df.withColumn(
 
 ```
 Detected Avro schema with 15 fields:
-- user_id (long) → BIGINT
-- username (string) → STRING
-- age (union[null, int]) → INT (nullable)
-- status (enum: active, inactive) → STRING
-- metadata (map<string, string>) → MAP<STRING, STRING>
-- preferences (record) → STRUCT
+- user_id (long) -> BIGINT
+- username (string) -> STRING
+- age (union[null, int]) -> INT (nullable)
+- status (enum: active, inactive) -> STRING
+- metadata (map<string, string>) -> MAP<STRING, STRING>
+- preferences (record) -> STRUCT
 ```
 
 ### Glue Job Configuration for Avro

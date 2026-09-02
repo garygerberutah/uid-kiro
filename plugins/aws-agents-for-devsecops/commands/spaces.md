@@ -2,7 +2,7 @@
 description: List configured AgentSpaces and summarize each one's accounts and capabilities
 ---
 
-1. Call `aws_devops_agent__list_agent_spaces()` — get all spaces accessible with current auth.
+1. Call `aws_devops_agent__list_agent_spaces()` -- get all spaces accessible with current auth.
    - **Bearer token auth:** Returns only the single space the token is scoped to.
    - **SigV4 auth:** Returns all spaces in the account.
 2. For each space, call `aws_devops_agent__list_associations(agent_space_id="SPACE_ID")` to see attached AWS accounts.

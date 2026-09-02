@@ -10,34 +10,34 @@ description: >-
 
 # Release Readiness Review
 
-> **AgentSpace routing (SigV4 only):** If `list_agent_spaces` is available in your tool list and the multi-space orchestration skill has NOT been invoked yet this session, invoke it first to determine which `agent_space_id` to use. Then pass `agent_space_id` on all tool calls below. For bearer token auth this is unnecessary — the token is already scoped to one space.
+> **AgentSpace routing (SigV4 only):** If `list_agent_spaces` is available in your tool list and the multi-space orchestration skill has NOT been invoked yet this session, invoke it first to determine which `agent_space_id` to use. Then pass `agent_space_id` on all tool calls below. For bearer token auth this is unnecessary -- the token is already scoped to one space.
 
 Run a release readiness review via the AWS DevOps Agent. Analyzes a code change for risk, correctness, and potential rollback issues. Returns a structured report with actionable findings.
 
 **Rules:**
 
 - If a **PR/MR URL** is provided: Extract ALL fields from the URL. Do NOT inspect the local workspace or git state.
-- **NEVER use `gh` CLI, `glab` CLI, or any external tool to fetch PR/MR details.** All required fields (repository, prNumber/mergeRequestIid, hostname) MUST be parsed directly from the URL or user input. The DevOps Agent fetches the content itself — you only need to pass identifiers.
+- **NEVER use `gh` CLI, `glab` CLI, or any external tool to fetch PR/MR details.** All required fields (repository, prNumber/mergeRequestIid, hostname) MUST be parsed directly from the URL or user input. The DevOps Agent fetches the content itself -- you only need to pass identifiers.
 - **Only** use the local workspace flows when the user references a repository or package **without** a PR/MR link.
 
 ## Gathering execution parameters
 
-Infer everything automatically from the user's request — do not ask for parameters that can be derived.
+Infer everything automatically from the user's request -- do not ask for parameters that can be derived.
 
 **Input source decision tree:**
 
 ```
 Has the user provided a pull request/merge request link or ID?
-├── Yes: github.com PR URL               → use "GitHub PR" flow below
-├── Yes: gitlab.com MR URL               → use "GitLab MR" flow below
-└── No link provided — repo name only    → use "Local GitHub/GitLab repo" flow below
++-- Yes: github.com PR URL               -> use "GitHub PR" flow below
++-- Yes: gitlab.com MR URL               -> use "GitLab MR" flow below
++-- No link provided -- repo name only    -> use "Local GitHub/GitLab repo" flow below
 ```
 
 ---
 
 ### GitHub PR (github.com URL or PR reference)
 
-- Parse the input to extract fields — do NOT attempt a web fetch unless fields cannot be determined from the input.
+- Parse the input to extract fields -- do NOT attempt a web fetch unless fields cannot be determined from the input.
 - `repository` (required): `owner/repo` from the PR URL
 - At least one of the following is required: `headSha` (commit SHA), `headBranch` (branch name), `prNumber` (PR number as a **string**, e.g. `"8"` not `8`)
 - `hostname`: Extract from the URL (e.g., `github.com` or a self-hosted hostname)
@@ -65,7 +65,7 @@ Has the user provided a pull request/merge request link or ID?
 
 ### GitLab MR (gitlab.com URL)
 
-- Parse the input to extract fields — do NOT attempt a web fetch unless fields cannot be determined from the input.
+- Parse the input to extract fields -- do NOT attempt a web fetch unless fields cannot be determined from the input.
 - `repository` (required): `owner/repo` from the MR URL
 - At least one of the following is required: `headSha` (commit SHA), `headBranch` (branch name), `mergeRequestIid` (MR number as a **string**, e.g. `"1"` not `1`)
 - `hostname`: Extract from the URL (e.g., `gitlab.com` or a self-hosted hostname)
@@ -91,9 +91,9 @@ Has the user provided a pull request/merge request link or ID?
 
 ---
 
-### Local GitHub/GitLab repo (no PR/MR URL provided — local workspace ONLY)
+### Local GitHub/GitLab repo (no PR/MR URL provided -- local workspace ONLY)
 
-**MANDATORY**: When the user references a repository or branch without a PR/MR link, you MUST execute every step below in order. Do NOT shortcut by grabbing the remote URL and SHA directly — the review agent needs a pushed branch to read from. Skipping the push step will cause the analysis to fail or produce incomplete results.
+**MANDATORY**: When the user references a repository or branch without a PR/MR link, you MUST execute every step below in order. Do NOT shortcut by grabbing the remote URL and SHA directly -- the review agent needs a pushed branch to read from. Skipping the push step will cause the analysis to fail or produce incomplete results.
 
 1. **Navigate to the repository directory**: `cd` to the repo root (e.g., the clone directory). Ask the user if needed.
 2. **Determine the base branch**: Use `main` unless the user specifies a different branch. Verify the remote tracking branch exists:
@@ -138,7 +138,7 @@ Has the user provided a pull request/merge request link or ID?
    git checkout -b $BRANCH_NAME 2>/dev/null || { BRANCH_NAME="feat/release-readiness-review-$(date +%Y%m%d-%H%M%S)"; git checkout -b $BRANCH_NAME; }
    ```
 
-6. **Apply stashed changes and commit on the review branch** (skip this step if working directory was clean — go straight to step 7):
+6. **Apply stashed changes and commit on the review branch** (skip this step if working directory was clean -- go straight to step 7):
 
    ```bash
    git stash apply
@@ -175,8 +175,8 @@ Has the user provided a pull request/merge request link or ID?
    ```
 
 8. **Determine the repository identifier and hostname**: Run `git remote get-url origin | sed 's|://[^@]*@|://|'` to extract the `owner/repo` and hostname.
-   - GitHub URLs (github.com or self-hosted) → use `githubPrContent`, hostname from URL
-   - GitLab URLs (gitlab.com or self-hosted) → use `gitlabMrContent`, hostname from URL
+   - GitHub URLs (github.com or self-hosted) -> use `githubPrContent`, hostname from URL
+   - GitLab URLs (gitlab.com or self-hosted) -> use `gitlabMrContent`, hostname from URL
 
 9. **Build the content**: Set `headBranch` to `$BRANCH_NAME`, `repository` to the extracted `owner/repo`, and `hostname` to the value from step 8. Wrap the object in an array:
    - GitHub: `{"githubPrContent": [{"repository": "owner/repo", "headBranch": "feat/release-readiness-review", "hostname": "github.com"}]}`
@@ -197,11 +197,11 @@ Has the user provided a pull request/merge request link or ID?
     git stash pop
     ```
 
-**Important**: Do NOT create a PR/MR — only push the branch. The release readiness review agent will read the branch directly.
+**Important**: Do NOT create a PR/MR -- only push the branch. The release readiness review agent will read the branch directly.
 
 ## Core workflow
 
-> **STRICT SEQUENCING**: Steps below are numbered. You MUST complete each step before moving to the next. In particular, step 1 (automated testing prompt) MUST NOT happen until the entire "Gathering execution parameters" flow above is fully complete — all git operations done, branch pushed (if local flow), content object built, and user informed of the branch. Only THEN proceed to step 1.
+> **STRICT SEQUENCING**: Steps below are numbered. You MUST complete each step before moving to the next. In particular, step 1 (automated testing prompt) MUST NOT happen until the entire "Gathering execution parameters" flow above is fully complete -- all git operations done, branch pushed (if local flow), content object built, and user informed of the branch. Only THEN proceed to step 1.
 
 ### 1. Determine `skip_automated_testing` (ask ONLY after content is ready)
 
@@ -209,21 +209,21 @@ The `skip_automated_testing` parameter controls whether the agent runs automated
 
 | Value | Behavior |
 |-------|----------|
-| `true` | Skip automated testing, run static analysis only (fast — code review, risk assessment, dependency checks) |
-| `false` | Full analysis including automated testing (longer — spins up a testing environment, builds code, runs automated verification tests) |
+| `true` | Skip automated testing, run static analysis only (fast -- code review, risk assessment, dependency checks) |
+| `false` | Full analysis including automated testing (longer -- spins up a testing environment, builds code, runs automated verification tests) |
 
 Present the choice and wait for a response:
-> "Would you like a quick static analysis (code review, risk assessment, dependency checks), or a full analysis that also includes automated testing? Automated testing spins up a testing environment, builds your code, and runs automated verification tests — it's more thorough but takes longer."
+> "Would you like a quick static analysis (code review, risk assessment, dependency checks), or a full analysis that also includes automated testing? Automated testing spins up a testing environment, builds your code, and runs automated verification tests -- it's more thorough but takes longer."
 
 **Do NOT proceed until the user answers.**
 
-- If the user says "yes" / "include testing" / "full analysis" / "run tests" → use `skip_automated_testing=false`
-- If the user says "no" / "static only" / "skip testing" / "quick" / declines → use `skip_automated_testing=true`
-- If the response is ambiguous (e.g., "go ahead", "sure", "proceed") → ask the user to clarify which option they prefer.
+- If the user says "yes" / "include testing" / "full analysis" / "run tests" -> use `skip_automated_testing=false`
+- If the user says "no" / "static only" / "skip testing" / "quick" / declines -> use `skip_automated_testing=true`
+- If the response is ambiguous (e.g., "go ahead", "sure", "proceed") -> ask the user to clarify which option they prefer.
 
 ### 2. Check tool availability
 
-Verify that the following tools are available: `aws_devops_agent__create_release_readiness_review`, `aws_devops_agent__get_task`, `aws_devops_agent__list_journal_records`, `aws_devops_agent__get_release_readiness_report`. These tools are NOT deferred/lazy-loaded — if they do not appear in your tool list, they are unavailable. Do NOT search for them via ToolSearch. If any are missing, skip the remaining steps in this section and use the "Fallback (aws-mcp)" path below instead. Tell the user: "Remote server unavailable — using direct aws-mcp server fallback."
+Verify that the following tools are available: `aws_devops_agent__create_release_readiness_review`, `aws_devops_agent__get_task`, `aws_devops_agent__list_journal_records`, `aws_devops_agent__get_release_readiness_report`. These tools are NOT deferred/lazy-loaded -- if they do not appear in your tool list, they are unavailable. Do NOT search for them via ToolSearch. If any are missing, skip the remaining steps in this section and use the "Fallback (aws-mcp)" path below instead. Tell the user: "Remote server unavailable -- using direct aws-mcp server fallback."
 
 ### 3. Start the Job
 
@@ -232,7 +232,7 @@ aws_devops_agent__create_release_readiness_review(
     content={...},
     skip_automated_testing=true/false
 )
-→ {"taskId": "...", "executionId": "...", "status": "started"}
+-> {"taskId": "...", "executionId": "...", "status": "started"}
 ```
 
 Record the **taskId** and **executionId** from the response.
@@ -249,7 +249,7 @@ Once `IN_PROGRESS`, poll for progress in a loop:
 2. Present each record to the user with a friendly progress update.
 3. Use `next_token` from the response to fetch only new records on subsequent polls.
 4. **Wait 15 seconds** between each poll iteration.
-5. Check `aws_devops_agent__get_task(task_id=TASK_ID)` periodically — stop when terminal status.
+5. Check `aws_devops_agent__get_task(task_id=TASK_ID)` periodically -- stop when terminal status.
 
 ### 6. Present Results
 
@@ -264,11 +264,11 @@ Once the job reaches a terminal status:
      ```
 
   3. Inform the user that the report was saved, including the file path.
-  4. **Auto-fix flow (MANDATORY)**: After saving the report, you MUST attempt to generate and present fixes for all actionable risks — this is the primary value of the review workflow, not an optional step.
+  4. **Auto-fix flow (MANDATORY)**: After saving the report, you MUST attempt to generate and present fixes for all actionable risks -- this is the primary value of the review workflow, not an optional step.
      - First, locate the analyzed repository in the current workspace:
        1. Run `ls` to list available directories in the workspace.
-       2. Match by repo name (the last segment of `owner/repo` or `namespace/repo`). For example, `testgroupadthiru/repo1updated` → look for a directory named `repo1updated`.
-       3. If a single match is found, confirm with the user: "I found `<match>` — is this the correct local copy of `<namespace/repo>`?"
+       2. Match by repo name (the last segment of `owner/repo` or `namespace/repo`). For example, `testgroupadthiru/repo1updated` -> look for a directory named `repo1updated`.
+       3. If a single match is found, confirm with the user: "I found `<match>` -- is this the correct local copy of `<namespace/repo>`?"
        4. If multiple matches are found, ask the user which one is correct.
        5. If no obvious match exists, ask the user: "I couldn't find a local directory matching `<repo-name>`. Is it available locally under a different name, or should I just show the suggested fixes?"
      - If **found locally**:
@@ -306,16 +306,16 @@ aws_devops_agent__cancel_release_readiness_review(task_id=TASK_ID)
 
 ## Error handling
 
-1. If `FAILED` or `TIMED_OUT` — stop and present the error. If the job failed quickly (within the first poll or two), call `aws_devops_agent__list_associations()` to check whether the target repository's hosting service (GitHub/GitLab hostname) is associated with the agent space.
-2. If job does not reach `IN_PROGRESS` within 5 minutes — cancel with `cancel_release_readiness_review`.
-3. If throttled (`429` or `ThrottlingException`) — wait 30 seconds, retry up to 3 times.
+1. If `FAILED` or `TIMED_OUT` -- stop and present the error. If the job failed quickly (within the first poll or two), call `aws_devops_agent__list_associations()` to check whether the target repository's hosting service (GitHub/GitLab hostname) is associated with the agent space.
+2. If job does not reach `IN_PROGRESS` within 5 minutes -- cancel with `cancel_release_readiness_review`.
+3. If throttled (`429` or `ThrottlingException`) -- wait 30 seconds, retry up to 3 times.
 4. If the error does not match any known pattern above, present the raw error output to the user.
 
 ## Fallback (aws-mcp)
 
 If the `aws-devops-agent` remote server is unavailable, use the AWS CLI directly:
 
-Tell the user: "Remote server unavailable — using the aws-mcp server fallback."
+Tell the user: "Remote server unavailable -- using the aws-mcp server fallback."
 
 ### 1. Select Agent Space
 
@@ -339,7 +339,7 @@ aws devops-agent create-backlog-task \
   --region us-east-1
 ```
 
-> **CRITICAL:** The `content` value must be a single object — NOT wrapped in a list. Correct: `"content": {"githubPrContent": [...]}`. Incorrect: `"content": [{"githubPrContent": [...]}]`. Wrapping in a list causes a Pydantic validation failure on the backend. The values in the content should all be of string format e.g. the PR number should be a string.
+> **CRITICAL:** The `content` value must be a single object -- NOT wrapped in a list. Correct: `"content": {"githubPrContent": [...]}`. Incorrect: `"content": [{"githubPrContent": [...]}]`. Wrapping in a list causes a Pydantic validation failure on the backend. The values in the content should all be of string format e.g. the PR number should be a string.
 
 Default is `"skipAutomatedTesting": true` (static only). Set to `false` only if user explicitly opted into automated testing.
 
@@ -369,7 +369,7 @@ aws devops-agent list-journal-records \
 1. Present each record to the user with a friendly progress update.
 2. Use `next_token` from the response to fetch only new records on subsequent polls.
 3. **Wait 15 seconds** between each poll iteration.
-4. Check `get-backlog-task` periodically — stop when terminal status.
+4. Check `get-backlog-task` periodically -- stop when terminal status.
 
 ### 5. Present Results
 
@@ -394,7 +394,7 @@ Once the job reaches a terminal status:
      ```
 
   3. Inform the user that the report was saved, including the file path.
-  4. **Auto-fix flow (MANDATORY)**: After saving the report, you MUST attempt to generate and present fixes for all actionable risks — this is the primary value of the review workflow, not an optional step. Follow the same auto-fix flow described in the Core workflow section above (locate repo, verify branch, generate fixes, push to `feat/release-readiness-fix`).
+  4. **Auto-fix flow (MANDATORY)**: After saving the report, you MUST attempt to generate and present fixes for all actionable risks -- this is the primary value of the review workflow, not an optional step. Follow the same auto-fix flow described in the Core workflow section above (locate repo, verify branch, generate fixes, push to `feat/release-readiness-fix`).
 - If `FAILED` or `TIMED_OUT`: Present the error information and suggest next steps.
 - If `CANCELED`: Inform the user the job was canceled and no report is available.
 

@@ -1139,7 +1139,7 @@ resource "aws_lambda_layer_version" "deps" {
 }
 
 # ---------------------------------------------------------------------------
-# functions — one per manifest entry
+# functions -- one per manifest entry
 # ---------------------------------------------------------------------------
 
 module "function" {

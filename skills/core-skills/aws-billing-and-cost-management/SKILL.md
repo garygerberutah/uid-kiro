@@ -16,7 +16,7 @@ metadata:
 
 ## Overview
 
-Analyze, optimize, and manage AWS costs. This skill encodes domain expertise from AWS's cost management products — gotchas, correct API usage patterns, and optimization workflows that models frequently get wrong.
+Analyze, optimize, and manage AWS costs. This skill encodes domain expertise from AWS's cost management products -- gotchas, correct API usage patterns, and optimization workflows that models frequently get wrong.
 
 ## Usage
 
@@ -34,13 +34,13 @@ Use this skill when:
 
 ## Core Concepts
 
-- **Cost Explorer** — query cost/usage data by service, account, tag, or time range
-- **Budgets** — set spending thresholds with alerts; supports billing view scoping
-- **Billing Views** — scope cost data to a subset of billing (custom view, billing group, or primary)
-- **Compute Optimizer** — right-sizing recommendations for EC2, Lambda, EBS, RDS
-- **Cost Optimization Hub** — aggregated savings recommendations across services
-- **Savings Plans / Reserved Instances** — commitment-based discounts
-- **CUR 2.0** — detailed line-item billing data queryable via Athena
+- **Cost Explorer** -- query cost/usage data by service, account, tag, or time range
+- **Budgets** -- set spending thresholds with alerts; supports billing view scoping
+- **Billing Views** -- scope cost data to a subset of billing (custom view, billing group, or primary)
+- **Compute Optimizer** -- right-sizing recommendations for EC2, Lambda, EBS, RDS
+- **Cost Optimization Hub** -- aggregated savings recommendations across services
+- **Savings Plans / Reserved Instances** -- commitment-based discounts
+- **CUR 2.0** -- detailed line-item billing data queryable via Athena
 
 **Recommended setup:** Use the AWS MCP server for sandboxed execution, audit logging, and enterprise controls. See: https://docs.aws.amazon.com/aws-mcp/
 
@@ -48,7 +48,7 @@ Use this skill when:
 
 ## Critical Rule: Always Check the Current Date
 
-**Before making ANY Cost Explorer, Budgets, or Savings Plans API call, you MUST determine the current date.** Use a tool to get the current date and time — do NOT assume or guess the year. LLMs frequently default to dates from their training data instead of the actual current date, producing analyses of stale data that appear correct but are completely wrong.
+**Before making ANY Cost Explorer, Budgets, or Savings Plans API call, you MUST determine the current date.** Use a tool to get the current date and time -- do NOT assume or guess the year. LLMs frequently default to dates from their training data instead of the actual current date, producing analyses of stale data that appear correct but are completely wrong.
 
 ## Critical Rule: Deterministic Calculations
 
@@ -91,7 +91,7 @@ aws ce get-cost-and-usage \
 Default to `UnblendedCost`. Exclude Credits/Refunds with `--filter '{"Not":{"Dimensions":{"Key":"RECORD_TYPE","Values":["Credit","Refund"]}}}'`. End date is exclusive.
 
 ### Run a cost audit
-Read `references/cost-audit.md` for the full 7-step workflow: top cost drivers → month-over-month comparison → optimization recommendations → idle resources → commitment coverage → per-service quick wins → report.
+Read `references/cost-audit.md` for the full 7-step workflow: top cost drivers -> month-over-month comparison -> optimization recommendations -> idle resources -> commitment coverage -> per-service quick wins -> report.
 
 ### Get right-sizing recommendations
 Compute Optimizer requires opt-in first: `aws compute-optimizer update-enrollment-status --status Active`. Then read `references/ec2-rightsizing.md` for EC2 or the relevant resource-specific reference.
@@ -159,7 +159,7 @@ aws budgets create-budget --account-id ACCOUNT_ID \
 | `AccessDeniedException` on hourly data | Hourly granularity not enabled | Enable in Cost Explorer preferences |
 | `Account not registered` on Compute Optimizer | Not opted in | Run `update-enrollment-status --status Active` |
 | Budgets API fails outside us-east-1 | Budgets requires us-east-1 | Set `--region us-east-1` |
-| Cost Explorer `Total` empty with GroupBy | By design — totals excluded when grouping | Make separate call without GroupBy, or sum grouped results using a script |
+| Cost Explorer `Total` empty with GroupBy | By design -- totals excluded when grouping | Make separate call without GroupBy, or sum grouped results using a script |
 | `AccessDeniedException` on `list-billing-views` | Missing permission | User needs `billing:ListBillingViews` permissions |
 | `ValidationException` with `--billing-view-arn` | API doesn't support billing views, or malformed ARN | Check the API support table above; ARN format is `arn:aws:billing::ACCOUNT_ID:billingview/VIEW_ID` |
 | Budget shows `UNHEALTHY` health status | Billing view access revoked or view deleted | Check `HealthStatus.StatusReason` in `describe-budget` output; ensure `billing:GetBillingViewData` is granted |

@@ -27,9 +27,9 @@ This skill works from both standalone accounts and delegated administrator accou
    aws securityhub get-finding-statistics-v2 --group-by-rules '[{"GroupByField":"severity"}]'
    ```
 
-   Valid GroupByField values (examples — see [API reference](https://docs.aws.amazon.com/securityhub/latest/userguide/llms.txt) for the current set): `severity`, `status`, `resources.type`, `cloud.account.uid`, `cloud.region`, `metadata.product.name`, `finding_info.types`, `class_name`
+   Valid GroupByField values (examples -- see [API reference](https://docs.aws.amazon.com/securityhub/latest/userguide/llms.txt) for the current set): `severity`, `status`, `resources.type`, `cloud.account.uid`, `cloud.region`, `metadata.product.name`, `finding_info.types`, `class_name`
 
-2. Query for Exposure findings (cross-service resource exposure — prioritize these first):
+2. Query for Exposure findings (cross-service resource exposure -- prioritize these first):
 
    ```bash
    aws securityhub get-finding-statistics-v2 --group-by-rules '[{"GroupByField":"class_name"}]'
@@ -69,7 +69,7 @@ This skill works from both standalone accounts and delegated administrator accou
    aws securityhub get-resources-statistics-v2 --group-by-rules '[{"GroupByField":"ResourceType"}]'
    ```
 
-   Valid GroupByField values (examples — see [API reference](https://docs.aws.amazon.com/securityhub/latest/userguide/llms.txt) for the current set): `AccountId`, `Region`, `ResourceType`, `ResourceCategory`
+   Valid GroupByField values (examples -- see [API reference](https://docs.aws.amazon.com/securityhub/latest/userguide/llms.txt) for the current set): `AccountId`, `Region`, `ResourceType`, `ResourceCategory`
 
 7. Get resource trends:
 
@@ -130,7 +130,7 @@ This skill works from both standalone accounts and delegated administrator accou
 - MUST prioritize critical and high severity findings
 - SHOULD include finding count per category
 - SHOULD use get-findings-trends-v2 to show posture improvement/degradation
-- V2 filters use OCSF field paths — check API reference for filter syntax
+- V2 filters use OCSF field paths -- check API reference for filter syntax
 - MUST run from delegated admin for cross-account visibility (Workflow B)
 
 ## Troubleshooting

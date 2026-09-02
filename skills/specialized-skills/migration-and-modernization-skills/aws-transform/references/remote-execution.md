@@ -1,7 +1,7 @@
 # Remote Execution
 
 Deploy and manage AWS Batch/Fargate infrastructure for ATX transformations at scale.
-All Lambda calls are executed by you — users never interact with Lambdas directly.
+All Lambda calls are executed by you -- users never interact with Lambdas directly.
 
 Remote mode deploys to the user's own AWS account. Key resources:
 
@@ -9,7 +9,7 @@ Remote mode deploys to the user's own AWS account. Key resources:
 - Source code uploaded to S3 (`atx-source-code-{accountId}`) with 7-day lifecycle
 - CloudWatch dashboard: `ATX-Transform-CLI-Dashboard` for monitoring jobs
 - 8 Lambda functions for job management (trigger, status, terminate, list)
-- AWS Batch/Fargate for container execution — costs nothing when idle
+- AWS Batch/Fargate for container execution -- costs nothing when idle
 - To find the account: `aws sts get-caller-identity --query Account --output text`
 
 ## Infrastructure Check
@@ -42,7 +42,7 @@ Do NOT deploy until user confirms.
 The infrastructure supports two container modes:
 
 **Pre-built image (default):** A public ECR image with Java (8, 11, 17, 21, 25),
-Python (3.8–3.14), Node.js (16–24), Maven, Gradle, and common build tools.
+Python (3.8-3.14), Node.js (16-24), Maven, Gradle, and common build tools.
 No Docker required on the user's machine. Use this when the pre-built image
 has everything the transformation needs (source runtime, target runtime, build
 tools, and any other dependencies).
@@ -53,7 +53,7 @@ customize the Dockerfile, and build locally. This requires Docker on the user's
 machine.
 
 You determine which mode to use during Step 6 (Verify Runtime Compatibility)
-in SKILL.md. Do NOT ask the user to choose — you decide automatically based
+in SKILL.md. Do NOT ask the user to choose -- you decide automatically based
 on whether the pre-built image has everything needed for the transformation.
 
 ### Pre-built Image Runtimes
@@ -71,7 +71,7 @@ If the transformation target is in this list, use the pre-built image path.
 
 ### Pre-built Image Path (No Docker Required)
 
-Clone and run setup — Docker is NOT required:
+Clone and run setup -- Docker is NOT required:
 
 ```bash
 ATX_INFRA_DIR="$HOME/.aws/atx/custom/remote-infra"
@@ -127,7 +127,7 @@ This path requires Docker installed and running. First deploy takes ~5-10 minute
 ### Deployment Failures
 
 If `setup.sh` fails, it prints the specific prerequisite that's missing. Fix that
-one thing and re-run — the script is idempotent.
+one thing and re-run -- the script is idempotent.
 
 If deployment fails partway through (e.g., CloudFormation stack stuck in
 `ROLLBACK_COMPLETE` or `UPDATE_ROLLBACK_FAILED`), run teardown first, then retry:
@@ -150,8 +150,8 @@ cd "$ATX_INFRA_DIR" && npx ts-node generate-caller-policy.ts
 
 This produces two JSON files in `$ATX_INFRA_DIR`:
 
-- `atx-runtime-policy.json` — Day-to-day operations (Lambda invoke, S3, KMS, Secrets Manager, logs)
-- `atx-deployment-policy.json` — One-time CDK deploy/destroy (CloudFormation, ECR, IAM, Batch, VPC)
+- `atx-runtime-policy.json` -- Day-to-day operations (Lambda invoke, S3, KMS, Secrets Manager, logs)
+- `atx-deployment-policy.json` -- One-time CDK deploy/destroy (CloudFormation, ECR, IAM, Batch, VPC)
 
 Attach the runtime policy to the caller:
 
@@ -193,7 +193,7 @@ aws lambda invoke --function-name atx-list-jobs --payload '{}' \
 ```
 
 If this succeeds, the runtime policy is active. If not, the attachment hasn't
-taken effect yet — wait a few seconds and retry.
+taken effect yet -- wait a few seconds and retry.
 
 If the caller also needs to deploy/destroy infrastructure (not just run jobs),
 repeat the above with `atx-deployment-policy.json` and policy name `ATXDeploymentPolicy`.
@@ -202,14 +202,14 @@ repeat the above with `atx-deployment-policy.json` and policy name `ATXDeploymen
 
 After deployment, the Lambda functions are available with these names:
 
-- `atx-trigger-job` — Submit a single transformation job
-- `atx-get-job-status` — Get status of a single job
-- `atx-terminate-job` — Terminate a running job
-- `atx-list-jobs` — List all jobs
-- `atx-trigger-batch-jobs` — Submit a batch of jobs
-- `atx-get-batch-status` — Get batch status
-- `atx-terminate-batch-jobs` — Terminate all jobs in a batch
-- `atx-list-batches` — List all batches
+- `atx-trigger-job` -- Submit a single transformation job
+- `atx-get-job-status` -- Get status of a single job
+- `atx-terminate-job` -- Terminate a running job
+- `atx-list-jobs` -- List all jobs
+- `atx-trigger-batch-jobs` -- Submit a batch of jobs
+- `atx-get-batch-status` -- Get batch status
+- `atx-terminate-batch-jobs` -- Terminate all jobs in a batch
+- `atx-list-batches` -- List all batches
 
 ## MCP Configuration (Optional)
 
@@ -229,7 +229,7 @@ aws lambda invoke --function-name atx-trigger-job \
   --cli-binary-format raw-in-base64-out /dev/stdout
 ```
 
-The MCP config travels with the job request — do NOT upload it separately via
+The MCP config travels with the job request -- do NOT upload it separately via
 `atx-configure-mcp`. Skip this step if no local MCP config exists.
 
 ## Job Submission
@@ -237,7 +237,7 @@ The MCP config travels with the job request — do NOT upload it separately via
 **Limits:** Maximum 512 repositories per session. Submit in batches of up to 128
 jobs each via `atx-trigger-batch-jobs`. If you have more than 128 jobs, split them
 into multiple Lambda calls (e.g., 500 repos = 4 calls of 128 + 128 + 128 + 116).
-Each call returns its own `batchId` — track all of them for monitoring. AWS Batch
+Each call returns its own `batchId` -- track all of them for monitoring. AWS Batch
 runs all jobs in a batch concurrently. If the total repo count exceeds 512, stop
 and ask the user to reduce the list.
 
@@ -274,12 +274,12 @@ aws lambda invoke --function-name atx-trigger-batch-jobs \
 ## SSH URL Handling
 
 SSH git URLs (`git@github.com:org/repo.git` or `ssh://git@github.com/org/repo.git`)
-are passed directly to the Lambda — the container clones them remotely. This requires
+are passed directly to the Lambda -- the container clones them remotely. This requires
 an SSH private key stored in Secrets Manager as `atx/ssh-key`. See Step 1 in SKILL.md
 for setup instructions.
 
 If the SSH key is not configured, the clone will fail inside the container. Do NOT
-fall back to cloning locally — guide the user through SSH key setup instead.
+fall back to cloning locally -- guide the user through SSH key setup instead.
 
 ## Polling
 
@@ -302,8 +302,8 @@ Do NOT download results locally. Results stay in S3. Present the S3 path to the 
 
 ```
 Results: s3://atx-custom-output-{account-id}/transformations/<job-name>/<conversation-id>/
-  code.zip  — zipped transformed source code
-  logs.zip  — ATX conversation logs
+  code.zip  -- zipped transformed source code
+  logs.zip  -- ATX conversation logs
 ```
 
 If the user explicitly asks to download, provide the command but let them run it:
@@ -320,26 +320,26 @@ mechanism for reference.
 
 The container fetches credentials from AWS Secrets Manager at startup. Three secret types:
 
-**`atx/github-token`** — plain string GitHub PAT for private HTTPS repo cloning:
+**`atx/github-token`** -- plain string GitHub PAT for private HTTPS repo cloning:
 
 ```bash
 aws secretsmanager create-secret --name "atx/github-token" --secret-string "<token>"
 ```
 
-**`atx/ssh-key`** — plain string SSH private key for private SSH repo cloning:
+**`atx/ssh-key`** -- plain string SSH private key for private SSH repo cloning:
 
 ```bash
 aws secretsmanager create-secret --name "atx/ssh-key" --secret-string "$(cat <path-to-your-private-key>)"
 ```
 
-**`atx/credentials`** — JSON array of credential files for any tool/registry (see Container Customization below).
+**`atx/credentials`** -- JSON array of credential files for any tool/registry (see Container Customization below).
 
 Setup (requires user consent):
 
 1. Explain which secrets will be created in their AWS account
 2. Get explicit confirmation and credentials from the user
 3. Create the secret(s)
-4. Container entrypoint auto-fetches at startup — no image rebuild needed
+4. Container entrypoint auto-fetches at startup -- no image rebuild needed
 5. User can delete anytime: `aws secretsmanager delete-secret --secret-id "atx/github-token" --region "$REGION" --force-delete-without-recovery`
 
 AWS credentials for ATX CLI are handled automatically by the IAM task role (refreshed every 45 min).
@@ -364,13 +364,13 @@ Include this link in the final output when remote execution completes.
 
 ## Container Customization
 
-The default container includes Java (8, 11, 17, 21, 25), Python (3.8–3.14), Node.js
-(16–24), Maven, Gradle, gcc/g++, make, and common build tools.
+The default container includes Java (8, 11, 17, 21, 25), Python (3.8-3.14), Node.js
+(16-24), Maven, Gradle, gcc/g++, make, and common build tools.
 
 If a transformation requires a language or tool not included, you handle this
-automatically during Step 6 (Verify Container Compatibility) — see SKILL.md. The
+automatically during Step 6 (Verify Container Compatibility) -- see SKILL.md. The
 Dockerfile has a clearly marked `CUSTOM LANGUAGES AND TOOLS` section where new
-`RUN` commands should be inserted. After editing, redeploy with `cd "$ATX_INFRA_DIR" && ./setup.sh` — CDK
+`RUN` commands should be inserted. After editing, redeploy with `cd "$ATX_INFRA_DIR" && ./setup.sh` -- CDK
 auto-detects Dockerfile changes and rebuilds the image.
 
 ### Adding Languages or Tools
@@ -385,11 +385,11 @@ ENV PATH="/home/atxuser/.cargo/bin:$PATH"
 
 ### Private Package Registries
 
-Credentials are fetched from AWS Secrets Manager at container startup — never baked into the image.
+Credentials are fetched from AWS Secrets Manager at container startup -- never baked into the image.
 
-**`atx/github-token`** (plain string) — GitHub PAT for private repo cloning.
+**`atx/github-token`** (plain string) -- GitHub PAT for private repo cloning.
 
-**`atx/credentials`** (JSON array) — Generic credential files for any tool or registry. Each entry writes a file into the container at startup:
+**`atx/credentials`** (JSON array) -- Generic credential files for any tool or registry. Each entry writes a file into the container at startup:
 
 ```json
 [
@@ -409,13 +409,13 @@ aws secretsmanager create-secret --name "atx/credentials" \
   --secret-string '[{"path":"/home/atxuser/.npmrc","content":"//npm.company.com/:_authToken=TOKEN"}]'
 ```
 
-This works for any language or tool added to the Dockerfile — npm, Maven, pip, RubyGems, Cargo, NuGet, etc. The `mode` field is optional (defaults to `0644`).
+This works for any language or tool added to the Dockerfile -- npm, Maven, pip, RubyGems, Cargo, NuGet, etc. The `mode` field is optional (defaults to `0644`).
 
 ### Version Switching at Runtime
 
 The container supports runtime version switching via environment variables passed as container overrides.
 The `environment` field on the job MUST match the exact target version of the
-transformation — not the closest available version. For example, if upgrading to
+transformation -- not the closest available version. For example, if upgrading to
 Java 23, set `"JAVA_VERSION":"23"` (not `"21"`). If the target version was added
 to the Dockerfile and entrypoint per Step 6, the switcher will activate it.
 
@@ -440,7 +440,7 @@ aws batch submit-job \
   }' ...
 ```
 
-Available: Java 8/11/17/21/25, Python 3.8–3.14, Node.js 16/18/20/22/24.
+Available: Java 8/11/17/21/25, Python 3.8-3.14, Node.js 16/18/20/22/24.
 Python accepts both short (`13`) and full (`3.13`) formats.
 
 See `$ATX_INFRA_DIR/container/README.md` for full customization reference including Docker BuildKit secrets for secure credential handling.
@@ -450,19 +450,19 @@ See `$ATX_INFRA_DIR/container/README.md` for full customization reference includ
 Do NOT quote specific prices or cost estimates to the user. If the user asks about
 pricing, direct them to: https://aws.amazon.com/transform/pricing/
 
-The remote infrastructure (Batch, Lambda, S3) has no fixed costs — all services are
+The remote infrastructure (Batch, Lambda, S3) has no fixed costs -- all services are
 pay-per-use and cost nothing when idle.
 
 ## Cleanup
 
-The remote infrastructure costs nothing when idle — Fargate is pay-per-task,
+The remote infrastructure costs nothing when idle -- Fargate is pay-per-task,
 Lambdas are pay-per-invoke, and S3 storage is minimal.
 
 After every remote execution completes (all jobs finished or failed), prompt the
 user with the following:
 
 > Your remote infrastructure is still deployed in your AWS account. All services
-> are pay-per-use only — there are no fixed costs when idle. You can leave it in
+> are pay-per-use only -- there are no fixed costs when idle. You can leave it in
 > place for future transformations, or tear it down now.
 >
 > For pricing details: https://aws.amazon.com/transform/pricing/
@@ -471,7 +471,7 @@ user with the following:
 >
 > - All ATX resources are completely removed from your account
 > - KMS key deletion is scheduled (7-day AWS minimum wait)
-> - S3 buckets, secrets, IAM policies, log groups — all deleted
+> - S3 buckets, secrets, IAM policies, log groups -- all deleted
 > - You'll need to re-run setup (~5-10 min) next time you use remote mode
 >
 > Would you like to keep the infrastructure or tear it down?

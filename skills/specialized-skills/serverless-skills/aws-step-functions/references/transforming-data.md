@@ -13,7 +13,7 @@ JSONata expressions are written inside `{% %}` delimiters in string values:
 Rules:
 
 - The string must start with `{%` (no leading spaces) and end with `%}` (no trailing spaces).
-- Not all fields accept JSONata — `Type` and `Resource` must be constant strings.
+- Not all fields accept JSONata -- `Type` and `Resource` must be constant strings.
 - JSONata expressions can appear in string values within objects and arrays at any nesting depth.
 - A string without `{% %}` is treated as a literal value.
 - All string literals inside JSONata expressions must use single quotes (`'text'`), not double quotes. The expression is already inside a JSON double-quoted string, so double quotes would break the JSON.
@@ -33,8 +33,8 @@ Rules:
 Never use double quotes inside the expression:
 
 ```
-❌  "Output": "{% "Hello" %}"
-✓  "Output": "{% 'Hello' %}"
+[NO]  "Output": "{% "Hello" %}"
+[OK]  "Output": "{% 'Hello' %}"
 ```
 
 ### Local Variable Binding with `:=`
@@ -203,6 +203,6 @@ Useful for sorting timestamps, calculating durations, or finding the most recent
 | `$partition(array, size)` | Partition array into chunks |
 | `$range(start, end, step)` | Generate array of values |
 | `$hash(data, algorithm)` | Calculate hash (MD5, SHA-1, SHA-256, SHA-384, SHA-512) |
-| `$random([seed])` | Random number 0 ≤ n < 1, optional seed |
+| `$random([seed])` | Random number 0 <= n < 1, optional seed |
 | `$uuid()` | Generate v4 UUID |
 | `$parse(jsonString)` | Deserialize JSON string |

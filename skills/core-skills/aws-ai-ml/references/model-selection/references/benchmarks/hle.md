@@ -5,7 +5,7 @@
 **Use this for:** Differentiating the most capable frontier models. Less useful for mid-range comparisons.
 
 **Source:** Artificial Analysis (artificialanalysis.ai).
-"—" = no data — infer from similar models in the same family, but tell the user you're inferring.
+"--" = no data -- infer from similar models in the same family, but tell the user you're inferring.
 
 |   # | Model                                  | Family      | Score |
 |-----|----------------------------------------|-------------|-------|
@@ -39,6 +39,6 @@
 |  28 | Qwen2.5 32B Instruct                   | Qwen        |  3.8% |
 |  29 | Nova Pro                               | Amazon Nova |  3.4% |
 |  30 | DeepSeek R1 Distill Qwen 1.5B          | DeepSeek    |  3.3% |
-|   — | Qwen2.5 14B Instruct                   | Qwen        |     — |
-|   — | Qwen2.5 7B Instruct                    | Qwen        |     — |
-|   — | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     — |
+|   -- | Qwen2.5 14B Instruct                   | Qwen        |     -- |
+|   -- | Qwen2.5 7B Instruct                    | Qwen        |     -- |
+|   -- | DeepSeek R1 Distill Qwen 7B            | DeepSeek    |     -- |

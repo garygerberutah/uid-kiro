@@ -50,7 +50,7 @@ Every individual occurrence of a conversion issue, with exact location.
 
 ### 3. Action Items Summary CSV (`<target>_Action_Items_Summary.csv`)
 
-Aggregated view — one row per unique action item type per schema.
+Aggregated view -- one row per unique action item type per schema.
 
 | Column | Description |
 |--------|-------------|
@@ -68,9 +68,9 @@ Aggregated view — one row per unique action item type per schema.
 
 When the customer asks to review or work through action items:
 
-1. **Start from the Summary CSV** to understand scope — how many objects need attention and at what complexity level.
+1. **Start from the Summary CSV** to understand scope -- how many objects need attention and at what complexity level.
 
-2. **Use the Action Items Summary CSV** to prioritize — focus on items with highest occurrence count or highest complexity first.
+2. **Use the Action Items Summary CSV** to prioritize -- focus on items with highest occurrence count or highest complexity first.
 
 3. **Use the Detailed CSV** to locate each specific object in the metadata tree by its `Occurrence` path.
 
@@ -80,7 +80,7 @@ When the customer asks to review or work through action items:
 
 When the customer asks to fix Action Items (e.g., "fix the action items", "help me resolve these"):
 
-### Step 1 — Verify existing conversion
+### Step 1 -- Verify existing conversion
 
 Before proposing any fixes, confirm the object has already been converted by checking for existing TARGET DDL. Use the object's `Occurrence` path from the Detailed CSV to build `explicit` selection rules targeting that specific object: [Selection rules in DMS Schema Conversion](https://docs.aws.amazon.com/dms/latest/userguide/sc-selection-rules.html)
 
@@ -93,10 +93,10 @@ aws dms describe-metadata-model \
   --selection-rules '<target_selection_rules_from_above>'
 ```
 
-- **If TARGET DDL exists** (i.e., `Definition` is non-empty) → the object was already converted by the DMS Schema Conversion engine. Proceed to Step 2 to apply targeted fixes to the action-item-affected code only. Do NOT trigger a full reconversion.
-- **If TARGET DDL does not exist** (i.e., `TargetMetadataModels` is empty or `Definition` is empty) → inform the customer that this object has not been converted yet and ask whether they want to convert it first (via [Convert Database](../SKILL.md#convert-database)) before fixing action items.
+- **If TARGET DDL exists** (i.e., `Definition` is non-empty) -> the object was already converted by the DMS Schema Conversion engine. Proceed to Step 2 to apply targeted fixes to the action-item-affected code only. Do NOT trigger a full reconversion.
+- **If TARGET DDL does not exist** (i.e., `TargetMetadataModels` is empty or `Definition` is empty) -> inform the customer that this object has not been converted yet and ask whether they want to convert it first (via [Convert Database](../SKILL.md#convert-database)) before fixing action items.
 
-### Step 2 — Export and prepare
+### Step 2 -- Export and prepare
 
 1. **Export target as SQL script:** Use `--origin TARGET` with selection rules containing the **target** server name (from `TargetMetadataModels[0].SelectionRules` in Step 1):
 
@@ -116,11 +116,11 @@ aws dms describe-metadata-model \
    chmod 600 ./exported_target.sql
    ```
 
-2. **Make a working copy:** Copy the exported SQL file locally. All fixes are applied to this copy — the original remains untouched as a reference.
+2. **Make a working copy:** Copy the exported SQL file locally. All fixes are applied to this copy -- the original remains untouched as a reference.
 
 3. **Load the Detailed CSV** to get the list of affected objects grouped by occurrence path.
 
-### Step 3 — Targeted fixes (preserve rule-based conversion)
+### Step 3 -- Targeted fixes (preserve rule-based conversion)
 
 For each affected object:
 
@@ -145,20 +145,20 @@ For each affected object:
 
 6. **Move to the next action item.**
 
-### Step 4 — Completion
+### Step 4 -- Completion
 
 After all fixes, the customer has a corrected SQL script they can apply to the target database manually or review further.
 
 **Constraints:**
 
-- You MUST verify that TARGET DDL exists (Step 1) before proposing fixes — do NOT assume conversion has run.
-- You MUST fix only the code covered by the action item — do NOT reconvert or rewrite the entire object. Full-object reconversion MUST only happen if the customer explicitly requests it (e.g., "reconvert the whole object", "redo the entire procedure").
+- You MUST verify that TARGET DDL exists (Step 1) before proposing fixes -- do NOT assume conversion has run.
+- You MUST fix only the code covered by the action item -- do NOT reconvert or rewrite the entire object. Full-object reconversion MUST only happen if the customer explicitly requests it (e.g., "reconvert the whole object", "redo the entire procedure").
 - You MUST mark all agent-generated SQL with `-- [GenAI-generated]` comments so the customer can identify what needs verification.
 - You MUST process objects one at a time and get customer confirmation before modifying each.
 - You MUST show the original and proposed DDL so the customer has full context.
-- You MUST explain the action item in plain language — do not just repeat the CSV description verbatim.
-- You MUST only modify the specific lines for the affected object — do not alter other objects in the file.
-- For `Info`-level items, inform the customer these are informational and may not require changes — ask if they want to review or skip them.
+- You MUST explain the action item in plain language -- do not just repeat the CSV description verbatim.
+- You MUST only modify the specific lines for the affected object -- do not alter other objects in the file.
+- For `Info`-level items, inform the customer these are informational and may not require changes -- ask if they want to review or skip them.
 - If the customer explicitly asks to reconvert an entire object, use `start-metadata-model-conversion` with selection rules scoped to that object and inform them that the full rule-based conversion output will be replaced.
 
 ---

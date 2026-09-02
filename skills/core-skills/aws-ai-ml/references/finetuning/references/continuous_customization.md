@@ -20,7 +20,7 @@ Adds a subsequent fine-tuning round on top of an already-customized model. Uses 
 
 ## Output Placement
 
-The output format (notebook or script) should already be established from the conversation context — do not re-ask if it has already been decided. If necessary, the output format guide is in `references/code_output_guide.md`.
+The output format (notebook or script) should already be established from the conversation context -- do not re-ask if it has already been decided. If necessary, the output format guide is in `references/code_output_guide.md`.
 
 - **Notebook mode**: If the user has an existing notebook from the previous round, append these cells under a new markdown header describing the round, e.g., `## DPO Fine-Tuning (Round 2)`. If no prior notebook exists, create a new one with a name reflecting the use case and techniques, e.g., `news-app-sft-to-dpo.ipynb`.
 - **Script mode**: Write a new numbered `.py` file in `<project-dir>/scripts/`, e.g., `02_dpo_finetuning_round2.py`. Use `# %%` cell markers to separate logical sections.
@@ -78,8 +78,8 @@ Looks up the model package ARN from the previous training job.
 ### Agent Instructions
 
 1. Ask the user if they have the training job name from the previous fine-tuning round or need help finding it.
-2. **If the user provides the name** → Set it as `previous_training_job_name` in the code.
-3. **If the user needs help** → Run `aws sagemaker list-training-jobs` with these flags:
+2. **If the user provides the name** -> Set it as `previous_training_job_name` in the code.
+3. **If the user needs help** -> Run `aws sagemaker list-training-jobs` with these flags:
 
    ```
    --status-equals Completed
@@ -90,7 +90,7 @@ Looks up the model package ARN from the previous training job.
 
    Present the results and let the user pick the correct job.
 
-4. **If the user is unsure and wants to fill it later** → Leave the placeholder `<previous_training_job_name>` and tell them to replace it before running.
+4. **If the user is unsure and wants to fill it later** -> Leave the placeholder `<previous_training_job_name>` and tell them to replace it before running.
 
 ### Code
 
@@ -170,7 +170,7 @@ Choose the trainer class matching the user's technique for this round and pass a
 | RLVR      | `from sagemaker.train.rlvr_trainer import RLVRTrainer`    | `custom_reward_function`                           |
 | RLAIF     | `from sagemaker.train.rlaif_trainer import RLAIFTrainer`  | `reward_prompt`, `reward_model_id`, `built_in_metrics` |
 
-### Code (SFT example — swap trainer class for DPO/RLVR/RLAIF)
+### Code (SFT example -- swap trainer class for DPO/RLVR/RLAIF)
 
 ```python
 from sagemaker.train.sft_trainer import SFTTrainer
@@ -196,6 +196,6 @@ print(f"Training Status: {step2_job.training_job_status}")
 
 ## Rules
 
-- ✅ Reuse the same `PREVIOUS_MODEL_PACKAGE_GROUP_NAME` from the first round so all model versions stay grouped together
-- ❌ Do NOT pass `accept_eula` — it only applies to the initial base model download
-- ❌ Do NOT re-create the `ModelPackageGroup` — it already exists from the first round
+- [YES] Reuse the same `PREVIOUS_MODEL_PACKAGE_GROUP_NAME` from the first round so all model versions stay grouped together
+- [NO] Do NOT pass `accept_eula` -- it only applies to the initial base model download
+- [NO] Do NOT re-create the `ModelPackageGroup` -- it already exists from the first round

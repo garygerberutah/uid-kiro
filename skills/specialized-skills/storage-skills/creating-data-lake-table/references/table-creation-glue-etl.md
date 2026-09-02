@@ -49,7 +49,7 @@ spark.sql.catalog.<name>.glue.id=<account_id>:s3tablescatalog/<table_bucket_name
 spark.sql.catalog.<name>.warehouse=<table_bucket_arn>
 ```
 
-The `warehouse` parameter is required — without it Spark fails with "Cannot derive default warehouse location".
+The `warehouse` parameter is required -- without it Spark fails with "Cannot derive default warehouse location".
 
 ## `--conf` Format Rules
 

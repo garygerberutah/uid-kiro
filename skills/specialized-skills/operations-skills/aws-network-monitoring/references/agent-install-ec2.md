@@ -1,7 +1,7 @@
 # EC2 Agent Installation Procedure
 
 Two install paths are supported. Prefer **SSM Distributor** when SSM is
-available — it lets you target many instances in one call (by tag, instance
+available -- it lets you target many instances in one call (by tag, instance
 ID, or resource group) and integrates with the manage-agent document used to
 activate/deactivate agents. Use the **command-line** path when SSM is
 unavailable. Activation is only applicable for the SSM path; command-line-installed
@@ -82,7 +82,7 @@ sudo journalctl -u network-flow-monitor.service | grep HTTP
 
 HTTP 200 responses to `networkflowmonitorreports.<region>.api.aws` confirm
 the agent is publishing successfully. Any other status code indicates an
-error — see [troubleshooting.md](troubleshooting.md).
+error -- see [troubleshooting.md](troubleshooting.md).
 
 ## Deactivate (without uninstalling)
 
@@ -107,7 +107,7 @@ aws ssm send-command \
 
 ## Command-line install path (no SSM)
 
-Use when SSM is unavailable. Activation is **not applicable** to this path —
+Use when SSM is unavailable. Activation is **not applicable** to this path --
 the agent begins publishing as soon as the package is installed and the IAM
 policy is attached to the instance role.
 

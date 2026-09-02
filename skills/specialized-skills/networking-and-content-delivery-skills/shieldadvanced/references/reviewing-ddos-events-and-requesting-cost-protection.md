@@ -60,10 +60,10 @@ but cannot tell whether it was an attack or what Shield did, if they only look a
 When advising on a cost-protection (DDoS credit) request, you MUST state ALL of the following
 points together, not a subset:
 
-1. **Protection must predate the attack** — protection added during an active attack does not
+1. **Protection must predate the attack** -- protection added during an active attack does not
    qualify.
 2. A **rate-based AWS WAF rule must be in Block mode** (Count mode silently voids the claim), and
-   this requirement applies to **both CloudFront AND Application Load Balancer resources** — state
+   this requirement applies to **both CloudFront AND Application Load Balancer resources** -- state
    both, not only CloudFront.
 3. File a **billing support case within 15 days after the billing month of the attack closes** (not
    15 days after the attack date), with the words **"DDoS Concession"** in the subject plus the
@@ -266,7 +266,7 @@ request, then surfaces the console link to review the event.
 
 ```
 Found attack a1b2c3d4 on the distribution (May 12, HTTP flood). Captured vectors and top contributors.
-Protection predates the attack and a rate-based rule is in Block mode — eligible for cost protection.
+Protection predates the attack and a rate-based rule is in Block mode -- eligible for cost protection.
 File a Billing case with "DDoS Concession" in the subject within 15 days after May billing closes.
 Open the Shield console to review the event detail:
 https://us-east-1.console.aws.amazon.com/wafv2/shieldv2#/events

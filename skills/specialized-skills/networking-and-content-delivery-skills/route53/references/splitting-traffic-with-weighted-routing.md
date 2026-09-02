@@ -235,9 +235,9 @@ No health check on the non-alias record. Attach one to each (Step 3).
 - You SHOULD use least-privilege IAM credentials provisioned through ephemeral mechanisms (IAM
   roles, SSO/IAM Identity Center session credentials, or `aws sts assume-role`) rather than
   long-lived IAM user access keys, and prefer read-only credentials for inspection steps. Grant
-  only the specific actions this procedure needs — `route53:ChangeResourceRecordSets` and
+  only the specific actions this procedure needs -- `route53:ChangeResourceRecordSets` and
   `route53:GetChange` to create the weighted records and confirm propagation, plus
-  `route53:ListResourceRecordSets` and `route53:GetHostedZone` for inspection — rather than
+  `route53:ListResourceRecordSets` and `route53:GetHostedZone` for inspection -- rather than
   `route53:*` or broader `service:*` wildcards.
 - You MUST enable Route 53 query logging to an encrypted destination (KMS on CloudWatch Logs,
   SSE-S3/SSE-KMS on S3, or server-side encryption on a Data Firehose stream) to confirm the

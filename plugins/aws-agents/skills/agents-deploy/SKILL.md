@@ -6,9 +6,9 @@ description: >
   management, rollback, and canary deployments. Triggers on: "deploy my
   agent", "agentcore deploy", "deploy failed", "CDK error", "rollback",
   "canary deploy", "pin version", "redeploy", "deploy stuck".
-  Not for production hardening — use agents-harden. Not for adding
-  capabilities before deploy — use agents-build or agents-connect.
-  Not for VPC configuration errors — use agents-build.
+  Not for production hardening -- use agents-harden. Not for adding
+  capabilities before deploy -- use agents-build or agents-connect.
+  Not for VPC configuration errors -- use agents-build.
 allowed-tools: Read Grep Glob Bash
 metadata:
   type: skill
@@ -34,7 +34,7 @@ Deploy your AgentCore agent to AWS, or diagnose why a deploy failed.
 `$ARGUMENTS` is optional:
 
 ```
-/agents-deploy                     # interactive — pre-flight check or diagnose failure
+/agents-deploy                     # interactive -- pre-flight check or diagnose failure
 /agents-deploy preflight           # validate config and IAM before deploying
 /agents-deploy diagnose            # diagnose a failed deploy (paste error or read logs)
 /agents-deploy preview             # show what deploy will create without deploying
@@ -56,7 +56,7 @@ Ask (or infer from context):
 > "Are you:
 >
 > 1. About to deploy and want to check everything first
-> 2. Dealing with a failed deploy — what error did you see?
+> 2. Dealing with a failed deploy -- what error did you see?
 > 3. Needing to roll back or pin a specific version?"
 
 If the developer needs versioning, rollback, or canary deployment, load [`references/versioning.md`](references/versioning.md) and follow its instructions.
@@ -130,11 +130,11 @@ aws iam simulate-principal-policy \
 
 ```bash
 agentcore deploy -y          # auto-confirm (alias: agentcore dp -y)
-agentcore deploy -y -v       # verbose — shows resource-level events
+agentcore deploy -y -v       # verbose -- shows resource-level events
 agentcore deploy --target staging -y   # deploy to a specific target
 ```
 
-**Memory provisioning note:** If your project includes memory, deploy takes 2–5 minutes longer while the memory resource becomes ACTIVE. This is normal — not an error. Check status:
+**Memory provisioning note:** If your project includes memory, deploy takes 2-5 minutes longer while the memory resource becomes ACTIVE. This is normal -- not an error. Check status:
 
 ```bash
 agentcore status --type memory
@@ -196,7 +196,7 @@ aws ecr get-login-password --region <REGION> | \
 ValidationException: The provided model identifier is invalid
 ```
 
-Fix: Enable the model in the Bedrock console → Model access. Ensure the model ID in `agentcore.json` matches an enabled model in your target region.
+Fix: Enable the model in the Bedrock console -> Model access. Ensure the model ID in `agentcore.json` matches an enabled model in your target region.
 
 **Region mismatch:**
 
@@ -212,7 +212,7 @@ Fix: Update `agentcore/aws-targets.json` to match your `aws configure` default r
 Memory resource is in CREATING state after 10 minutes
 ```
 
-This is unusual — normal provisioning takes 2–5 minutes. Check:
+This is unusual -- normal provisioning takes 2-5 minutes. Check:
 
 ```bash
 agentcore status --type memory --json
@@ -226,7 +226,7 @@ If stuck, try removing and re-adding the memory resource.
 LimitExceededException: Account limit for AgentCore runtimes exceeded
 ```
 
-Fix: Request a quota increase in the AWS console → Service Quotas → Amazon Bedrock AgentCore.
+Fix: Request a quota increase in the AWS console -> Service Quotas -> Amazon Bedrock AgentCore.
 
 ### Step B3: After fixing, re-run
 

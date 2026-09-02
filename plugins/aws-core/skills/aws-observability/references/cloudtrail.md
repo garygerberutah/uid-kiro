@@ -8,7 +8,7 @@ Using CloudTrail for operational debugging: who changed what, when. Not for secu
 - [Event history](#event-history)
 - [Common operational queries](#common-operational-queries)
 - [Querying CloudTrail logs](#querying-cloudtrail-logs)
-- [CloudTrail → CloudWatch integration](#cloudtrail--cloudwatch-integration)
+- [CloudTrail -> CloudWatch integration](#cloudtrail--cloudwatch-integration)
 
 ---
 
@@ -87,7 +87,7 @@ aws cloudtrail put-event-selectors --trail-name my-trail \
 
 ## Querying CloudTrail logs
 
-### Recommended: Trail → S3 → Athena
+### Recommended: Trail -> S3 -> Athena
 
 For new setups, deliver CloudTrail logs to S3 and query with Amazon Athena:
 
@@ -100,16 +100,16 @@ ORDER BY eventTime DESC
 LIMIT 100;
 ```
 
-This is the long-term supported approach — works with standard SQL, scales to any volume, and integrates with existing S3-based analytics.
+This is the long-term supported approach -- works with standard SQL, scales to any volume, and integrates with existing S3-based analytics.
 
 ---
 
-## CloudTrail → CloudWatch integration
+## CloudTrail -> CloudWatch integration
 
 ### Alert on specific API calls
 
 ```
-CloudTrail → Trail → CloudWatch Logs → Metric Filter → CloudWatch Alarm → SNS
+CloudTrail -> Trail -> CloudWatch Logs -> Metric Filter -> CloudWatch Alarm -> SNS
 ```
 
 1. Configure trail to deliver events to a CloudWatch Logs log group

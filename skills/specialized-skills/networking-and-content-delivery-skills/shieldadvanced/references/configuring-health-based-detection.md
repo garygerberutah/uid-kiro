@@ -52,7 +52,7 @@ subset:
 1. **Route 53 hosted zones do not support health-based detection** (every other protected resource
    type does); do not try to associate a health check with a hosted zone.
 2. The health check **must be healthy at association time**, or the association is rejected.
-3. The health check **must reflect real application health** — use a **calculated health check**
+3. The health check **must reflect real application health** -- use a **calculated health check**
    built from the CloudWatch metrics that genuinely indicate the application is unavailable, NOT a
    shallow check (e.g. a TCP or single-endpoint ping) that keeps returning healthy while the
    application is failing, and not a staging or test check for a production protection.

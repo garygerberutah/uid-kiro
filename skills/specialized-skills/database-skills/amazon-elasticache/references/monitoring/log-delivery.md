@@ -50,7 +50,7 @@ Use the following JSON structure for `--log-delivery-configurations`:
 | Slow log | `slow-log` | Available |
 | Engine log | `engine-log` | Available |
 
-**⚠️ Command log (`command-log`):** The ElastiCache API accepts only `slow-log` and `engine-log` as LogType values; `command-log` is not a valid LogType. The COMMANDLOG feature (Valkey 8.1+) may be exposed via the `engine-log` LogType or require a separate API enum value for `command-log`. Check the latest API reference before attempting to configure command log delivery.
+**[WARNING] Command log (`command-log`):** The ElastiCache API accepts only `slow-log` and `engine-log` as LogType values; `command-log` is not a valid LogType. The COMMANDLOG feature (Valkey 8.1+) may be exposed via the `engine-log` LogType or require a separate API enum value for `command-log`. Check the latest API reference before attempting to configure command log delivery.
 
 ### DestinationType Values
 

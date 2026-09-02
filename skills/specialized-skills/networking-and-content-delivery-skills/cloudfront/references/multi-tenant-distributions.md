@@ -45,7 +45,7 @@ observability). Fall back to the AWS CLI otherwise.
 **Constraints:**
 
 - You MUST explain this three-part model before the customer starts creating resources
-- You MUST make clear the multi-tenant distribution cannot serve traffic directly — only tenants do
+- You MUST make clear the multi-tenant distribution cannot serve traffic directly -- only tenants do
 - You MUST point DNS at the connection group routing endpoint, never at the multi-tenant
   distribution template
 
@@ -85,7 +85,7 @@ Everything else is fixed at the multi-tenant distribution level.
 
 Multi-tenant distributions do not support every standard-distribution feature, and the exact list
 evolves as the service adds support. Examples of features that have been unsupported or have required
-a standard distribution include origin access identity (OAI) — use OAC instead — AWS WAF Classic
+a standard distribution include origin access identity (OAI) -- use OAC instead -- AWS WAF Classic
 (use AWS WAF v2), Smooth streaming, continuous deployment, dedicated IP custom SSL, and the default
 testing domain.
 
@@ -106,7 +106,7 @@ testing domain.
 
 A default connection group is created automatically by CloudFront when the multi-tenant
 distribution is created. Customers may create additional connection groups to limit the blast
-radius — if one connection group has an issue, tenants on other connection groups are unaffected.
+radius -- if one connection group has an issue, tenants on other connection groups are unaffected.
 
 **Constraints:**
 
@@ -126,7 +126,7 @@ Tenants must be explicitly activated to serve traffic. This is a manual step.
 **Constraints:**
 
 - You MUST always remind customers about the explicit activation step
-- You MUST explain there is no automated mechanism to activate the tenant — activation always
+- You MUST explain there is no automated mechanism to activate the tenant -- activation always
   requires explicit customer action (for HTTP-validated managed certificates, certificate
   association is automatic, but the tenant still must be activated)
 
@@ -259,7 +259,7 @@ IP custom SSL, and the default testing domain.
 
 ### Configuration changes don't apply to a specific tenant
 Only a limited set of settings is customizable per tenant (examples that have been overridable: AWS
-WAF web ACL, TLS certificate, geographic restrictions, and parameters — verify the current set
+WAF web ACL, TLS certificate, geographic restrictions, and parameters -- verify the current set
 against the CloudFront Developer Guide); all other settings are inherited from the multi-tenant
 distribution template.
 

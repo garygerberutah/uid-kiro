@@ -1,19 +1,19 @@
 # Spec for Deployment
 
-## Phase 1: Discovery (1–3 turns)
+## Phase 1: Discovery (1-3 turns)
 
 Review what is already known from the conversation so far, then identify what is still missing. You need:
 
 - **What** is the problem the user is trying to solve (the business problem)
 - **Who** will use the model and in what context
-- **Deployment preferences** — gather the user's preferences in natural language. Don't require specific values or formats. Just understand what they need.
+- **Deployment preferences** -- gather the user's preferences in natural language. Don't require specific values or formats. Just understand what they need.
 
-**Core questions to ask (1–2 turns max):**
+**Core questions to ask (1-2 turns max):**
 
 1. What should the model do? (task/use case)
 2. Any size or cost preferences?
 
-That's it for the default flow. The table below lists additional preferences you can capture **if the user volunteers them or asks to drill down** — but do not ask about these unprompted:
+That's it for the default flow. The table below lists additional preferences you can capture **if the user volunteers them or asks to drill down** -- but do not ask about these unprompted:
 
 | Preference | What to ask about | Examples of user answers |
 |---|---|---|
@@ -29,13 +29,13 @@ That's it for the default flow. The table below lists additional preferences you
 
 **Guidelines**:
 
-- Infer from context — "chatbot" implies task=text generation, data type=text
+- Infer from context -- "chatbot" implies task=text generation, data type=text
 - Only ask the core questions above. Do NOT walk through the preferences table asking each one.
 - If the user volunteers additional constraints (e.g., "must be Apache 2.0"), capture them.
-- Record the user's words as-is. Do NOT map to specific keyword values — that happens later in model-selection.
+- Record the user's words as-is. Do NOT map to specific keyword values -- that happens later in model-selection.
 - If the user says "I don't care" or "any" for a preference, omit it from the spec.
 
-⏸ Wait for user after each clarifying question.
+[PAUSE] Wait for user after each clarifying question.
 
 ## Phase 2: Produce Spec
 
@@ -59,15 +59,15 @@ Deploy base model
 
 ## Deployment Constraints
 
-- **Task**: [user's words — e.g., "text generation", "chatbot", "image classification"]
-- **Data type**: [user's words — e.g., "text", "images", "multimodal"]
-- **Size preference**: [user's words — e.g., "small and fast", "under 10B", "large"]
-- **Deployment target**: [user's words — e.g., "SageMaker", "Bedrock", "either"]
-- **License**: [user's words — e.g., "Apache 2.0", "open source", "any"]
-- **Context window**: [user's words — e.g., "long documents", "short messages"]
-- **Languages**: [user's words — e.g., "English", "multilingual"]
-- **Model type**: [user's words — e.g., "open source", "proprietary OK"]
-- **Recency**: [user's words — e.g., "latest available", "newest"]
+- **Task**: [user's words -- e.g., "text generation", "chatbot", "image classification"]
+- **Data type**: [user's words -- e.g., "text", "images", "multimodal"]
+- **Size preference**: [user's words -- e.g., "small and fast", "under 10B", "large"]
+- **Deployment target**: [user's words -- e.g., "SageMaker", "Bedrock", "either"]
+- **License**: [user's words -- e.g., "Apache 2.0", "open source", "any"]
+- **Context window**: [user's words -- e.g., "long documents", "short messages"]
+- **Languages**: [user's words -- e.g., "English", "multilingual"]
+- **Model type**: [user's words -- e.g., "open source", "proprietary OK"]
+- **Recency**: [user's words -- e.g., "latest available", "newest"]
 
 ```
 
@@ -83,4 +83,4 @@ Only include preferences that have a known value. Omit fields the user didn't sp
 >
 > Does this match your intent?
 
-⏸ Wait for user approval.
+[PAUSE] Wait for user approval.

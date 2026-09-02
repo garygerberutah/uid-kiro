@@ -1,11 +1,11 @@
-# Security — Amazon OpenSearch controls
+# Security -- Amazon OpenSearch controls
 
 Every assessment / recommendation MUST include a Security section that confirms each control below.
 
 ## Three security layers
 
 ```
-[Network] → [Domain Access Policy] → [Fine-Grained Access Control (FGAC)]
+[Network] -> [Domain Access Policy] -> [Fine-Grained Access Control (FGAC)]
 ```
 
 ### 1. Network
@@ -15,9 +15,9 @@ Every assessment / recommendation MUST include a Security section that confirms 
 | **VPC + Interface VPC endpoint** | Production. Private connectivity from your VPC to AOS. |
 | **VPC + ENI** (older pattern) | Production legacy. ENI in VPC subnets. |
 | **Public endpoint + IAM** | Dev/test, or when external SaaS integration requires public access |
-| **Public endpoint + IP allowlist** | Tightening public — pair with Domain Access Policy IP filter |
+| **Public endpoint + IP allowlist** | Tightening public -- pair with Domain Access Policy IP filter |
 
-VPC ↔ AOS endpoint traffic is regional; cross-AZ data transfer within an AOS cluster is FREE.
+VPC <-> AOS endpoint traffic is regional; cross-AZ data transfer within an AOS cluster is FREE.
 
 ### 2. Domain Access Policy (resource-based)
 
@@ -50,7 +50,7 @@ Adds **document-level / field-level / role-based** authorization on top.
 
 **Master user** is either:
 
-- An **IAM principal** (signed Sig v4 requests) — no password
+- An **IAM principal** (signed Sig v4 requests) -- no password
 - A **username/password in the internal user database**
 
 The master user is automatically mapped to `all_access` and `security_manager` roles.
@@ -172,7 +172,7 @@ Amazon OpenSearch Service is in scope for (verify current per-service status):
 ### Pattern A: Private domain (production)
 
 ```
-[App in VPC subnet] ─→ [VPC Interface Endpoint] ─→ [AOS domain in private subnet]
+[App in VPC subnet] --> [VPC Interface Endpoint] --> [AOS domain in private subnet]
 ```
 
 - AOS deployed with VPC endpoint
@@ -182,7 +182,7 @@ Amazon OpenSearch Service is in scope for (verify current per-service status):
 ### Pattern B: Public domain + IAM (lighter footprint)
 
 ```
-[App] ──signed-Sig-v4──→ [AOS public endpoint]
+[App] --signed-Sig-v4---> [AOS public endpoint]
 ```
 
 - AOS in public DNS
@@ -192,7 +192,7 @@ Amazon OpenSearch Service is in scope for (verify current per-service status):
 ### Pattern C: Public domain + FGAC for humans
 
 ```
-[Human user] ─→ [Cognito] ─→ [Dashboards] ─→ [AOS public]
+[Human user] --> [Cognito] --> [Dashboards] --> [AOS public]
 ```
 
 - Cognito user pool + identity pool
@@ -220,22 +220,22 @@ Amazon OpenSearch Service is in scope for (verify current per-service status):
 ## Data privacy / sensitive data
 
 - **PII** in indexed documents: use FLS or field masking. For HIPAA workloads, also consider tokenization at ingest.
-- **Search logs** can leak sensitive query terms — disable search request logging when PII may appear in queries.
-- **Slow logs** can leak query content — pair with restrictive CloudWatch IAM.
+- **Search logs** can leak sensitive query terms -- disable search request logging when PII may appear in queries.
+- **Slow logs** can leak query content -- pair with restrictive CloudWatch IAM.
 - **Snapshot encryption**: manual snapshots inherit S3 bucket encryption. Use SSE-KMS with CMK for compliance.
 
 ## Threat model headlines
 
 1. **Public domain + open Domain Access Policy = data exposed.** Always pair public endpoints with IAM signing or FGAC + IP allowlist.
 2. **FGAC misconfiguration** (e.g., IAM master with overly broad policy) gives unintended access.
-3. **Pre-FGAC domains** can have IAM-only auth without document/field controls — risky for multi-tenant data.
+3. **Pre-FGAC domains** can have IAM-only auth without document/field controls -- risky for multi-tenant data.
 4. **Snapshot bucket** in your account: if its bucket policy is too permissive, snapshots are exfiltrable.
-5. **CloudWatch Logs** for audit/slow logs — restrict who can read them.
-6. **Master user password** if internal user database — store in Secrets Manager, rotate regularly.
+5. **CloudWatch Logs** for audit/slow logs -- restrict who can read them.
+6. **Master user password** if internal user database -- store in Secrets Manager, rotate regularly.
 
 ## What this skill MUST NOT do
 
 - **Embed credentials, master usernames, VPC endpoint URLs, or KMS key ARNs in generated reports.** They propagate to chat logs and may end up in unapproved repos.
-- **Recommend disabling FGAC.** Once enabled it cannot be disabled — the right answer is rebuild domain, not "turn off security".
+- **Recommend disabling FGAC.** Once enabled it cannot be disabled -- the right answer is rebuild domain, not "turn off security".
 - **Recommend `cluster.routing.allocation.disk.threshold_enabled: false`** as a fix for read-only clusters. The right answer is more storage / smaller shards / move data, NOT disabling watermarks.
 - **Recommend public domains for production** without explicit IAM + FGAC + IP allowlist.

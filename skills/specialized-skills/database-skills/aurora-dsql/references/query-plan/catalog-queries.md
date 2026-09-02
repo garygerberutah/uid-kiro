@@ -29,7 +29,7 @@ WHERE n.nspname = '{schema}'
   AND c.relname IN ('{table1}', '{table2}', '{table3}');
 ```
 
-Compare `reltuples` against actual `COUNT(*)`. A divergence >20% on the table-stats snapshot indicates stale `reltuples` requiring `ANALYZE`. This is distinct from the row-estimate-vs-actual error thresholds used for plan findings (see plan-interpretation.md: 2x–5x minor, 5x–50x significant, 50x+ severe).
+Compare `reltuples` against actual `COUNT(*)`. A divergence >20% on the table-stats snapshot indicates stale `reltuples` requiring `ANALYZE`. This is distinct from the row-estimate-vs-actual error thresholds used for plan findings (see plan-interpretation.md: 2x-5x minor, 5x-50x significant, 50x+ severe).
 
 ## Column Statistics
 
@@ -63,7 +63,7 @@ WHERE schemaname = '{schema}'
 
 ## Index Definitions
 
-Retrieve existing indexes on referenced tables. DSQL does not populate the cumulative `pg_stat_user_indexes` counters (`idx_scan`, `idx_tup_read`, `idx_tup_fetch`) that standard PostgreSQL exposes — infer index usage from the EXPLAIN plan instead.
+Retrieve existing indexes on referenced tables. DSQL does not populate the cumulative `pg_stat_user_indexes` counters (`idx_scan`, `idx_tup_read`, `idx_tup_fetch`) that standard PostgreSQL exposes -- infer index usage from the EXPLAIN plan instead.
 
 ```sql
 SELECT
@@ -137,7 +137,7 @@ WHERE {predicate1} AND {predicate2};
 Then compare against the independence assumption:
 
 ```
-Expected (independent) = (count_pred1 / total_rows) × (count_pred2 / total_rows) × total_rows
+Expected (independent) = (count_pred1 / total_rows) x (count_pred2 / total_rows) x total_rows
 Actual = combined_count
 Error = actual / expected
 ```

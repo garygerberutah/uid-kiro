@@ -13,7 +13,7 @@ shopt -s expand_aliases
 #     - Lightweight transactions inside `BEGIN UNLOGGED BATCH`
 #     - Aggregations (COUNT / MIN / MAX / SUM / AVG)
 #     - User-defined function calls (when a schema is also supplied)
-#     - Per-table `USING TTL` usage (informational — used to set has_ttl
+#     - Per-table `USING TTL` usage (informational -- used to set has_ttl
 #       when no default TTL is declared on the table)
 #
 # The script takes the same parameters as cqlsh to connect to cassandra.
@@ -31,7 +31,7 @@ shopt -s expand_aliases
 #   export CQLSH_PASSWORD="$PASSWORD"
 #   ./scripts/prepared-statements-sampler.sh <host> <port> -u "serviceuser" --ssl > prepared_statements.ndjson
 #
-# NEVER pass passwords via -p on the command line — they are visible in process listings.
+# NEVER pass passwords via -p on the command line -- they are visible in process listings.
 
 # check if the cqlsh-expansion is installed, then if cqlsh installed, then check local file
 if [ -x "$(command -v cqlsh-expansion)" ]; then

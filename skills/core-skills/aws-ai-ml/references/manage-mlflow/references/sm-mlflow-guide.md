@@ -1,8 +1,8 @@
 # SageMaker Managed MLflow Guide
 
-Documentation reference for SageMaker Managed MLflow. Use when the user wants to understand what SM MLflow is, how to set it up, or what its limitations are — before or instead of taking action.
+Documentation reference for SageMaker Managed MLflow. Use when the user wants to understand what SM MLflow is, how to set it up, or what its limitations are -- before or instead of taking action.
 
-> **IMPORTANT:** Do NOT answer informational questions from general knowledge. Share the relevant documentation link below and let the user read the authoritative source. Do not summarize, paraphrase, or fabricate details about SageMaker MLflow features, limitations, or configuration — the documentation may have changed since your training data.
+> **IMPORTANT:** Do NOT answer informational questions from general knowledge. Share the relevant documentation link below and let the user read the authoritative source. Do not summarize, paraphrase, or fabricate details about SageMaker MLflow features, limitations, or configuration -- the documentation may have changed since your training data.
 
 ## Documentation Links
 

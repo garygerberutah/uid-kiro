@@ -2,13 +2,13 @@
 
 ## Overview
 
-Reviews AWS Security Hub configuration — the unified security platform using OCSF format. Covers integrations, cross-region aggregation, connectors, automation rules, and organization-wide enrollment.
+Reviews AWS Security Hub configuration -- the unified security platform using OCSF format. Covers integrations, cross-region aggregation, connectors, automation rules, and organization-wide enrollment.
 
 This skill works from both standalone accounts and delegated administrator accounts.
 
 **API constraint:** MUST use V2 APIs (suffixed with `-v2`) only. MUST NOT use V1 APIs (`describe-hub`, `get-findings`, `list-finding-aggregators`, `get-enabled-standards`).
 
-**Membership:** Security Hub V2 uses Organizations exclusively — no invitation-based membership.
+**Membership:** Security Hub V2 uses Organizations exclusively -- no invitation-based membership.
 
 ## Operator prerequisites
 
@@ -41,7 +41,7 @@ This skill works from both standalone accounts and delegated administrator accou
    aws securityhub list-aggregators-v2
    ```
 
-   Use the returned `AggregatorV2Arn` values to identify configured aggregators. If empty, note prominently: no home region aggregator configured — findings from other regions not visible.
+   Use the returned `AggregatorV2Arn` values to identify configured aggregators. If empty, note prominently: no home region aggregator configured -- findings from other regions not visible.
 
 4. If an aggregator exists and you need detailed configuration such as aggregation Region, region-linking mode, or linked Regions:
 

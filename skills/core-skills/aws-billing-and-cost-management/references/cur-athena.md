@@ -8,15 +8,15 @@ AWS has three billing data formats. Determine which the customer is using before
 |--------|-----------|--------|-----------------|
 | **CUR 2.0** | `COST_AND_USAGE_REPORT` | Recommended | Fixed schema, nested columns (`resource_tags`, `cost_category`, `product`, `discount` are key-value maps), Parquet/GZIP only. Created via AWS Data Exports. |
 | **Legacy CUR** | User-defined | Still supported, no deprecation planned | Dynamic schema (columns vary monthly based on usage), tags/categories as separate columns (e.g., `resource_tags_user_creator`), supports CSV/ZIP/GZIP/Parquet. Created via CUR console or API. |
-| **FOCUS 1.2** | `FOCUS_1_2_AWS` | GA | FinOps Open Cost and Usage Specification — cloud-agnostic schema for multi-cloud FinOps. Different column names entirely (e.g., `BilledCost`, `EffectiveCost`, `ServiceName`). Created via AWS Data Exports. |
+| **FOCUS 1.2** | `FOCUS_1_2_AWS` | GA | FinOps Open Cost and Usage Specification -- cloud-agnostic schema for multi-cloud FinOps. Different column names entirely (e.g., `BilledCost`, `EffectiveCost`, `ServiceName`). Created via AWS Data Exports. |
 
 **How to tell which format a customer has:** Ask, or check the Data Exports console. If they reference `billing_period` as a string column, they're likely on Legacy CUR. If they reference `bill_billing_period_start_date` as a timestamp, they're on CUR 2.0.
 
 **Key query differences between Legacy CUR and CUR 2.0:**
 
 - **Billing period filter:** Legacy CUR uses `billing_period = '2026-03'` (string). CUR 2.0 uses `bill_billing_period_start_date = TIMESTAMP '2026-03-01'` (timestamp).
-- **Tags:** Legacy CUR CSV has `resource_tags_user_<tagname>` as separate columns. CUR 2.0 nests all tags into a `resource_tags` map column — query with `resource_tags['user:tagname']`.
-- **Product attributes:** Legacy CUR has `product_<attribute>` as separate columns. CUR 2.0 nests into `product` map — query with `product['attribute']`.
+- **Tags:** Legacy CUR CSV has `resource_tags_user_<tagname>` as separate columns. CUR 2.0 nests all tags into a `resource_tags` map column -- query with `resource_tags['user:tagname']`.
+- **Product attributes:** Legacy CUR has `product_<attribute>` as separate columns. CUR 2.0 nests into `product` map -- query with `product['attribute']`.
 - **Table name:** Legacy CUR uses whatever name the customer chose. CUR 2.0 is always `COST_AND_USAGE_REPORT`.
 
 ## Setup (CUR 2.0)
@@ -31,7 +31,7 @@ aws bcm-data-exports create-export --export '{
   "RefreshCadence":{"Frequency":"SYNCHRONOUS"}}'
 ```
 
-Always use PARQUET — 10-100x cheaper Athena queries than CSV. Set `INCLUDE_RESOURCES=TRUE` only if per-resource analysis needed (dramatically increases data volume).
+Always use PARQUET -- 10-100x cheaper Athena queries than CSV. Set `INCLUDE_RESOURCES=TRUE` only if per-resource analysis needed (dramatically increases data volume).
 
 ## Key Column Groups
 
@@ -41,7 +41,7 @@ Always use PARQUET — 10-100x cheaper Athena queries than CSV. Set `INCLUDE_RES
 | savings_plan | `savings_plan_effective_cost`, `savings_plan_a_r_n` | SP analysis |
 | reservation | `reservation_a_r_n`, `effective_cost`, `unused_quantity` | RI analysis |
 | pricing | `public_on_demand_cost`, `public_on_demand_rate` | On-demand comparison |
-| resource_tags | **Legacy CUR:** `resource_tags_user_<tagname>` columns; **CUR 2.0:** `resource_tags` map — query with `resource_tags['user:tagname']` | Tag-based allocation |
+| resource_tags | **Legacy CUR:** `resource_tags_user_<tagname>` columns; **CUR 2.0:** `resource_tags` map -- query with `resource_tags['user:tagname']` | Tag-based allocation |
 
 ## Common Athena Queries
 
@@ -90,15 +90,15 @@ GROUP BY line_item_product_code;
 
 - **Confirm the report format first.** Legacy CUR and CUR 2.0 have different column names, filtering syntax, and table names. Queries written for one will fail on the other.
 - **Service names differ between Cost Explorer and CUR.** Cost Explorer uses human-readable names (e.g., `Elastic Load Balancing`). CUR uses API-style product codes (e.g., `AWSELB`). Before writing filter queries, run `SELECT DISTINCT line_item_product_code` to discover available values. If a filtered query returns 0 results, check the product code first.
-- CUR 2.0 table name is `COST_AND_USAGE_REPORT` (fixed) — not user-defined
+- CUR 2.0 table name is `COST_AND_USAGE_REPORT` (fixed) -- not user-defined
 - **Tags differ by format:** Legacy CUR uses `resource_tags_user_<tagname>` columns. CUR 2.0 uses `resource_tags['user:tagname']` map syntax. Neither matches Cost Explorer API, which uses the tag key directly.
-- CUR data delivered to S3 up to 3 times daily — not real-time
-- Current month CUR is incomplete until month closes — don't compare to Cost Explorer
+- CUR data delivered to S3 up to 3 times daily -- not real-time
+- Current month CUR is incomplete until month closes -- don't compare to Cost Explorer
 - Tags activated after CUR creation require manual Athena table column addition
 
 ## Additional Resources
 
-- **CUR Query Library** (Well-Architected Labs): https://wellarchitectedlabs.com/cost-optimization/cur_queries/ — curated SQL queries for common cost analysis tasks (data transfer, EC2, RDS, S3, Savings Plans, etc.). NOTE: These queries are written for Legacy CUR column names — adapt for CUR 2.0 if needed (see "Key query differences" above).
-- **Data Transfer Cost Analysis Dashboard** (Well-Architected Labs): https://wellarchitectedlabs.com/cost/200_labs/200_enterprise_dashboards/3_create_data_transfer_cost_analysis_dashboard/ — pre-built QuickSight dashboard for data transfer analysis from CUR data.
+- **CUR Query Library** (Well-Architected Labs): https://wellarchitectedlabs.com/cost-optimization/cur_queries/ -- curated SQL queries for common cost analysis tasks (data transfer, EC2, RDS, S3, Savings Plans, etc.). NOTE: These queries are written for Legacy CUR column names -- adapt for CUR 2.0 if needed (see "Key query differences" above).
+- **Data Transfer Cost Analysis Dashboard** (Well-Architected Labs): https://wellarchitectedlabs.com/cost/200_labs/200_enterprise_dashboards/3_create_data_transfer_cost_analysis_dashboard/ -- pre-built QuickSight dashboard for data transfer analysis from CUR data.
 - **CUR 2.0 column reference**: https://docs.aws.amazon.com/cur/latest/userguide/table-dictionary-cur2.html
 - **FOCUS 1.2 column reference**: https://docs.aws.amazon.com/cur/latest/userguide/table-dictionary-focus-1-2-aws.html

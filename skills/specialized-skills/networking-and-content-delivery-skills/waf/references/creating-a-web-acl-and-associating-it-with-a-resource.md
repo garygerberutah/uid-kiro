@@ -62,9 +62,9 @@ access.
 
 **Constraints:**
 
-- You MUST grant only the specific `wafv2:` actions these procedures use — for the entry-point
+- You MUST grant only the specific `wafv2:` actions these procedures use -- for the entry-point
   workflow that is `wafv2:CreateWebACL`, `wafv2:GetWebACL`, `wafv2:UpdateWebACL`, and
-  `wafv2:AssociateWebACL` — rather than `wafv2:*` or the `AWSWAFFullAccess` managed policy
+  `wafv2:AssociateWebACL` -- rather than `wafv2:*` or the `AWSWAFFullAccess` managed policy
 - You SHOULD extend the same least-privilege approach to the other references (for example
   `wafv2:PutLoggingConfiguration` for logging, `wafv2:CreateIPSet`/`wafv2:UpdateIPSet` for IP sets),
   granting only what each task requires
@@ -201,7 +201,7 @@ surfaces the console link to verify.
 }
 ```
 
-(`Block` is the secure default — unmatched requests are denied, and Allow rules admit the
+(`Block` is the secure default -- unmatched requests are denied, and Allow rules admit the
 traffic you intend. Use `"default_action": "Allow"` only when the customer explicitly wants an
 allow-by-default web ACL whose rules do the blocking.)
 

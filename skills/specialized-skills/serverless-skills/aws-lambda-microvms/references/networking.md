@@ -5,12 +5,12 @@ How traffic gets in and out of a MicroVM, what protocols are supported, and how 
 ## Big picture
 
 ```
-┌────────────┐  HTTPS / WSS    ┌─────────────────┐  TLS-PSK   ┌──────────────┐  TLS?  ┌─────────────────┐
-│   Client   │ ── auth token ─▶│  Service proxy  │ ──────────▶│  MicroVM     │ ──────▶│  Application    │
-│ (browser,  │                 │  (TLS terminate;│            │  Proxy Agent │        │  (any TCP-based │
-│  curl,     │                 │   port routing) │            │              │        │   server: HTTP, │
-│  app)      │                 │                 │            │              │        │   gRPC, WS)     │
-└────────────┘                 └─────────────────┘            └──────────────┘        └─────────────────┘
++------------+  HTTPS / WSS    +-----------------+  TLS-PSK   +--------------+  TLS?  +-----------------+
+|   Client   | -- auth token ->|  Service proxy  | ---------->|  MicroVM     | ------>|  Application    |
+| (browser,  |                 |  (TLS terminate;|            |  Proxy Agent |        |  (any TCP-based |
+|  curl,     |                 |   port routing) |            |              |        |   server: HTTP, |
+|  app)      |                 |                 |            |              |        |   gRPC, WS)     |
++------------+                 +-----------------+            +--------------+        +-----------------+
 ```
 
 > The proxy agent auto-detects whether the guest application speaks TLS.
@@ -59,7 +59,7 @@ The proxy expects a valid auth token in `X-aws-proxy-auth`. Tokens come from `Cr
 | `create-microvm-auth-token` | Application traffic. Requires `allowedPorts`. |
 | `create-microvm-shell-auth-token` | Shell access (only when the `SHELL_INGRESS` network connector is attached). Works from the AWS console or a terminal WebSocket client. |
 
-Both return a `TokenParts` map (multiple key/value entries) — typically you want the `X-aws-proxy-auth` value.
+Both return a `TokenParts` map (multiple key/value entries) -- typically you want the `X-aws-proxy-auth` value.
 
 ### curl
 
@@ -100,11 +100,11 @@ The `lambda-microvms.*` subprotocols are **stripped before forwarding** to your 
 |---|---|
 | HTTP/1.1 | Default. |
 | HTTP/2 | Negotiated via ALPN on TLS (if supported), with HTTP/1.1 fallback. For plaintext connections, send `X-aws-proxy-force-h2: true` to force HTTP/2 over plaintext (H2C) to the upstream. |
-| gRPC | Just HTTP/2 — works as soon as your server is on HTTP/2. |
+| gRPC | Just HTTP/2 -- works as soon as your server is on HTTP/2. |
 | WebSockets | Standard upgrade flow. Use subprotocols for auth/port (above). |
 | TLS to upstream | Optional. The proxy auto-detects whether your server speaks TLS and adjusts (re-encrypt for end-to-end TLS, or terminate at proxy). |
 
-> Protocol negotiation in this table applies to proxy agent → guest application traffic inside the MicroVM. Client → proxy service traffic is always TLS-encrypted and negotiates HTTP/2 independently.
+> Protocol negotiation in this table applies to proxy agent -> guest application traffic inside the MicroVM. Client -> proxy service traffic is always TLS-encrypted and negotiates HTTP/2 independently.
 
 ### Bandwidth ("proxy bandwidth capability")
 
@@ -133,7 +133,7 @@ Steps:
      --operator-role arn:aws:iam::<account>:role/NetworkConnectorOperatorRole
    ```
 
-   States: `PENDING` (provisioning ENIs, up to ~10 min) → `ACTIVE` → `DELETING`. Failure → `FAILED` with `StateReason`.
+   States: `PENDING` (provisioning ENIs, up to ~10 min) -> `ACTIVE` -> `DELETING`. Failure -> `FAILED` with `StateReason`.
 3. Pass the connector ARN returned by `create-network-connector` at run time:
 
    ```bash
@@ -148,16 +148,16 @@ Constraints:
 - Security groups must be in that VPC.
 - Connector must be in the same Region as the MicroVM image.
 - `NetworkProtocol` supports both `IPv4` and `DualStack`.
-- The connector is **bound at run time** — you can't swap connectors on suspend/resume.
+- The connector is **bound at run time** -- you can't swap connectors on suspend/resume.
 - For internet *and* VPC access, configure a **NAT gateway** in your VPC.
 
 ## Reserved / stripped headers
 
 The proxy reserves the `x-aws-proxy-*` namespace. Specifically:
 
-- `X-aws-proxy-auth` — auth token (required).
-- `X-aws-proxy-port` — target port (overrides default 8080).
-- `X-aws-proxy-force-h2` — force HTTP/2 to upstream (`true`).
+- `X-aws-proxy-auth` -- auth token (required).
+- `X-aws-proxy-port` -- target port (overrides default 8080).
+- `X-aws-proxy-force-h2` -- force HTTP/2 to upstream (`true`).
 
 Unrecognized `x-aws-proxy-*` headers are stripped before forwarding. Don't use that namespace in your own application headers.
 

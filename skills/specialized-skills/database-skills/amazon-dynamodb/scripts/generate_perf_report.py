@@ -2,10 +2,10 @@
 """Turn perf_summary.json + the design JSON into performance_report.md + design_findings.json.
 
 Imports calculate_costs directly so the Expected column matches the calculator
-exactly — no formula duplication. Produces two artifacts:
+exactly -- no formula duplication. Produces two artifacts:
 
-  - performance_report.md — human-readable report per references/performance-report-format.md.
-  - design_findings.json — machine-readable classified findings for the agent to
+  - performance_report.md -- human-readable report per references/performance-report-format.md.
+  - design_findings.json -- machine-readable classified findings for the agent to
     reason over when authoring the Design reflection section.
 
 No AWS calls; no side effects. Runs locally on any fixture.
@@ -40,21 +40,21 @@ PAGE_CAP_BYTES = cc.PAGE_CAP_KB * 1024
 ERROR_RATE_HIGH = 0.5
 
 # Error/cancellation codes that signal a BENCHMARK ARTIFACT rather than a design
-# defect. These arise from the synthetic load shape — many concurrent writes
-# contending on a small seeded key space — not from anything wrong with the
+# defect. These arise from the synthetic load shape -- many concurrent writes
+# contending on a small seeded key space -- not from anything wrong with the
 # schema or access-pattern JSON:
-#   TransactionConflict       — two in-flight transactions touched the same item
+#   TransactionConflict       -- two in-flight transactions touched the same item
 #                               (the benchmark reuses ~seed_items_per_table keys;
 #                               real unique IDs don't collide).
-#   ConditionalCheckFailed*   — a conditional write's guard fired because the item
-#                               already exists / changed — expected when the
+#   ConditionalCheckFailed*   -- a conditional write's guard fired because the item
+#                               already exists / changed -- expected when the
 #                               benchmark rewrites a bounded key pool.
 # Everything else above the error threshold (ValidationException,
 # ResourceNotFoundException, AccessDeniedException, ...) is treated as a genuine
 # STRUCTURAL defect the design/JSON must fix.
 #
 # This list is intentionally small and conservative: a code NOT listed here is
-# classified "structural" (the fail-safe direction — we'd rather over-flag a
+# classified "structural" (the fail-safe direction -- we'd rather over-flag a
 # real defect than downplay one as a benign artifact). If AWS ever surfaces
 # another pure-contention / condition cancellation code that a benchmark's small
 # key space can provoke, add it here.
@@ -77,7 +77,7 @@ def _classify_error_codes(error_codes: dict, cancellation_reason_codes: dict):
     kind is "artifact" when the dominant failure is contention/condition (a
     benchmark-key-space artifact) or "structural" otherwise. For a
     TransactionCanceledException the per-item cancellation reasons (when the
-    Lambda captured them) are authoritative — they say WHY it cancelled — so
+    Lambda captured them) are authoritative -- they say WHY it cancelled -- so
     they drive the classification; otherwise the top-level error code does.
     `reason_histogram` is the cancellation-reason map when present, else {}.
     """
@@ -90,7 +90,7 @@ def _classify_error_codes(error_codes: dict, cancellation_reason_codes: dict):
     if not codes:
         return "structural", "unknown", {}
     dominant = max(codes, key=lambda k: codes[k])
-    # Treat as artifact only when EVERY observed code is an artifact code — a
+    # Treat as artifact only when EVERY observed code is an artifact code -- a
     # mix that includes a real ValidationException stays structural.
     kind = "artifact" if all(_is_artifact_code(c) for c in codes) else "structural"
     return kind, dominant, {}
@@ -106,13 +106,13 @@ def _load_json(path: Path) -> dict:
 
 def _fmt_delta(obs: float, exp: float) -> str:
     if exp == 0:
-        return "—"
+        return "--"
     return f"{((obs - exp) / exp) * 100:+.1f}%"
 
 
 def _fmt_money(v: float) -> str:
     if v is None:
-        return "—"
+        return "--"
     if v >= 100:
         return f"${v:,.0f}"
     return f"${v:,.2f}"
@@ -120,17 +120,17 @@ def _fmt_money(v: float) -> str:
 
 def _fmt_ms(v) -> str:
     if v is None:
-        return "—"
+        return "--"
     return f"{v:.1f}"
 
 
 def _hot_cold_ratio(r: dict):
-    """Hot-partition p99 ÷ cold-partition p99 for a row, or None if unknown.
+    """Hot-partition p99 / cold-partition p99 for a row, or None if unknown.
 
-    Used to tell a genuine hot-partition effect (hot p99 ≫ cold p99) from
-    uniform capacity starvation (hot p99 ≈ cold p99). Returns None when the
+    Used to tell a genuine hot-partition effect (hot p99 >> cold p99) from
+    uniform capacity starvation (hot p99 ~ cold p99). Returns None when the
     distribution wasn't captured (uniform/quick/standard runs) or cold p99 is
-    zero/missing — callers treat None as "cannot confirm skew".
+    zero/missing -- callers treat None as "cannot confirm skew".
     """
     kd = r.get("key_distribution") or {}
     hot = kd.get("hot_partition_p99_ms")
@@ -141,7 +141,7 @@ def _hot_cold_ratio(r: dict):
 
 
 # ---------------------------------------------------------------------------
-# Per-pattern merge — observed vs expected
+# Per-pattern merge -- observed vs expected
 # ---------------------------------------------------------------------------
 
 
@@ -260,8 +260,8 @@ def _extract_signals(rows: list[dict]) -> dict:
                         "pattern_id": r["pattern_id"],
                         "monthly": r["extrapolated_monthly"],
                         "share": share,
-                        # op/consistency drive axiom selection in _classify_findings —
-                        # a transactional write's cost driver (Mechanics #18 2×) is
+                        # op/consistency drive axiom selection in _classify_findings --
+                        # a transactional write's cost driver (Mechanics #18 2x) is
                         # nothing like an analytical read's (move-off-DDB / projection).
                         "op": r["op"],
                         "consistency": r.get("consistency", "eventual"),
@@ -302,7 +302,7 @@ def _extract_signals(rows: list[dict]) -> dict:
     # Strong-read overhead: flag a strong-consistency read only if its share
     # of the total monthly bill is meaningful AND at least one cheaper
     # alternative exists (eventual read on the same aggregate). Without that
-    # comparison, a strong read isn't inherently a design flaw — it's only a
+    # comparison, a strong read isn't inherently a design flaw -- it's only a
     # finding when the added cost is non-trivial. Threshold: >10% of total
     # monthly.
     strong_reads: list[dict] = []
@@ -341,10 +341,10 @@ def _extract_signals(rows: list[dict]) -> dict:
         if r["cold_start"].get("cold_start_elevated")
     ]
 
-    # Key skew → hot-partition risk (Mechanics #3). Fires when a pattern's
+    # Key skew -> hot-partition risk (Mechanics #3). Fires when a pattern's
     # measured key distribution is materially uneven (stddev/mean > 0.5, the
     # threshold documented in performance-report-format.md) AND the hot
-    # partition shows distress — EITHER throttles OR materially elevated tail
+    # partition shows distress -- EITHER throttles OR materially elevated tail
     # latency relative to the design's other patterns. The latency arm matters
     # because on **on-demand** tables (the skill's default) adaptive capacity
     # isolates a single hot key and absorbs it as LATENCY rather than throttles:
@@ -360,8 +360,8 @@ def _extract_signals(rows: list[dict]) -> dict:
         if kd.get("stddev_over_mean", 0.0) <= 0.5:
             continue
         # Baseline-free hot-partition latency check: the hottest partition's p99
-        # vs the cold partitions' p99, WITHIN this pattern. > 1.8× means the hot
-        # key is materially slower than its peers — a hot partition by
+        # vs the cold partitions' p99, WITHIN this pattern. > 1.8x means the hot
+        # key is materially slower than its peers -- a hot partition by
         # definition, independent of any other pattern or absolute threshold.
         hot_p99 = kd.get("hot_partition_p99_ms")
         cold_p99 = kd.get("cold_partition_p99_ms")
@@ -384,10 +384,10 @@ def _extract_signals(rows: list[dict]) -> dict:
                 }
             )
 
-    # High non-throttle error rate → the pattern is structurally broken, not
+    # High non-throttle error rate -> the pattern is structurally broken, not
     # mispriced. This MUST be detected before large_delta below, because a
     # 100%-error pattern has observed_cu == 0 and would otherwise be misread as a
-    # benign "observed << expected" delta ("RPS/item-size off") — exactly the
+    # benign "observed << expected" delta ("RPS/item-size off") -- exactly the
     # silent-failure mode the real-AWS run exposed (a Query on a missing GSI, a
     # duplicate-key batch, an undefined GSI attr all exit 0 with errors recorded
     # but never surfaced). error_rate/error_codes come from the Lambda's exact
@@ -449,7 +449,7 @@ def _extract_signals(rows: list[dict]) -> dict:
         # below expected because most calls were REJECTED, not because the item
         # size was overstated. Labeling that "item_size_off" contradicts the
         # (correct, loud) throttle finding the Load-risk section already raised.
-        # Suppress — the throttle is the story, not a cost deviation.
+        # Suppress -- the throttle is the story, not a cost deviation.
         if r["throttles"] > 0:
             continue
         if abs(r["delta_pct"]) > TOLERANCE:
@@ -495,12 +495,12 @@ def _classify_findings(signals: dict) -> list[dict]:
         is_write = op in cc.WRITE_OPS
         is_txn = op == "TransactWriteItems" or (is_write and consistency == "transactional")
         # Axioms must match WHY this pattern dominates the bill:
-        #  - transactional write → the 2× transaction multiplier (Mechanics #18);
+        #  - transactional write -> the 2x transaction multiplier (Mechanics #18);
         #    aggregate tightness is the lever (Mechanics #1). NOT projection
-        #    (Mechanics #7) and NOT "move off DynamoDB" (Integration #8) — those
+        #    (Mechanics #7) and NOT "move off DynamoDB" (Integration #8) -- those
         #    are analytical-read levers and are nonsensical for an OLTP write.
-        #  - plain write → aggregate tightness + mutable-GSI-key amplification.
-        #  - read/scan → the original analytical triple (projection / move-off-DDB).
+        #  - plain write -> aggregate tightness + mutable-GSI-key amplification.
+        #  - read/scan -> the original analytical triple (projection / move-off-DDB).
         if is_txn:
             axioms = ["Mechanics #18", "Mechanics #1"]
         elif is_write:
@@ -510,7 +510,7 @@ def _classify_findings(signals: dict) -> list[dict]:
         # Severity: cost SHARE alone is load-invariant (it's computed from declared
         # peak, not anything the run stressed) and is already surfaced in
         # cost_report.md. Only escalate to high when a LIVE signal corroborates a
-        # real problem — throttles, or a materially-off observed-vs-expected delta.
+        # real problem -- throttles, or a materially-off observed-vs-expected delta.
         # Otherwise cap at medium so a clean unit-cost run doesn't manufacture a
         # high-severity finding that flips no_significant_findings / triggers the
         # iteration offer on its own.
@@ -637,7 +637,7 @@ def _classify_findings(signals: dict) -> list[dict]:
         )
         counter += 1
 
-    # Structural errors first — highest priority. A pattern failing most/all of
+    # Structural errors first -- highest priority. A pattern failing most/all of
     # its calls is broken, not mispriced; this is a correctness finding the agent
     # must act on (fix the index/attr/key shape) before any cost reasoning.
     for e in signals.get("high_error_rate_patterns", []):
@@ -654,7 +654,7 @@ def _classify_findings(signals: dict) -> list[dict]:
                 "calls that DID succeed are still representative of per-op cost. "
                 "To drive this pattern to a clean error rate, raise "
                 "`seed_items_per_table` well above the "
-                "write RPS, or lower the driven rate — do NOT change the design "
+                "write RPS, or lower the driven rate -- do NOT change the design "
                 "on account of this error rate alone. Confirm against the "
                 "real cancellation-reason histogram in the Correctness section."
             )
@@ -667,7 +667,7 @@ def _classify_findings(signals: dict) -> list[dict]:
                 "references an attribute the table never defines; a batch/"
                 "transact request built duplicate or unseeded keys; or the "
                 "Lambda role lacks the action. Fix the structural cause and "
-                "re-run — the cost/latency numbers for this pattern are not "
+                "re-run -- the cost/latency numbers for this pattern are not "
                 "meaningful until it succeeds."
             )
         out.append(
@@ -756,7 +756,7 @@ def _render_report(
     # Freshness markers (benchmark_model.py stamps these only after a run
     # completes). Rendered in the Deployment block so the user/agent can
     # confirm the report reflects the run they just launched, not a stale
-    # summary. Absent on older summaries → rendered as "<not recorded>".
+    # summary. Absent on older summaries -> rendered as "<not recorded>".
     completed_at = summary.get("benchmark_completed_at") or "<not recorded>"
     wall_seconds = summary.get("benchmark_wall_seconds")
     total_rows = summary.get("total_rows")
@@ -780,7 +780,7 @@ def _render_report(
         for r in rows
     )
 
-    # Crude actual-bill estimate: mean_observed_cu × number of calls × unit price.
+    # Crude actual-bill estimate: mean_observed_cu x number of calls x unit price.
     # Vector bytes are added on the same basis: they are real charges the run incurred,
     # and omitting them understated the spend for any design with a vector index.
     bench_cost = 0.0
@@ -796,11 +796,11 @@ def _render_report(
             * cc.VECTOR_WRITE_PRICE_PER_GB
         ) * r["call_count"]
 
-    # Effective driven throughput — describe what the run ACTUALLY drove, from
+    # Effective driven throughput -- describe what the run ACTUALLY drove, from
     # the per-pattern bench_rps in the summary, not the nominal scale_factor
     # (which the min_rps floor can override, as it did when a small-peak design
     # got clamped to ~1 rps and "0 throttles" meant nothing). When every pattern
-    # ran at the min floor, this was a unit-cost sample, not a load test — say so.
+    # ran at the min floor, this was a unit-cost sample, not a load test -- say so.
     _bench_rates = [float(r["bench_rps"]) for r in rows if r.get("bench_rps") is not None]
     _min_rps = float(cfg.get("min_rps_per_pattern", 1))
     _floor_bound = bool(_bench_rates) and all(abs(b - _min_rps) < 1e-6 for b in _bench_rates)
@@ -809,13 +809,13 @@ def _render_report(
         _rate_str = (
             f"{_lo:.2g} rps/pattern"
             if abs(_hi - _lo) < 1e-6
-            else f"{_lo:.2g}–{_hi:.2g} rps/pattern"
+            else f"{_lo:.2g}-{_hi:.2g} rps/pattern"
         )
     else:
         _rate_str = "unknown rate"
     if _floor_bound:
         _scale_clause = (
-            f"drove {_rate_str} — the `min_rps_per_pattern` floor, BELOW the "
+            f"drove {_rate_str} -- the `min_rps_per_pattern` floor, BELOW the "
             f"configured scale_factor, so this is a UNIT-COST sample, not a load "
             f"test: it validates per-op cost and unloaded latency only, NOT load, "
             f"throttling, or behaviour at your declared peak"
@@ -831,7 +831,7 @@ def _render_report(
 
     a("# DynamoDB Live Performance Report\n")
 
-    # Coverage banner — belt-and-suspenders for a partial/zero-coverage summary
+    # Coverage banner -- belt-and-suspenders for a partial/zero-coverage summary
     # (e.g. a hand-fed or interrupted run). benchmark_model already exits with a
     # warning on incomplete coverage, but the report is sometimes generated from
     # a summary directly, so surface it loudly at the very top too.
@@ -840,7 +840,7 @@ def _render_report(
     if _cov.get("coverage_incomplete") or _cov.get("missing_patterns") or _all_zero:
         _miss = _cov.get("missing_patterns") or []
         a(
-            "> ⚠️ **INCOMPLETE COVERAGE — do not trust these numbers as a full "
+            "> [WARNING] **INCOMPLETE COVERAGE -- do not trust these numbers as a full "
             "result.** "
             + (f"Patterns with no measurement: {', '.join(_miss)}. " if _miss else "")
             + ("Every measured pattern recorded zero calls. " if _all_zero else "")
@@ -854,10 +854,10 @@ def _render_report(
         f"{_scale_clause}, against real AWS resources deployed in "
         f"{account}/{region}. Capacity numbers are live observations from "
         "ReturnConsumedCapacity. Monthly-cost figures extrapolate linearly: "
-        "observed per-op capacity × declared peak RPS × on-demand unit price "
-        "(full public rate; rates vary by region — confirm against the AWS "
+        "observed per-op capacity x declared peak RPS x on-demand unit price "
+        "(full public rate; rates vary by region -- confirm against the AWS "
         "DynamoDB pricing page for your region). This benchmark does NOT prove the design "
-        "sustains declared peak RPS — it validates per-op unit cost, latency, "
+        "sustains declared peak RPS -- it validates per-op unit cost, latency, "
         "and GSI amplification shape. Not measured: stream consumers, TTL "
         "sweep, autoscaling, cross-region replication, long-tail bursts, any "
         "non-DDB services in the design.\n"
@@ -865,17 +865,17 @@ def _render_report(
     if is_representative:
         a(
             "> **Representative mode:** this run drove ~"
-            f"{cfg.get('scale_factor', 0.15)}× declared peak with **zipf hot-key "
+            f"{cfg.get('scale_factor', 0.15)}x declared peak with **zipf hot-key "
             "sampling** and **realistic item-collection cardinality** "
             f"({cfg.get('items_per_partition', 40)} items/partition) to surface "
-            "SCALE risk — hot-partition throttling, throttle-under-load, GSI "
+            "SCALE risk -- hot-partition throttling, throttle-under-load, GSI "
             "amplification at volume, and Query-at-cardinality. **Throttle and "
             "latency numbers here are load-risk signals collected under "
-            "deliberate skew at bounded scale — they scale NONLINEARLY with "
+            "deliberate skew at bounded scale -- they scale NONLINEARLY with "
             "skew and must NOT be linearly extrapolated to peak.** The cost "
             "figures above remain valid: they extrapolate per-op capacity "
             "(scale-invariant) against declared peak, not the driven bench RPS. "
-            "One in-region Lambda tops out near 1,500–2,000 RPS/pattern, so this "
+            "One in-region Lambda tops out near 1,500-2,000 RPS/pattern, so this "
             "surfaces hot-partition risk at bounded cost; it does not prove "
             "sustained-peak capacity.\n"
         )
@@ -885,13 +885,13 @@ def _render_report(
     )
     a(f"**Calculator Monthly Cost (expected):              {_fmt_money(total_expected)}**")
     a(
-        f"**Delta:                                           {f'{delta:+.1f}%' if delta is not None else '—'}**"
+        f"**Delta:                                           {f'{delta:+.1f}%' if delta is not None else '--'}**"
     )
     if delta is not None and total_expected > 0 and vector_search_monthly / total_expected > 0.01:
         a(
             f"\n*Of the measured figure, {_fmt_money(vector_search_monthly)}/month is vector "
             f"**search** cost. The calculator deliberately does not price search, so that "
-            f"amount is missing from the expected column by design — it accounts for "
+            f"amount is missing from the expected column by design -- it accounts for "
             f"{vector_search_monthly / total_expected * 100:+.1f} points of the delta above and "
             f"is not a model error. See **Vector capacity (measured)** below.*"
         )
@@ -899,11 +899,11 @@ def _render_report(
         f"**This benchmark consumed: ~{_fmt_money(bench_cost)} in actual AWS charges** *(seed + warmup + measurement)*\n"
     )
 
-    a("| Source                  | Measured Monthly | Calculator | Δ% |")
+    a("| Source                  | Measured Monthly | Calculator | Delta% |")
     a("| ----------------------- | ---------------- | ---------- | -- |")
-    a("| Storage (not measured)  | —                | —          | —  |")
+    a("| Storage (not measured)  | --                | --          | --  |")
     a(
-        f"| Read/write requests     | {_fmt_money(total_extrapolated):<16} | {_fmt_money(total_expected):<10} | {(f'{delta:+.1f}%' if delta is not None else '—'):<2} |\n"
+        f"| Read/write requests     | {_fmt_money(total_extrapolated):<16} | {_fmt_money(total_expected):<10} | {(f'{delta:+.1f}%' if delta is not None else '--'):<2} |\n"
     )
 
     # Deployment.
@@ -930,7 +930,7 @@ def _render_report(
         "See `cost_report.md` for the storage breakdown from the calculator.\n"
     )
 
-    # Seed verification — how many items actually landed per table before the
+    # Seed verification -- how many items actually landed per table before the
     # measurement phase. A shortfall means measurements ran against the wrong
     # data shape (see the seed_shortfall correctness finding).
     sv_map = summary.get("seed_verification") or {}
@@ -947,8 +947,8 @@ def _render_report(
                 status = "SHORTFALL" if not sv.get("sampled") else "below cap (sampled)"
             act_cell = f"{act}{'+' if sv.get('sampled') else ''}"
             a(
-                f"| `{tname}` | {exp if exp is not None else '—'} | "
-                f"{act_cell if act is not None else '—'} | {status} |"
+                f"| `{tname}` | {exp if exp is not None else '--'} | "
+                f"{act_cell if act is not None else '--'} | {status} |"
             )
         a("")
 
@@ -957,18 +957,18 @@ def _render_report(
     a('Steady-state only (warmup excluded). See "Cold start" below for warmup numbers.\n')
     a(
         "| Pattern | Operation | Table/Index | Peak RPS | Bench RPS | "
-        "Observed RCU/WCU | Expected RCU/WCU | Δ | p50 ms | p99 ms | Throttles | Errors | Extrapolated Monthly |"
+        "Observed RCU/WCU | Expected RCU/WCU | Delta | p50 ms | p99 ms | Throttles | Errors | Extrapolated Monthly |"
     )
     a("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     # Driver-saturation detection (Little's Law). The benchmark drives each
     # pattern with `concurrency_per_pattern` threads sharing a connection pool.
-    # The mean number of requests in flight is bench_rps × mean_latency
+    # The mean number of requests in flight is bench_rps x mean_latency
     # (p50, seconds). When that approaches/exceeds the thread count, requests
     # queue INSIDE the driver waiting for a worker/connection, so the measured
     # tail (p99) reflects client-side queueing, not DynamoDB. Flag those rows so
     # a reader of this report alone isn't alarmed by an inflated p99 that the
     # service didn't cause. (With the pool now sized to the concurrency this is
-    # rarer, but high bench_rps × non-trivial latency can still saturate the
+    # rarer, but high bench_rps x non-trivial latency can still saturate the
     # threads themselves.)
     _concurrency = int(cfg.get("concurrency_per_pattern", 32) or 32)
 
@@ -992,9 +992,9 @@ def _render_report(
                 err_cell += " *"
         else:
             err_cell = "0"
-        # A '†' on p99 marks driver saturation: the latency tail is client-side
+        # A '[1]' on p99 marks driver saturation: the latency tail is client-side
         # queueing (threads/pool), not DynamoDB.
-        p99_cell = _fmt_ms(r["p99_ms"]) + (" †" if _driver_saturated(r) else "")
+        p99_cell = _fmt_ms(r["p99_ms"]) + (" [1]" if _driver_saturated(r) else "")
         a(
             "| {pid} | {op} | {ti} | {pk} | {bk:.2f} | {oc:.3f} | {ec:.3f} | {d} | {p50} | {p99} | {thr} | {er} | {mo} |".format(
                 pid=r["pattern_id"],
@@ -1017,12 +1017,12 @@ def _render_report(
         a(
             "> `*` = this pattern errored on most/all calls (non-throttle). Its "
             "Observed RCU/WCU, latency, and Extrapolated Monthly are **not "
-            "meaningful** — the operation failed. See **Correctness** below.\n"
+            "meaningful** -- the operation failed. See **Correctness** below.\n"
         )
     if saturated:
         a(
-            f"> `†` = **driver-saturated p99 — not a DynamoDB latency.** At the "
-            f"driven rate, the in-flight request count (rps × p50) meets or "
+            f"> `[1]` = **driver-saturated p99 -- not a DynamoDB latency.** At the "
+            f"driven rate, the in-flight request count (rps x p50) meets or "
             f"exceeds the {_concurrency} benchmark driver threads, so these "
             f"requests queue client-side waiting for a worker/connection and the "
             f"**p99 reflects the single-Lambda load generator, not the service**. "
@@ -1032,10 +1032,10 @@ def _render_report(
             f"lower rps. Affected: {', '.join(saturated)}.\n"
         )
 
-    # Correctness — operation errors. Placed high in the report (right after the
+    # Correctness -- operation errors. Placed high in the report (right after the
     # measurements) so a broken run cannot be mistaken for a clean one. A pattern
     # erroring on ~all calls is EITHER a design/JSON bug (structural) OR a
-    # benchmark artifact (contention on the small synthetic key space) — the two
+    # benchmark artifact (contention on the small synthetic key space) -- the two
     # are split below so a contention artifact is never narrated as "your design
     # is broken".
     high_err = signals.get("high_error_rate_patterns", [])
@@ -1069,11 +1069,11 @@ def _render_report(
             )
             _err_table(struct_err)
             a(
-                "Likely causes by error code: `ValidationException` → a Query/GSI "
+                "Likely causes by error code: `ValidationException` -> a Query/GSI "
                 "names an index that doesn't exist, an operation references an "
                 "undefined attribute, or a batch/transact built duplicate/unseeded "
-                "keys; `ResourceNotFoundException` → the pattern's table isn't in "
-                "the design; `AccessDeniedException` → the benchmark role lacks the "
+                "keys; `ResourceNotFoundException` -> the pattern's table isn't in "
+                "the design; `AccessDeniedException` -> the benchmark role lacks the "
                 "action. Fix the structural cause in `dynamodb_data_model.json` and "
                 "re-run; do not interpret the cost numbers for these patterns until "
                 "they succeed.\n"
@@ -1081,25 +1081,25 @@ def _render_report(
 
         if artifact_err:
             a(
-                "**Benchmark artifact — NOT a design defect.** These patterns showed "
+                "**Benchmark artifact -- NOT a design defect.** These patterns showed "
                 "a high error rate, but the failures are `TransactionConflict` / "
                 "condition-check rejections, which come from the benchmark driving "
                 "many concurrent writes against a small synthetic key pool "
                 "(`seed_items_per_table`), not from anything wrong with the schema or the "
                 "access-pattern JSON. Under real traffic with unique IDs these do "
                 "not occur. The successful calls' per-op cost/latency are still "
-                "representative — do **not** change the design on account of this "
+                "representative -- do **not** change the design on account of this "
                 "error rate:\n"
             )
             _err_table(artifact_err)
             # Render the REAL cancellation-reason histogram when the Lambda
-            # captured it — so the agent narrates from data, not a guess about
+            # captured it -- so the agent narrates from data, not a guess about
             # what cancelled.
             for e in artifact_err:
                 hist = e.get("cancellation_reason_codes") or {}
                 if hist:
                     parts = ", ".join(
-                        f"`{c}` ×{n}" for c, n in sorted(hist.items(), key=lambda kv: -kv[1])
+                        f"`{c}` x{n}" for c, n in sorted(hist.items(), key=lambda kv: -kv[1])
                     )
                     a(
                         f"- {e['pattern_id']} cancellation reasons (per-item, "
@@ -1114,7 +1114,7 @@ def _render_report(
         if minor_err:
             a(
                 "Patterns with a LOW but non-zero error rate (transient or partial "
-                "— below the structural threshold, cost numbers still usable): "
+                "-- below the structural threshold, cost numbers still usable): "
                 + ", ".join(
                     f"{e['pattern_id']} ({e['errors']}/{e['call_count']}, "
                     f"`{e['top_error_code']}`)"
@@ -1123,7 +1123,7 @@ def _render_report(
                 + ".\n"
             )
 
-    # Load-risk signals — representative mode only. These are the numbers that
+    # Load-risk signals -- representative mode only. These are the numbers that
     # do NOT appear in a 1%-scale unit-cost run: hot-partition throttling and
     # the latency/amplification observed under deliberate skew.
     if is_representative:
@@ -1131,7 +1131,7 @@ def _render_report(
         a(
             "Collected under zipf hot-key sampling at bounded scale. **These scale "
             "nonlinearly with key skew and must not be linearly extrapolated to "
-            "peak** — they characterize hot-partition and throttle RISK, not "
+            "peak** -- they characterize hot-partition and throttle RISK, not "
             "sustained-peak capacity.\n"
         )
         a("| Pattern | Throttles | p99 ms | Observed amp | Top-key share | Distinct keys |")
@@ -1141,13 +1141,13 @@ def _render_report(
             tks = kd.get("top_key_share")
             ndk = kd.get("n_distinct_keys")
             a(
-                "| {pid} | {thr} | {p99} | {amp:.2f}× | {tks} | {ndk} |".format(
+                "| {pid} | {thr} | {p99} | {amp:.2f}x | {tks} | {ndk} |".format(
                     pid=r["pattern_id"],
                     thr=r["throttles"],
                     p99=_fmt_ms(r["p99_ms"]),
                     amp=r["amplification_ratio"],
-                    tks=(f"{tks:.0%}" if tks is not None else "—"),
-                    ndk=(ndk if ndk is not None else "—"),
+                    tks=(f"{tks:.0%}" if tks is not None else "--"),
+                    ndk=(ndk if ndk is not None else "--"),
                 )
             )
         a("")
@@ -1157,10 +1157,10 @@ def _render_report(
         # Skew-vs-starvation split. A throttled pattern points at a HOT PARTITION
         # only if the hot partition's p99 is materially above the cold ones'
         # (the same within-pattern differential the key_skew signal uses). When
-        # hot p99 ≈ cold p99, every partition throttled UNIFORMLY — that is
+        # hot p99 ~ cold p99, every partition throttled UNIFORMLY -- that is
         # capacity starvation (the whole table/GSI is under-provisioned for the
         # driven load), NOT key skew, and must not be attributed to the
-        # partition key. Missing/zero cold p99 → can't isolate → treat as
+        # partition key. Missing/zero cold p99 -> can't isolate -> treat as
         # not-confirmed-skew (conservative).
         throttled_skew = [
             r for r in throttled if _hot_cold_ratio(r) is not None and _hot_cold_ratio(r) >= 1.3
@@ -1169,7 +1169,7 @@ def _render_report(
         if throttled_skew:
             a(
                 "Patterns with steady-state throttles AND a hot partition p99 "
-                "materially above the cold partitions' — a hot partition is at the "
+                "materially above the cold partitions' -- a hot partition is at the "
                 "per-partition ceiling (Mechanics #3, ~1000 WCU / 3000 RCU). "
                 "Write-shard the partition key (hash suffix) or re-aggregate: "
                 + ", ".join(r["pattern_id"] for r in throttled_skew)
@@ -1177,11 +1177,11 @@ def _render_report(
             )
         if throttled_starved:
             a(
-                "Patterns that throttled with hot-partition p99 ≈ cold-partition "
-                "p99 — this is **uniform capacity starvation, NOT key skew**: the "
+                "Patterns that throttled with hot-partition p99 ~ cold-partition "
+                "p99 -- this is **uniform capacity starvation, NOT key skew**: the "
                 "whole table/GSI was under-provisioned for the driven load, so "
                 "every partition throttled equally. This run did **not** isolate a "
-                "hot-partition effect for these — do not attribute it to the "
+                "hot-partition effect for these -- do not attribute it to the "
                 "partition key. To test skew specifically, re-run with capacity set "
                 "*above* uniform demand so only a genuinely hot partition throttles: "
                 + ", ".join(r["pattern_id"] for r in throttled_starved)
@@ -1190,7 +1190,7 @@ def _render_report(
         if lat_only:
             a(
                 "Patterns whose hot partition shows **elevated tail latency** (no "
-                "throttles) under skew — on an on-demand table this is adaptive "
+                "throttles) under skew -- on an on-demand table this is adaptive "
                 "capacity absorbing a hot key as latency rather than rejecting it. "
                 "It signals the same partition-key concentration (Mechanics #3) and "
                 "the same fix (write-shard / re-aggregate); on a PROVISIONED table "
@@ -1227,7 +1227,7 @@ def _render_report(
         )
     a("")
     a(
-        'A pattern is flagged "Elevated" when warmup p99 > 2× steady-state p99 — '
+        'A pattern is flagged "Elevated" when warmup p99 > 2x steady-state p99 -- '
         "a signal that callers hitting this pattern immediately after deploy will "
         "see materially worse latency than the steady-state numbers suggest.\n"
     )
@@ -1256,7 +1256,7 @@ def _render_report(
     a("**Validated by this run**\n")
     a(
         "- Mechanics #18: RCU/WCU formulas reproduced within tolerance for patterns "
-        "where `|Δ| ≤ 10%`. See Access Pattern Measurements table."
+        "where `|Delta| <= 10%`. See Access Pattern Measurements table."
     )
     # Mechanics #15 eventual/strong 2:1 check if we have both
     a(
@@ -1302,38 +1302,38 @@ def _render_report(
             a(
                 f"- {r['pattern_id']}: observed {r['observed_cu']:.3f} vs "
                 f"expected {r['expected_cu']:.3f} "
-                f"(Δ {_fmt_delta(r['observed_cu'], r['expected_cu'])}). Likely: {likely}."
+                f"(Delta {_fmt_delta(r['observed_cu'], r['expected_cu'])}). Likely: {likely}."
             )
             any_dev = True
     if structural_pids:
         a(
-            f"- ({len(structural_pids)} pattern(s) excluded here — they FAILED "
+            f"- ({len(structural_pids)} pattern(s) excluded here -- they FAILED "
             "most/all calls and are reported under **Correctness** above, not as "
             "cost deviations.)"
         )
     if artifact_pids:
         a(
-            f"- ({len(artifact_pids)} pattern(s) excluded here — their high error "
+            f"- ({len(artifact_pids)} pattern(s) excluded here -- their high error "
             "rate is a benchmark artifact (contention on the synthetic key space), "
             "not a cost or design issue; see **Correctness** above.)"
         )
     if throttled_excluded:
         a(
-            f"- ({throttled_excluded} pattern(s) excluded here — they THROTTLED and "
+            f"- ({throttled_excluded} pattern(s) excluded here -- they THROTTLED and "
             "are reported under **Load-risk signals** above, not as cost "
             "deviations.)"
         )
     if not any_dev:
-        a("- None: every pattern within ±10% of calculator prediction.")
+        a("- None: every pattern within +/-10% of calculator prediction.")
     a("")
     a("**Not validated by this run**\n")
     if is_representative:
         a(
             "- Mechanics #3 (per-partition ceilings 1000 WCU / 3000 RCU): "
-            "PROBED under zipf skew at bounded scale — see Load-risk signals. "
+            "PROBED under zipf skew at bounded scale -- see Load-risk signals. "
             "Throttles indicate a hot partition near its ceiling ONLY when the hot "
             "partition's p99 is materially above the cold partitions'; throttles "
-            "with hot p99 ≈ cold p99 are uniform capacity starvation, not skew, and "
+            "with hot p99 ~ cold p99 are uniform capacity starvation, not skew, and "
             "do not isolate a hot-partition effect. Absence of throttles is not "
             "proof of headroom at full peak."
         )
@@ -1349,7 +1349,7 @@ def _render_report(
     a("- Patterns #1 (idempotency middleware): application layer, not DDB alone.")
     a("- Integration #1 (consumer idempotency): consumers not deployed.\n")
 
-    # Vector capacity — measured, because it cannot be soundly predicted.
+    # Vector capacity -- measured, because it cannot be soundly predicted.
     vector_rows = [
         r for r in rows if r["observed_vector_search_bytes"] or r["observed_vector_write_bytes"]
     ]
@@ -1357,7 +1357,7 @@ def _render_report(
         a("## Vector capacity (measured)\n")
         a(
             "Vector indexes are metered in **bytes**, not RCU/WCU, so none of this "
-            "appears in the capacity columns above — a `SearchVectors` pattern legitimately "
+            "appears in the capacity columns above -- a `SearchVectors` pattern legitimately "
             "consumes 0 CU. These are observed `VectorSearchRequestBytes` and "
             "`VectorWriteRequestBytes` per call, taken from `ConsumedCapacity` on this "
             "deployment.\n"
@@ -1367,7 +1367,7 @@ def _render_report(
             f"declines to price **search**: the share of an index that approximate-nearest-"
             f"neighbour search examines varied by roughly 10x across configurations in "
             f"testing, so a predicted figure would be confidently wrong. The numbers below "
-            f"close that gap by measurement — per-call bytes observed on this design, at its "
+            f"close that gap by measurement -- per-call bytes observed on this design, at its "
             f"real dimensions and projection, multiplied by declared peak. Search is billed at "
             f"${cc.VECTOR_SEARCH_PRICE_PER_GB}/GB and writes at "
             f"${cc.VECTOR_WRITE_PRICE_PER_GB}/GB.\n"
@@ -1379,7 +1379,7 @@ def _render_report(
         a("| --- | --- | --- | --- | --- | --- | --- |")
         for r in vector_rows:
             wb = r["observed_vector_write_bytes_by_index"]
-            idx = r["index"] or (", ".join(sorted(wb)) if wb else "—")
+            idx = r["index"] or (", ".join(sorted(wb)) if wb else "--")
             a(
                 f"| {r['pattern_id']} | {r['op']} | {idx} | "
                 f"{r['observed_vector_search_bytes']:,.0f} | "
@@ -1391,7 +1391,7 @@ def _render_report(
         a(
             f"**Vector capacity total: {_fmt_money(vector_total)}/month** at declared peak, "
             "already included in the extrapolated monthly figures above. Vector index "
-            "*storage* is not in this total — it rolls into table storage, which the cost "
+            "*storage* is not in this total -- it rolls into table storage, which the cost "
             "report covers.\n"
         )
         min_b = cc.VECTOR_METERING_MIN_BYTES
@@ -1418,7 +1418,7 @@ def _render_report(
     elif structural_pids:
         a(
             "Cost validation is INCONCLUSIVE for "
-            f"{len(structural_pids)} pattern(s) that errored on most/all calls — "
+            f"{len(structural_pids)} pattern(s) that errored on most/all calls -- "
             "their observed capacity is 0 because the operation failed, not because "
             "the design is cheap (see **Correctness** above). Fix those patterns "
             "and re-run before trusting their cost numbers. The patterns that DID "
@@ -1429,7 +1429,7 @@ def _render_report(
             "Cost numbers are trustworthy. "
             f"{len(artifact_pids)} pattern(s) showed a high error rate, but it is a "
             "benchmark artifact (key-space contention, see **Correctness** above), "
-            "not a design issue — the successful calls reproduce the calculator "
+            "not a design issue -- the successful calls reproduce the calculator "
             "within tolerance.\n"
         )
     else:
@@ -1440,7 +1440,7 @@ def _render_report(
         )
 
     # Cost-concentration caveat (P2.6): when one pattern dominates the bill, the
-    # headline is only as accurate as that pattern's item-size/RPS inputs — carry
+    # headline is only as accurate as that pattern's item-size/RPS inputs -- carry
     # the fragility note from the calculator into the live report so the two
     # artifacts agree.
     dom = signals.get("dominant_cost_patterns") or []
@@ -1449,16 +1449,16 @@ def _render_report(
         dom_row = next((r for r in rows if r["pattern_id"] == top["pattern_id"]), None)
         delta_bit = ""
         if dom_row and dom_row.get("delta_pct") is not None:
-            delta_bit = f" (its observed vs expected Δ here is " f"{dom_row['delta_pct']:+.0%})"
+            delta_bit = f" (its observed vs expected Delta here is " f"{dom_row['delta_pct']:+.0%})"
         a(
             f"Cost concentration: `{top['pattern_id']}` drives ~{top['share']:.0%} of "
             "the estimate, so the headline is dominated by that one pattern's "
-            f"item-size and RPS inputs{delta_bit} — a misstatement there moves the "
+            f"item-size and RPS inputs{delta_bit} -- a misstatement there moves the "
             "whole number roughly in proportion. Validate those inputs before "
             "quoting the figure.\n"
         )
 
-    # Design reflection — scaffolded; agent authors the subsections.
+    # Design reflection -- scaffolded; agent authors the subsections.
     a("## Design reflection\n")
     a(
         f"Authored by the agent from `design_findings.json` ({len(findings)} "
@@ -1479,7 +1479,7 @@ def _render_report(
                     f"{ev.get('expected')} expected items. Measurements for "
                     "patterns on this table ran against far less data than declared "
                     "(hot-key skew and item-collection cardinality are both wrong) "
-                    "— fix the seed (or seed volume) and re-run before trusting any "
+                    "-- fix the seed (or seed volume) and re-run before trusting any "
                     "number on this table."
                 )
                 continue
@@ -1489,11 +1489,11 @@ def _render_report(
                 f"Error rate {ev.get('error_rate', 0.0):.0%}, top code "
                 f"`{ev.get('top_error_code', 'unknown')}` "
                 f"({ev.get('errors', '?')}/{ev.get('call_count', '?')} calls). "
-                "Cost/latency for this pattern are meaningless until it succeeds — "
+                "Cost/latency for this pattern are meaningless until it succeeds -- "
                 "fix the structural cause in the design JSON and re-run."
             )
     else:
-        a("- None — every pattern completed its calls without structural errors.")
+        a("- None -- every pattern completed its calls without structural errors.")
     a("")
 
     a("### Input-accuracy findings (update the inputs, not the design)\n")
@@ -1510,7 +1510,7 @@ def _render_report(
                 "update JSON and re-run calculator only."
             )
     else:
-        a("- None — declared inputs reproduce observed capacity within tolerance.")
+        a("- None -- declared inputs reproduce observed capacity within tolerance.")
     a("")
 
     a("### Design findings (the structure itself is the source)\n")
@@ -1528,24 +1528,24 @@ def _render_report(
         a("Measurements support the current design. No alternative is argued " "for by this run.")
     a("")
 
-    # Iteration offer — when at least one design OR correctness finding exists
+    # Iteration offer -- when at least one design OR correctness finding exists
     # (a structurally broken pattern needs a JSON fix + re-run just as much as a
     # design finding does).
     if design_f or correctness_f:
         a("## Iteration offer\n")
         a(
-            "- **Calculator-only re-eval** — update the JSON with the proposed "
+            "- **Calculator-only re-eval** -- update the JSON with the proposed "
             "changes from the Design findings section above and re-run "
             "`scripts/calculate_costs.py`. No AWS calls."
         )
         a(
-            "- **Full re-eval** — calculator + a second live validation against "
+            "- **Full re-eval** -- calculator + a second live validation against "
             "the revised design. Requires re-consenting to AWS deployment and "
             "running the prior `teardown.sh` first unless the change is "
             "additive-only (e.g. adding a GSI)."
         )
         a(
-            "- **No changes** — record the decision as a deviation per Artifact "
+            "- **No changes** -- record the decision as a deviation per Artifact "
             "#5 with your stated reason.\n"
         )
 
@@ -1578,7 +1578,7 @@ def main():
 
     # Seed-shortfall finding (P1.5). verify_seed now reports a bounded-pagination
     # actual count plus a `sampled` flag. A real shortfall (passed:false AND
-    # sampled:false — we counted to exhaustion, not just to the cap) means the
+    # sampled:false -- we counted to exhaustion, not just to the cap) means the
     # table seeded far fewer items than declared, so its measurements ran against
     # the wrong data shape: high-severity correctness. A `sampled` non-pass is
     # only "we stopped counting at the cap" and is NOT a defect.
@@ -1613,16 +1613,16 @@ def main():
     ]
 
     # "Significant" = something the agent must ACT on: any design finding, or a
-    # STRUCTURAL correctness finding (a pattern failing most/all calls — the
+    # STRUCTURAL correctness finding (a pattern failing most/all calls -- the
     # high-severity pattern_high_error_rate). A 100%-error pattern is NOT a clean
-    # run even with no design findings — surfacing that is the whole point of the
+    # run even with no design findings -- surfacing that is the whole point of the
     # error signal added after the real-AWS run found silent 100%-error patterns.
     # A LOW-severity minor-error note (e.g. 1 transient error in 200 calls) is
     # informational AWS noise, not an action item: it stays visible in the
     # findings + report but does NOT flip the clean-run bit, so realistic
     # transient blips don't raise a false "significant finding".
     # A dominant_cost finding that did NOT reach high severity is load-invariant
-    # cost concentration with no live corroboration — it's already shown in
+    # cost concentration with no live corroboration -- it's already shown in
     # cost_report.md and must not, on its own, flip the clean-run bit or trigger
     # the iteration offer on an otherwise-clean unit-cost run. Every other design
     # finding (throttles, skew, amplification, page-cap, strong-read, cold-start)
@@ -1636,7 +1636,7 @@ def main():
 
     significant = [f for f in findings if _is_significant(f)]
     # Incomplete coverage (missing patterns, or a partial/zero-call run) is itself
-    # a reason the run is not a clean result — surface it as a flag the agent
+    # a reason the run is not a clean result -- surface it as a flag the agent
     # reads and let it flip the clean-run bit so a half-finished benchmark never
     # reports "no significant findings".
     cov = summary.get("coverage") or {}

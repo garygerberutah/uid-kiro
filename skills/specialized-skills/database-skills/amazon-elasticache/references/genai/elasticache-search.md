@@ -124,7 +124,7 @@ else:
 | FT._LIST | Documented, supported |
 | FT.DROPINDEX | Documented, supported |
 
-> **⚠️ FT.AGGREGATE is NOT available on ElastiCache.** FT.AGGREGATE is supported on Amazon MemoryDB but is not supported on ElastiCache. If you need server-side aggregation over vector search results, use MemoryDB or perform aggregation client-side after FT.SEARCH.
+> **[WARNING] FT.AGGREGATE is NOT available on ElastiCache.** FT.AGGREGATE is supported on Amazon MemoryDB but is not supported on ElastiCache. If you need server-side aggregation over vector search results, use MemoryDB or perform aggregation client-side after FT.SEARCH.
 
 ---
 
@@ -135,7 +135,7 @@ else:
 | Max indexes per cluster | 10 |
 | Max fields per index | 50 |
 | Max vector dimensions | 32768 |
-| HNSW M (max edges per node) | 2,000,000 (practical recommendation: 16–64 for most workloads; higher values increase memory usage and index build time) |
+| HNSW M (max edges per node) | 2,000,000 (practical recommendation: 16-64 for most workloads; higher values increase memory usage and index build time) |
 | HNSW EF_CONSTRUCTION | 4096 |
 | HNSW EF_RUNTIME | 4096 |
 | Max prefixes per index | 16 |
@@ -150,7 +150,7 @@ else:
 
 FT.CREATE triggers a background backfill for all existing keys matching the PREFIX. Query operations attempted while an index is undergoing backfill are not allowed and are terminated with an error.
 
-> **Backfill types:** During initial index creation (FT.CREATE), queries against the index are blocked and return an error until backfill completes. However, during scaling events (e.g., adding shards), the index may undergo backfill with reduced recall for search queries — queries are allowed but may return incomplete results.
+> **Backfill types:** During initial index creation (FT.CREATE), queries against the index are blocked and return an error until backfill completes. However, during scaling events (e.g., adding shards), the index may undergo backfill with reduced recall for search queries -- queries are allowed but may return incomplete results.
 
 **Check readiness with FT.INFO.** Key fields to monitor:
 

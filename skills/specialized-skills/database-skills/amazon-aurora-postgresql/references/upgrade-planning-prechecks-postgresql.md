@@ -14,7 +14,7 @@ aws ssm send-command --instance-ids {instance_id} --document-name "AWS-RunShellS
   --region {region} --output json --query "Command.CommandId"
 ```
 
-This writes the password to a temporary `.pgpass` file (`chmod 600`, removed after) rather than `export PGPASSWORD`, which is visible via `/proc/<pid>/environ` — matching the secure temp-file pattern used in the Aurora MySQL prechecks. Alternatively, prefer **IAM database authentication** where supported — it eliminates passwords entirely. See the AWS docs for enabling IAM auth on Aurora PostgreSQL.
+This writes the password to a temporary `.pgpass` file (`chmod 600`, removed after) rather than `export PGPASSWORD`, which is visible via `/proc/<pid>/environ` -- matching the secure temp-file pattern used in the Aurora MySQL prechecks. Alternatively, prefer **IAM database authentication** where supported -- it eliminates passwords entirely. See the AWS docs for enabling IAM auth on Aurora PostgreSQL.
 
 If psql not installed:
 
@@ -45,7 +45,7 @@ Flag: Extensions that may not be available or changed in target version. Key one
 SELECT schemaname, tablename, indexname, indexdef FROM pg_indexes WHERE indexdef LIKE '%USING hash%';
 ```
 
-Flag: 🟡 Must REINDEX after upgrade.
+Flag: [YELLOW] Must REINDEX after upgrade.
 
 ### 3. Unknown/Invalid Data Types
 
@@ -59,7 +59,7 @@ WHERE n.nspname NOT IN ('pg_catalog','information_schema','pg_toast')
 AND t.typname IN ('unknown');
 ```
 
-Flag: 🔴 Unknown types block upgrade.
+Flag: [RED] Unknown types block upgrade.
 
 ### 4. Logical Replication Slots
 
@@ -67,7 +67,7 @@ Flag: 🔴 Unknown types block upgrade.
 SELECT slot_name, plugin, slot_type, active, restart_lsn FROM pg_replication_slots;
 ```
 
-Flag: 🔴 ANY logical replication slot (active or inactive) blocks a major version upgrade — the pre-check fails until all are dropped. Confirm the slot's purpose, then drop unused slots. Even rows with `active=false` must be dropped (or restarted post-upgrade for pglogical).
+Flag: [RED] ANY logical replication slot (active or inactive) blocks a major version upgrade -- the pre-check fails until all are dropped. Confirm the slot's purpose, then drop unused slots. Even rows with `active=false` must be dropped (or restarted post-upgrade for pglogical).
 
 ### 5. Prepared Transactions
 
@@ -75,7 +75,7 @@ Flag: 🔴 ANY logical replication slot (active or inactive) blocks a major vers
 SELECT * FROM pg_prepared_xacts;
 ```
 
-Flag: 🔴 Prepared transactions BLOCK the upgrade.
+Flag: [RED] Prepared transactions BLOCK the upgrade.
 
 ### 6. Objects Owned by System Roles
 
@@ -88,7 +88,7 @@ WHERE r.rolname IN ('rdsadmin','rds_superuser')
 AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast');
 ```
 
-Flag: 🟡 May block upgrades.
+Flag: [YELLOW] May block upgrades.
 
 ### 7. Database Encoding and Locale
 
@@ -144,7 +144,7 @@ WHERE t.typname IN ('regproc','regprocedure','regoper','regoperator','regconfig'
 AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast');
 ```
 
-Flag: 🔴 Unsupported reg* types block the upgrade (pg_upgrade can't persist them); remove before upgrading. regclass/regtype/regrole are exempt and survive.
+Flag: [RED] Unsupported reg* types block the upgrade (pg_upgrade can't persist them); remove before upgrading. regclass/regtype/regrole are exempt and survive.
 
 ### 13. Stale Table Statistics
 
@@ -159,7 +159,7 @@ WHERE (last_analyze IS NULL AND last_autoanalyze IS NULL)
 ORDER BY n_live_tup DESC;
 ```
 
-Flag: 🟡 If statistics are older than 7 days (or never analyzed), recommend running `ANALYZE` on affected tables before the upgrade. Optimizer statistics are NOT transferred during an Aurora PostgreSQL major version upgrade — `pg_upgrade` does not carry over the contents of `pg_statistic`. After every major version upgrade you must run `ANALYZE` (e.g. `ANALYZE VERBOSE;`) on every database on all instances to regenerate statistics; otherwise the new planner runs with no statistics and can choose poor plans. Running `ANALYZE` pre-upgrade does not help post-upgrade because the stats are discarded. Capturing/refreshing stats before the upgrade is still useful for baselining plans, but the authoritative remediation is a full post-upgrade `ANALYZE`. Each major PostgreSQL version refines the planner's cost model, making it more dependent on accurate statistics.
+Flag: [YELLOW] If statistics are older than 7 days (or never analyzed), recommend running `ANALYZE` on affected tables before the upgrade. Optimizer statistics are NOT transferred during an Aurora PostgreSQL major version upgrade -- `pg_upgrade` does not carry over the contents of `pg_statistic`. After every major version upgrade you must run `ANALYZE` (e.g. `ANALYZE VERBOSE;`) on every database on all instances to regenerate statistics; otherwise the new planner runs with no statistics and can choose poor plans. Running `ANALYZE` pre-upgrade does not help post-upgrade because the stats are discarded. Capturing/refreshing stats before the upgrade is still useful for baselining plans, but the authoritative remediation is a full post-upgrade `ANALYZE`. Each major PostgreSQL version refines the planner's cost model, making it more dependent on accurate statistics.
 
 Action: For each table with stale stats:
 
@@ -179,7 +179,7 @@ Also consider `VACUUM ANALYZE` for tables with high dead tuple counts to reclaim
 
 After running queries, generate:
 
-1. Categorized findings (🔴/🟡/🟢)
+1. Categorized findings ([RED]/[YELLOW]/[GREEN])
 2. For each finding: what was found, why it matters, action to take
 3. Extension compatibility matrix for target version
 4. Recommended post-upgrade REINDEX/ANALYZE plan

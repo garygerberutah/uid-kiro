@@ -4,17 +4,17 @@ This file describes the process for collecting and validating custom metric defi
 
 ## Step 1: Collect Custom Metrics
 
-Ask the user to provide their custom metrics as JSON — either by pasting it directly or pointing to a file. The JSON must be an array of metric definitions following the Bedrock format.
+Ask the user to provide their custom metrics as JSON -- either by pasting it directly or pointing to a file. The JSON must be an array of metric definitions following the Bedrock format.
 
 > "Please share your custom metrics JSON. You can paste it here or point me to a file."
 
-⏸ Wait for user.
+[PAUSE] Wait for user.
 
 ### Helping Users Structure Metrics
 
 If the user doesn't have ready-made JSON but describes what they want to evaluate, you can help them create the JSON structure. Be upfront about limitations:
 
-> "I can help you put together the JSON structure based on what you've described. Note that I can't guarantee the judge model will interpret your metric exactly as intended — you may need to iterate on the prompt wording after seeing initial results."
+> "I can help you put together the JSON structure based on what you've described. Note that I can't guarantee the judge model will interpret your metric exactly as intended -- you may need to iterate on the prompt wording after seeing initial results."
 
 When helping, follow the Bedrock-recommended prompt structure (in this order):
 
@@ -58,7 +58,7 @@ python scripts/validate_custom_metrics.py custom_metrics.json
 
 If validation fails, show the errors to the user and iterate until it passes.
 
-⏸ Do not proceed until validation passes.
+[PAUSE] Do not proceed until validation passes.
 
 ## After Collection
 

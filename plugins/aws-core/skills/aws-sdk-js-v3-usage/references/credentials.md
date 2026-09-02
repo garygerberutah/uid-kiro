@@ -6,14 +6,14 @@ All providers from `@aws-sdk/credential-providers`.
 
 | Provider | Use case |
 |---|---|
-| `fromNodeProviderChain()` | Default Node.js chain (env → ini → IMDS/ECS) |
+| `fromNodeProviderChain()` | Default Node.js chain (env -> ini -> IMDS/ECS) |
 | `fromEnv()` | `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` env vars |
 | `fromIni()` | `~/.aws/credentials` / `~/.aws/config` profiles |
 | `fromTemporaryCredentials()` | STS AssumeRole |
 | `fromWebToken()` | STS AssumeRoleWithWebIdentity (OIDC) |
-| `fromTokenFile()` | OIDC token file (EKS IRSA) — reads `AWS_WEB_IDENTITY_TOKEN_FILE` + `AWS_ROLE_ARN` |
+| `fromTokenFile()` | OIDC token file (EKS IRSA) -- reads `AWS_WEB_IDENTITY_TOKEN_FILE` + `AWS_ROLE_ARN` |
 | `fromSSO()` | AWS IAM Identity Center (SSO) |
-| `fromCognitoIdentityPool()` | Browser/mobile — Cognito Identity Pool |
+| `fromCognitoIdentityPool()` | Browser/mobile -- Cognito Identity Pool |
 | `fromInstanceMetadata()` | EC2 instance profile (IMDSv1/v2) |
 | `fromContainerMetadata()` | ECS task role |
 | `fromHttp()` | Custom HTTP credential endpoint |
@@ -50,10 +50,10 @@ credentials: fromTemporaryCredentials({
 ## Named Profile
 
 ```js
-// Simplest — sets profile for both client config and credentials
+// Simplest -- sets profile for both client config and credentials
 const client = new S3Client({ profile: "my-profile" });
 
-// Explicit — credentials only
+// Explicit -- credentials only
 import { fromIni } from "@aws-sdk/credential-providers";
 const client = new S3Client({ credentials: fromIni({ profile: "my-profile" }) });
 ```
@@ -101,10 +101,10 @@ const client = new S3Client({
 When a credential provider uses STS internally, region is resolved in this order:
 
 1. `clientConfig.region` passed to the provider
-2. Profile region — if resolving from config file, this beats `AWS_REGION`
+2. Profile region -- if resolving from config file, this beats `AWS_REGION`
 3. Outer client's region
 4. `AWS_REGION` env var
-5. Profile region — if *not* resolving from config file, this is lower than `AWS_REGION`
+5. Profile region -- if *not* resolving from config file, this is lower than `AWS_REGION`
 6. `us-east-1` fallback
 
 To pin the STS region explicitly:

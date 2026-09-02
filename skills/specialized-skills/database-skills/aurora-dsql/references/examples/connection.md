@@ -17,7 +17,7 @@ PGPASSWORD="$(aws dsql generate-db-connect-auth-token \
 psql -h ${CLUSTER}.dsql.${REGION}.on.aws -U app_readwrite -d postgres \
   -c "SELECT COUNT(*) FROM objectives WHERE tenant_id = 'tenant-123';"
 
-# Admin only — for role/schema setup
+# Admin only -- for role/schema setup
 PGPASSWORD="$(aws dsql generate-db-connect-admin-auth-token \
   --hostname ${CLUSTER}.dsql.${REGION}.on.aws \
   --region ${REGION})" \

@@ -21,7 +21,7 @@ aws kafka update-broker-storage \
 
 **Constraints:**
 
-- You MUST get the current cluster version first: `aws kafka describe-cluster-v2 --cluster-arn <arn>` — the version string looks like `KTVPDKIKX0DER`, not a simple integer.
+- You MUST get the current cluster version first: `aws kafka describe-cluster-v2 --cluster-arn <arn>` -- the version string looks like `KTVPDKIKX0DER`, not a simple integer.
 - Storage expansion has a cool-down period of minimum 6 hours. A second expansion attempt during cool-down fails with "storage is optimizing."
 - Optimization after expansion can take up to 24 hours proportional to storage size.
 
@@ -36,21 +36,21 @@ Policy parameters:
 
 Auto-scaling increases storage by the larger of 10 GiB or 10% of current storage. A scaling action can occur only once every 6 hours.
 
-**Long-term alternative**: If recurring storage management is a pain point, consider migrating to Express brokers — storage is fully managed, pay-as-you-go, and requires no provisioning or monitoring.
+**Long-term alternative**: If recurring storage management is a pain point, consider migrating to Express brokers -- storage is fully managed, pay-as-you-go, and requires no provisioning or monitoring.
 
 ### Identify high-growth topics
 
 To find which topics consume the most storage, check per-topic `BytesInPerSec` (PER_TOPIC_PER_BROKER level) and multiply by retention period:
 
-`Estimated storage per topic = SUM(BytesInPerSec across all brokers for the topic) × retention_seconds × ReplicationFactor`
+`Estimated storage per topic = SUM(BytesInPerSec across all brokers for the topic) x retention_seconds x ReplicationFactor`
 
-Use this to identify topics that need retention adjustment. Retention changes require app-owner approval — reducing retention deletes data permanently.
+Use this to identify topics that need retention adjustment. Retention changes require app-owner approval -- reducing retention deletes data permanently.
 
 ### Provision storage throughput (Standard only)
 
 For broker sizes `kafka.m5.4xlarge` or larger (or `kafka.m7g.2xlarge` or larger), you can provision storage throughput above the default of 250 MiB/s (for volumes 10 GiB+). Check the [MSK storage throughput documentation](https://docs.aws.amazon.com/msk/latest/developerguide/msk-provision-throughput-management.html) for current max provisioned throughput per broker size.
 
-When enabling provisioned throughput, also increase `num.replica.fetchers` (default 2) to match the instance size — e.g., 4 for m5.4xl, 8 for m5.8xl.
+When enabling provisioned throughput, also increase `num.replica.fetchers` (default 2) to match the instance size -- e.g., 4 for m5.4xl, 8 for m5.8xl.
 
 ## Express Brokers: Managed Storage
 
@@ -66,9 +66,9 @@ Monitor total cluster storage with the `StorageUsed` metric (DEFAULT level, dime
 
 Set a CloudWatch alarm on `StorageUsed` based on expected retention:
 
-`Expected StorageUsed ≈ SUM(BytesInPerSec across all topics) × retention_seconds × 3`
+`Expected StorageUsed ~ SUM(BytesInPerSec across all topics) x retention_seconds x 3`
 
-The `× 3` accounts for Express's fixed replication factor. If `StorageUsed` significantly exceeds this estimate, investigate per-topic growth.
+The `x 3` accounts for Express's fixed replication factor. If `StorageUsed` significantly exceeds this estimate, investigate per-topic growth.
 
 ### Identify and resolve runaway storage growth
 
@@ -83,11 +83,11 @@ Even though Express storage scales automatically, you should actively monitor fo
 
 3. **Check for compacted topics**: Topics with `cleanup.policy=compact` retain data indefinitely based on key cardinality, not time. High-cardinality compacted topics can grow without bound.
 4. **Check for topic proliferation**: A growing number of topics (each with RF=3) compounds storage. Monitor `GlobalTopicCount` at the cluster level.
-5. **Reduce retention**: Lowering `retention.ms` on high-volume topics is the most direct way to reduce stored data. Coordinate with app owners before changing — reducing retention deletes data permanently.
+5. **Reduce retention**: Lowering `retention.ms` on high-volume topics is the most direct way to reduce stored data. Coordinate with app owners before changing -- reducing retention deletes data permanently.
 
 ### Storage costs on Express
 
-Express storage is fully managed. Unlike Standard where you explicitly manage EBS and optionally enable tiered storage, Express storage requires no configuration. Storage costs are based on total data retained — reducing retention or cleaning up unused topics is the primary lever for cost control.
+Express storage is fully managed. Unlike Standard where you explicitly manage EBS and optionally enable tiered storage, Express storage requires no configuration. Storage costs are based on total data retained -- reducing retention or cleaning up unused topics is the primary lever for cost control.
 
 ## Standard Brokers: Tiered Storage
 
@@ -96,7 +96,7 @@ Standard brokers can optionally enable tiered storage to extend retention beyond
 ### How tiered storage works on Standard
 
 1. Closed log segments are copied from primary (EBS) storage to tiered (S3) storage automatically.
-2. Active segments are NOT eligible for tiering — segment size (`segment.bytes`, default 128 MiB for tiered clusters) or segment roll time (`segment.ms`) controls when segments close.
+2. Active segments are NOT eligible for tiering -- segment size (`segment.bytes`, default 128 MiB for tiered clusters) or segment roll time (`segment.ms`) controls when segments close.
 3. `local.retention.ms` controls how long data stays on primary storage after being copied to tiered storage. Default `-2` means use `retention.ms` (data stays on both local and tiered until retention expires).
 4. `retention.ms` controls total retention (local + tiered). Minimum 3 days for tiered topics.
 
@@ -120,9 +120,9 @@ With `retention.ms = 5 days` and `local.retention.ms = 12 hours`:
 
 ### Enable tiered storage
 
-Enabling tiered storage is a **two-step** process: first switch the cluster to `TIERED` storage mode, then enable `remote.storage.enable` on each topic. Switching the cluster mode alone does NOT tier any data — no topic tiers until you set `remote.storage.enable=true` on it.
+Enabling tiered storage is a **two-step** process: first switch the cluster to `TIERED` storage mode, then enable `remote.storage.enable` on each topic. Switching the cluster mode alone does NOT tier any data -- no topic tiers until you set `remote.storage.enable=true` on it.
 
-**Step 1 — set the cluster storage mode to `TIERED`.** The cluster must run Kafka 3.6.0+ or 2.8.2.tiered. If it does not, upgrade first with `aws kafka update-cluster-kafka-version` (check upgrade targets via `aws kafka get-compatible-kafka-versions`). The cluster `log.cleanup.policy` must be `delete` (compacted topics are not eligible). Get the current version string (e.g. `KTVPDKIKX0DER`, not an integer) from `describe-cluster-v2` first.
+**Step 1 -- set the cluster storage mode to `TIERED`.** The cluster must run Kafka 3.6.0+ or 2.8.2.tiered. If it does not, upgrade first with `aws kafka update-cluster-kafka-version` (check upgrade targets via `aws kafka get-compatible-kafka-versions`). The cluster `log.cleanup.policy` must be `delete` (compacted topics are not eligible). Get the current version string (e.g. `KTVPDKIKX0DER`, not an integer) from `describe-cluster-v2` first.
 
 ```
 aws kafka update-storage \
@@ -131,7 +131,7 @@ aws kafka update-storage \
   --storage-mode TIERED
 ```
 
-**Step 2 — enable tiered storage per topic.** Requires an Apache Kafka client version 3.0.0+ for `kafka-topics.sh --create`; existing topics can be reconfigured from a lower client version with `kafka-configs.sh`.
+**Step 2 -- enable tiered storage per topic.** Requires an Apache Kafka client version 3.0.0+ for `kafka-topics.sh --create`; existing topics can be reconfigured from a lower client version with `kafka-configs.sh`.
 
 ```
 kafka-configs.sh --bootstrap-server <bootstrap> --alter --entity-type topics --entity-name <topic> \

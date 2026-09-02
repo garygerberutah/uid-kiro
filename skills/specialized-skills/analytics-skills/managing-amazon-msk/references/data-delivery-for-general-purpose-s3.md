@@ -4,26 +4,26 @@ Data Delivery for General Purpose S3 Buckets for Amazon MSK Express brokers deli
 
 Serverless with no connectors to manage, minutes-level freshness, and auto-scaling throughput (see [Amazon MSK Data Delivery quotas](https://docs.aws.amazon.com/msk/latest/developerguide/limits.html#msk-data-delivery-quota) for the per-channel ceiling). Each record is delivered exactly once by the delivery pipeline. Data Delivery does not consume broker egress throughput or impact producer or consumer workloads. This optimizes cost as it enables delivery to S3 without requiring additional cluster capacity on MSK Express clusters. Additionally, you can fan out multiple delivery channels from the same topic.
 
-> **Note:** Records are batched into S3 objects — multiple Kafka records land in a single S3 object. The output key template determines the key for each object, and the `!{sequence-number}` token provides uniqueness across objects within the same prefix.
+> **Note:** Records are batched into S3 objects -- multiple Kafka records land in a single S3 object. The output key template determines the key for each object, and the `!{sequence-number}` token provides uniqueness across objects within the same prefix.
 
 ## Data Delivery for General Purpose S3 Buckets Constraints
 
 Check Data Delivery for General Purpose S3 Buckets documentation for constraints. Some key constraints are:
 
-- Data Delivery for General Purpose S3 Buckets is ONLY available on **Express brokers** — Standard brokers and MSK Serverless are NOT supported
-- Data freshness is bounded and not adjustable — get the current bounds and default from [Amazon MSK Data Delivery quotas](https://docs.aws.amazon.com/msk/latest/developerguide/limits.html#msk-data-delivery-quota). The documented minimum-throughput floor for the tightest freshness setting applies to the S3 Tables (Iceberg) destination, not to General Purpose S3
-- **No backfill** — only records produced AFTER Data Delivery for General Purpose S3 Buckets is enabled are delivered
+- Data Delivery for General Purpose S3 Buckets is ONLY available on **Express brokers** -- Standard brokers and MSK Serverless are NOT supported
+- Data freshness is bounded and not adjustable -- get the current bounds and default from [Amazon MSK Data Delivery quotas](https://docs.aws.amazon.com/msk/latest/developerguide/limits.html#msk-data-delivery-quota). The documented minimum-throughput floor for the tightest freshness setting applies to the S3 Tables (Iceberg) destination, not to General Purpose S3
+- **No backfill** -- only records produced AFTER Data Delivery for General Purpose S3 Buckets is enabled are delivered
 
 If the user needs any of the above functionality, recommend **Managed Service for Apache Flink** instead. Data Delivery for General Purpose S3 Buckets is the most cost-effective way to deliver data to General Purpose S3 Buckets, so if it can be used it should be preferred in general.
 
-**Broker-type routing (Express vs Standard/Serverless).** Data Delivery and Streaming Tables are **Express-only**. On **Standard or Serverless** clusters they are not available — to land topic data in S3 there, use one of: the [Amazon Data Firehose MSK-source integration](https://docs.aws.amazon.com/msk/latest/developerguide/integrations-kinesis-data-firehose.html) (fully managed; delivers to Amazon S3 or to Apache Iceberg tables in self-managed S3 or S3 Tables), a self-managed Kafka Connect S3 sink connector, or Managed Service for Apache Flink. On Express, prefer Data Delivery / Streaming Tables over all three — it is fully managed, consumes no broker egress, and is the lowest-cost option.
+**Broker-type routing (Express vs Standard/Serverless).** Data Delivery and Streaming Tables are **Express-only**. On **Standard or Serverless** clusters they are not available -- to land topic data in S3 there, use one of: the [Amazon Data Firehose MSK-source integration](https://docs.aws.amazon.com/msk/latest/developerguide/integrations-kinesis-data-firehose.html) (fully managed; delivers to Amazon S3 or to Apache Iceberg tables in self-managed S3 or S3 Tables), a self-managed Kafka Connect S3 sink connector, or Managed Service for Apache Flink. On Express, prefer Data Delivery / Streaming Tables over all three -- it is fully managed, consumes no broker egress, and is the lowest-cost option.
 
 ## Prerequisites
 
 - MSK Provisioned cluster with **Express brokers**
 - Kafka topic producing data (JSON, ByteArray, or String)
 - General-purpose S3 bucket for delivery
-- S3 bucket for dead-letter queue (DLQ) — required
+- S3 bucket for dead-letter queue (DLQ) -- required
 
 ## Input Formats
 
@@ -127,9 +127,9 @@ No schema registry is required for S3 bucket delivery.
 }
 ```
 
-`CloudWatchLogsAccess` is required whenever CloudWatch Logs delivery logging is enabled (the default) — without it the service role cannot write delivery logs and failures stay invisible. If you route delivery logs to S3 or Firehose instead, swap this for the corresponding `s3:PutObject` (log bucket) or `firehose:PutRecord`/`firehose:PutRecordBatch` permissions per the Delivery Logging section.
+`CloudWatchLogsAccess` is required whenever CloudWatch Logs delivery logging is enabled (the default) -- without it the service role cannot write delivery logs and failures stay invisible. If you route delivery logs to S3 or Firehose instead, swap this for the corresponding `s3:PutObject` (log bucket) or `firehose:PutRecord`/`firehose:PutRecordBatch` permissions per the Delivery Logging section.
 
-`KMSAccess` covers the delivery bucket (its `kms:EncryptionContext` condition is scoped to `BUCKET/PREFIX*`). `KMSAccessDLQ` is required when the DLQ bucket uses SSE-KMS — the delivery-bucket condition does not cover the DLQ, so without this statement the service role gets `AccessDenied` writing failed records to an SSE-KMS DLQ. Both KMS statements are recommended for production — omit only if the corresponding bucket relies on SSE-S3 (AES-256) default encryption. SSE-KMS (or at minimum SSE-S3) should always be enabled on both the delivery and DLQ buckets.
+`KMSAccess` covers the delivery bucket (its `kms:EncryptionContext` condition is scoped to `BUCKET/PREFIX*`). `KMSAccessDLQ` is required when the DLQ bucket uses SSE-KMS -- the delivery-bucket condition does not cover the DLQ, so without this statement the service role gets `AccessDenied` writing failed records to an SSE-KMS DLQ. Both KMS statements are recommended for production -- omit only if the corresponding bucket relies on SSE-S3 (AES-256) default encryption. SSE-KMS (or at minimum SSE-S3) should always be enabled on both the delivery and DLQ buckets.
 
 ## Create the Channel
 
@@ -173,21 +173,21 @@ For `ByteArray` or `String` input, change `RecordConverter.ValueConverter` accor
 
 ## Delivery Logging
 
-**Always enable at least one logging destination** on the channel. Without it, delivery errors (`AccessDenied` on the delivery bucket / DLQ, format-mismatch failures, KMS `Decrypt` failures on the delivery-bucket key, template-rendering errors) are invisible — the only visible symptom is missing objects at the expected S3 key. Logging is also a prerequisite for [streaming-tables-troubleshooting.md](streaming-tables-troubleshooting.md).
+**Always enable at least one logging destination** on the channel. Without it, delivery errors (`AccessDenied` on the delivery bucket / DLQ, format-mismatch failures, KMS `Decrypt` failures on the delivery-bucket key, template-rendering errors) are invisible -- the only visible symptom is missing objects at the expected S3 key. Logging is also a prerequisite for [streaming-tables-troubleshooting.md](streaming-tables-troubleshooting.md).
 
-The `--logging-info` field on `aws kafka create-channel` accepts three independent destinations — any subset can be enabled at once:
+The `--logging-info` field on `aws kafka create-channel` accepts three independent destinations -- any subset can be enabled at once:
 
 | Destination | JSON key | Required fields | When to use |
 |---|---|---|---|
-| CloudWatch Logs | `CloudWatchLogs` | `Enabled`, `LogGroup` (must exist before create-channel) | Default choice — interactive querying via Logs Insights, alarms on log patterns |
+| CloudWatch Logs | `CloudWatchLogs` | `Enabled`, `LogGroup` (must exist before create-channel) | Default choice -- interactive querying via Logs Insights, alarms on log patterns |
 | Amazon S3 | `S3` | `Enabled`, `Bucket`, `Prefix` (optional) | Long-term retention, Athena/downstream analysis |
 | Firehose | `Firehose` | `Enabled`, `DeliveryStream` | Fan-out to OpenSearch / Splunk / third-party SIEMs |
 
 **Log group prerequisite:** MSK does not auto-create the CloudWatch log group. Create it in advance with `aws logs create-log-group --log-group-name "<name>"` and, for production, set a retention policy (`aws logs put-retention-policy --log-group-name "<name>" --retention-in-days 30`). Passing a nonexistent log group to `create-channel` returns a validation error.
 
-**IAM:** The service role must be able to write to whichever destinations are enabled — for CloudWatch Logs: `logs:CreateLogStream`, `logs:PutLogEvents` on the target log group; for S3: `s3:PutObject` on the log bucket/prefix (plus `kms:GenerateDataKey` if SSE-KMS); for Firehose: `firehose:PutRecord`, `firehose:PutRecordBatch` on the delivery stream. Use a **separate** log bucket/prefix from the delivery bucket — routing logs through the same prefix that stores delivered records makes downstream analytics unreliable.
+**IAM:** The service role must be able to write to whichever destinations are enabled -- for CloudWatch Logs: `logs:CreateLogStream`, `logs:PutLogEvents` on the target log group; for S3: `s3:PutObject` on the log bucket/prefix (plus `kms:GenerateDataKey` if SSE-KMS); for Firehose: `firehose:PutRecord`, `firehose:PutRecordBatch` on the delivery stream. Use a **separate** log bucket/prefix from the delivery bucket -- routing logs through the same prefix that stores delivered records makes downstream analytics unreliable.
 
-**Encryption:** Enable SSE-KMS on the CloudWatch log group (via `aws logs associate-kms-key`) and the S3 log bucket — delivery error records may contain payload fragments and topic names.
+**Encryption:** Enable SSE-KMS on the CloudWatch log group (via `aws logs associate-kms-key`) and the S3 log bucket -- delivery error records may contain payload fragments and topic names.
 
 **Logging is set at channel creation and is not updatable.** `aws kafka update-channel` only accepts `--iceberg-destination-update` and `--s3-destination-update` with a single field (`DataFreshnessInSeconds`). To change logging destinations, delete and recreate the channel.
 
@@ -233,11 +233,11 @@ data/!{channel-id}/!{HH}/!{sequence-number}.json
 
 ## Monitoring
 
-Data Delivery emits its own CloudWatch metrics in the `AWS/Kafka` namespace with dimensions `ClusterName`, `ChannelName`, `Topic`. Recommended alarms — `DeliveryToS3.DataFreshness` above the configured freshness interval, `FailedRecordCount` > 0 (records not conforming to input format), and `DLQDeliverySuccess` > 0 (records routed to DLQ). Full metric list, alarm patterns, and troubleshooting steps live in [streaming-tables-troubleshooting.md](streaming-tables-troubleshooting.md). Do not fall back to generic Express cluster health metrics or S3-bucket-object counts for delivery monitoring — the channel-scoped metrics above are the correct primitives.
+Data Delivery emits its own CloudWatch metrics in the `AWS/Kafka` namespace with dimensions `ClusterName`, `ChannelName`, `Topic`. Recommended alarms -- `DeliveryToS3.DataFreshness` above the configured freshness interval, `FailedRecordCount` > 0 (records not conforming to input format), and `DLQDeliverySuccess` > 0 (records routed to DLQ). Full metric list, alarm patterns, and troubleshooting steps live in [streaming-tables-troubleshooting.md](streaming-tables-troubleshooting.md). Do not fall back to generic Express cluster health metrics or S3-bucket-object counts for delivery monitoring -- the channel-scoped metrics above are the correct primitives.
 
 ## Channel Management
 
-Every channel operation is scoped to a specific cluster — `--cluster-arn` is required on `describe-channel`, `list-channels`, `update-channel`, and `delete-channel`.
+Every channel operation is scoped to a specific cluster -- `--cluster-arn` is required on `describe-channel`, `list-channels`, `update-channel`, and `delete-channel`.
 
 ```bash
 # Check state (both flags required)
@@ -245,19 +245,19 @@ aws kafka describe-channel \
     --cluster-arn "arn:aws:kafka:REGION:ACCOUNT_ID:cluster/CLUSTER/ID" \
     --channel-arn "CHANNEL_ARN"
 
-# List channels on a cluster. Only --topic-name-filter is available server-side —
+# List channels on a cluster. Only --topic-name-filter is available server-side --
 # filter by destination type client-side from the returned DestinationType field.
 aws kafka list-channels \
     --cluster-arn "arn:aws:kafka:REGION:ACCOUNT_ID:cluster/CLUSTER/ID" \
     --query "Channels[?DestinationType=='S3']"
 
-# Update freshness — only DataFreshnessInSeconds is updatable
+# Update freshness -- only DataFreshnessInSeconds is updatable
 aws kafka update-channel \
     --cluster-arn "arn:aws:kafka:REGION:ACCOUNT_ID:cluster/CLUSTER/ID" \
     --channel-arn "CHANNEL_ARN" \
     --s3-destination-update '{"DataFreshnessInSeconds": 600}'
 
-# Delete (irreversible — already-delivered data is NOT deleted)
+# Delete (irreversible -- already-delivered data is NOT deleted)
 aws kafka delete-channel \
     --cluster-arn "arn:aws:kafka:REGION:ACCOUNT_ID:cluster/CLUSTER/ID" \
     --channel-arn "CHANNEL_ARN"
@@ -270,7 +270,7 @@ aws kafka delete-channel \
 - Enable server-side encryption (SSE-KMS or SSE-S3) on both delivery and DLQ buckets
 - Enable S3 access logging on the delivery bucket
 - Apply bucket policies restricting access to authorized principals only
-- DLQ bucket may contain sensitive customer data (PII, financial data) — encrypt and restrict access
+- DLQ bucket may contain sensitive customer data (PII, financial data) -- encrypt and restrict access
 - Encrypt CloudWatch Logs log groups that receive Data Delivery for General Purpose S3 Buckets delivery logs
 - Use VPC endpoints for S3 where applicable to keep traffic off the public internet
 - For additional hardening guidance, see the [MSK Security chapter](https://docs.aws.amazon.com/msk/latest/developerguide/security.html) and [Amazon S3 security best practices](https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html)

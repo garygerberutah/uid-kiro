@@ -4,12 +4,12 @@ Pure file processor: reads a discovery `cluster-config.json` and emits
 `compatibility.<cluster_name>.json` with the five-pillar verdict.
 
 Five pillars: topology, kafka_version, configs, auth, quotas. No live
-cluster or AWS API calls — deterministic and replayable from fixtures.
+cluster or AWS API calls -- deterministic and replayable from fixtures.
 
 The discovery contract carries FULL Kafka config dumps (every broker- and
 topic-level config the source exposed), not deltas. compatibility.py filters
 against per-Kafka-version Apache defaults so values that match the default
-do not produce evidence — only divergences from default are flagged.
+do not produce evidence -- only divergences from default are flagged.
 
 Source of truth for every threshold and rule below is one of these AWS
 public documentation pages (cited inline at the relevant constant):
@@ -68,7 +68,7 @@ def roll_up(verdicts: Iterable[str]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Pillar 1 — Topology
+# Pillar 1 -- Topology
 # Source: Express broker overview (3-AZ requirement; minimum 3 brokers;
 # KRaft from 3.9). The target broker count is determined by the sizing
 # workbook, not carried over from the source, so no per-cluster broker
@@ -76,7 +76,7 @@ def roll_up(verdicts: Iterable[str]) -> str:
 # ---------------------------------------------------------------------------
 
 EXPRESS_AZ_COUNT = 3  # Express broker overview (Express is 3-AZ only)
-EXPRESS_TARGET_MIN_BROKERS = 3  # Express broker overview (RF=3 across 3 AZs ⇒ ≥3)
+EXPRESS_TARGET_MIN_BROKERS = 3  # Express broker overview (RF=3 across 3 AZs => >=3)
 
 
 def assess_topology(cfg: dict) -> tuple[str, list[dict]]:
@@ -147,7 +147,7 @@ def assess_topology(cfg: dict) -> tuple[str, list[dict]]:
         )
         verdict = worst(verdict, ADVISORY)
 
-    # KRaft transition on 3.9 — flagged informationally.
+    # KRaft transition on 3.9 -- flagged informationally.
     if ver[:2] == (3, 9) and coordination == "ZooKeeper":
         evidence.append(
             _ev(
@@ -167,8 +167,8 @@ def assess_topology(cfg: dict) -> tuple[str, list[dict]]:
 
 
 # ---------------------------------------------------------------------------
-# Pillar 2 — Kafka version
-# Source: Express broker overview — "Express brokers are supported on the
+# Pillar 2 -- Kafka version
+# Source: Express broker overview -- "Express brokers are supported on the
 # following Apache Kafka versions: 3.6, 3.8, and 3.9."
 # ---------------------------------------------------------------------------
 
@@ -221,7 +221,7 @@ def assess_kafka_version(cfg: dict) -> tuple[str, list[dict]]:
             f"MSK Express supports Apache Kafka 3.6, 3.8, and 3.9. Your cluster "
             f"runs {raw}, so after migrating your workload will run on a new "
             "Kafka version. Confirm your client libraries and applications are "
-            "compatible with the version you choose for Express — Kafka clients "
+            "compatible with the version you choose for Express -- Kafka clients "
             "are generally compatible across minor versions, but we recommend "
             "validating in a test environment before migrating. See the Apache "
             "Kafka upgrade notes at https://kafka.apache.org/documentation/#upgrade "
@@ -250,7 +250,7 @@ def assess_kafka_version(cfg: dict) -> tuple[str, list[dict]]:
 
 
 # ---------------------------------------------------------------------------
-# Pillar 3 — Configs (broker- and topic-level)
+# Pillar 3 -- Configs (broker- and topic-level)
 # Sources: Express read/write configurations page (R/W broker + topic
 # configs, bounded ranges), Express read-only configurations page (forced
 # read-only values).
@@ -476,7 +476,7 @@ def _normalize_value(value: Any) -> str:
 def _is_default(key: str, value: Any, defaults: dict[str, Any]) -> bool:
     """Return True if value matches the Apache Kafka default for key."""
     if key not in defaults:
-        # No known default — cannot tell, treat as not-default so the rule
+        # No known default -- cannot tell, treat as not-default so the rule
         # still fires.
         return False
     return _normalize_value(value) == _normalize_value(defaults[key])
@@ -577,7 +577,7 @@ def assess_configs(cfg: dict) -> tuple[str, list[dict]]:
         if _is_default(key, val, broker_defaults):
             continue
 
-        # Range checks first — they decide ACTION_REQUIRED.
+        # Range checks first -- they decide ACTION_REQUIRED.
         if key in EXPRESS_BROKER_RANGES:
             problem = _check_range(key, val, EXPRESS_BROKER_RANGES[key], "Your cluster")
             if problem is not None:
@@ -632,7 +632,7 @@ def assess_configs(cfg: dict) -> tuple[str, list[dict]]:
                 _ev(
                     "BROKER_CONFIG_NOT_EXPOSED",
                     ADVISORY,
-                    f"{key} isn't a configurable property on MSK Express — "
+                    f"{key} isn't a configurable property on MSK Express -- "
                     "Express manages it internally, and the behavior may differ "
                     f"from your current value of {val!r}. We recommend "
                     "validating in a test environment to ensure a smooth "
@@ -642,7 +642,7 @@ def assess_configs(cfg: dict) -> tuple[str, list[dict]]:
                 )
             )
             verdict = worst(verdict, ADVISORY)
-        # else: in EXPRESS_BROKER_RW and within range — INFO, no evidence.
+        # else: in EXPRESS_BROKER_RW and within range -- INFO, no evidence.
 
     # 3b. Per-topic configs.
     for topic in cfg.get("topics", []):
@@ -714,7 +714,7 @@ def assess_configs(cfg: dict) -> tuple[str, list[dict]]:
                         "TOPIC_CONFIG_NOT_EXPOSED",
                         ADVISORY,
                         f"Topic {name!r} sets {key}={val!r}, which isn't a "
-                        "configurable topic property on MSK Express — Express "
+                        "configurable topic property on MSK Express -- Express "
                         "uses the broker default instead. We recommend "
                         "validating that the default works for this topic in a "
                         "test environment to ensure a smooth migration.",
@@ -729,7 +729,7 @@ def assess_configs(cfg: dict) -> tuple[str, list[dict]]:
 
 
 # ---------------------------------------------------------------------------
-# Pillar 4 — Auth
+# Pillar 4 -- Auth
 # Sources: Express read-only configurations page (REPLICATION_SECURE listener
 # implies TLS), Express broker quotas page (IAM vs non-IAM connection limits).
 # ---------------------------------------------------------------------------
@@ -777,7 +777,7 @@ def assess_auth(cfg: dict) -> tuple[str, list[dict]]:
     # --- Authentication mechanism ---
     # MSK Express supports unauthenticated, TLS, SASL/SCRAM, and IAM. Those
     # carry over as-is (INFO, no evidence). SASL_OAUTHBEARER from a
-    # self-managed source is a custom OAuth provider (not the AWS IAM path) —
+    # self-managed source is a custom OAuth provider (not the AWS IAM path) --
     # MSK Express does not accept non-AWS OAUTHBEARER tokens. OTHER is also
     # unsupported. UNKNOWN cannot be confirmed (ADVISORY).
     if authentication == "SASL_OAUTHBEARER":
@@ -802,7 +802,7 @@ def assess_auth(cfg: dict) -> tuple[str, list[dict]]:
                 "Your cluster uses an authentication mechanism MSK Express "
                 "doesn't support (for example SASL/GSSAPI/Kerberos, SASL/PLAIN, "
                 "or a custom callback handler). MSK Express accepts "
-                "unauthenticated, TLS, SASL/SCRAM, and IAM — move your clients "
+                "unauthenticated, TLS, SASL/SCRAM, and IAM -- move your clients "
                 "to one of these to ensure a smooth migration.",
                 observed=authentication,
             )
@@ -814,8 +814,8 @@ def assess_auth(cfg: dict) -> tuple[str, list[dict]]:
                 "AUTH_UNKNOWN",
                 ADVISORY,
                 "We couldn't determine your cluster's authentication "
-                "mechanism. Confirm it's one MSK Express supports — one of "
-                "unauthenticated, TLS, SASL/SCRAM, or IAM — to ensure a smooth "
+                "mechanism. Confirm it's one MSK Express supports -- one of "
+                "unauthenticated, TLS, SASL/SCRAM, or IAM -- to ensure a smooth "
                 "migration. MSK Express doesn't support SASL/GSSAPI/Kerberos, "
                 "SASL/PLAIN, or custom mechanisms.",
                 observed=authentication,
@@ -864,7 +864,7 @@ def assess_auth(cfg: dict) -> tuple[str, list[dict]]:
 
 
 # ---------------------------------------------------------------------------
-# Pillar 5 — Quotas
+# Pillar 5 -- Quotas
 # Source: Express broker quotas page (per-broker max-quota throughput at
 # m7g.16xlarge, partition
 # cap, IAM connection limits, per-partition throughput).
@@ -1008,9 +1008,9 @@ _VERSION_RE = re.compile(r"^\s*(\d+)\.(\d+)(?:\.(\d+))?")
 
 
 def parse_version(raw: str | None) -> tuple[int, ...] | None:
-    """Parse '3.6', '3.6.0', '3.6.1' → (3, 6, ...).
+    """Parse '3.6', '3.6.0', '3.6.1' -> (3, 6, ...).
 
-    Returns None when raw is None — the discovery contract allows
+    Returns None when raw is None -- the discovery contract allows
     `kafka.version` to be null when it could not be determined (see
     references/discovery.md). Callers must handle a None return the same
     way they already handle other unknown discovery fields (e.g.
@@ -1031,7 +1031,7 @@ def _utcnow_iso() -> str:
 
 
 # ---------------------------------------------------------------------------
-# Input validation — discovery contract
+# Input validation -- discovery contract
 # ---------------------------------------------------------------------------
 
 REQUIRED_TOP_LEVEL = ("cluster_name", "kafka", "topology", "topics")

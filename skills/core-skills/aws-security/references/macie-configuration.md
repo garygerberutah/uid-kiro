@@ -50,8 +50,8 @@ Works from both standalone accounts and delegated administrator accounts.
 
    Report BOTH settings:
 
-   - `publishClassificationFindings`: sensitive data → Security Hub
-   - `publishPolicyFindings`: policy findings → Security Hub
+   - `publishClassificationFindings`: sensitive data -> Security Hub
+   - `publishPolicyFindings`: policy findings -> Security Hub
 
 5. Check classification export configuration:
 
@@ -149,8 +149,8 @@ Works from both standalone accounts and delegated administrator accounts.
 
 | Symptom | Resolution |
 |---|---|
-| AccessDeniedException on get-macie-session | Macie not enabled — report as NOT_CONFIGURED |
-| AccessDeniedException on list-members | Not a Macie admin — switch to Workflow A |
+| AccessDeniedException on get-macie-session | Macie not enabled -- report as NOT_CONFIGURED |
+| AccessDeniedException on list-members | Not a Macie admin -- switch to Workflow A |
 | ValidationException on describe-organization-configuration | Not an org admin |
 
 ## Output Sensitivity

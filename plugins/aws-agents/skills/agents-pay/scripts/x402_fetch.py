@@ -6,7 +6,7 @@ security-relevant happens in this process, never in the model's context:
   * The policy gate (x402_policy) decides whether to pay, before any signing.
   * The signed payment proof is attached to the outbound request and then
     discarded. It is never returned, logged, or shown to the model.
-  * Provider credentials are never parameters — this module never touches them.
+  * Provider credentials are never parameters -- this module never touches them.
     Signing happens inside AgentCore Payments; only resource IDs live here.
   * Paid content is not returned into the model context. The tool returns only
     bounded metadata and a SHA-256 hash, so fetched instructions cannot become
@@ -24,7 +24,7 @@ The config file takes precedence over the environment for every identifier. That
 ordering is deliberate: the session ID names the budget being drawn down, so if a
 variable could override the 0600 file, anything able to set that variable could
 redirect spending to a larger session. The environment remains a fallback for
-container and Lambda deployments with no writable home — a weaker mode, because
+container and Lambda deployments with no writable home -- a weaker mode, because
 whatever sets the environment there chooses the session.
 
 Region/resource-resolution fixes (see agents_pay_admin.py for the admin-side
@@ -33,9 +33,9 @@ same pattern for the admin CLI's config.json lookups)
 -------------------------------------------------------------------------------
 Three call sites in this file used to build PaymentManager with
 `region_name=pol.resolve_resource(policy, "region") or "us-west-2"`. That
-hardcoded fallback only fires when nothing configures a region anywhere — a
+hardcoded fallback only fires when nothing configures a region anywhere -- a
 normal state for a deployment that relies on its AWS profile/IMDS region rather
-than setting one explicitly — and PaymentManager already falls back to
+than setting one explicitly -- and PaymentManager already falls back to
 boto3.Session().region_name internally before its own "us-west-2" default. So
 forcing "us-west-2" here could send a real payment against the wrong AWS region
 and fail with a confusing manager-not-found error. Fixed by passing
@@ -131,7 +131,7 @@ def _ssl_context() -> ssl.SSLContext:
 
     Prefers certifi's CA bundle when present, because some hosts (including
     mise-managed Pythons) have no system CA file and would otherwise fail
-    verification. Verification is never disabled — if no bundle is available the
+    verification. Verification is never disabled -- if no bundle is available the
     request fails closed rather than proceeding unverified.
     """
     try:
@@ -154,7 +154,7 @@ class _PinnedResolverTransport(httpx.HTTPTransport):
     answer is vetted, and the socket is opened directly to a vetted address.
 
     Implemented by overriding the connection pool's socket creation rather than
-    by patching `socket.getaddrinfo`. Patching that global is not thread-safe —
+    by patching `socket.getaddrinfo`. Patching that global is not thread-safe --
     two concurrent fetches to different hosts can restore or observe each
     other's state, and a request can end up resolving *unpinned*, which silently
     reopens the very window this class exists to close.
@@ -307,7 +307,7 @@ def payment_session_status() -> str:
     """Report whether the configured payment session can currently be spent.
 
     Read-only: it cannot create, extend, or fund anything. Exposing this to the
-    model is safe and useful — it lets an agent say "the budget is exhausted, ask
+    model is safe and useful -- it lets an agent say "the budget is exhausted, ask
     your operator" instead of discovering it as a failed payment mid-task.
 
     Returns JSON with a `usable` boolean. When false, `next_step` says what a
@@ -350,7 +350,7 @@ def payment_session_status() -> str:
             # config.json's resources.region, else AWS_REGION, else let boto3/PaymentManager
             # resolve it (profile, IMDS, etc.) themselves. A hardcoded "us-west-2" fallback
             # would silently override a correctly-resolved region whenever the operator's
-            # deployment lives elsewhere and neither config nor env sets one explicitly —
+            # deployment lives elsewhere and neither config nor env sets one explicitly --
             # PaymentManager itself already falls back to boto3.Session().region_name before
             # its own "us-west-2" default, so passing None here is safe and correct.
             region_name=pol.resolve_resource(policy, "region"),
@@ -395,7 +395,7 @@ def payment_session_status() -> str:
 # must not expose the proof to the model, so it never leaves this process. It is held
 # here and referenced by a single-use handle bound to one origin and resource.
 #
-# The handle is useless to an attacker who reads the transcript — it is not a
+# The handle is useless to an attacker who reads the transcript -- it is not a
 # credential, cannot be replayed elsewhere, and expires.
 
 _PROOF_VAULT: dict[str, dict[str, Any]] = {}
@@ -412,8 +412,8 @@ def _purge_expired(now: float) -> None:
 def prepare_browser_payment(url: str, purchase_id: str | None = None) -> str:
     """Pay for a URL and return an OPAQUE HANDLE for a browser to replay.
 
-    Same trusted pipeline as `x402_fetch` — policy gate, SSRF checks, strict
-    challenge parsing, derived idempotency — but instead of fetching the content
+    Same trusted pipeline as `x402_fetch` -- policy gate, SSRF checks, strict
+    challenge parsing, derived idempotency -- but instead of fetching the content
     it retains the signed proof in-process and returns a handle.
 
     The model receives the handle and a redacted receipt. It never sees the proof.
@@ -463,7 +463,7 @@ def prepare_browser_payment(url: str, purchase_id: str | None = None) -> str:
             agent_name=AGENT_NAME,
         )
 
-        # Only the vetted entry reaches the signer — resource is included only
+        # Only the vetted entry reaches the signer -- resource is included only
         # after URL-binding validation in the policy gate (see _validated_resource).
         vetted = {"x402Version": decision["x402_version"], "accepts": [decision["accept"]]}
         if decision.get("resource"):
@@ -583,7 +583,7 @@ def x402_fetch(url: str, purchase_id: str | None = None, method: str = "GET") ->
     """Fetch an x402-protected URL, paying only if trusted policy allows it.
 
     Returns a JSON string. On success it contains status, response metadata,
-    and a redacted payment receipt (amount, network, resource) — never the
+    and a redacted payment receipt (amount, network, resource) -- never the
     signed proof, credential, or transaction signature. The paid body is
     returned only when `return_body: true` is set in the operator's config
     file; otherwise only content type, byte count, and SHA-256 hash are
@@ -637,7 +637,7 @@ def x402_fetch(url: str, purchase_id: str | None = None, method: str = "GET") ->
             # Same fix as the two call sites above and agents_pay_admin.py's
             # resolve_region(): never force "us-west-2" over a region that config.json,
             # the environment, or boto3's own session/profile resolution already has
-            # right — doing so on this signing path risked a real payment attempt
+            # right -- doing so on this signing path risked a real payment attempt
             # failing with a confusing manager-not-found instead of succeeding.
             region_name=pol.resolve_resource(policy, "region"),
             agent_name=AGENT_NAME,
@@ -661,8 +661,8 @@ def x402_fetch(url: str, purchase_id: str | None = None, method: str = "GET") ->
         #
         # On Base Sepolia the proof is often valid while on-chain settlement lags, so
         # the paid retry still returns 402. Without a retry that surfaces as a failed
-        # fetch for a payment the user already made. The SDK only builds the header —
-        # it does not make the merchant call — so the retry has to live here.
+        # fetch for a payment the user already made. The SDK only builds the header --
+        # it does not make the merchant call -- so the retry has to live here.
         #
         # Safe because the SAME derived client_token is reused for every attempt:
         # ProcessPayment is idempotent on it, so each attempt replays one
@@ -672,7 +672,7 @@ def x402_fetch(url: str, purchase_id: str | None = None, method: str = "GET") ->
         for attempt in range(1, MAX_PAYMENT_ATTEMPTS + 1):
             # The proof lives only in this local variable, for the length of one
             # request. It is never returned to the caller and never logged. The
-            # `finally` guarantees it is dropped even if the paid request raises —
+            # `finally` guarantees it is dropped even if the paid request raises --
             # a bare `del` after the call would be skipped on the exception path.
             payment_header = None
             try:
@@ -709,7 +709,7 @@ def x402_fetch(url: str, purchase_id: str | None = None, method: str = "GET") ->
                     "attempts": MAX_PAYMENT_ATTEMPTS,
                     "reason": (
                         f"Paid and replayed {MAX_PAYMENT_ATTEMPTS} times but the merchant "
-                        "still returns 402 — usually transient on-chain settlement. The same "
+                        "still returns 402 -- usually transient on-chain settlement. The same "
                         "authorization was replayed each time, so there is no double charge. "
                         "Retry shortly, or raise X402_MAX_PAYMENT_ATTEMPTS."
                     ),
@@ -734,7 +734,7 @@ def x402_fetch(url: str, purchase_id: str | None = None, method: str = "GET") ->
         # Refusals are safe to surface: they carry no challenge values or secrets.
         return json.dumps({"paid": False, "refused": True, "reason": str(e)})
     except Exception as e:  # noqa: BLE001
-        # Never let a raw exception escape — SDK errors can embed request detail.
+        # Never let a raw exception escape -- SDK errors can embed request detail.
         return json.dumps(
             {"paid": False, "refused": True, "reason": f"{type(e).__name__} during payment flow."}
         )

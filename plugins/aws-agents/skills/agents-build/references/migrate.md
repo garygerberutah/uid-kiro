@@ -13,7 +13,7 @@ Move an existing Amazon Bedrock Agent to AgentCore Runtime.
 `$ARGUMENTS` is optional:
 
 ```
-/migrate                    # interactive — walks through the migration
+/migrate                    # interactive -- walks through the migration
 /migrate strands            # migrate targeting Strands framework
 /migrate langgraph          # migrate targeting LangGraph framework
 ```
@@ -22,18 +22,18 @@ Move an existing Amazon Bedrock Agent to AgentCore Runtime.
 
 The `agentcore create --type import` command reads your existing Bedrock Agent's configuration and generates an AgentCore project that reproduces its behavior in a code-first framework. Specifically:
 
-- **System prompt** → copied into the generated `main.py`
-- **Action groups (Lambda-backed)** → converted to Gateway targets with `--type lambda-function-arn`
-- **Knowledge bases** → referenced in the system prompt with a note to wire retrieval manually (AgentCore doesn't auto-import KB bindings)
-- **Guardrails** → noted in comments but not auto-converted (AgentCore uses Cedar policies, not Bedrock Guardrails)
-- **Agent alias / version** → the import targets a specific alias, not the draft
+- **System prompt** -> copied into the generated `main.py`
+- **Action groups (Lambda-backed)** -> converted to Gateway targets with `--type lambda-function-arn`
+- **Knowledge bases** -> referenced in the system prompt with a note to wire retrieval manually (AgentCore doesn't auto-import KB bindings)
+- **Guardrails** -> noted in comments but not auto-converted (AgentCore uses Cedar policies, not Bedrock Guardrails)
+- **Agent alias / version** -> the import targets a specific alias, not the draft
 
 What migration does **not** do:
 
-- It does not delete or modify the original Bedrock Agent — the source agent keeps running
+- It does not delete or modify the original Bedrock Agent -- the source agent keeps running
 - It does not migrate conversation history or session state
 - It does not convert Bedrock Guardrails to Cedar policies (different authorization model)
-- It does not auto-wire Knowledge Base retrieval — you'll need to add that as a tool or direct SDK call
+- It does not auto-wire Knowledge Base retrieval -- you'll need to add that as a tool or direct SDK call
 
 ## Prerequisites
 
@@ -77,12 +77,12 @@ Check:
 
 **Knowledge Bases:** If your Bedrock Agent used Knowledge Bases, you have two options:
 
-1. **Keep using the KB via boto3** — call `bedrock-agent-runtime:RetrieveAndGenerate` or `Retrieve` directly from your agent code as a tool
-2. **Replace with AgentCore Memory** — if the KB was used for user-specific context, AgentCore Memory with SEMANTIC strategy may be a better fit. See [memory.md](memory.md).
+1. **Keep using the KB via boto3** -- call `bedrock-agent-runtime:RetrieveAndGenerate` or `Retrieve` directly from your agent code as a tool
+2. **Replace with AgentCore Memory** -- if the KB was used for user-specific context, AgentCore Memory with SEMANTIC strategy may be a better fit. See [memory.md](memory.md).
 
-**Guardrails → Cedar policies:** Bedrock Guardrails (content filters, denied topics, word filters) don't have a 1:1 mapping to Cedar policies. Cedar policies control *which tools the agent can call and with what parameters* — they're authorization rules, not content filters. If you need content filtering, keep the guardrail logic in your agent code (pre/post-processing) or use Bedrock Guardrails as a standalone API call.
+**Guardrails -> Cedar policies:** Bedrock Guardrails (content filters, denied topics, word filters) don't have a 1:1 mapping to Cedar policies. Cedar policies control *which tools the agent can call and with what parameters* -- they're authorization rules, not content filters. If you need content filtering, keep the guardrail logic in your agent code (pre/post-processing) or use Bedrock Guardrails as a standalone API call.
 
-**Custom orchestration:** If your Bedrock Agent used custom orchestration (return-of-control, custom Lambda orchestrators), you'll need to rebuild that logic in the framework's native patterns — Strands tool chains, LangGraph graph nodes, etc.
+**Custom orchestration:** If your Bedrock Agent used custom orchestration (return-of-control, custom Lambda orchestrators), you'll need to rebuild that logic in the framework's native patterns -- Strands tool chains, LangGraph graph nodes, etc.
 
 ### Step 4: Test locally and deploy
 

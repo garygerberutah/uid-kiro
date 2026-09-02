@@ -24,7 +24,7 @@ aws ec2 create-vpc-endpoint \
 
 ## Important Notes
 
-- The S3 endpoint **must be in the same account VPC** — shared subnets from another account will NOT work
+- The S3 endpoint **must be in the same account VPC** -- shared subnets from another account will NOT work
 - This applies to V3 only (V2 does not use S3 for storage)
 - Verify with: `aws ec2 describe-vpc-endpoints --filters Name=vpc-id,Values=<vpc-id>`
 - Use `scripts/check_vpc_endpoints.sh` to automate this check

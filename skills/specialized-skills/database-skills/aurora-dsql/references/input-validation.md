@@ -43,8 +43,8 @@ sql = build(
 | Free text (description, comment)   | `literal(v)`           | `$dq_xxx$value$dq_xxx$` |
 
 Built-in patterns in `safe_query.py`: `TENANT_SLUG` (`[a-z0-9-]{1,64}`),
-`UUID`, `INT`, `ISO_DATE` (structurally validated `YYYY-MM-DD` — month 01–12, day
-01–31; does NOT check month-day combinations such as Feb 30. The database will
+`UUID`, `INT`, `ISO_DATE` (structurally validated `YYYY-MM-DD` -- month 01-12, day
+01-31; does NOT check month-day combinations such as Feb 30. The database will
 reject impossible calendar dates at execute time).
 
 ## Authorization Is Separate
@@ -60,14 +60,14 @@ sql = build("... WHERE tenant_id = {tid}", tid=regex(tenant_id, TENANT_SLUG))
 
 ## Why the Helper Exists
 
-- `psql -c "..."` and many shell-driven pipelines accept only SQL strings — there is no
+- `psql -c "..."` and many shell-driven pipelines accept only SQL strings -- there is no
   parameter-binding facility at that layer.
 - A Postgres driver's native parameter binding handles validation when the value reaches it as a
   bound parameter, but the moment you build a raw SQL string anywhere along the way (string
   interpolation, dynamic ORDER BY, dynamic table name, etc.), you are back to constructing a SQL
   text. `safe_query.build()` is the canonical way to do that without opening an injection vector.
 - Identifier interpolation (table name, column name) cannot be parameter-bound by any standard
-  Postgres driver — it MUST be validated and emitted as a quoted identifier. `ident()` is the
+  Postgres driver -- it MUST be validated and emitted as a quoted identifier. `ident()` is the
   only safe way.
 
 ## Rules
@@ -75,7 +75,7 @@ sql = build("... WHERE tenant_id = {tid}", tid=regex(tenant_id, TENANT_SLUG))
 - **MUST** build every dynamically-constructed SQL string with `safe_query.build()`.
 - **MUST** authorize the caller before validating format.
 - **MUST NOT** fall back to f-strings, `%`, `.format()`, or concatenation when
-  a validator rejects a value — fix the caller or widen the validator.
+  a validator rejects a value -- fix the caller or widen the validator.
 - **MUST NOT** catch `UnsafeSQLError` to recover silently. Re-raise or return
   an error to the caller.
 - **SHOULD** add new patterns to `safe_query.py` rather than inlining regex at
@@ -105,7 +105,7 @@ PGPASSWORD=$(aws dsql generate-db-connect-admin-auth-token --hostname "$HOST" --
 `regex()` raises before `psql` runs; `literal()` escapes the validated
 value into the final SQL text.
 
-**ALWAYS** explicitly set SSL mode — DSQL rejects non-TLS connections
+**ALWAYS** explicitly set SSL mode -- DSQL rejects non-TLS connections
 and psql's default `PGSSLMODE=prefer` will attempt plaintext first.
 Two equivalent forms, both valid per the
 [AWS DSQL psql guide](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/accessing-psql.html):
@@ -118,4 +118,4 @@ Two equivalent forms, both valid per the
 
 Use `sslmode=verify-full sslrootcert=system` (matches `psql-connect.sh`'s default and what the
 Java/Rust/Python connectors enforce). Drop to `sslmode=require` only when the client genuinely
-cannot reach a trusted CA bundle — and document the downgrade in the runbook.
+cannot reach a trusted CA bundle -- and document the downgrade in the runbook.

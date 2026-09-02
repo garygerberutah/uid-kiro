@@ -190,7 +190,7 @@ def semantic_cache_query(client, prompt: str, llm_fn, threshold: float = 0.90,
 
 ## Similarity thresholds
 
-> **Note:** ElastiCache vector search uses cosine distance (1 - cosine_similarity), where 0 = identical and 1 = orthogonal. A distance threshold of 0.10 corresponds to cosine similarity ≥ 0.90.
+> **Note:** ElastiCache vector search uses cosine distance (1 - cosine_similarity), where 0 = identical and 1 = orthogonal. A distance threshold of 0.10 corresponds to cosine similarity >= 0.90.
 
 Starting recommendations:
 

@@ -1,4 +1,4 @@
-# RDS Commitment Pricing — Mechanics
+# RDS Commitment Pricing -- Mechanics
 
 ## Reserved Instances (RI)
 
@@ -14,7 +14,7 @@ RIs are a per-instance commitment for RDS. You commit to a specific instance cla
 
 ### Size Flexibility
 
-RDS RIs have size flexibility within the same instance family and engine. A `db.r7g.2xlarge` RI can cover 2× `db.r7g.xlarge`. Size flexibility does NOT apply across families or engines.
+RDS RIs have size flexibility within the same instance family and engine. A `db.r7g.2xlarge` RI can cover 2x `db.r7g.xlarge`. Size flexibility does NOT apply across families or engines.
 
 ### Multi-AZ
 
@@ -59,7 +59,7 @@ RIs save money when utilization exceeds ~40-60% of the term. Below that, on-dema
 ## RDS vs Aurora Differences
 
 - RDS DSP supports both 1yr and 3yr terms (Aurora DSP is 1yr only)
-- RDS has no Serverless option — all instances are provisioned
-- RDS has no I/O-Optimized storage tier — no 30% compute premium to worry about
+- RDS has no Serverless option -- all instances are provisioned
+- RDS has no I/O-Optimized storage tier -- no 30% compute premium to worry about
 - RDS Multi-AZ RIs are separate from Single-AZ (Aurora handles this at the cluster level)
-- RDS RI is engine-specific: MySQL RI ≠ PostgreSQL RI ≠ MariaDB RI
+- RDS RI is engine-specific: MySQL RI != PostgreSQL RI != MariaDB RI

@@ -5,10 +5,10 @@ Checks:
   1. No symlinks anywhere under plugins/.
   2. Every plugin.json and mcp.json validates against the vendored canonical
      schemas. They are vendored because the spec forbids retrieving a schema
-     while loading a plugin (§7.2.1), and CI should not need network access.
+     while loading a plugin (Section 7.2.1), and CI should not need network access.
   3. Rules the schemas cannot express: path containment against the resolved
-     plugin root (§4.1), placeholder restrictions (§9.2), and MCP url and
-     header rules (§7.2.1).
+     plugin root (Section 4.1), placeholder restrictions (Section 9.2), and MCP url and
+     header rules (Section 7.2.1).
   4. Every skill in plugins/*/skills/ passes the Agent Skills field, length,
      and naming rules.
 
@@ -75,7 +75,7 @@ def iter_strings(node: object, prefix: str):
 
 
 def check_containment(rel_path: str, label: str, plugin_dir: Path) -> None:
-    """Spec §4.1: a plugin-relative path is './'-prefixed and, once the
+    """Spec Section 4.1: a plugin-relative path is './'-prefixed and, once the
     filesystem resolves it, stays inside the resolved plugin root.
 
     Resolution matters: a lexical check passes a path that reaches outside
@@ -102,7 +102,7 @@ def validate_plugin_dir(plugin_dir: Path, plugin_schema: dict, mcp_schema: dict)
 
     manifest_path = plugin_dir / "plugin.json"
     if not manifest_path.exists():
-        error(f"{rel}: missing required root plugin.json (spec §5.1)")
+        error(f"{rel}: missing required root plugin.json (spec Section 5.1)")
         return
     try:
         manifest = json.loads(manifest_path.read_text())
@@ -118,14 +118,14 @@ def validate_plugin_dir(plugin_dir: Path, plugin_schema: dict, mcp_schema: dict)
         error(f"{rel}/plugin.json: name {manifest.get('name')!r} != directory {plugin_dir.name!r}")
 
     # Extension namespaces must be reverse-domain and have a matching directory
-    # when they declare file paths (spec §8.2).
+    # when they declare file paths (spec Section 8.2).
     extensions = manifest.get("extensions")
     if extensions is not None and not isinstance(extensions, dict):
-        error(f"{rel}/plugin.json: extensions must be an object (spec §8.1)")
+        error(f"{rel}/plugin.json: extensions must be an object (spec Section 8.1)")
         extensions = {}
     for ns, value in (extensions or {}).items():
         if "." not in ns:
-            error(f"{rel}/plugin.json: extension namespace {ns!r} is not reverse-domain (spec §8)")
+            error(f"{rel}/plugin.json: extension namespace {ns!r} is not reverse-domain (spec Section 8)")
         # Every string leaf is a candidate path, at any nesting depth. Values
         # that merely look path-like are checked too: a namespace owner can
         # nest pointers arbitrarily, so type is the only reliable filter.
@@ -151,7 +151,7 @@ def validate_plugin_dir(plugin_dir: Path, plugin_schema: dict, mcp_schema: dict)
 
     skills_dir = plugin_dir / "skills"
     if skills_dir.exists() and not skills_dir.is_dir():
-        error(f"{rel}: skills exists but is not a directory (spec §6.2)")
+        error(f"{rel}: skills exists but is not a directory (spec Section 6.2)")
 
 
 PLACEHOLDER_RE = re.compile(r"\$\{([^}]*)\}")
@@ -187,7 +187,7 @@ def check_runtime_path(val: str, label: str, plugin_dir: Path) -> None:
 
 
 def validate_server(name: str, srv: dict, label: str, plugin_dir: Path) -> None:
-    """Spec §7.2.1 and §9.2 rules the JSON Schema cannot express."""
+    """Spec Section 7.2.1 and Section 9.2 rules the JSON Schema cannot express."""
     if not isinstance(srv, dict):
         error(f"{label}: server {name!r} must be an object")
         return
@@ -198,7 +198,7 @@ def validate_server(name: str, srv: dict, label: str, plugin_dir: Path) -> None:
             error(f"{label}: server {name!r} command must be a string")
             cmd = ""
         if PLACEHOLDER_RE.search(cmd):
-            error(f"{label}: server {name!r} command must not use placeholders (spec §7.2.1)")
+            error(f"{label}: server {name!r} command must not use placeholders (spec Section 7.2.1)")
         if not (cmd.startswith("./") or "/" not in cmd):
             error(f"{label}: server {name!r} command must be a bare name or './' path")
         if cmd.startswith("./"):
@@ -209,7 +209,7 @@ def validate_server(name: str, srv: dict, label: str, plugin_dir: Path) -> None:
             env = {}
         for key in ("PLUGIN_ROOT", "PLUGIN_DATA"):
             if key in (env or {}):
-                error(f"{label}: server {name!r} env must not set {key} (spec §9.2)")
+                error(f"{label}: server {name!r} env must not set {key} (spec Section 9.2)")
         for field in ("args", "cwd"):
             values = srv.get(field)
             values = values if isinstance(values, list) else ([values] if values else [])
@@ -219,7 +219,7 @@ def validate_server(name: str, srv: dict, label: str, plugin_dir: Path) -> None:
                     continue
                 for ph in PLACEHOLDER_RE.findall(v):
                     if ph not in RESERVED:
-                        error(f"{label}: server {name!r} {field} uses unsupported placeholder ${{{ph}}} (spec §9.2)")
+                        error(f"{label}: server {name!r} {field} uses unsupported placeholder ${{{ph}}} (spec Section 9.2)")
                 # These values become a subprocess path, so containment is
                 # enforced on anything resolvable against the plugin root.
                 if looks_like_path(v):
@@ -230,12 +230,12 @@ def validate_server(name: str, srv: dict, label: str, plugin_dir: Path) -> None:
             error(f"{label}: server {name!r} url must be a string")
             return
         if PLACEHOLDER_RE.search(url):
-            error(f"{label}: server {name!r} url must not use expansion (spec §7.2.1)")
+            error(f"{label}: server {name!r} url must not use expansion (spec Section 7.2.1)")
         parsed = urlsplit(url)
         if parsed.fragment or parsed.username or parsed.password:
-            error(f"{label}: server {name!r} url must not contain user info or a fragment (spec §7.2.1)")
+            error(f"{label}: server {name!r} url must not contain user info or a fragment (spec Section 7.2.1)")
         if parsed.scheme != "https" and parsed.hostname not in LOOPBACK_HOSTS:
-            error(f"{label}: server {name!r} non-loopback url must use HTTPS (spec §7.2.1)")
+            error(f"{label}: server {name!r} non-loopback url must use HTTPS (spec Section 7.2.1)")
         headers = srv.get("headers")
         if headers is not None and not isinstance(headers, dict):
             error(f"{label}: server {name!r} headers must be an object")
@@ -245,9 +245,9 @@ def validate_server(name: str, srv: dict, label: str, plugin_dir: Path) -> None:
             error(f"{label}: server {name!r} has duplicate header names under different casing")
         for hname, hval in (headers or {}).items():
             if isinstance(hval, str) and PLACEHOLDER_RE.search(hval):
-                error(f"{label}: server {name!r} header {hname!r} must not use expansion (spec §7.2.1)")
+                error(f"{label}: server {name!r} header {hname!r} must not use expansion (spec Section 7.2.1)")
             if hname.lower() == "authorization":
-                error(f"{label}: server {name!r} must not embed credentials in headers (spec §7.2.1)")
+                error(f"{label}: server {name!r} must not embed credentials in headers (spec Section 7.2.1)")
 
 
 def parse_frontmatter(text: str) -> dict | None:

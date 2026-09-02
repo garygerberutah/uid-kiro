@@ -16,11 +16,11 @@ A type conflict occurs when:
 
 | Source Type | Target Type | Example Conflict |
 |-------------|-------------|------------------|
-| STRING | INT/DECIMAL | "$29.99" → 29.99 |
-| STRING | DATE/TIMESTAMP | "2024-01-15" → DATE |
-| INT | STRING | 12345 → "12345" |
-| STRING | BOOLEAN | "true"/"false" → TRUE/FALSE |
-| DECIMAL | INT | 29.99 → 29 (loses precision) |
+| STRING | INT/DECIMAL | "$29.99" -> 29.99 |
+| STRING | DATE/TIMESTAMP | "2024-01-15" -> DATE |
+| INT | STRING | 12345 -> "12345" |
+| STRING | BOOLEAN | "true"/"false" -> TRUE/FALSE |
+| DECIMAL | INT | 29.99 -> 29 (loses precision) |
 
 ## Expected User Interaction
 
@@ -46,12 +46,12 @@ How would you like to handle this?
 Option 1: Transform/Cast - Remove $ symbol and cast STRING to DECIMAL
   - Pros: Preserves all valid data
   - Cons: Invalid values may cause import to fail
-  - Example: "$29.99" → 29.99
+  - Example: "$29.99" -> 29.99
 
 Option 2: Skip Invalid Rows - Skip rows where transformation fails
   - Pros: Import continues even with bad data
   - Cons: May lose some rows
-  - Example: "$29.99" → 29.99, "N/A" → skipped
+  - Example: "$29.99" -> 29.99, "N/A" -> skipped
 
 Option 3: Fail Import - Stop if any invalid values found
   - Pros: Ensures data quality
@@ -67,7 +67,7 @@ Do NOT silently apply a transformation without user confirmation.
 
 ## Transformation Patterns
 
-### STRING → Numeric (INT/DECIMAL)
+### STRING -> Numeric (INT/DECIMAL)
 
 **PySpark**:
 
@@ -101,7 +101,7 @@ FROM source_table
 WHERE regexp_replace(price, '[^0-9.]', '') <> ''
 ```
 
-### STRING → DATE/TIMESTAMP
+### STRING -> DATE/TIMESTAMP
 
 **PySpark**:
 
@@ -142,7 +142,7 @@ SELECT
 FROM source_table
 ```
 
-### STRING → BOOLEAN
+### STRING -> BOOLEAN
 
 **PySpark**:
 
@@ -169,7 +169,7 @@ SELECT
 FROM source_table
 ```
 
-### Numeric → STRING
+### Numeric -> STRING
 
 **PySpark**:
 
@@ -322,4 +322,4 @@ Incomplete transformation code (missing null handling)
 Not logging how many rows were filtered out
 Assuming all source data is valid without validation
 Not providing fallback for invalid values
-Generic "cast to type" without cleaning data first (e.g., "$29.99" → cast fails)
+Generic "cast to type" without cleaning data first (e.g., "$29.99" -> cast fails)

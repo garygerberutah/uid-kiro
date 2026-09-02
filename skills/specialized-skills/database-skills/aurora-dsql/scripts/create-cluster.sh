@@ -129,7 +129,7 @@ fi
 CLUSTER_ENDPOINT="${CLUSTER_ID}.dsql.${REGION}.on.aws"
 
 echo ""
-echo "✓ Cluster created successfully!"
+echo "[OK] Cluster created successfully!"
 echo ""
 echo "Cluster Identifier: $CLUSTER_ID"
 echo "Cluster Endpoint:   $CLUSTER_ENDPOINT"

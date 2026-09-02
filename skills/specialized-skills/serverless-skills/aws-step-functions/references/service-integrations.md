@@ -4,9 +4,9 @@
 
 Step Functions can integrate with AWS services in three patterns:
 
-1. **Optimized integrations** — Purpose-built, recommended where available
-2. **AWS SDK integrations** — Call any AWS SDK API action directly
-3. **HTTP Task** — Call HTTPS APIs (e.g., Stripe, Salesforce)
+1. **Optimized integrations** -- Purpose-built, recommended where available
+2. **AWS SDK integrations** -- Call any AWS SDK API action directly
+3. **HTTP Task** -- Call HTTPS APIs (e.g., Stripe, Salesforce)
 
 ## Integration Patterns
 
@@ -128,7 +128,7 @@ The result is wrapped in a `Payload` field, so use `$states.result.Payload` to a
 
 The execution pauses until an external system calls `SendTaskSuccess` or `SendTaskFailure` with the task token.
 
-> **Encryption and sensitive data:** Enable server-side encryption (`KmsMasterKeyId`) on SQS queues and SNS topics used by a workflow. The task token is a sensitive credential, and message bodies may carry order or approval details — avoid placing PII, financial data, or secrets in the body; pass a reference ID and look up details through an authorized channel.
+> **Encryption and sensitive data:** Enable server-side encryption (`KmsMasterKeyId`) on SQS queues and SNS topics used by a workflow. The task token is a sensitive credential, and message bodies may carry order or approval details -- avoid placing PII, financial data, or secrets in the body; pass a reference ID and look up details through an authorized channel.
 
 ---
 
@@ -151,7 +151,7 @@ The execution pauses until an external system calls `SendTaskSuccess` or `SendTa
 
 Note: The `.sync:2` suffix waits for completion. The child output is a JSON string in `$states.result.Output`, so use `$parse()` to deserialize it.
 
-#### Start Execution (Async — Fire and Forget)
+#### Start Execution (Async -- Fire and Forget)
 
 ```json
 "StartAsync": {

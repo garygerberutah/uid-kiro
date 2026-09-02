@@ -8,11 +8,11 @@ Before deploying, verify:
 
 - `npx ampx --version` returns a valid version
 - `aws sts get-caller-identity` succeeds
-- Node.js ≥ 18.x installed
+- Node.js >= 18.x installed
 - `.gitignore` includes `node_modules/`, `.env*`, `amplify_outputs.json`,
   `.amplify/`
 
-**`amplify_outputs.json` is gitignored** — it is generated at build
+**`amplify_outputs.json` is gitignored** -- it is generated at build
 time, NOT committed to source control:
 
 - **Local dev:** `npx ampx sandbox` generates it automatically
@@ -29,7 +29,7 @@ Deploy a personal development environment:
 AWS_REGION=us-east-1 npx ampx sandbox --once
 ```
 
-Use the `--once` flag in agent and CI environments — without
+Use the `--once` flag in agent and CI environments -- without
 it, the command starts a file watcher that never exits. If prompted to
 bootstrap, run `npx ampx sandbox --once` again after bootstrapping
 completes.
@@ -49,7 +49,7 @@ APP_ID=$(aws amplify create-app \
   --query 'app.appId' --output text)
 ```
 
-Use `github.com/user/repo` format — **not** `https://`.
+Use `github.com/user/repo` format -- **not** `https://`.
 
 ### IAM Service Role
 
@@ -77,7 +77,7 @@ ROLE_ARN=$(aws iam get-role --role-name "$ROLE_NAME" --query 'Role.Arn' --output
 aws amplify update-app --app-id "$APP_ID" --iam-service-role-arn "$ROLE_ARN"
 ```
 
-All three steps are required — missing the role causes
+All three steps are required -- missing the role causes
 `AccessDeniedException` during deployment.
 
 ### Create Branch
@@ -161,15 +161,15 @@ aws amplify start-job --app-id "$APP_ID" --branch-name main --job-type RELEASE
 echo -n "<value>" | npx ampx sandbox secret set MY_API_KEY
 ```
 
-> **Security:** Avoid passing secret values as CLI arguments or via `echo` — these appear in shell history and `/proc`. Instead, use `npx ampx sandbox secret set MY_SECRET` which prompts for input interactively, or pipe from a secure source: `aws ssm get-parameter --name /path/to/secret --with-decryption --query Parameter.Value --output text | npx ampx sandbox secret set MY_SECRET --from-stdin`
+> **Security:** Avoid passing secret values as CLI arguments or via `echo` -- these appear in shell history and `/proc`. Instead, use `npx ampx sandbox secret set MY_SECRET` which prompts for input interactively, or pipe from a secure source: `aws ssm get-parameter --name /path/to/secret --with-decryption --query Parameter.Value --output text | npx ampx sandbox secret set MY_SECRET --from-stdin`
 
-Pipe the value via stdin — without the pipe, the command
+Pipe the value via stdin -- without the pipe, the command
 prompts interactively.
 
 > **Important:** Use `echo -n` (no trailing newline) when piping values to `secret set`. (The documented approach uses an interactive prompt; piping with `echo -n` is a practical alternative for scripts.)
 
 This stores the secret for your personal sandbox environment.
-**Branch environments (production):** Secrets are managed through the **Amplify console** (App settings → Environment variables → Secrets), NOT via CLI. The `ampx sandbox secret` command only works for local sandbox environments.
+**Branch environments (production):** Secrets are managed through the **Amplify console** (App settings -> Environment variables -> Secrets), NOT via CLI. The `ampx sandbox secret` command only works for local sandbox environments.
 
 Alternatively, use the AWS CLI for non-secret environment variables:
 
@@ -185,12 +185,12 @@ aws amplify update-app --app-id "$APP_ID" \
 >
 > **Note:** Under the hood, Amplify Gen2 `secret()` references are backed by AWS Systems Manager Parameter Store (SecureString parameters). Review access policies on the `/amplify/` parameter path in your account to ensure only authorized roles can read production secrets.
 
-Reference secrets in functions using `secret()` — see
+Reference secrets in functions using `secret()` -- see
 [functions-and-api.md](functions-and-api.md) for the pattern.
 
 ## Multi-Environment
 
-Use branch-based environments — each Git branch deploys independently:
+Use branch-based environments -- each Git branch deploys independently:
 
 ```bash
 # Create a staging branch
@@ -229,7 +229,7 @@ aws amplify get-domain-association --app-id "$APP_ID" --domain-name example.com
 Amplify Hosting provides framework-aware builds with SSR support for
 Next.js. The build pipeline auto-detects the framework from
 `package.json`. For SSR apps, Amplify deploys a Lambda@Edge or
-CloudFront function — no manual CloudFront configuration needed.
+CloudFront function -- no manual CloudFront configuration needed.
 
 Production URL format: `https://<branch>.<app-id>.amplifyapp.com`
 
@@ -262,7 +262,7 @@ export AWS_REGION=us-east-1
 
 Each sandbox creates an AppSync API. Frequent sandbox creation/deletion can leave orphaned APIs. If deployment fails with "LimitExceededException":
 
-1. Check: AWS Console → AppSync → APIs → delete unused
+1. Check: AWS Console -> AppSync -> APIs -> delete unused
 2. Request limit increase via Service Quotas
 
 ## Links

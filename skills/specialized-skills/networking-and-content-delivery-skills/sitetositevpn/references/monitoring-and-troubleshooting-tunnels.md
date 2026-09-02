@@ -72,7 +72,7 @@ tunnels are down versus watching one specific tunnel.
 When a tunnel is down the metric says it is down but not why, and customers spend time guessing at
 IKE, dead peer detection, or BGP causes. Site-to-Site VPN can publish two separate, independently
 enabled log types to CloudWatch Logs to help with troubleshooting (the same two names the AWS
-docs use — see [AWS Site-to-Site VPN logs](https://docs.aws.amazon.com/vpn/latest/s2svpn/monitoring-logs.html)):
+docs use -- see [AWS Site-to-Site VPN logs](https://docs.aws.amazon.com/vpn/latest/s2svpn/monitoring-logs.html)):
 
 - **Tunnel activity logs** record the IPsec/IKE control plane: IPsec tunnel establishment, IKE phase
   1/2 protocol state (Established / Rekeying / Negotiating / Down), dead peer detection (DPD), and
@@ -81,7 +81,7 @@ docs use — see [AWS Site-to-Site VPN logs](https://docs.aws.amazon.com/vpn/lat
   **every** connection, static or dynamic. Controlled by the `LogEnabled` / `LogGroupArn` /
   `LogOutputFormat` fields.
 - **Tunnel BGP logs** record the BGP control plane as two event types: `BGPStatus` (session state
-  transitions such as OpenConfirm→Established, prefix-limit warnings and violations, hold-timer
+  transitions such as OpenConfirm->Established, prefix-limit warnings and violations, hold-timer
   expiry, and Cease notifications) and `RouteStatus` (routes ADVERTISED / UPDATED / WITHDRAWN, with
   a details field when a route is denied). They apply **only to dynamic (BGP)** connections and are
   meaningless on a static connection. Controlled by the separate `BgpLogEnabled` / `BgpLogGroupArn`
@@ -90,13 +90,13 @@ docs use — see [AWS Site-to-Site VPN logs](https://docs.aws.amazon.com/vpn/lat
 Both are toggled through `modify-vpn-tunnel-options`, but they are distinct switches: enabling
 tunnel activity logging does NOT enable BGP logging. A dynamic connection whose tunnel stays up at
 the IKE layer but drops its BGP session (prefix-limit hit, hold-timer expiry, route withdrawn) shows
-nothing useful in the activity log — only the BGP log names that cause. This is exactly the trap of
+nothing useful in the activity log -- only the BGP log names that cause. This is exactly the trap of
 enabling "the VPN logs" and quietly getting activity logs alone.
 
 **Constraints:**
 
 - You MUST treat tunnel activity logs and BGP logs as two separate choices, not one "VPN logs" toggle
-- You MUST ask the customer which log type(s) to enable — tunnel activity, BGP, or both — before
+- You MUST ask the customer which log type(s) to enable -- tunnel activity, BGP, or both -- before
   running `modify-vpn-tunnel-options`, rather than defaulting to activity logs alone
 - For a **dynamic (BGP)** connection you MUST offer BGP logs and SHOULD recommend enabling **both**
   activity and BGP logs, since BGP-layer failures are invisible in the activity log
@@ -136,9 +136,9 @@ The threshold does not match the routing type. Set it against static (0/1) or BG
 The SNS topic has no confirmed subscription. Confirm the subscription (Wiring a working alarm).
 
 ### Tunnel is down and the cause is unknown
-VPN logs are not enabled, or only one of the two types is. Enable the right type(s) — tunnel
+VPN logs are not enabled, or only one of the two types is. Enable the right type(s) -- tunnel
 activity logs for IKE/IPsec detail, BGP logs for BGP session and route detail on dynamic
-connections — and read them (Publish tunnel activity and BGP logs to CloudWatch).
+connections -- and read them (Publish tunnel activity and BGP logs to CloudWatch).
 
 ### Tunnel is up but a dynamic connection has no route / traffic
 The IKE tunnel is up but the BGP session or route exchange failed, and only activity logging was
@@ -167,7 +167,7 @@ topic, and enables VPN logs, then surfaces the connection console link to verify
 - **sns_topic_arn** (required): The SNS topic to notify.
 - **kms_key_arn** (required): The AWS KMS key ARN used to encrypt the CloudWatch Logs group that receives VPN logs.
 - **tunnel_outside_ips** (required): The outside IP addresses of the VPN tunnels (one per tunnel, obtained from `describe-vpn-connections`).
-- **log_types** (required): which of the two log types to enable — `activity`, `bgp`, or `both`.
+- **log_types** (required): which of the two log types to enable -- `activity`, `bgp`, or `both`.
   Ask the customer explicitly. `activity` (tunnel activity log: IKE/IPsec/DPD/NAT-T) applies to any
   connection; `bgp` (tunnel BGP log: session and route events) applies only to dynamic connections.
   For a dynamic connection, recommend `both`; for a static connection this is forced to `activity`.
@@ -242,7 +242,7 @@ switches on the same `modify-vpn-tunnel-options` call, and enabling one does not
 
 **Constraints:**
 
-- You MUST confirm with the customer which log type(s) to enable — `activity`, `bgp`, or `both` —
+- You MUST confirm with the customer which log type(s) to enable -- `activity`, `bgp`, or `both` --
   before running `modify-vpn-tunnel-options`. Do NOT silently enable activity logs alone. For a
   **dynamic (BGP)** connection, recommend `both` because BGP-layer failures (prefix-limit hits,
   hold-timer expiry, withdrawn routes) do not appear in the activity log. For a **static**

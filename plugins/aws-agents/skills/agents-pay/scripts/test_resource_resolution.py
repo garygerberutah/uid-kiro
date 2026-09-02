@@ -72,7 +72,7 @@ try:
     assert m.resolve_manager_arn(None, arn_cfg) == "arn:env", "env should win over config"
     del os.environ["PAYMENT_MANAGER_ARN"]
 
-    # 3. config.json wins when no flag/env — this is the regression case: a
+    # 3. config.json wins when no flag/env -- this is the regression case: a
     # manager ARN persisted by a previous create-instrument/init-config run
     # must be found even when re-running from a directory with no
     # deployed-state.json in reach.

@@ -25,7 +25,7 @@ aws compute-optimizer get-rds-db-instance-recommendations \
 
 ## Read Replica Considerations
 
-- Recommendations synchronized with writer for promotion tiers ≤1
+- Recommendations synchronized with writer for promotion tiers <=1
 - Smaller replica instances may increase replication lag
 
 ## Storage Considerations

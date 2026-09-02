@@ -20,7 +20,7 @@ Local mode also: `atx --version`
 ## Local Execution
 
 If any repos were provided as git URLs (HTTPS or SSH), clone them locally first.
-The user's local git config handles authentication — no Secrets Manager needed.
+The user's local git config handles authentication -- no Secrets Manager needed.
 
 ```bash
 CLONE_DIR=~/.aws/atx/custom/atx-agent-session/repos/<repo-name>-$SESSION_TS
@@ -68,11 +68,11 @@ before proceeding.
 When running `atx custom def exec`, always include the `--telemetry` flag (see the Telemetry section in SKILL.md). Format:
 `--telemetry "client=<client>,agent=<agent>,executionMode=<local|remote>"`
 
-- `client` is the MCP client or tool hosting this session (lowercase, no spaces) — e.g., `kiro`, `vscode`, `cursor`, `windsurf`, `claudecode`. Use the real tool name, not a default.
-- `agent` is the AI assistant driving this session (lowercase, no spaces) — e.g., `kiro`, `amazonq`, `claude`, `copilot`, `cline`, `codex`. Use the real assistant name, not a default.
+- `client` is the MCP client or tool hosting this session (lowercase, no spaces) -- e.g., `kiro`, `vscode`, `cursor`, `windsurf`, `claudecode`. Use the real tool name, not a default.
+- `agent` is the AI assistant driving this session (lowercase, no spaces) -- e.g., `kiro`, `amazonq`, `claude`, `copilot`, `cline`, `codex`. Use the real assistant name, not a default.
 - `executionMode` is `local` for direct CLI invocation, `remote` when submitting via Lambda
 
-Run transformations in parallel — maximum 3 concurrent repos at a time (the user
+Run transformations in parallel -- maximum 3 concurrent repos at a time (the user
 can override this, but 3 is recommended to avoid overloading the machine). If there
 are more than 3 repos, process them in batches of 3 (wait for a batch to finish
 before starting the next). Maximum 9 repos total for local mode (user can override,
@@ -95,8 +95,8 @@ nohup ~/.aws/atx/custom/atx-agent-session/run-<repo-name>.sh > ~/.aws/atx/custom
 echo $! > ~/.aws/atx/custom/atx-agent-session/<repo-name>.pid
 ```
 
-Omit `--configuration` if no config needed. The `--telemetry` flag is always included — see the Telemetry section above for field values. Launch each repo's script in rapid
-succession — do NOT wait between launches. Each runner script is backgrounded
+Omit `--configuration` if no config needed. The `--telemetry` flag is always included -- see the Telemetry section above for field values. Launch each repo's script in rapid
+succession -- do NOT wait between launches. Each runner script is backgrounded
 via nohup; the exit code is captured to `~/.aws/atx/custom/atx-agent-session/<repo-name>.exit` when ATX finishes.
 
 After launching all repos, find each repo's conversation log by grepping its
@@ -107,7 +107,7 @@ grep "Conversation log:" ~/.aws/atx/custom/atx-agent-session/<repo-name>.log 2>/
 ```
 
 If it hasn't appeared yet, wait 15 seconds and retry. Extract the full path from
-each — do NOT use `ls -t` across all conversations, as that may match a different run.
+each -- do NOT use `ls -t` across all conversations, as that may match a different run.
 
 Then start monitoring. On each 60-second cycle:
 
@@ -121,7 +121,7 @@ continuous progress updates across all repos.
 A repo's transformation is done ONLY when its background process exits (i.e.,
 `kill -0` returns non-zero). Do NOT treat exit code 0 from any other command
 (grep, cat, test, ls, etc.) as transformation completion. Do NOT treat log
-messages like "TRANSFORMATION COMPLETE" as completion — ATX performs additional
+messages like "TRANSFORMATION COMPLETE" as completion -- ATX performs additional
 steps after that (validation summary generation).
 
 ## Remote Execution
@@ -214,8 +214,8 @@ for the exact prompt and flow.
 
 ## Key Principles
 
-1. Single prerequisite check — never repeat for parallel tasks
-2. Trust the match report — do not re-discover TDs
-3. Local parallel execution — maximum 3 concurrent repos (user-overridable); recommend remote for more than 9
-4. Remote parallel execution — submit in chunks of up to 128 jobs per `atx-trigger-batch-jobs` call; split larger sets into multiple calls (max 512 repos per session)
+1. Single prerequisite check -- never repeat for parallel tasks
+2. Trust the match report -- do not re-discover TDs
+3. Local parallel execution -- maximum 3 concurrent repos (user-overridable); recommend remote for more than 9
+4. Remote parallel execution -- submit in chunks of up to 128 jobs per `atx-trigger-batch-jobs` call; split larger sets into multiple calls (max 512 repos per session)
 5. Skip prerequisite checks in parallel task prompts

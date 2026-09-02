@@ -2,7 +2,7 @@
 
 ## Overview
 
-Add AgentCore Payments to your agent — the managed service that enables microtransaction payments in AI agents to access paid APIs, MCP servers, and content via the x402 protocol.
+Add AgentCore Payments to your agent -- the managed service that enables microtransaction payments in AI agents to access paid APIs, MCP servers, and content via the x402 protocol.
 
 The AWS MCP server is recommended for executing AWS commands (sandboxed execution, audit logging, observability), but is not required. If the MCP server is not available, use AWS CLI or boto3 scripts instead.
 
@@ -40,53 +40,53 @@ Do NOT use for:
 
 Read the agent's entrypoint file (e.g., `main.py`, `app.py`). Detect the framework:
 
-- `from strands import Agent` → **Strands**
-- `from langgraph` or `from langchain` → **LangGraph**
-- `from agents import Agent` → **OpenAI Agents SDK**
-- No recognizable framework → default to the **custom tool pattern**
+- `from strands import Agent` -> **Strands**
+- `from langgraph` or `from langchain` -> **LangGraph**
+- `from agents import Agent` -> **OpenAI Agents SDK**
+- No recognizable framework -> default to the **custom tool pattern**
 
 ### Step 2: Determine the situation
 
-**Case A — No payments configured yet**
+**Case A -- No payments configured yet**
 No Payment Manager exists. Proceed to Step 3 (prerequisites) then Step 4 (resource creation).
 
-**Case B — Payments resources exist, needs wiring**
+**Case B -- Payments resources exist, needs wiring**
 The developer already has a Payment Manager. Skip to Step 5 (generate wiring code). Ask for their Payment Manager ARN, Instrument ID, and Session ID.
 
-**Case C — Payments configured and wired, debugging**
+**Case C -- Payments configured and wired, debugging**
 Ask: "What's happening? Is the agent seeing 402 but not paying? Is ProcessPayment failing? What error do you see?"
 Then diagnose using the Debugging section below.
 
-**Case D — Developer asking about payments without a project**
+**Case D -- Developer asking about payments without a project**
 Answer directly. For architecture questions, explain the x402 flow. For code questions, show the custom tool pattern.
 
 ### Step 3: Collect inputs from the developer
 
 Before setting up payments, collect these inputs:
 
-1. **Which payment provider?** — Coinbase CDP or Stripe Privy
-2. **Which AWS region?** — must be one of: us-east-1, us-west-2, eu-central-1, ap-southeast-2
-3. **AWS account ID** — the account where resources will be created
-4. **AWS credentials** — the developer needs two levels of access:
+1. **Which payment provider?** -- Coinbase CDP or Stripe Privy
+2. **Which AWS region?** -- must be one of: us-east-1, us-west-2, eu-central-1, ap-southeast-2
+3. **AWS account ID** -- the account where resources will be created
+4. **AWS credentials** -- the developer needs two levels of access:
 
    **For running the setup script** (one-time, admin-level):
-   - `iam:CreateRole`, `iam:PutRolePolicy` — to create the service role
-   - `bedrock-agentcore:CreatePaymentCredentialProvider` — to store provider credentials
-   - `bedrock-agentcore:CreatePaymentManager`, `bedrock-agentcore:GetPaymentManager` — to create the manager
-   - `bedrock-agentcore:CreatePaymentConnector` — to create the connector
-   - `bedrock-agentcore:CreatePaymentInstrument` — to create the wallet
-   - `bedrock-agentcore:CreatePaymentSession` — to create a session
+   - `iam:CreateRole`, `iam:PutRolePolicy` -- to create the service role
+   - `bedrock-agentcore:CreatePaymentCredentialProvider` -- to store provider credentials
+   - `bedrock-agentcore:CreatePaymentManager`, `bedrock-agentcore:GetPaymentManager` -- to create the manager
+   - `bedrock-agentcore:CreatePaymentConnector` -- to create the connector
+   - `bedrock-agentcore:CreatePaymentInstrument` -- to create the wallet
+   - `bedrock-agentcore:CreatePaymentSession` -- to create a session
 
    In practice, an **Admin** or **PowerUser** role covers all of these.
 
    **For running the agent** (ongoing, can be scoped down):
-   - `bedrock-agentcore:ProcessPayment` — to execute payments
-   - `bedrock-agentcore:GetPaymentInstrument`, `bedrock-agentcore:GetPaymentSession` — for read operations
-   - `bedrock:InvokeModel` or `bedrock:InvokeModelWithResponseStream` — if using Bedrock models
+   - `bedrock-agentcore:ProcessPayment` -- to execute payments
+   - `bedrock-agentcore:GetPaymentInstrument`, `bedrock-agentcore:GetPaymentSession` -- for read operations
+   - `bedrock:InvokeModel` or `bedrock:InvokeModelWithResponseStream` -- if using Bedrock models
 
    Verify credentials are active: `aws sts get-caller-identity`
 
-5. **End user email** — the email of the person whose wallet the agent will spend from. For POC/testing, the developer's own email is fine.
+5. **End user email** -- the email of the person whose wallet the agent will spend from. For POC/testing, the developer's own email is fine.
 
 Once you have answers 1-5, show the provider-specific `.env.payments` template and ask the developer to create the file and run `source .env.payments`:
 
@@ -95,12 +95,12 @@ Once you have answers 1-5, show the provider-specific `.env.payments` template a
    How to get these credentials:
 
    1. Create or log in to a Coinbase Developer Platform account and project
-   2. Generate an API key (or reuse existing) — note the **API Key ID** and **API Key Secret**
+   2. Generate an API key (or reuse existing) -- note the **API Key ID** and **API Key Secret**
    3. Generate a **Wallet Secret** (for cryptographic wallet operations like signing transactions)
    4. Under Project > Wallet > Embedded Wallets > Policies, **enable Delegated signing**
 
    ```bash
-   # .env.payments — DO NOT COMMIT THIS FILE
+   # .env.payments -- DO NOT COMMIT THIS FILE
    export COINBASE_API_KEY_ID=your-api-key-id-uuid-here
    export COINBASE_API_KEY_SECRET=your-base64-encoded-api-key-secret-here
    export COINBASE_WALLET_SECRET=your-base64-encoded-wallet-secret-here
@@ -113,11 +113,11 @@ Once you have answers 1-5, show the provider-specific `.env.payments` template a
    1. Create a **dedicated** Privy app for AgentCore (do not reuse apps serving other purposes)
    2. Copy the **App ID** and **App Secret** from app settings
    3. Navigate to Wallet Infrastructure > Authorization > New Key to generate a P-256 key pair
-   4. The private key is prefixed with `wallet-auth:` — **strip this prefix**, use only the raw base64 content
+   4. The private key is prefixed with `wallet-auth:` -- **strip this prefix**, use only the raw base64 content
    5. Note the **Authorization ID** (signer ID) shown alongside the key
 
    ```bash
-   # .env.payments — DO NOT COMMIT THIS FILE
+   # .env.payments -- DO NOT COMMIT THIS FILE
    export AUTH_PRIVATE_KEY=your-base64-encoded-ec-private-key-here
    export AUTH_ID=your-hex-auth-id-here
    export PRIVY_APP_ID=your-privy-app-id-here
@@ -187,14 +187,14 @@ Fetch the content from https://sandbox.node4all.com/v1/x402-test and tell me wha
 > **Note:** This test endpoint is an x402 **v2** merchant. The `x402_fetch` tool
 > detects the version from the challenge and sends a `PAYMENT-SIGNATURE` header
 > with the v2 proof shape. If the agent loops on 402 here, the proof is likely
-> being sent as v1 (`X-PAYMENT`) — see the Debugging section.
+> being sent as v1 (`X-PAYMENT`) -- see the Debugging section.
 
 Expected behavior:
 
 1. Agent calls `x402_fetch` with the URL
 2. Gets 402 with x402 challenge (0.1 USDC on Base Sepolia)
-3. Calls ProcessPayment → gets signed proof
-4. Retries with `PAYMENT-SIGNATURE` header (v2 endpoint) → gets 200
+3. Calls ProcessPayment -> gets signed proof
+4. Retries with `PAYMENT-SIGNATURE` header (v2 endpoint) -> gets 200
 5. Returns the content to the user
 
 If the session has expired, create a fresh one:
@@ -224,21 +224,21 @@ For comprehensive security guidance, see the [AgentCore Security documentation](
 
 ```
 Agent calls x402_fetch("https://paid-api.example.com/data")
-  │
-  ├─ 1. HTTP GET → 402 Payment Required
-  │     Body: {"x402Version": 1, "accepts": [{"scheme": "exact", "network": "base-sepolia", ...}]}
-  │
-  ├─ 2. Extract x402 challenge
-  │
-  ├─ 3. ProcessPayment(paymentManagerArn, instrumentId, sessionId, challenge)
-  │     → Returns signed proof (signature + authorization)
-  │
-  ├─ 4. Build payment header (X-PAYMENT for v1, PAYMENT-SIGNATURE for v2)
-  │
-  ├─ 5. Retry with payment header (fresh HTTP client, no cookies)
-  │     → 200 OK + paid content
-  │
-  └─ 6. Return content to agent
+  |
+  +- 1. HTTP GET -> 402 Payment Required
+  |     Body: {"x402Version": 1, "accepts": [{"scheme": "exact", "network": "base-sepolia", ...}]}
+  |
+  +- 2. Extract x402 challenge
+  |
+  +- 3. ProcessPayment(paymentManagerArn, instrumentId, sessionId, challenge)
+  |     -> Returns signed proof (signature + authorization)
+  |
+  +- 4. Build payment header (X-PAYMENT for v1, PAYMENT-SIGNATURE for v2)
+  |
+  +- 5. Retry with payment header (fresh HTTP client, no cookies)
+  |     -> 200 OK + paid content
+  |
+  +- 6. Return content to agent
 ```
 
 ## Supported Networks
@@ -262,7 +262,7 @@ Two concepts: **network** (blockchain family, used when creating instruments) an
 | Solana Mainnet | `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp` | `SOLANA` | Mainnet | Coinbase, Stripe |
 | Solana Devnet | `solana-devnet` | `SOLANA_DEVNET` | Testnet | Stripe |
 
-For testing, start with **Base Sepolia** (network: `ETHEREUM`, chain: `BASE_SEPOLIA`) — free testnet tokens from https://faucet.circle.com/.
+For testing, start with **Base Sepolia** (network: `ETHEREUM`, chain: `BASE_SEPOLIA`) -- free testnet tokens from https://faucet.circle.com/.
 
 ## Debugging payments
 
@@ -288,14 +288,14 @@ For testing, start with **Base Sepolia** (network: `ETHEREUM`, chain: `BASE_SEPO
 
 **ProcessPayment succeeds but merchant still returns 402:**
 
-- **Cookie contamination**: The retry is sending cookies from the initial 402 request. Ensure you use a fresh httpx client: `httpx.Client(cookies=None).request(...)` — do NOT reuse the same client/session.
-- **Wrong x402 version / header**: The merchant is x402 v2 but the proof was sent as v1 (or vice versa). v1 expects an `X-PAYMENT` header with a flat proof (top-level `scheme`/`network`); v2 expects a `PAYMENT-SIGNATURE` header where `accepted` is a top-level sibling of `payload`, and `payload` holds only `signature` + `authorization` (no top-level `scheme`/`network`). A v2 merchant that receives a v1 `X-PAYMENT` header ignores it and re-issues the same 402 — often with an empty `{}` body and no error, which is hard to diagnose. Read `x402Version` from the challenge (body or `payment-required` header) and build the matching proof.
-- **Proof format mismatch (network field)**: For **v1**, the proof `network` must use the merchant's human label (e.g., `"base-sepolia"` not `"eip155:84532"`). For **v2**, the proof keeps the CAIP-2 identifier from the challenge unchanged (e.g., `"eip155:84532"`). Note: the `ProcessPayment` input always uses CAIP-2 regardless of version — only the proof presented to the merchant differs.
+- **Cookie contamination**: The retry is sending cookies from the initial 402 request. Ensure you use a fresh httpx client: `httpx.Client(cookies=None).request(...)` -- do NOT reuse the same client/session.
+- **Wrong x402 version / header**: The merchant is x402 v2 but the proof was sent as v1 (or vice versa). v1 expects an `X-PAYMENT` header with a flat proof (top-level `scheme`/`network`); v2 expects a `PAYMENT-SIGNATURE` header where `accepted` is a top-level sibling of `payload`, and `payload` holds only `signature` + `authorization` (no top-level `scheme`/`network`). A v2 merchant that receives a v1 `X-PAYMENT` header ignores it and re-issues the same 402 -- often with an empty `{}` body and no error, which is hard to diagnose. Read `x402Version` from the challenge (body or `payment-required` header) and build the matching proof.
+- **Proof format mismatch (network field)**: For **v1**, the proof `network` must use the merchant's human label (e.g., `"base-sepolia"` not `"eip155:84532"`). For **v2**, the proof keeps the CAIP-2 identifier from the challenge unchanged (e.g., `"eip155:84532"`). Note: the `ProcessPayment` input always uses CAIP-2 regardless of version -- only the proof presented to the merchant differs.
 - **Proof expired**: The proof has a ~60 second validity window (`validBefore`). If the agent loop is slow, the proof may expire before the retry.
 
 **ProcessPayment succeeds (PROOF_GENERATED) but merchant returns 402 with an empty `{}` body and no error:**
 
-- The merchant is x402 **v2** and is ignoring the v1 `X-PAYMENT` header. Detect the version from the challenge (`x402Version: 2`, present in the body or the `payment-required` response header) and send a `PAYMENT-SIGNATURE` header. The v2 proof puts `accepted` (the full requirements, CAIP-2 network) as a top-level sibling of `payload`, with `payload` containing only `signature` + `authorization`. Note: if ProcessPayment returns `PROOF_GENERATED` and the proof shape is correct but the merchant still 402s, it may be a transient on-chain settlement failure — retry once before assuming a format problem.
+- The merchant is x402 **v2** and is ignoring the v1 `X-PAYMENT` header. Detect the version from the challenge (`x402Version: 2`, present in the body or the `payment-required` response header) and send a `PAYMENT-SIGNATURE` header. The v2 proof puts `accepted` (the full requirements, CAIP-2 network) as a top-level sibling of `payload`, with `payload` containing only `signature` + `authorization`. Note: if ProcessPayment returns `PROOF_GENERATED` and the proof shape is correct but the merchant still 402s, it may be a transient on-chain settlement failure -- retry once before assuming a format problem.
 
 **ProcessPayment fails with "Payment session not found":**
 

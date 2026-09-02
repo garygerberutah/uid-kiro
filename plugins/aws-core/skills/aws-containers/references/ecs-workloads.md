@@ -250,13 +250,13 @@ aws ecs register-task-definition \
 
 ## ECS Managed Daemons
 
-Amazon ECS Managed Daemons let you deploy and manage software agents — such as security, observability, and networking agents — across your container infrastructure on **Amazon ECS Managed Instances**.
+Amazon ECS Managed Daemons let you deploy and manage software agents -- such as security, observability, and networking agents -- across your container infrastructure on **Amazon ECS Managed Instances**.
 
 > **Note:** Managed Daemons is distinct from the older `DAEMON` scheduling strategy. The `DAEMON` scheduling strategy runs one task per active container instance for ECS services on the EC2 launch type and is managed as part of the service. Managed Daemons is a newer capability built specifically for ECS Managed Instances that provides stronger coverage guarantees.
 
 ### How Managed Daemons work
 
-1. Register a **daemon task definition** — a template describing the containers that form the daemon.
+1. Register a **daemon task definition** -- a template describing the containers that form the daemon.
 1. Create a **daemon** and associate it with a cluster and one or more ECS Managed Instances capacity providers.
 1. ECS then ensures that exactly one daemon task runs on every EC2 instance provisioned through those capacity providers.
 
@@ -265,11 +265,11 @@ Daemons do not launch instances on their own. When you run an application task o
 ### Key considerations
 
 - **Rolling update** - updating a daemon to a new task definition revision triggers a rolling replacement of all EC2 instances in the associated capacity providers, which is an critical consideration for deployment reliability and safety. This will cause ECS to drain existing instances and provision new ones with the updated daemon.
-- **Guaranteed coverage** — daemon tasks start before application tasks on every instance.
-- **Automatic instance repair** — if a daemon task stops or becomes unhealthy, ECS automatically drains and replaces that container instance.
-- **Deployment safety** — ECS provides built-in circuit breaker protection. You can configure a bake time and CloudWatch alarms so ECS monitors the deployment and automatically rolls back if issues arise.
-- **Drain percentage** — the percentage of instances drained simultaneously during a daemon update. Defaults to `25`.
-- **Bake time** — the number of minutes ECS waits after updating all instances to the new daemon revision before completing the deployment. During this period ECS monitors the configured CloudWatch alarms and automatically rolls back if any alarm triggers. IMPORTANT: Defaults to `0`.
-- **Improved resource utilization** — running a single daemon task per instance eliminates the sidecar-per-task model, reducing overhead across the cluster.
+- **Guaranteed coverage** -- daemon tasks start before application tasks on every instance.
+- **Automatic instance repair** -- if a daemon task stops or becomes unhealthy, ECS automatically drains and replaces that container instance.
+- **Deployment safety** -- ECS provides built-in circuit breaker protection. You can configure a bake time and CloudWatch alarms so ECS monitors the deployment and automatically rolls back if issues arise.
+- **Drain percentage** -- the percentage of instances drained simultaneously during a daemon update. Defaults to `25`.
+- **Bake time** -- the number of minutes ECS waits after updating all instances to the new daemon revision before completing the deployment. During this period ECS monitors the configured CloudWatch alarms and automatically rolls back if any alarm triggers. IMPORTANT: Defaults to `0`.
+- **Improved resource utilization** -- running a single daemon task per instance eliminates the sidecar-per-task model, reducing overhead across the cluster.
 
 See [the documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/managed-daemons.html) for more information.

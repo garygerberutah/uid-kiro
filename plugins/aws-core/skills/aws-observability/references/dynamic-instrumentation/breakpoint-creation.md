@@ -7,7 +7,7 @@ How to specify a breakpoint correctly, and what to do when it misfires.
 A breakpoint targets one of two levels, decided by whether you set `line_number`:
 
 - **Method-level** (set `method_name`, omit `line_number`): captures at function entry and
-  exit — `capture_arguments`, `capture_return` (return value + throwable), and execution
+  exit -- `capture_arguments`, `capture_return` (return value + throwable), and execution
   duration. Use for "what went in / what came out / how long." `capture_locals` does not
   apply at this level.
 - **Line-level** (set `line_number`, 1-based): captures the local variables in scope **at
@@ -15,34 +15,34 @@ A breakpoint targets one of two levels, decided by whether you set `line_number`
   assignment, at a branch). No return value or duration is captured.
 
 Rule of thumb: start method-level to bracket a function; drop to line-level when you need a
-specific intermediate value — and for void/`None` methods that mutate a field (see
+specific intermediate value -- and for void/`None` methods that mutate a field (see
 "Void / None-Return Mutated Fields" below).
 
 ## BREAKPOINT vs PROBE
 
-**Default to `BREAKPOINT`** for every debugging / root-cause task — line-level or method-level,
+**Default to `BREAKPOINT`** for every debugging / root-cause task -- line-level or method-level,
 one-off inspection of arguments, return values, locals, or timing, including on a live service.
 When unsure, use `BREAKPOINT`.
 
 Use `PROBE` **only when the user explicitly asks** to either (1) capture past the `max_hits` cap, or
 (2) run long-term / ongoing observability. A mention of "production" or "live traffic" alone does
-not qualify — a normal investigation on a live service is still a `BREAKPOINT`.
+not qualify -- a normal investigation on a live service is still a `BREAKPOINT`.
 
-- **BREAKPOINT** (default) — capture-limited by `max_hits` (default `100`); transitions to DISABLED
+- **BREAKPOINT** (default) -- capture-limited by `max_hits` (default `100`); transitions to DISABLED
   once reached. Expires automatically at `ttl_hours` (set `ttl_hours = 24`). Supports line-level
   (`line_number`) and method-level targets.
-- **PROBE** (exception only) — **method/function-level only** (`line_number` must be omitted; the
+- **PROBE** (exception only) -- **method/function-level only** (`line_number` must be omitted; the
   script rejects a PROBE create that sets it), **not supported for JavaScript**, **no `max_hits`**
-  (fires on every hit). **Never expires on its own — `ttl_hours` is ignored — so you MUST delete it
+  (fires on every hit). **Never expires on its own -- `ttl_hours` is ignored -- so you MUST delete it
   explicitly when done.**
 
-## Scoping to specific instances — `attribute_filters`
+## Scoping to specific instances -- `attribute_filters`
 
 To apply a breakpoint only to certain service instances (e.g. one version or deployment), pass
 `attribute_filters`: a list of groups, each a dict of OpenTelemetry resource-attribute names to
 **exact-match** values (no wildcards/patterns), e.g.
 `[{"service.version": "1.2.0", "deployment.environment": "staging"}]`. Conditions are AND-ed within a
-group and groups are OR-ed together; up to 10 groups, keys 1–50 chars and values 1–100 chars. Omit
+group and groups are OR-ed together; up to 10 groups, keys 1-50 chars and values 1-100 chars. Omit
 to apply to all instances.
 
 ## Capture-limit fields
@@ -64,7 +64,7 @@ capture). `capture_stack_trace` toggles stack capture (on by default). For trunc
 
 ## Python Mapping
 
-- `code_unit` = the target's **importable dotted module name** — the exact string you would put in
+- `code_unit` = the target's **importable dotted module name** -- the exact string you would put in
   an `import` statement for that module. The SDK resolves it with `importlib.import_module(code_unit)`
   and then looks up `method_name` on the result, so it must be the module *as the running app
   imports it*, not just the filename.
@@ -113,10 +113,10 @@ installs.
 ### Direct import aliasing (important)
 
 If a target function is imported by value (`from mod import func`), the SDK only wraps the
-function inside the **defining** module and does not update imported aliases — so a breakpoint
+function inside the **defining** module and does not update imported aliases -- so a breakpoint
 on the defining module may never fire. Instead, target the **importing** module:
 
-- `file_path` = the importing file (e.g. `__main__` → the app entrypoint).
+- `file_path` = the importing file (e.g. `__main__` -> the app entrypoint).
 - `method_name` = the alias as used at the call site. For `from mod import func`, use `func`.
   For `from mod import func as f`, use `f`.
 
@@ -127,7 +127,7 @@ on the defining module may never fire. Instead, target the **importing** module:
 - `code_unit` = package name (e.g., `com.amazon.sampleapp`).
 - `class_name` = **simple class name only** (e.g., `OrderService`, not `com.example.OrderService`).
 - `method_name` = method name. Note: Java may have **overloaded methods** (same name, different
-  params) — an ambiguous target surfaces as `OVERLOADED_METHODS`; disambiguate by signature.
+  params) -- an ambiguous target surfaces as `OVERLOADED_METHODS`; disambiguate by signature.
 
 ```json
 // Given: package com.amazon.sampleapp; public class OrderContext { ... }
@@ -143,19 +143,19 @@ on the defining module may never fire. Instead, target the **importing** module:
 }
 // code_unit = package name; class_name = simple name (NOT com.amazon.sampleapp.OrderContext)
 // capture_arguments = the REAL parameter name from the signature ("customerId"), NOT "arg0".
-// The snapshot may later render it as arg0 — that is a read-time concern, not a create input.
+// The snapshot may later render it as arg0 -- that is a read-time concern, not a create input.
 ```
 
 ## JavaScript Mapping
 
-**JavaScript binds by `file_path` + `line_number` only** — it is always line-level.
+**JavaScript binds by `file_path` + `line_number` only** -- it is always line-level.
 
 - `line_number` is **required** (>= 1); `code_unit`, `class_name`, and `method_name` are not
   used.
 - Point `line_number` at the executable statement you want to observe.
 - A breakpoint on a non-executable line **slides to the next parseable line** and fires there
-  (unlike Python/Java, where it is ignored and never fires) — verify it lands where you intend.
-- **PROBE is not supported for JavaScript** — use `instrumentation_type=BREAKPOINT`.
+  (unlike Python/Java, where it is ignored and never fires) -- verify it lands where you intend.
+- **PROBE is not supported for JavaScript** -- use `instrumentation_type=BREAKPOINT`.
 
 ## Pre-flight Checklist
 
@@ -166,7 +166,7 @@ Before creating a breakpoint, read the relevant source files and verify:
 3. `class_name` is the simple name for Java (not FQCN).
 4. `method_name` matches the executed symbol name.
 5. `line_number` is executable code if line-level.
-6. `capture_arguments` lists the **real parameter names from the source signature** (for Java too —
+6. `capture_arguments` lists the **real parameter names from the source signature** (for Java too --
    never `arg0`/`arg1`; those only show up when reading the snapshot, never as a create input).
 
 ## Code Snippet Display (when proposing breakpoints)
@@ -197,19 +197,19 @@ Capture locals: ["key"]
 
 ## Argument Names
 
-The `create` operation requires explicit `capture_arguments` — argument names are not inferred,
+The `create` operation requires explicit `capture_arguments` -- argument names are not inferred,
 and it rejects both `["*"]` and an empty list. (Line-level breakpoints use `capture_locals` the
 same way, and a line-level create requires `capture_locals`.)
 
 **Python:** read the source file directly, match the function/method signature, and list the
 parameter names explicitly in `capture_arguments`.
 
-**Java — create with the REAL names; snapshots may rename them positionally.** These are two
+**Java -- create with the REAL names; snapshots may rename them positionally.** These are two
 separate phases and the names differ between them. Do not confuse them:
 
 1. **At `create` time:** pass the **real parameter names from the source signature** in
-   `capture_arguments` (e.g. `["amount", "orderId"]`) — exactly as for Python. Read the source and
-   use those exact names. **Never pass `arg0`/`arg1` to `create`** — positional placeholders are
+   `capture_arguments` (e.g. `["amount", "orderId"]`) -- exactly as for Python. Read the source and
+   use those exact names. **Never pass `arg0`/`arg1` to `create`** -- positional placeholders are
    not valid breakpoint inputs and will not match the method's parameters.
 2. **When reading the resulting snapshot:** Java bytecode does not always preserve parameter names,
    so the *captured values* may come back under **positional** keys (`arg0`, `arg1`, ...) no matter
@@ -237,7 +237,7 @@ appear in the captured data:
 @message like /"arg1"/ and @message like /"10"/          # filter by quantity
 ```
 
-(Filters match what is *in the snapshot* — `arg0`/`arg1` — not the real names you created with.)
+(Filters match what is *in the snapshot* -- `arg0`/`arg1` -- not the real names you created with.)
 
 ## max_hits and DISABLED
 
@@ -258,7 +258,7 @@ breakpoint to observe a mutated field.**
 **Do not rely on `capture_return` for void methods.** This is a common false assumption:
 "Java passes objects by reference, so `capture_return=true` will show the mutated field at
 method exit." **This is wrong.** For void/None methods the SDK omits the `return` key from the
-snapshot entirely — there is no `body.captures.return`. The `capture_arguments` snapshot
+snapshot entirely -- there is no `body.captures.return`. The `capture_arguments` snapshot
 reflects **entry state only**, so a field assigned inside the method still shows its pre-call
 value (`0`, `null`, or default). Setting `capture_return=true` on a void method does not
 re-capture argument fields at exit.
@@ -275,14 +275,14 @@ immediately after the assignment**, capturing the mutated object as a local:
 // Java example
 void applyCouponDiscount(PricingContext ctx) {
     ctx.couponSavings = round(ctx.subtotal * couponRate);  // line 57
-    ctx.orderAmount = ctx.orderAmount - ctx.couponSavings; // line 58  ← breakpoint here
+    ctx.orderAmount = ctx.orderAmount - ctx.couponSavings; // line 58  <- breakpoint here
 }
-// At line 58, ctx.couponSavings is already set — it appears in body.captures.lines.58.locals.ctx
+// At line 58, ctx.couponSavings is already set -- it appears in body.captures.lines.58.locals.ctx
 ```
 
 **Proof (real snapshot from a method-level breakpoint on a `void` Java method with
 `capture_return=true`).** Note: there is NO `return` key, and `couponSavings` is `0.0` even
-though the method sets it — because the snapshot is entry-state only:
+though the method sets it -- because the snapshot is entry-state only:
 
 ```json
 {
@@ -310,7 +310,7 @@ at exit. This is why you must use a line-level breakpoint.
 
 **When to apply this pattern:**
 
-- Method signature is `void` / returns `None` (this alone is enough — apply the rule)
+- Method signature is `void` / returns `None` (this alone is enough -- apply the rule)
 - The value you need is assigned inside the method, not passed in as an argument
 - Method-level breakpoint snapshot shows the field as `0`, `null`, or its default value, and
   has no `body.captures.return` key
@@ -321,12 +321,12 @@ at exit. This is why you must use a line-level breakpoint.
 
 Check the `ErrorCause` field and act on it:
 
-- `FILE_NOT_FOUND` — the file path may not match the running application.
-- `METHOD_NOT_FOUND` — the function name may be incorrect or not loaded.
-- `LINE_NOT_EXECUTABLE` — the line may be a comment, blank, or declaration.
-- `OVERLOADED_METHODS` — ambiguous Java method; disambiguate by signature.
-- `LANGUAGE_MISMATCH` — the wrong `language` was specified.
-- `RUNTIME_ERROR` — other runtime failure.
+- `FILE_NOT_FOUND` -- the file path may not match the running application.
+- `METHOD_NOT_FOUND` -- the function name may be incorrect or not loaded.
+- `LINE_NOT_EXECUTABLE` -- the line may be a comment, blank, or declaration.
+- `OVERLOADED_METHODS` -- ambiguous Java method; disambiguate by signature.
+- `LANGUAGE_MISMATCH` -- the wrong `language` was specified.
+- `RUNTIME_ERROR` -- other runtime failure.
 
 Record the error and notify the user with the specific cause.
 
@@ -335,25 +335,25 @@ Record the error and notify the user with the specific cause.
 The breakpoint installed but received no traffic. Tell the user, and ask whether this code
 path is actually being executed and whether to wait longer or try a different location. If
 traffic is known to hit the function but it stays READY, re-check Python direct-import aliasing
-(instrument the importing module — see "Direct import aliasing" above).
+(instrument the importing module -- see "Direct import aliasing" above).
 
 ### Breakpoint in DISABLED state
 
-`max_hits` was exceeded. See "max_hits and DISABLED" above — recover ACTIVE timestamps via
+`max_hits` was exceeded. See "max_hits and DISABLED" above -- recover ACTIVE timestamps via
 `di_instrumentation.py get-status` with an earlier time range, then delete and recreate
 with a higher `max_hits` if more data is needed.
 
 ### No snapshot data found
 
-1. Check your timestamp — try the 2nd or 3rd most recent ACTIVE event, not just the latest
+1. Check your timestamp -- try the 2nd or 3rd most recent ACTIVE event, not just the latest
    (older events have had more time to ingest).
-2. CloudWatch Logs has ingestion delay (typically 1–3 minutes); wait and retry.
+2. CloudWatch Logs has ingestion delay (typically 1-3 minutes); wait and retry.
 3. If still no data after waiting, notify the user.
 
 ## Parallel Breakpoints
 
 Usually a single, well-chosen breakpoint is enough. Set **multiple breakpoints at once** only
-when you genuinely don't know which of several functions is implicated — e.g. a latency chain
+when you genuinely don't know which of several functions is implicated -- e.g. a latency chain
 with several branches (compare durations), or an intermittent value/cache bug where you need
 data from the **same request** across functions before the next problematic request arrives. If
 you already have a strong hypothesis about one function, start there and expand only if needed.

@@ -41,11 +41,11 @@ Start with the highest of these three estimates, then add headroom:
 **1. CRITICAL: Throughput-based estimate:**
 
 ```
-base_kpus = (input_record_rate × avg_record_size_bytes × processing_amplification) / throughput_per_kpu
+base_kpus = (input_record_rate x avg_record_size_bytes x processing_amplification) / throughput_per_kpu
 ```
 
-- `processing_amplification`: ratio of total bytes processed (including intermediate shuffles) to input bytes. Typically 2–4× for jobs with `keyBy` and windowing.
-- `throughput_per_kpu`: start with 5–10 MB/s per KPU for typical ETL workloads. CPU-intensive transformations (regex, JSON parsing, ML inference) reduce this to 1–3 MB/s.
+- `processing_amplification`: ratio of total bytes processed (including intermediate shuffles) to input bytes. Typically 2-4x for jobs with `keyBy` and windowing.
+- `throughput_per_kpu`: start with 5-10 MB/s per KPU for typical ETL workloads. CPU-intensive transformations (regex, JSON parsing, ML inference) reduce this to 1-3 MB/s.
 
 **2. CRITICAL: State-size-based estimate:**
 
@@ -53,7 +53,7 @@ base_kpus = (input_record_rate × avg_record_size_bytes × processing_amplificat
 base_kpus = total_state_size_gb / usable_memory_per_kpu_gb
 ```
 
-- `usable_memory_per_kpu_gb`: approximately 2–2.5 GB per KPU after JVM overhead and network buffers (out of 3 GiB heap). The 1 GiB native memory is used by RocksDB and framework overhead. With ParallelismPerKPU = 2, usable memory per slot drops to ~1–1.2 GB.
+- `usable_memory_per_kpu_gb`: approximately 2-2.5 GB per KPU after JVM overhead and network buffers (out of 3 GiB heap). The 1 GiB native memory is used by RocksDB and framework overhead. With ParallelismPerKPU = 2, usable memory per slot drops to ~1-1.2 GB.
 
 **3. CRITICAL: Source-parallelism-based estimate:**
 
@@ -66,10 +66,10 @@ Source parallelism should match the partition/shard count. If the source has 16 
 **Final KPU count with headroom:**
 
 ```
-recommended_kpus = max(throughput_estimate, state_estimate, source_estimate) × 1.3
+recommended_kpus = max(throughput_estimate, state_estimate, source_estimate) x 1.3
 ```
 
-The 1.3× multiplier provides ~30% headroom for checkpoint overhead, traffic spikes, and GC pauses. Round up to the nearest even number for balanced TaskManager allocation.
+The 1.3x multiplier provides ~30% headroom for checkpoint overhead, traffic spikes, and GC pauses. Round up to the nearest even number for balanced TaskManager allocation.
 
 ### Auto-Scaling Behavior
 
@@ -99,14 +99,14 @@ After deployment, use these CloudWatch metrics to validate sizing and adjust:
 
 **`heapMemoryUtilization` graduated thresholds**:
 
-- **Healthy:** ≤ 75% — no action needed
-- **Scale-up / investigation:** > 80% sustained — investigate state size, TTL, and consider adding KPUs (see [monitoring-and-metrics.md](monitoring-and-metrics.md))
-- **Critical alarm:** > 90% — immediate action required; risk of OOM (see [checkpoint-tuning.md](checkpoint-tuning.md) for OOM diagnostic steps)
+- **Healthy:** <= 75% -- no action needed
+- **Scale-up / investigation:** > 80% sustained -- investigate state size, TTL, and consider adding KPUs (see [monitoring-and-metrics.md](monitoring-and-metrics.md))
+- **Critical alarm:** > 90% -- immediate action required; risk of OOM (see [checkpoint-tuning.md](checkpoint-tuning.md) for OOM diagnostic steps)
 
-1. High `containerCPUUtilization` + low `heapMemoryUtilization` → add KPUs (CPU-bound)
-2. High `heapMemoryUtilization` + low CPU → increase KPUs or request memory override (memory-bound)
-3. High `backPressuredTimeMsPerSecond` → identify bottleneck operator, then scale or optimize
-4. Growing `millisBehindLatest` → add KPUs or optimize processing logic
+1. High `containerCPUUtilization` + low `heapMemoryUtilization` -> add KPUs (CPU-bound)
+2. High `heapMemoryUtilization` + low CPU -> increase KPUs or request memory override (memory-bound)
+3. High `backPressuredTimeMsPerSecond` -> identify bottleneck operator, then scale or optimize
+4. Growing `millisBehindLatest` -> add KPUs or optimize processing logic
 
 ## Operator Parallelism Tuning
 
@@ -138,10 +138,10 @@ If parallelism < partition/shard count, some subtasks handle multiple partitions
 
 When you set per-operator parallelism, Managed Service for Apache Flink still allocates task slots based on the maximum parallelism across all operators. Operators with lower parallelism use fewer slots; operators with higher parallelism require enough total slots to accommodate them.
 
-**Example**: Parallelism = 16, ParallelismPerKPU = 1 → 16 KPUs, 16 task slots.
+**Example**: Parallelism = 16, ParallelismPerKPU = 1 -> 16 KPUs, 16 task slots.
 
 ```java
-// Source: 8 shards → parallelism 8
+// Source: 8 shards -> parallelism 8
 DataStream<Event> events = env
     .fromSource(kinesisSource, watermarkStrategy, "kinesis-source")
     .setParallelism(8)
@@ -167,7 +167,7 @@ Managed Service for Apache Flink manages most infrastructure configuration autom
 | JVM heap size | 3 GiB (~75% of KPU memory) | Custom | Applications with large in-memory caches or high object churn |
 | TaskManager native memory | 1 GiB (~25% of KPU memory) | Custom | Adjusting RocksDB vs heap balance |
 | RocksDB block cache size | Auto-configured | Custom size | Large state with frequent random reads |
-| RocksDB write buffer count | Default | 2–6 | High write-throughput state workloads |
+| RocksDB write buffer count | Default | 2-6 | High write-throughput state workloads |
 | Network buffer memory | Auto-configured | Custom size | Jobs with high fan-out or many network channels |
 | State backend type (RocksDB vs. HashMap) | RocksDB | | Jobs with lightweight state that can stay in-memory and benefit from faster in-memory performance |
 
@@ -176,7 +176,7 @@ Managed Service for Apache Flink manages most infrastructure configuration autom
 1. Gather diagnostic evidence: CloudWatch metrics showing the resource constraint (heap utilization, GC time, checkpoint duration trends)
 2. Open an AWS support case under "Managed Service for Apache Flink"
 3. Include: application ARN, current KPU count, the specific parameter to override, the requested value, and the diagnostic evidence
-4. AWS support applies the override at the service level — no application code changes needed
+4. AWS support applies the override at the service level -- no application code changes needed
 5. After the override is applied, Managed Service for Apache Flink restarts the application to pick up the new configuration
 
 For checkpoint impact on resources (checkpoint size and memory, frequency vs CPU/network, duration exceeding interval, OOM/GC diagnostic steps), see [checkpoint-tuning.md](checkpoint-tuning.md).

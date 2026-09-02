@@ -1,8 +1,8 @@
-# RDS for Db2 — EC2/RDS Colocation for Multi-AZ Reference
+# RDS for Db2 -- EC2/RDS Colocation for Multi-AZ Reference
 
 > **Source:** `EC2_RDS_COLOCATION_GUIDE.md` (Cloud-Formation root). AWS CLI commands and
 > option names are reproduced from that source; no secret values, credentials, customer IDs,
-> or contact data are included — replace every `<placeholder>`.
+> or contact data are included -- replace every `<placeholder>`.
 
 ---
 
@@ -12,16 +12,16 @@ In Multi-AZ, the active RDS for Db2 instance can be in either AZ, and it changes
 To keep application-to-database latency low and survive an AZ loss, run application instances in
 **both** AZs behind an Application Load Balancer (ALB) via an Auto Scaling Group (ASG). This gives
 automatic same-AZ routing, no manual intervention on failover, and no instance-to-instance
-synchronization — each instance connects to the same RDS endpoint and stays stateless (use
+synchronization -- each instance connects to the same RDS endpoint and stays stateless (use
 ElastiCache or DynamoDB for session state).
 
 ```mermaid
 graph TD
-  ALB[Application Load Balancer] --> A1[EC2 ASG · AZ-1]
-  ALB --> A2[EC2 ASG · AZ-2]
-  A1 --> P[(RDS Db2 Primary · AZ-1)]
+  ALB[Application Load Balancer] --> A1[EC2 ASG / AZ-1]
+  ALB --> A2[EC2 ASG / AZ-2]
+  A1 --> P[(RDS Db2 Primary / AZ-1)]
   A2 --> P
-  P -. sync replication .-> S[(RDS Db2 Standby · AZ-2)]
+  P -. sync replication .-> S[(RDS Db2 Standby / AZ-2)]
 ```
 
 ## 1. Identify the RDS AZs
@@ -68,13 +68,13 @@ aws autoscaling create-auto-scaling-group --auto-scaling-group-name db2-app-asg 
 
 `--vpc-zone-identifier` listing both subnets is what spreads instances across both AZs.
 
-## 4. Security groups — scope to a specific source, never `0.0.0.0/0`
+## 4. Security groups -- scope to a specific source, never `0.0.0.0/0`
 
 Restrict ALB ingress to a known client range, and let the app and RDS layers reference the
 upstream security group rather than an IP range.
 
 ```bash
-# ALB ingress — a SPECIFIC trusted CIDR (replace with your corporate/VPC range).
+# ALB ingress -- a SPECIFIC trusted CIDR (replace with your corporate/VPC range).
 # Do NOT use 0.0.0.0/0; if a public endpoint is unavoidable, front it with WAF and
 # document the exception explicitly.
 aws ec2 authorize-security-group-ingress --group-id <alb-sg-id> \
@@ -91,10 +91,10 @@ aws ec2 authorize-security-group-ingress --group-id <rds-sg-id> \
 
 Using `--source-group` ties access to identity, not addresses, so it keeps working after failover.
 
-## 5. Failover alerting — SNS + EventBridge
+## 5. Failover alerting -- SNS + EventBridge
 
 ```bash
-# Create the topic ENCRYPTED FROM INCEPTION — pass KmsMasterKeyId inline on
+# Create the topic ENCRYPTED FROM INCEPTION -- pass KmsMasterKeyId inline on
 # create-topic so the topic is never momentarily unencrypted. Failover
 # notifications can carry sensitive RDS instance details.
 aws sns create-topic --name rds-db2-az-change-alerts \
@@ -133,7 +133,7 @@ the new active AZ and endpoint in the notification. Grant it `rds:DescribeDBInst
 
 ```python
 import ibm_db
-# Use the RDS endpoint — it always resolves to the active instance after failover.
+# Use the RDS endpoint -- it always resolves to the active instance after failover.
 conn_str = f"DATABASE={db_name};HOSTNAME={rds_endpoint};PORT=50000;PROTOCOL=TCPIP;UID={user};PWD={pwd};"
 conn = ibm_db.connect(conn_str, "", "")
 ```

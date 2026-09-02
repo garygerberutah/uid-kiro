@@ -2,7 +2,7 @@
 
 Creates a SageMaker Managed MLflow app using a user-provided or discovered IAM role and S3 bucket.
 
-> **IMPORTANT:** Use only `sagemaker:CreateMlflowApp` (Mercury/serverless). Do NOT use `CreateMlflowTrackingServer` (legacy Aloy/serverful) — that API is deprecated for new deployments.
+> **IMPORTANT:** Use only `sagemaker:CreateMlflowApp` (Mercury/serverless). Do NOT use `CreateMlflowTrackingServer` (legacy Aloy/serverful) -- that API is deprecated for new deployments.
 
 ## Step 1: Ask User Preference for IAM Role and S3 Bucket
 
@@ -61,7 +61,7 @@ For optional parameters (ModelRegistrationMode, AccountDefaultStatus, etc.), use
 
 Use `aws-mcp` to call `sagemaker:DescribeMlflowApp` in a loop (every 15 seconds):
 
-- Expected progression: `CREATING` → `ACTIVE`
+- Expected progression: `CREATING` -> `ACTIVE`
 - Timeout: 10 minutes
 - If `FAILED`: surface the failure reason, suggest checking IAM role trust policy and S3 bucket configuration
 - If timeout: warn user, suggest checking Console

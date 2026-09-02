@@ -117,11 +117,11 @@ recovery target, and surfaces the console links to verify.
   recovery target.
 - **target_reachability** (optional, default: `public`): How the failover targets are reached,
   which selects the health-check mechanism:
-  - `public` — publicly reachable endpoint → standard endpoint health check
-  - `alias_to_aws_resource` — alias to a supported AWS resource (e.g., ALB/NLB, whether
-    internet-facing or internal) whose health Route 53 evaluates directly → ETH (free, no probe)
-  - `internal_endpoint` — private endpoint behind a standard record (e.g., private EC2/IP), where
-    ETH does not apply → CloudWatch alarm-based health check
+  - `public` -- publicly reachable endpoint -> standard endpoint health check
+  - `alias_to_aws_resource` -- alias to a supported AWS resource (e.g., ALB/NLB, whether
+    internet-facing or internal) whose health Route 53 evaluates directly -> ETH (free, no probe)
+  - `internal_endpoint` -- private endpoint behind a standard record (e.g., private EC2/IP), where
+    ETH does not apply -> CloudWatch alarm-based health check
 - **alarm_name** / **alarm_region** (required when `target_reachability` is `internal_endpoint`):
   The CloudWatch alarm that reflects the primary endpoint's health, and its Region.
 
@@ -173,7 +173,7 @@ recovery target, and surfaces the console links to verify.
   ```
 
 - If `target_reachability` is `alias_to_aws_resource`, do NOT create a standard health check against
-  the target. Use ETH on the alias record instead (Step 4) — Route 53 evaluates the supported
+  the target. Use ETH on the alias record instead (Step 4) -- Route 53 evaluates the supported
   resource's own health directly, so a paid standard health check is unnecessary whether the
   resource is internet-facing or internal
 - If `target_reachability` is `internal_endpoint`, the target is private and not an alias to a
@@ -291,10 +291,10 @@ Active-active built where active-passive was intended. Use the failover routing 
 - You SHOULD use least-privilege IAM credentials provisioned through ephemeral mechanisms (IAM
   roles, SSO/IAM Identity Center session credentials, or `aws sts assume-role`) rather than
   long-lived IAM user access keys, and prefer read-only credentials for inspection steps. Grant
-  only the specific actions this procedure needs — `route53:CreateHealthCheck`,
+  only the specific actions this procedure needs -- `route53:CreateHealthCheck`,
   `route53:ChangeResourceRecordSets`, and `route53:GetChange` to create the health check and
   failover records and confirm propagation, plus `route53:ListResourceRecordSets`,
-  `route53:GetHostedZone`, and `route53:GetHealthCheckStatus` for inspection — rather than
+  `route53:GetHostedZone`, and `route53:GetHealthCheckStatus` for inspection -- rather than
   `route53:*` or broader `service:*` wildcards.
 - You MUST enable Route 53 query logging to an encrypted destination (KMS on CloudWatch Logs,
   SSE-S3/SSE-KMS on S3, or server-side encryption on a Data Firehose stream) and ensure CloudTrail

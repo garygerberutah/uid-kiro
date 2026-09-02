@@ -1,4 +1,4 @@
-# RLAIF (Reinforcement Learning from AI Feedback) Template — Custom Reward Prompt
+# RLAIF (Reinforcement Learning from AI Feedback) Template -- Custom Reward Prompt
 
 # Cell 0 [markdown]: Fine-Tuning
 
@@ -40,7 +40,7 @@ ACCEPT_EULA = (
 )
 MODEL_PACKAGE_GROUP_NAME = ""  # Auto-generated based on use case
 
-# Reward model — the Bedrock LLM used as judge
+# Reward model -- the Bedrock LLM used as judge
 # Available models and regions: see references/rlaif_guide.md
 REWARD_MODEL_ID = ""
 

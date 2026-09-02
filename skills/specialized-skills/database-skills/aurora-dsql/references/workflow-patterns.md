@@ -28,7 +28,7 @@ SELECT * FROM entities LIMIT 10;
 # WRONG - Combined DDL and index in single transaction
 with conn.transaction():
     conn.execute("CREATE TABLE entities (...)")
-    conn.execute("CREATE INDEX ASYNC idx_tenant ON entities(tenant_id)")  # ❌ Will fail
+    conn.execute("CREATE INDEX ASYNC idx_tenant ON entities(tenant_id)")  # [NO] Will fail
 
 # CORRECT - Separate transactions (one DDL each)
 conn.execute("CREATE TABLE entities (...)")
@@ -45,7 +45,7 @@ STATUSES = {"active", "archived", "pending"}
 # Step 1: Add column (its own transaction)
 conn.execute("ALTER TABLE entities ADD COLUMN status VARCHAR(50)")
 
-# Step 2: Populate in batches — each in its own transaction, under 3,000 rows
+# Step 2: Populate in batches -- each in its own transaction, under 3,000 rows
 populate = build(
     "UPDATE entities SET status = {s} "
     "WHERE entity_id IN ("

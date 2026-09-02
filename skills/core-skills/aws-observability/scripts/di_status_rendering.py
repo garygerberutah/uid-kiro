@@ -149,7 +149,7 @@ TIME RANGE:
         output += (
             "SNAPSHOT QUERY TIP: Try these timestamps with search_snapshots_for_status_event\n"
             f'  (log group: "{resolve_snapshot_log_group(service)}")\n'
-            "  Oldest first — older events are more likely to have snapshots ingested:\n"
+            "  Oldest first -- older events are more likely to have snapshots ingested:\n"
         )
         for idx, event in enumerate(reversed(active_events[:5])):
             label = " (oldest, try first)" if idx == 0 else ""
@@ -159,7 +159,7 @@ TIME RANGE:
                 f'  - status_timestamp="{format_timestamp(event.get("Time"), default="")}"{label}\n'
             )
         output += "\n"
-        output += "OVERALL STATUS: ACTIVE ✓ (breakpoint is being hit)\n"
+        output += "OVERALL STATUS: ACTIVE [OK] (breakpoint is being hit)\n"
         return output
 
     output += "OVERALL STATUS: ACTIVE not confirmed yet\n"

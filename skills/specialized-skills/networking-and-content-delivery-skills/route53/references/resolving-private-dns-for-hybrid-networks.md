@@ -190,7 +190,7 @@ shares resolver rules across accounts, and surfaces the console links to verify.
 **Constraints:**
 
 - If `direction` is `outbound` or `both`, you MUST create a forwarding rule for outbound resolution
-  (skip this step entirely when `direction` is `inbound` only — `on_prem_domains` and
+  (skip this step entirely when `direction` is `inbound` only -- `on_prem_domains` and
   `on_prem_dns_servers` are not provided in that case). The outbound endpoint does nothing
   until a rule names the on-premises domains and DNS server IPs:
 

@@ -1,10 +1,10 @@
-# RDS for Oracle — Encryption (SSL/TLS and NNE)
+# RDS for Oracle -- Encryption (SSL/TLS and NNE)
 
 RDS Oracle supports two transport-encryption methods. **You cannot use both on the same instance.** If SSL is enabled, disable NNE first, and vice versa. Both are available on all licensed editions of Oracle 19c and 21c on RDS.
 
 Source: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.Oracle.Options.SSL.html
 
-## Option 1 — Native Network Encryption (NNE) — transparent
+## Option 1 -- Native Network Encryption (NNE) -- transparent
 
 No client-side cert needed. Add the `NATIVE_NETWORK_ENCRYPTION` option to an RDS option group:
 
@@ -47,7 +47,7 @@ resource "aws_db_option_group" "oracle_nne" {
 
 Clients connect normally on port 1521. Encryption is applied transparently.
 
-## Option 2 — TLS (certificate-based, port 2484)
+## Option 2 -- TLS (certificate-based, port 2484)
 
 Add the `SSL` option to an RDS option group with port 2484:
 
@@ -93,10 +93,10 @@ For **FedRAMP compliance**, pick one of the `TLS_ECDHE_*` suites.
 
 RDS supports RSA and ECDSA certificates. The cipher suite **must match** the certificate type:
 
-- **RSA certs** (`rds-ca-2019`, `rds-ca-rsa2048-g1`, `rds-ca-rsa4096-g1`) → use `SSL_RSA_*` or `TLS_ECDHE_RSA_*` suites.
-- **ECDSA certs** (`rds-ca-ecc384-g1`) → use `TLS_ECDHE_ECDSA_*` suites only.
+- **RSA certs** (`rds-ca-2019`, `rds-ca-rsa2048-g1`, `rds-ca-rsa4096-g1`) -> use `SSL_RSA_*` or `TLS_ECDHE_RSA_*` suites.
+- **ECDSA certs** (`rds-ca-ecc384-g1`) -> use `TLS_ECDHE_ECDSA_*` suites only.
 
-Mismatch → connection fails at TLS handshake.
+Mismatch -> connection fails at TLS handshake.
 
 ## FIPS 140-2
 
@@ -112,7 +112,7 @@ curl -o global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global
 curl -o rds-ca-bundle.pem https://truststore.pki.rds.amazonaws.com/<region>/<region>-bundle.pem
 ```
 
-## Python — TLS thin mode
+## Python -- TLS thin mode
 
 ```python
 import oracledb
@@ -136,7 +136,7 @@ conn = oracledb.connect(
 )
 ```
 
-## Java — TLS thin mode
+## Java -- TLS thin mode
 
 ```java
 System.setProperty("javax.net.ssl.trustStore", "/path/to/truststore.jks");
@@ -163,7 +163,7 @@ done
 rm -f /tmp/rds-cert-*.pem
 ```
 
-## Node.js — TLS thin mode
+## Node.js -- TLS thin mode
 
 ```bash
 export NODE_EXTRA_CA_CERTS=/path/to/global-bundle.pem
@@ -181,7 +181,7 @@ const conn = await oracledb.getConnection({
 });
 ```
 
-## .NET — TLS
+## .NET -- TLS
 
 ```csharp
 var connString = "User Id=dbadmin;Password=<from-secrets-manager>;"
@@ -202,7 +202,7 @@ sudo update-ca-certificates
 ## Verify encryption is active
 
 ```sql
--- Protocol — 'tcps' for TLS
+-- Protocol -- 'tcps' for TLS
 SELECT SYS_CONTEXT('USERENV','NETWORK_PROTOCOL') FROM dual;
 
 -- Algorithm in use for NNE
@@ -214,6 +214,6 @@ Or run `scripts/check_ssl_status.sql` from the bundled scripts.
 
 ## Common TLS errors
 
-- **`ORA-29024: Certificate validation failure`** — the RDS CA bundle isn't imported into the client's trust store. Import all certs (see Java section above for the split-and-loop pattern).
-- **`ORA-28860: Fatal SSL error`** — TLS version or cipher mismatch. Check `SQLNET.SSL_VERSION = 1.2` and that the client supports TLS 1.2.
-- **Connects without SSL but fails with TCPS** — using port 1521 (clear-text) instead of 2484 (TLS), or the option group wasn't applied (and the instance wasn't rebooted if required).
+- **`ORA-29024: Certificate validation failure`** -- the RDS CA bundle isn't imported into the client's trust store. Import all certs (see Java section above for the split-and-loop pattern).
+- **`ORA-28860: Fatal SSL error`** -- TLS version or cipher mismatch. Check `SQLNET.SSL_VERSION = 1.2` and that the client supports TLS 1.2.
+- **Connects without SSL but fails with TCPS** -- using port 1521 (clear-text) instead of 2484 (TLS), or the option group wasn't applied (and the instance wasn't rebooted if required).

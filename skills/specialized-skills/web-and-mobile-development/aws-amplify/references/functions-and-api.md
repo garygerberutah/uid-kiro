@@ -57,7 +57,7 @@ Each Lambda function is bundled independently from its own directory. Importing 
 
 | Handler Type | Import | Returns |
 |-------------|--------|---------|
-| `S3Handler` | `@types/aws-lambda` | `void` — async event, no response expected |
+| `S3Handler` | `@types/aws-lambda` | `void` -- async event, no response expected |
 | `APIGatewayProxyHandler` | `@types/aws-lambda` | `{ statusCode, headers?, body }` |
 | `APIGatewayProxyHandlerV2` | `@types/aws-lambda` | `{ statusCode, headers?, body }` |
 
@@ -66,7 +66,7 @@ Each Lambda function is bundled independently from its own directory. Importing 
 ## Environment Variables & Secrets
 
 You **SHOULD** import environment variables from `$amplify/env/<function-name>`
-— this provides **type-safe** access to values defined in `defineFunction`.
+-- this provides **type-safe** access to values defined in `defineFunction`.
 Values are also available at runtime via `process.env.VAR_NAME`, but the
 `$amplify/env` import is preferred because it gives you compile-time type
 checking and autocompletion.
@@ -89,7 +89,7 @@ Set secrets via CLI: `echo -n "<value>" | npx ampx sandbox secret set MY_API_KEY
 
 > **Important:** Use `echo -n` (no trailing newline) when piping values to `secret set`.
 >
-> **Important:** The `ampx sandbox secret set` command is for **local/sandbox development only**. For apps deployed to **Amplify Hosting**, secrets must be created via the Amplify console (NOT `ampx sandbox secret` — that's local only) — sandbox secrets are NOT available in hosted environments. See: https://docs.amplify.aws/react/deploy-and-host/fullstack-branching/secrets-and-vars/#set-secrets
+> **Important:** The `ampx sandbox secret set` command is for **local/sandbox development only**. For apps deployed to **Amplify Hosting**, secrets must be created via the Amplify console (NOT `ampx sandbox secret` -- that's local only) -- sandbox secrets are NOT available in hosted environments. See: https://docs.amplify.aws/react/deploy-and-host/fullstack-branching/secrets-and-vars/#set-secrets
 
 ### Environment Variables in Lambda
 
@@ -118,7 +118,7 @@ export const cronJob = defineFunction({
   entry: './handler.ts',
   schedule: 'every 1h', // natural-language shorthand
   // Valid shorthands: 'every 5m', 'every 1h', 'every day', 'every week', 'every month', 'every year'
-  // OR: schedule: '0 */1 * * ? *', // cron expression — same property
+  // OR: schedule: '0 */1 * * ? *', // cron expression -- same property
 });
 ```
 
@@ -190,13 +190,13 @@ const schema = a.schema({
 });
 ```
 
-> **How `.handler()` works:** `.handler()` grants AppSync the permission to **invoke** the Lambda (AppSync→Lambda). The Lambda IS the resolver — it receives the GraphQL event directly. If the Lambda also needs to call the Data API or access DynamoDB tables for side effects, add `allow.resource(fn)` to the model with `resourceGroupName: 'data'` on the function to avoid circular dependencies.
+> **How `.handler()` works:** `.handler()` grants AppSync the permission to **invoke** the Lambda (AppSync->Lambda). The Lambda IS the resolver -- it receives the GraphQL event directly. If the Lambda also needs to call the Data API or access DynamoDB tables for side effects, add `allow.resource(fn)` to the model with `resourceGroupName: 'data'` on the function to avoid circular dependencies.
 >
 > ```typescript
-> // ❌ CIRCULAR DEPENDENCY — manual table grant in backend.ts
+> // [NO] CIRCULAR DEPENDENCY -- manual table grant in backend.ts
 > backend.data.resources.tables["Model"].grantReadData(backend.myFn.resources.lambda);
 >
-> // ✅ Use resourceGroupName to co-locate the function in the data stack
+> // [YES] Use resourceGroupName to co-locate the function in the data stack
 > const myFn = defineFunction({ name: 'my-fn', resourceGroupName: 'data' });
 > // Then in the schema: allow.resource(myFn) on the model
 > ```
@@ -208,8 +208,8 @@ const schema = a.schema({
 >
 > **When to use which:**
 >
-> - `a.query()` / `a.mutation()` with `.handler()` — AppSync-native, type-safe, uses the data schema. **Preferred for most custom logic.**
-> - API Gateway + Lambda — Use when you need REST endpoints, webhooks, or third-party integrations that require a specific URL.
+> - `a.query()` / `a.mutation()` with `.handler()` -- AppSync-native, type-safe, uses the data schema. **Preferred for most custom logic.**
+> - API Gateway + Lambda -- Use when you need REST endpoints, webhooks, or third-party integrations that require a specific URL.
 
 ## REST API (API Gateway)
 
@@ -293,7 +293,7 @@ For REST/HTTP API outputs added via `backend.addOutput()`, read the endpoint URL
   with `event.requestContext.http.method`. Mixing them causes malformed
   responses. Both return `{ statusCode, body }`.
 - **Missing resource access:** A function without explicit grants cannot
-  access auth, data, or storage resources — add grants in `backend.ts`.
+  access auth, data, or storage resources -- add grants in `backend.ts`.
 - **Secrets in plain `environment`:** Sensitive values must use
   `secret()`, not string literals.
 - **`createStack` name collision:** Stack names passed to

@@ -9,7 +9,7 @@ Collects diagnostic information from a SageMaker endpoint using documented AWS A
 
 ## Principles
 
-1. **Read-only**: No mutations — only Describe, GetMetricData, and FilterLogEvents calls
+1. **Read-only**: No mutations -- only Describe, GetMetricData, and FilterLogEvents calls
 2. **Deterministic**: No heuristics, no scoring, no classification
 3. **Graceful degradation**: Each collection step is independent; failures in one do not block others
 4. **Agent interprets**: The script collects facts; the agent provides interpretation and guidance
@@ -27,10 +27,10 @@ Activate when the user:
 
 ### Do NOT activate for
 
-- **Training job failures** — use the finetuning skill instead. Training jobs and endpoints are separate SageMaker resources.
-- **Listing, creating, updating, or deleting endpoints** — this skill diagnoses existing endpoints, not endpoint lifecycle management.
-- **Model deployment requests** — use the model-deployment skill instead.
-- **Scaling or capacity changes** — this skill collects diagnostics, it does not modify endpoints.
+- **Training job failures** -- use the finetuning skill instead. Training jobs and endpoints are separate SageMaker resources.
+- **Listing, creating, updating, or deleting endpoints** -- this skill diagnoses existing endpoints, not endpoint lifecycle management.
+- **Model deployment requests** -- use the model-deployment skill instead.
+- **Scaling or capacity changes** -- this skill collects diagnostics, it does not modify endpoints.
 
 ## Requirements
 
@@ -43,15 +43,15 @@ Activate when the user:
 
 For this step, you need the **endpoint name** and **AWS region**:
 
-1. Check conversation history — the user may have already mentioned the endpoint name or region.
+1. Check conversation history -- the user may have already mentioned the endpoint name or region.
 2. Silently read project files (e.g., deployment notebooks, config files, `sdk-getting-started` output) for the region or endpoint name.
 3. Only if still unknown, ask the user for the missing values.
 
-⏸ Wait for user response if any values are missing.
+[PAUSE] Wait for user response if any values are missing.
 
 ### Step 2: Run diagnostics
 
-Execute `collect_diagnostics.py` with the endpoint name and region. Do not create a notebook — run the script directly:
+Execute `collect_diagnostics.py` with the endpoint name and region. Do not create a notebook -- run the script directly:
 
 ```python
 from collect_diagnostics import collect_endpoint_diagnostics

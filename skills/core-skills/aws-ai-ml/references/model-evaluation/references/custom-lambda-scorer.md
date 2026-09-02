@@ -26,23 +26,23 @@ If the user has an ARN, validate it:
 
 If validation fails, tell the user what went wrong:
 
-- **API call errors** → "That ARN doesn't seem to exist. Could you double-check it?"
-- **Status is not `Available`** → "That evaluator exists but isn't ready (status: [status]). It may still be provisioning."
-- **Missing `@evaluatortype:rewardfunction`** → "That resource exists but doesn't appear to be a reward function evaluator. Could you verify you have the right ARN?"
+- **API call errors** -> "That ARN doesn't seem to exist. Could you double-check it?"
+- **Status is not `Available`** -> "That evaluator exists but isn't ready (status: [status]). It may still be provisioning."
+- **Missing `@evaluatortype:rewardfunction`** -> "That resource exists but doesn't appear to be a reward function evaluator. Could you verify you have the right ARN?"
 
 In any failure case, offer to re-enter the ARN or fall back to a built-in scorer.
 
 If the user doesn't have one:
 
-> "You don't have a registered reward function yet. I can help you create one — I'll provide a template with your scoring logic and register it as a SageMaker Hub Evaluator. Or you can use a built-in scorer instead.
+> "You don't have a registered reward function yet. I can help you create one -- I'll provide a template with your scoring logic and register it as a SageMaker Hub Evaluator. Or you can use a built-in scorer instead.
 >
-> 1. **Create a new reward function** — I'll walk you through it
-> 2. **Use a built-in scorer** — Prime Math or Prime Code
+> 1. **Create a new reward function** -- I'll walk you through it
+> 2. **Use a built-in scorer** -- Prime Math or Prime Code
 >
 > Which would you prefer?"
 
-- If **create new** → read `references/create-reward-function.md` and follow its instructions. It will produce an evaluator ARN. Once complete, return here and proceed to "After resolution".
-- If **built-in** → return to the main Custom Scorer workflow and switch to the built-in scorer path.
+- If **create new** -> read `references/create-reward-function.md` and follow its instructions. It will produce an evaluator ARN. Once complete, return here and proceed to "After resolution".
+- If **built-in** -> return to the main Custom Scorer workflow and switch to the built-in scorer path.
 
 ## After resolution
 
@@ -59,7 +59,7 @@ The return format depends on the model type:
 **For OSS models:**
 
 ```python
-# <RETURN_FORMAT> — OSS models
+# <RETURN_FORMAT> -- OSS models
 return {
     "statusCode": 200,
     "headers": {"Content-Type": "application/json"},
@@ -71,7 +71,7 @@ return {
 **For Nova models:**
 
 ```python
-# <RETURN_FORMAT> — Nova models
+# <RETURN_FORMAT> -- Nova models
 return {
     "statusCode": 200,
     "headers": {"Content-Type": "application/json"},

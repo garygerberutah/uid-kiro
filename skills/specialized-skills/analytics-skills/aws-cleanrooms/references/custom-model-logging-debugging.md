@@ -42,14 +42,14 @@ If `configuredModelAlgorithmAssociationArn` is not in the response, use: `aws cl
   - `trainedModels.containerLogs` with `allowedAccountIds` (for training)
   - `trainedModelInferenceJobs.containerLogs` with `allowedAccountIds` (for inference)
 - You MUST verify the customer's account ID is included in `allowedAccountIds`
-- If `containerLogs` is empty/missing, flag this as a likely root cause — but you MUST continue through all remaining steps before generating the diagnosis, as multiple issues may exist simultaneously
+- If `containerLogs` is empty/missing, flag this as a likely root cause -- but you MUST continue through all remaining steps before generating the diagnosis, as multiple issues may exist simultaneously
 - Explain that logging is configured in CreateConfiguredModelAlgorithmAssociation, NOT CreateTrainedModel
 
 ### 4. Check ML Configuration
 
 - `aws cleanroomsml get-ml-configuration --membership-identifier ${membership_id} --region ${region}`
-- Extract `defaultOutputLocation.roleArn` — this role publishes logs
-- If no ML Configuration exists (ResourceNotFoundException), flag this as a root cause — the user must create one via PutMLConfiguration. Skip Step 5 (role permissions cannot be checked without a role ARN) and continue to Step 6, as multiple issues may exist simultaneously.
+- Extract `defaultOutputLocation.roleArn` -- this role publishes logs
+- If no ML Configuration exists (ResourceNotFoundException), flag this as a root cause -- the user must create one via PutMLConfiguration. Skip Step 5 (role permissions cannot be checked without a role ARN) and continue to Step 6, as multiple issues may exist simultaneously.
 
 ### 5. Check ML Configuration Role CloudWatch Permissions
 
@@ -81,7 +81,7 @@ Only if logsStatus is PUBLISH_FAILED:
 
 ### 8. Generate Diagnosis
 
-Identify root cause (typically: missing privacy config, missing CloudWatch permissions, missing ML Configuration, or missing trust policy). Provide exact fix with CLI commands. Reference [ML roles docs](https://docs.aws.amazon.com/clean-rooms/latest/userguide/ml-roles.html) and [LogsConfigurationPolicy API](https://docs.aws.amazon.com/cleanrooms-ml/latest/APIReference/API_LogsConfigurationPolicy.html). Note that a new job must be run after fixing — existing failed jobs won't retroactively publish logs.
+Identify root cause (typically: missing privacy config, missing CloudWatch permissions, missing ML Configuration, or missing trust policy). Provide exact fix with CLI commands. Reference [ML roles docs](https://docs.aws.amazon.com/clean-rooms/latest/userguide/ml-roles.html) and [LogsConfigurationPolicy API](https://docs.aws.amazon.com/cleanrooms-ml/latest/APIReference/API_LogsConfigurationPolicy.html). Note that a new job must be run after fixing -- existing failed jobs won't retroactively publish logs.
 
 **Expected output format:**
 

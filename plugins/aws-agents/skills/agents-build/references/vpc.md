@@ -14,7 +14,7 @@ Configure your AgentCore agent to connect to private AWS resources inside a VPC.
 `$ARGUMENTS` is optional:
 
 ```
-/vpc                        # interactive — asks what you're connecting to
+/vpc                        # interactive -- asks what you're connecting to
 /vpc rds                    # RDS database connectivity
 /vpc debug                  # diagnose VPC connectivity issues
 ```
@@ -25,9 +25,9 @@ When you configure VPC mode, AgentCore creates **Elastic Network Interfaces (ENI
 
 **Key facts:**
 
-- VPC connectivity directly affects **outbound traffic** — ENIs route your agent's outbound calls through your VPC. For **inbound traffic**, you can optionally add an AgentCore VPC endpoint to keep API calls private via PrivateLink (this is separate from the `networkMode` setting).
+- VPC connectivity directly affects **outbound traffic** -- ENIs route your agent's outbound calls through your VPC. For **inbound traffic**, you can optionally add an AgentCore VPC endpoint to keep API calls private via PrivateLink (this is separate from the `networkMode` setting).
 - AgentCore creates ENIs via the service-linked role `AWSServiceRoleForBedrockAgentCoreNetwork` (auto-created on first VPC deployment)
-- Subnets must be in **supported Availability Zones** — not all AZs are supported. The supported AZ list changes as AgentCore expands to new regions.
+- Subnets must be in **supported Availability Zones** -- not all AZs are supported. The supported AZ list changes as AgentCore expands to new regions.
 
 ---
 
@@ -39,7 +39,7 @@ Run `agentcore --version`. This skill requires v0.9.0 or later. If the version i
 
 ## Step 1: Verify your subnets are in supported AZs
 
-AgentCore only supports specific Availability Zone IDs per region. The supported AZ list changes as AgentCore expands — **always check the current docs** for the latest table.
+AgentCore only supports specific Availability Zone IDs per region. The supported AZ list changes as AgentCore expands -- **always check the current docs** for the latest table.
 
 Check your subnet's AZ ID:
 
@@ -50,7 +50,7 @@ aws ec2 describe-subnets \
   --query 'Subnets[0].{AZ:AvailabilityZone,AZId:AvailabilityZoneId,SubnetId:SubnetId}'
 ```
 
-**To find the current supported AZ IDs:** See the AgentCore VPC configuration guide: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-vpc.html — look for the "Supported Availability Zones" section. The table lists AZ IDs (e.g., `use1-az1`, `usw2-az2`) per region — use AZ IDs, not AZ names, because AZ name-to-ID mappings differ across AWS accounts.
+**To find the current supported AZ IDs:** See the AgentCore VPC configuration guide: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-vpc.html -- look for the "Supported Availability Zones" section. The table lists AZ IDs (e.g., `use1-az1`, `usw2-az2`) per region -- use AZ IDs, not AZ names, because AZ name-to-ID mappings differ across AWS accounts.
 
 If your subnet is in an unsupported AZ, the deployment will fail. Use subnets in supported AZs.
 
@@ -136,7 +136,7 @@ agentcore add agent \
   --security-groups sg-agent123
 ```
 
-Or edit `agentcore/agentcore.json` directly — add the `networkMode` and `networkConfig` fields to the runtime's entry:
+Or edit `agentcore/agentcore.json` directly -- add the `networkMode` and `networkConfig` fields to the runtime's entry:
 
 ```json
 {
@@ -153,7 +153,7 @@ Or edit `agentcore/agentcore.json` directly — add the `networkMode` and `netwo
 }
 ```
 
-The `$schema` URL at the top of `agentcore.json` (`https://schema.agentcore.aws.dev/v1/agentcore.json`) gives IDE autocomplete and validation for every field — including the subnet/security-group ID patterns.
+The `$schema` URL at the top of `agentcore.json` (`https://schema.agentcore.aws.dev/v1/agentcore.json`) gives IDE autocomplete and validation for every field -- including the subnet/security-group ID patterns.
 
 ### Deploy
 
@@ -174,11 +174,11 @@ agentcore deploy -y
 
 ```
 AgentCore agent (private subnet)
-    ↓ outbound traffic
+    v outbound traffic
 NAT Gateway (public subnet)
-    ↓
+    v
 Internet Gateway
-    ↓
+    v
 Internet
 ```
 
@@ -218,7 +218,7 @@ aws ec2 create-vpc-endpoint \
   --subnet-ids subnet-abc123 \
   --security-group-ids sg-agent123
 
-# S3 Gateway endpoint (required — ECR stores image layers in S3)
+# S3 Gateway endpoint (required -- ECR stores image layers in S3)
 # This is a free Gateway endpoint. Without it, ECR image refreshes
 # route through NAT and incur data processing charges.
 aws ec2 create-vpc-endpoint \
@@ -244,12 +244,12 @@ A common pattern: `UpdateAgentRuntime` returns READY, the network configuration 
 
 Cold-start VMs need outbound HTTPS (port 443) to these AWS service endpoints. In public or NAT-routed VPCs, a correctly configured NAT gateway covers all of them. In fully private VPCs, every one of these needs an interface VPC endpoint or gateway endpoint:
 
-- `com.amazonaws.<region>.ecr.api` — pull image metadata
-- `com.amazonaws.<region>.ecr.dkr` — pull container layers
-- `com.amazonaws.<region>.s3` (Gateway endpoint) — ECR layers live in S3
-- `com.amazonaws.<region>.logs` — emit CloudWatch logs
-- `com.amazonaws.<region>.monitoring` — emit CloudWatch metrics
-- `com.amazonaws.<region>.sts` — assume the execution role
+- `com.amazonaws.<region>.ecr.api` -- pull image metadata
+- `com.amazonaws.<region>.ecr.dkr` -- pull container layers
+- `com.amazonaws.<region>.s3` (Gateway endpoint) -- ECR layers live in S3
+- `com.amazonaws.<region>.logs` -- emit CloudWatch logs
+- `com.amazonaws.<region>.monitoring` -- emit CloudWatch metrics
+- `com.amazonaws.<region>.sts` -- assume the execution role
 
 Plus whichever endpoints your agent's tools and dependencies need (Bedrock, DynamoDB, Secrets Manager, etc.).
 
@@ -267,14 +267,14 @@ aws ec2 authorize-security-group-egress \
 
 If you scope egress more tightly (to specific endpoint prefix lists or CIDR blocks), double-check that every endpoint above is covered.
 
-### NACLs — the gotcha
+### NACLs -- the gotcha
 
 Network ACLs are **stateless**. A security group allowing outbound 443 implicitly allows the response traffic. A NACL does not.
 
 If your subnet uses a restrictive NACL, you need both directions explicitly:
 
 - **Outbound:** allow TCP 443 to the destination
-- **Inbound:** allow **ephemeral ports 1024–65535** (TCP) from the destination — these are the return-traffic ports
+- **Inbound:** allow **ephemeral ports 1024-65535** (TCP) from the destination -- these are the return-traffic ports
 
 Forgetting the inbound ephemeral-port rule produces the exact symptom of "connection works sometimes, hangs other times" because TCP handshakes succeed (SYN goes out, SYN-ACK comes back on low port ranges) but the actual data response on an ephemeral port gets dropped.
 
@@ -285,7 +285,7 @@ If your subnet routes outbound through a Transit Gateway to a central firewall, 
 Symptoms of a missing TGW route:
 
 - Invocations hang for the full client-side timeout (~300 seconds for default Lambda clients)
-- No 502, no `ConnectionClosedError` — the request just doesn't come back
+- No 502, no `ConnectionClosedError` -- the request just doesn't come back
 - `ping` from a test EC2 in the same subnet/SG works, but actual invocations don't
 - Warm environments (already initialized, so already have all their egress done) succeed, new cold starts fail
 
@@ -303,8 +303,8 @@ Mitigation is the same as for all cold-start latency: reuse sessions, keep the i
 
 **Connection timeouts to RDS or internal APIs:**
 
-1. Verify security group rules — outbound from agent SG, inbound on target SG
-2. Check route tables — private subnet must route to NAT gateway (for internet) or have direct routes to targets
+1. Verify security group rules -- outbound from agent SG, inbound on target SG
+2. Check route tables -- private subnet must route to NAT gateway (for internet) or have direct routes to targets
 3. Verify DNS resolution is enabled in the VPC: `aws ec2 describe-vpc-attribute --vpc-id vpc-12345678 --attribute enableDnsSupport`
 
 **"Unsupported Availability Zone" error during deploy:**
@@ -337,8 +337,8 @@ aws ec2 modify-vpc-attribute --vpc-id vpc-12345678 --enable-dns-hostnames
 
 ## Quality criteria
 
-- Subnet AZ IDs are validated against supported AZs (not AZ names — names vary by account)
+- Subnet AZ IDs are validated against supported AZs (not AZ names -- names vary by account)
 - Security group rules cover both directions (agent outbound + target inbound)
-- NAT gateway is recommended for internet access (not public subnets — AgentCore ENIs don't get public IPs)
+- NAT gateway is recommended for internet access (not public subnets -- AgentCore ENIs don't get public IPs)
 - VPC endpoint list is complete for fully private deployments
 - The developer understands that `networkMode: VPC` primarily affects outbound traffic

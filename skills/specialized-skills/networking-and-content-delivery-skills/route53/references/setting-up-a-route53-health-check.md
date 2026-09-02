@@ -179,9 +179,9 @@ alarm and SNS topic for notifications, and surfaces the console link to verify.
 **Constraints:**
 
 - If `notify` is true, you MUST create a CloudWatch alarm on the health check status metric and
-  point it at an SNS topic. You MUST enable KMS SSE on that topic — create a new topic with
+  point it at an SNS topic. You MUST enable KMS SSE on that topic -- create a new topic with
   `aws sns create-topic --name {topic} --attributes KmsMasterKeyId={kms_key_id}`, or confirm a
-  provided `sns_topic_arn` already has SSE enabled — because notification content can reveal
+  provided `sns_topic_arn` already has SSE enabled -- because notification content can reveal
   infrastructure topology:
 
   ```

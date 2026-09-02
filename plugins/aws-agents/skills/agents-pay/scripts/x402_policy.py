@@ -1,4 +1,4 @@
-"""Deterministic x402 payment policy gate — the trusted decision point.
+"""Deterministic x402 payment policy gate -- the trusted decision point.
 
 Every payment decision is made HERE, in code, from a policy file the operator
 controls. Nothing in this module reads model output, chat history, or publisher
@@ -59,7 +59,7 @@ Two ceilings, not one
 ---------------------
 `max_per_payment_usd` is NOT a duplicate of the session budget:
 
-  * the session budget is CUMULATIVE — total spend before a human must re-approve;
+  * the session budget is CUMULATIVE -- total spend before a human must re-approve;
   * `max_per_payment_usd` is PER TRANSACTION.
 
 With only the session budget, one hostile challenge for the full remaining balance
@@ -141,7 +141,7 @@ def load_config(path: str | os.PathLike[str] | None = None) -> dict:
     Merging them also buys a real control, not just convenience: the session ID is
     a spending credential, and the sanctioned runtime cannot select a replacement
     policy file through HOME or a config-path environment variable. Resource values
-    in the file also win over environment fallbacks — see resolve_resource().
+    in the file also win over environment fallbacks -- see resolve_resource().
 
     The file is a security control, so one that anyone else can write is treated as
     no config at all. lstat (not stat) rejects symlinks rather than following them.
@@ -244,8 +244,8 @@ def resolve_resource(policy: dict, key: str) -> str | None:
     could point the runtime at some other session with a larger budget, and the
     0600 file would be decorative. So the file wins wherever it speaks.
 
-    The environment remains the fallback for deployments with no writable home —
-    containers, Lambda — where identifiers arrive by injection. That is a real
+    The environment remains the fallback for deployments with no writable home --
+    containers, Lambda -- where identifiers arrive by injection. That is a real
     need, but it is the weaker mode: anything that can set the environment can
     choose the session.
     """
@@ -300,7 +300,7 @@ def assert_public_https_url(url: str) -> str:
     one public and one private address through.
 
     This is a pre-flight check. It does not by itself defeat DNS rebinding,
-    because the OS resolves again when the socket is opened — x402_fetch.py
+    because the OS resolves again when the socket is opened -- x402_fetch.py
     closes that gap by pinning the connection to a vetted address.
     """
     u = urlparse(url)
@@ -499,7 +499,7 @@ def _validated_resource(challenge: dict, url: str) -> dict | None:
     ch_base = f"{challenged.scheme}://{challenged.netloc}{challenged.path}".rstrip("/")
     if req_base != ch_base:
         raise _fail("Challenge resource.url does not match the requested URL.")
-    # Forward only the url field — no arbitrary publisher-controlled keys.
+    # Forward only the url field -- no arbitrary publisher-controlled keys.
     return {"url": resource_url}
 
 
@@ -587,14 +587,14 @@ def derive_client_token(
 
     The publisher's nonce is deliberately NOT part of the material. A retry
     re-fetches the 402 and many servers issue a fresh nonce each time, so mixing
-    it in would produce a different token per attempt — turning the retry this
+    it in would produce a different token per attempt -- turning the retry this
     function exists to protect into a second real payment, and handing a hostile
     publisher a way to force double charges by rotating nonces.
 
     The trade-off: two intentional purchases of the same resource, for the same
     amount, in the same session collapse to one token, so the second would be
     suppressed as a replay. Pass an explicit `purchase_id` (an order number, a
-    turn counter — anything the caller controls) to distinguish deliberate
+    turn counter -- anything the caller controls) to distinguish deliberate
     repeat buys. Suppressing a duplicate charge is the safer default when the
     caller has not said otherwise.
 
@@ -602,7 +602,7 @@ def derive_client_token(
     `session_id` nor `policy` is given, this falls back to a raw environment
     read for backward compatibility with existing callers (tests, embedded use)
     that predate the `policy` parameter. A caller that DOES pass `policy` gets
-    resolve_resource()'s documented config-file-first precedence instead — the
+    resolve_resource()'s documented config-file-first precedence instead -- the
     correct behavior for any new caller resolving the session itself rather than
     passing an explicit session_id (the production call site in
     authorize_payment() already always passes session_id explicitly and is

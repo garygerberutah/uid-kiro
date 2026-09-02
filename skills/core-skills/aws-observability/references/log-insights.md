@@ -116,15 +116,15 @@ stats avg(duration) as avg_ms, pct(duration, 99) as p99 by serviceName, bin(1h)
 
 ## Time functions
 
-- `bin(period)` — time bucketing: `bin(5m)`, `bin(1h)`, `bin(1d)`
-- `datefloor(ts, period)`, `dateceil(ts, period)` — truncate/round
-- `fromMillis(num)`, `toMillis(ts)` — epoch conversion
-- `now()` — time query processing was started, in epoch seconds
+- `bin(period)` -- time bucketing: `bin(5m)`, `bin(1h)`, `bin(1d)`
+- `datefloor(ts, period)`, `dateceil(ts, period)` -- truncate/round
+- `fromMillis(num)`, `toMillis(ts)` -- epoch conversion
+- `now()` -- time query processing was started, in epoch seconds
 
 **bin() caps**:
 
-- ms → max 1000, s → max 60, m → max 60, h → max 24
-- Use `bin(5m)` **NOT** `bin(300s)` — 300 exceeds the s→60 cap
+- ms -> max 1000, s -> max 60, m -> max 60, h -> max 24
+- Use `bin(5m)` **NOT** `bin(300s)` -- 300 exceeds the s->60 cap
 
 ---
 
@@ -173,17 +173,17 @@ Recurring queries with results delivered to S3 and EventBridge. Configure via co
 
 3. **JSON structured logs only ~10% faster** than unstructured text search. The real speedup comes from parallelizing across time ranges.
 
-4. **Parallelization strategy**: Break queries into time-range chunks and run in parallel (14 × 12h instead of 1 × 7d). Reduces 84-minute query to ~6 minutes.
+4. **Parallelization strategy**: Break queries into time-range chunks and run in parallel (14 x 12h instead of 1 x 7d). Reduces 84-minute query to ~6 minutes.
 
 5. **`pattern`, `diff`, `unmask`, `anomaly`, and `filterIndex` don't work on Infrequent Access** log class.
 
-6. **`head` and `tail` are deprecated** — use `limit` instead.
+6. **`head` and `tail` are deprecated** -- use `limit` instead.
 
 7. **StartQuery API**: 10 TPS (most regions). GetQueryResults: 10 TPS.
 
 8. **Max 50 log groups** per query (API-level limit on `logGroupNames`/`logGroupIdentifiers`).
 
-9. **No nested subqueries or correlated subqueries** — only simple subqueries.
+9. **No nested subqueries or correlated subqueries** -- only simple subqueries.
 
 10. **Subquery inner execution is limited to 30 seconds**. The overall query timeout is 60 minutes.
 

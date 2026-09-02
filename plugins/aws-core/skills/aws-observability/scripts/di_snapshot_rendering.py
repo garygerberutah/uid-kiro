@@ -195,7 +195,7 @@ def render_get_sample_snapshot_for_breakpoint_output(
                 },
                 "message": (
                     "No snapshots found in this window. Suggestions: "
-                    "(1) Try an older ACTIVE event timestamp — older events have had more time "
+                    "(1) Try an older ACTIVE event timestamp -- older events have had more time "
                     "for CloudWatch Logs ingestion. "
                     "(2) If all timestamps fail, wait 1-2 minutes for ingestion delay. "
                     "(3) Verify the breakpoint is still ACTIVE and not DISABLED from max_hits exhaustion."
@@ -299,7 +299,7 @@ def render_get_sample_snapshot_for_breakpoint_output(
             "'elements' (array of CapturedValue, for lists/arrays), "
             "'entries' (array of {key: CapturedValue, value: CapturedValue}, for maps/dicts), "
             "'is_null': true (for null values), "
-            "'not_captured_reason' — the literal is agent-specific: Python emits lowercase "
+            "'not_captured_reason' -- the literal is agent-specific: Python emits lowercase "
             "camelCase (depth, fieldCount, timeout); Java emits uppercase enum names "
             "(DEPTH, TIMEOUT). Match both forms when filtering. "
             "Oversize collections/maps are signaled via 'truncated: true' plus 'size' (original element count), "

@@ -1,12 +1,12 @@
-# RDS for Oracle — Networking
+# RDS for Oracle -- Networking
 
 Security groups, cross-VPC connectivity, and Route 53 private endpoints.
 
 **Security rule: do NOT enable public access on RDS Oracle.** Keep `Publicly Accessible: No`, private subnets only. External access goes through VPN, Direct Connect, or SSM port forwarding.
 
-## Security groups — the three patterns
+## Security groups -- the three patterns
 
-### Pattern A — App in same VPC (or peered VPC via SG reference)
+### Pattern A -- App in same VPC (or peered VPC via SG reference)
 
 RDS SG inbound:
 
@@ -21,7 +21,7 @@ App SG outbound:
 | Oracle-RDS | TCP | 1521 | RDS SG id |
 | HTTPS | TCP | 443 | Secrets Manager VPC endpoint SG (preferred), or `com.amazonaws.<region>.secretsmanager` prefix list |
 
-### Pattern B — App in a different VPC (Transit Gateway, or peering without SG-ref support)
+### Pattern B -- App in a different VPC (Transit Gateway, or peering without SG-ref support)
 
 Cross-VPC SG-id references only work with VPC peering when `AllowDnsResolutionFromRemoteVpc = true`. For Transit Gateway or any unclear case, use **CIDR-based rules**:
 
@@ -31,7 +31,7 @@ RDS SG inbound:
 |---|---|---|---|
 | Oracle-RDS | TCP | 1521 | App VPC CIDR (e.g. `10.0.0.0/16`) |
 
-### Pattern C — On-prem app via VPN/Direct Connect
+### Pattern C -- On-prem app via VPN/Direct Connect
 
 Requires an established VPN or Direct Connect:
 
@@ -72,7 +72,7 @@ SG: allow inbound TCP 443 from app SG
 
 ## Cross-VPC connectivity
 
-### Option 1 — Transit Gateway (recommended for hub-and-spoke)
+### Option 1 -- Transit Gateway (recommended for hub-and-spoke)
 
 ```bash
 aws ec2 create-transit-gateway --description cross-vpc-tgw
@@ -94,7 +94,7 @@ aws ec2 create-route --route-table-id rtb-rds \
 
 Then SG inbound on RDS using the **app VPC CIDR** (SG-id refs don't cross TGW).
 
-### Option 2 — VPC Peering (1:1, cross-region supported)
+### Option 2 -- VPC Peering (1:1, cross-region supported)
 
 ```bash
 aws ec2 create-vpc-peering-connection --vpc-id vpc-app --peer-vpc-id vpc-rds
@@ -121,7 +121,7 @@ aws ec2 modify-vpc-peering-connection-options \
 |---|---|---|
 | Transitive routing | No | Yes |
 | Scalability | 1:1 per pair | Hub-and-spoke |
-| SG-id cross-reference | Yes (with `AllowDnsResolution`) | **No — use CIDR** |
+| SG-id cross-reference | Yes (with `AllowDnsResolution`) | **No -- use CIDR** |
 | Cost | Data transfer only | Hourly + data transfer |
 | Bandwidth | No limit | 50 Gbps per attachment |
 
@@ -129,7 +129,7 @@ aws ec2 modify-vpc-peering-connection-options \
 
 RDS endpoints resolve to private IPs inside the RDS VPC. For apps in other VPCs:
 
-- **TGW with `DnsSupport` enabled + VPC `enableDnsSupport`/`enableDnsHostnames`** — simplest same-account case.
+- **TGW with `DnsSupport` enabled + VPC `enableDnsSupport`/`enableDnsHostnames`** -- simplest same-account case.
 - **Route 53 private hosted zone with CNAME** to the RDS endpoint; associate with both VPCs.
 - **Route 53 Resolver rules** forwarding `<region>.rds.amazonaws.com` to the RDS VPC DNS (VPC + 2 IP).
 
@@ -182,6 +182,6 @@ Or run `scripts/test_connectivity.sh <endpoint> 1521` and `scripts/check_securit
 | Timeout after DNS resolves | Route tables missing in one direction, or SG missing inbound from app CIDR |
 | Intermittent timeouts | NACL ephemeral port range (1024-65535) blocked for return traffic |
 | Works from one AZ, not another | Route table only associated with some subnets |
-| `ORA-12170` | Network path blocked — check routes, SGs, NACLs |
-| `ORA-12541` | DNS resolved to wrong IP — verify endpoint resolves to RDS private IP |
-| Kerberos auth fails cross-VPC | App VPC can't reach AD DNS — add resolver rule forwarding the AD domain |
+| `ORA-12170` | Network path blocked -- check routes, SGs, NACLs |
+| `ORA-12541` | DNS resolved to wrong IP -- verify endpoint resolves to RDS private IP |
+| Kerberos auth fails cross-VPC | App VPC can't reach AD DNS -- add resolver rule forwarding the AD domain |

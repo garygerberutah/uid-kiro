@@ -96,7 +96,7 @@ Benefits:
 
 ### Cluster Mode Disabled to Cluster Mode Enabled (In-Place)
 
-For Valkey 7.2+ and Redis OSS 7.0+ replication groups with automatic failover and at least one replica, you can convert from cluster mode disabled (CMD) to cluster mode enabled (CME) in-place without creating a new cluster. This is a **one-way operation** — once cluster mode is set to `enabled`, it cannot be disabled. CME→CMD conversion is not supported.
+For Valkey 7.2+ and Redis OSS 7.0+ replication groups with automatic failover and at least one replica, you can convert from cluster mode disabled (CMD) to cluster mode enabled (CME) in-place without creating a new cluster. This is a **one-way operation** -- once cluster mode is set to `enabled`, it cannot be disabled. CME->CMD conversion is not supported.
 
 This is a two-step process:
 

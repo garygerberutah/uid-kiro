@@ -17,15 +17,15 @@ is intentionally resolved from the AWS page each time rather than hardcoded
 here, so the skill always tracks the current AWS-published workbook.
 
 Cell mapping (sheet "MSK Provisioned"):
-    C11  Average Data In  MB/s   = avg_bytes_in_per_broker_mbps × num_brokers
+    C11  Average Data In  MB/s   = avg_bytes_in_per_broker_mbps x num_brokers
                                    (falls back to peak_in / 2 if the contract
                                    doesn't carry avg; override via --avg-in-mbps)
-    C12  Peak Data In     MB/s   = peak_bytes_in_per_broker_mbps × num_brokers
-    C13  Average Data Out MB/s   = avg_bytes_out_per_broker_mbps × num_brokers
+    C12  Peak Data In     MB/s   = peak_bytes_in_per_broker_mbps x num_brokers
+    C13  Average Data Out MB/s   = avg_bytes_out_per_broker_mbps x num_brokers
                                    (falls back to peak_out / 2; override via
                                    --avg-out-mbps)
-    C14  Peak Data Out    MB/s   = peak_bytes_out_per_broker_mbps × num_brokers
-    C17  Retention Hrs           = max retention.ms over topics, ÷ 3_600_000
+    C14  Peak Data Out    MB/s   = peak_bytes_out_per_broker_mbps x num_brokers
+    C17  Retention Hrs           = max retention.ms over topics, / 3_600_000
     C20  Partitions              = sum(num_partitions over topics) x 3
                                    -- total partition replicas on the Express
                                    target (RF is always 3; source RF ignored)
@@ -94,7 +94,7 @@ def compute_inputs(cfg: dict) -> dict:
     metrics = cfg.get("metrics") or {}
     bc = int(cfg["topology"]["num_brokers"])
 
-    # Peaks: per-broker × num_brokers = total cluster peak.
+    # Peaks: per-broker x num_brokers = total cluster peak.
     peak_in_per_broker = float(metrics.get("peak_bytes_in_per_broker_mbps") or 0)
     peak_out_per_broker = float(metrics.get("peak_bytes_out_per_broker_mbps") or 0)
     peak_in_total = peak_in_per_broker * bc
@@ -332,7 +332,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         type=float,
         default=None,
         help=(
-            "Override average ingress MBps. Defaults to peak/2 — accurate cost "
+            "Override average ingress MBps. Defaults to peak/2 -- accurate cost "
             "projection requires the real average."
         ),
     )
@@ -348,7 +348,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         default=None,
         help=(
             "Override retention hours. Defaults to max retention.ms across "
-            "topics ÷ 3_600_000, or 24h if no topic specifies retention.ms."
+            "topics / 3_600_000, or 24h if no topic specifies retention.ms."
         ),
     )
     return p.parse_args(argv)

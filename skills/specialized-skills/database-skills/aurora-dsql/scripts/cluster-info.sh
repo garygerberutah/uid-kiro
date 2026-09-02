@@ -57,7 +57,7 @@ done
 echo "Fetching cluster information for: $CLUSTER_ID"
 echo ""
 
-# Get cluster details — capture output first so AWS CLI failures aren't hidden by the pipe
+# Get cluster details -- capture output first so AWS CLI failures aren't hidden by the pipe
 CLUSTER_JSON=$(aws dsql get-cluster \
   --identifier "$CLUSTER_ID" \
   --region "$REGION" \

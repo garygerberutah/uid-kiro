@@ -14,7 +14,7 @@ effortless scaling, multi-region viability, among other advantages.
 - **SHALL repeatedly generate fresh tokens** - Refer to [Connection Limits](auth/authentication-guide.md#connection-rules)
 - **ALWAYS use ASYNC indexes** - `CREATE INDEX ASYNC` is mandatory
 - **MUST Serialize arrays/JSON as TEXT** - Store arrays/JSON as TEXT (comma separated, JSON.stringify)
-- **ALWAYS Batch within row limit** - maintain transaction limits (defaults: 3,000 rows, 10 MiB, 5 minutes — verify via the AWS MCP Server's `aws___search_documentation` if available, or check the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/) directly: `aurora dsql transaction limits`)
+- **ALWAYS Batch within row limit** - maintain transaction limits (defaults: 3,000 rows, 10 MiB, 5 minutes -- verify via the AWS MCP Server's `aws___search_documentation` if available, or check the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/) directly: `aurora dsql transaction limits`)
 - **REQUIRED: Sanitize SQL inputs with allowlists, regex, and quote escaping** - See [Input Validation](input-validation.md#rules)
 - **MUST follow correct Application Layer Patterns** - when multi-tenant isolation or application referential integrity are required; refer to [Application Layer Patterns](#application-layer-patterns)
 - **REQUIRED use DELETE for truncation** - DELETE is the only supported operation for truncation
@@ -28,9 +28,9 @@ effortless scaling, multi-region viability, among other advantages.
 
 ## Detailed References
 
-- **[authentication-guide.md](auth/authentication-guide.md)** — IAM auth, token management, secrets, SSL/TLS, connection pooling, audit logging, access control
-- **[connectivity-tools.md](auth/connectivity-tools.md)** — Database drivers, ORMs, adapters, and data loading tools
-- **[scaling-guide.md](auth/scaling-guide.md)** — Horizontal scaling strategy, batch optimization, hot key avoidance, identifier types
+- **[authentication-guide.md](auth/authentication-guide.md)** -- IAM auth, token management, secrets, SSL/TLS, connection pooling, audit logging, access control
+- **[connectivity-tools.md](auth/connectivity-tools.md)** -- Database drivers, ORMs, adapters, and data loading tools
+- **[scaling-guide.md](auth/scaling-guide.md)** -- Horizontal scaling strategy, batch optimization, hot key avoidance, identifier types
 
 ---
 
@@ -63,7 +63,7 @@ effortless scaling, multi-region viability, among other advantages.
 
 - REQUIRED: **at most one DDL statement** per operation
 - ALWAYS separate schema (DDL) and data (DML) changes
-- MUST use **`CREATE INDEX ASYNC`:** No synchronous creation (defaults: max 24 indexes per table, 8 columns per index — verify via the AWS MCP Server's `aws___search_documentation` if available, or check the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/): `aurora dsql index limits`)
+- MUST use **`CREATE INDEX ASYNC`:** No synchronous creation (defaults: max 24 indexes per table, 8 columns per index -- verify via the AWS MCP Server's `aws___search_documentation` if available, or check the [DSQL documentation](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/): `aurora dsql index limits`)
   - MAXIMUM: **24 indexes per table**
   - MAXIMUM: **8 columns per index**
 - **Asynchronous Execution:** DDL ALWAYS runs asynchronously
@@ -116,10 +116,10 @@ implement the following pattern instead:
 ### Schema Operations
 
 ```sql
-CREATE INDEX ASYNC idx_name ON table(column);          ← ALWAYS ASYNC
-ALTER TABLE t ADD COLUMN c VARCHAR(50);                ← ONE AT A TIME
-ALTER TABLE t ADD COLUMN c2 INTEGER;                   ← SEPARATE STATEMENT
-UPDATE table SET c = 'default' WHERE c IS NULL;        ← AFTER ADD COLUMN
+CREATE INDEX ASYNC idx_name ON table(column);          <- ALWAYS ASYNC
+ALTER TABLE t ADD COLUMN c VARCHAR(50);                <- ONE AT A TIME
+ALTER TABLE t ADD COLUMN c2 INTEGER;                   <- SEPARATE STATEMENT
+UPDATE table SET c = 'default' WHERE c IS NULL;        <- AFTER ADD COLUMN
 ```
 
 ### Supported Data Types

@@ -15,20 +15,20 @@ This is the #1 production issue with streaming Iceberg workloads. Understanding 
 **1. High commit rate (checkpoint interval):** Iceberg commits happen at Flink checkpoint boundaries. Files are closed at checkpoint boundaries regardless of whether they've reached the target size. The checkpoint interval is the single biggest lever for controlling file count.
 
 ```
-Files per commit (worst case) = writer_parallelism × active_partitions
-Files per day = (86400 / checkpoint_interval_seconds) × files_per_commit
+Files per commit (worst case) = writer_parallelism x active_partitions
+Files per day = (86400 / checkpoint_interval_seconds) x files_per_commit
 ```
 
 Example with 60-second checkpoints, 4 writer tasks, 10 active partitions:
 
-- 1,440 checkpoints/day × 4 × 10 = 57,600 files/day
+- 1,440 checkpoints/day x 4 x 10 = 57,600 files/day
 - After 7 days: 403,200 files, each potentially only 1-10 MB
 
 With a 10-second checkpoint interval, that becomes 345,600 files/day.
 
-**2. MoR delete files from upserts:** Each upsert within a checkpoint generates both a data file (the new row) and an equality delete file (marking the old row for deletion). Upsert workloads create roughly 2× the files of append-only workloads. These delete files are typically tiny (just the equality field values) but accumulate and must be merged at read time.
+**2. MoR delete files from upserts:** Each upsert within a checkpoint generates both a data file (the new row) and an equality delete file (marking the old row for deletion). Upsert workloads create roughly 2x the files of append-only workloads. These delete files are typically tiny (just the equality field values) but accumulate and must be merged at read time.
 
-**3. No shuffle before writing (distribution mode NONE):** Without distribution, each writer task creates one file per partition it touches per checkpoint. If data arrives in random order across all partitions, every writer touches every partition. With N writer tasks and M active partitions, you get up to N × M files per commit. HASH distribution routes each partition's data to a single writer, reducing to M files per commit — but is limited by partition cardinality (if you have 5 partitions, only 5 of 20 writer tasks get data). RANGE distribution addresses this by using traffic statistics to balance load across writers regardless of cardinality.
+**3. No shuffle before writing (distribution mode NONE):** Without distribution, each writer task creates one file per partition it touches per checkpoint. If data arrives in random order across all partitions, every writer touches every partition. With N writer tasks and M active partitions, you get up to N x M files per commit. HASH distribution routes each partition's data to a single writer, reducing to M files per commit -- but is limited by partition cardinality (if you have 5 partitions, only 5 of 20 writer tasks get data). RANGE distribution addresses this by using traffic statistics to balance load across writers regardless of cardinality.
 
 ### Impact
 
@@ -38,7 +38,7 @@ With a 10-second checkpoint interval, that becomes 345,600 files/day.
 
 ### Mitigation Strategies
 
-Apply these together — none is sufficient on its own for production streaming workloads.
+Apply these together -- none is sufficient on its own for production streaming workloads.
 
 1. **Increase checkpoint interval:** The single most effective lever. A 60-second interval creates 24x fewer files than a 2.5-second interval. On MSF, configure this at the application level (not in code):
 
@@ -67,8 +67,8 @@ Default retention policies are designed for batch workloads. For streaming:
 - Use **count-based retention** (e.g., retain last 100-1000 snapshots) rather than time-based (e.g., 7 days)
 - A streaming job creating snapshots every 60 seconds generates 10,080 snapshots per week
 - Keep active storage ratio above 85% (current data / total stored data)
-- Compacted files leave behind orphaned old files — aggressive snapshot expiration is needed to clean them up
-- **Long retention defeats the purpose of compaction.** Old data files cannot be physically removed (via `DeleteOrphanFiles`) while *any* retained snapshot still references them. A 7-day retention on a 60-second checkpoint job pins the post-compaction "old" files in S3 for the full 7 days, so storage footprint stays inflated even after compaction runs and you keep paying for the same bytes twice. Count-based retention solves this directly — once the retained snapshots roll past, compaction can actually reclaim space.
+- Compacted files leave behind orphaned old files -- aggressive snapshot expiration is needed to clean them up
+- **Long retention defeats the purpose of compaction.** Old data files cannot be physically removed (via `DeleteOrphanFiles`) while *any* retained snapshot still references them. A 7-day retention on a 60-second checkpoint job pins the post-compaction "old" files in S3 for the full 7 days, so storage footprint stays inflated even after compaction runs and you keep paying for the same bytes twice. Count-based retention solves this directly -- once the retained snapshots roll past, compaction can actually reclaim space.
 
 ## Table Maintenance
 
@@ -76,14 +76,14 @@ Default retention policies are designed for batch workloads. For streaming:
 
 Iceberg tables require ongoing maintenance for production health. The three core operations, in correct execution order:
 
-1. **Compact data files** (RewriteDataFiles) — Merge small files into larger ones
-2. **Expire snapshots** (ExpireSnapshots) — Remove old table versions, orphaning old files
-3. **Delete orphan files** (DeleteOrphanFiles) — Clean up files no longer referenced by any snapshot
+1. **Compact data files** (RewriteDataFiles) -- Merge small files into larger ones
+2. **Expire snapshots** (ExpireSnapshots) -- Remove old table versions, orphaning old files
+3. **Delete orphan files** (DeleteOrphanFiles) -- Clean up files no longer referenced by any snapshot
 
 **Running these out of order can cause data loss or corruption.** For example, expiring snapshots before compaction can orphan files that are still needed.
 
 After all three, optionally:
-4. **Rewrite manifests** — Consolidate metadata structure (not available in Flink streaming maintenance API, use Spark or batch Flink)
+4. **Rewrite manifests** -- Consolidate metadata structure (not available in Flink streaming maintenance API, use Spark or batch Flink)
 
 ### Three Distinct Maintenance Approaches on AWS
 
@@ -91,20 +91,20 @@ There are exactly three ways to run maintenance for Iceberg tables written by Fl
 
 | Approach | Catalog | Compaction | Snapshot expiration | Orphan cleanup | Operational overhead | Control |
 |---|---|---|---|---|---|---|
-| **1. S3 Tables (fully managed)** | S3 Tables | Automatic | Automatic | Automatic | None | Low — service overrides some table properties |
-| **2. Glue + Glue auto-compaction** | Glue | Managed by Glue | You handle (Flink or external) | You handle (Flink or external) | Medium — only snapshot/orphan cleanup to run | Medium — Glue manages compaction thresholds |
-| **3. Glue + Flink embedded maintenance** | Glue | Flink job topology | Flink job topology | Flink job topology | High — RDS for JDBC locks, VPC config | Full — every parameter is yours to tune |
+| **1. S3 Tables (fully managed)** | S3 Tables | Automatic | Automatic | Automatic | None | Low -- service overrides some table properties |
+| **2. Glue + Glue auto-compaction** | Glue | Managed by Glue | You handle (Flink or external) | You handle (Flink or external) | Medium -- only snapshot/orphan cleanup to run | Medium -- Glue manages compaction thresholds |
+| **3. Glue + Flink embedded maintenance** | Glue | Flink job topology | Flink job topology | Flink job topology | High -- RDS for JDBC locks, VPC config | Full -- every parameter is yours to tune |
 
 **Key constraints (do not violate):**
 
 - S3 Tables: do NOT add Flink embedded maintenance or external compaction. Concurrent maintenance causes commit conflicts.
-- Glue: do NOT combine Glue auto-compaction with Flink embedded compaction on the same table. Pick one compaction mechanism. (You can still pair Glue auto-compaction with Flink embedded snapshot expiration and orphan cleanup — those are not redundant.)
+- Glue: do NOT combine Glue auto-compaction with Flink embedded compaction on the same table. Pick one compaction mechanism. (You can still pair Glue auto-compaction with Flink embedded snapshot expiration and orphan cleanup -- those are not redundant.)
 
 **Quick picker:**
 
-- Want zero maintenance work and accept S3 Tables' constraints? → S3 Tables
-- Want Glue catalog (broader query engine support, full table-property control) but don't want to operate compaction yourself? → Glue + Glue auto-compaction
-- Need to control compaction strategy, scheduling, and partial-progress behavior precisely? → Glue + Flink embedded maintenance
+- Want zero maintenance work and accept S3 Tables' constraints? -> S3 Tables
+- Want Glue catalog (broader query engine support, full table-property control) but don't want to operate compaction yourself? -> Glue + Glue auto-compaction
+- Need to control compaction strategy, scheduling, and partial-progress behavior precisely? -> Glue + Flink embedded maintenance
 
 These approaches are detailed in the next section, followed by the Flink TableMaintenance API used by Glue + Flink embedded maintenance (and for the snapshot/orphan portions of Glue + Glue auto-compaction).
 
@@ -115,19 +115,19 @@ Each of the three approaches introduced above is described below with its specif
 **S3 Tables (fully managed):**
 
 - Compaction is automatic and enabled by default. Target file size: 512 MB (configurable 64-512 MB). Strategies: auto (default), binpack, sort, z-order.
-- Compaction applies delete file effects — merges equality/position deletes into data files automatically.
+- Compaction applies delete file effects -- merges equality/position deletes into data files automatically.
 - Snapshot management is automatic: defaults to min 1 snapshot, max 120 hours age. Configurable via `PutTableMaintenanceConfiguration` API.
 - Unreferenced file removal is automatic.
-- Do NOT run Flink embedded maintenance or external compaction alongside S3 Tables — it will cause commit conflicts with the service's own maintenance.
+- Do NOT run Flink embedded maintenance or external compaction alongside S3 Tables -- it will cause commit conflicts with the service's own maintenance.
 - Limitation: S3 Tables overrides some table properties. S3 Tables snapshot management does NOT respect Iceberg table properties set via `ALTER TABLE SET TBLPROPERTIES` (e.g., branch/tag retention). If you set such properties, S3 Tables disables its own snapshot management and you must handle it yourself.
-- Transient commit conflicts between S3 Tables compaction and your streaming writer are normal — S3 Tables handles retry internally, but you may see transient errors in Flink logs.
+- Transient commit conflicts between S3 Tables compaction and your streaming writer are normal -- S3 Tables handles retry internally, but you may see transient errors in Flink logs.
 
 **Glue Catalog with Glue Auto-Compaction (managed compaction, manual snapshot/orphan cleanup):**
 
 - AWS Glue Data Catalog supports automatic compaction for Iceberg tables. It monitors partitions and triggers compaction when thresholds are met (e.g., >100 files smaller than 75% of target size).
 - Supports both CoW and MoR tables, including compacting delete files.
 - Commits partial progress regularly.
-- You still need to handle snapshot expiration and orphan file cleanup yourself — use Flink's TableMaintenance API for those, or schedule external jobs.
+- You still need to handle snapshot expiration and orphan file cleanup yourself -- use Flink's TableMaintenance API for those, or schedule external jobs.
 - Concurrent write conflicts between Glue compaction and your streaming writer are possible. Glue handles retries, but your Flink job should tolerate transient commit failures.
 
 **Glue Catalog with Flink Embedded Maintenance (full control):**
@@ -136,22 +136,22 @@ Each of the three approaches introduced above is described below with its specif
 - Runs inside the Flink job topology, coordinated by distributed locks (JDBC/ZK). No external compaction conflicts.
 - Requires infrastructure: RDS PostgreSQL instance for JDBC locks, VPC configuration for the Flink app.
 - Most flexible but most operational overhead.
-- Do NOT combine with Glue auto-compaction — pick one compaction approach to avoid conflicts.
+- Do NOT combine with Glue auto-compaction -- pick one compaction approach to avoid conflicts.
 
 **Decision guide (recap):**
 
-- Want zero maintenance overhead? → S3 Tables (Approach 1)
-- Want managed compaction but keep Glue catalog flexibility? → Glue auto-compaction + Flink for snapshot/orphan cleanup (Approach 2)
-- Need full control over maintenance scheduling and parameters? → Flink embedded maintenance with JDBC locks on Glue Catalog (Approach 3)
+- Want zero maintenance overhead? -> S3 Tables (Approach 1)
+- Want managed compaction but keep Glue catalog flexibility? -> Glue auto-compaction + Flink for snapshot/orphan cleanup (Approach 2)
+- Need full control over maintenance scheduling and parameters? -> Flink embedded maintenance with JDBC locks on Glue Catalog (Approach 3)
 
 ### Flink Streaming Maintenance (TableMaintenance API)
 
 The TableMaintenance API (Iceberg 1.10+) runs maintenance as part of the Flink job topology, triggered by post-commit events. Requires IcebergSink (SinkV2).
 
-Store the JDBC lock-database credentials in AWS Secrets Manager and look them up at job startup. **Never hardcode credentials in application code, runtime properties, or `setup.sql`/JAR resources.** Connect to the lock database over TLS — the JDBC URL must include `ssl=true` so the connection is encrypted in transit. Certificate verification (`sslmode=verify-full`) on MSF requires a custom `SSLSocketFactory` that loads the CA bundle from the classpath, since MSF doesn't expose a stable filesystem path for `sslrootcert`; see [cdc-connector-guide.md](cdc-connector-guide.md#tls--ssl-to-the-database) for the constraints. See [cdc-connector-guide.md](cdc-connector-guide.md#database-credentials-and-secrets-management) for the full Secrets Manager pattern; the Iceberg lock-DB credentials should follow the same approach.
+Store the JDBC lock-database credentials in AWS Secrets Manager and look them up at job startup. **Never hardcode credentials in application code, runtime properties, or `setup.sql`/JAR resources.** Connect to the lock database over TLS -- the JDBC URL must include `ssl=true` so the connection is encrypted in transit. Certificate verification (`sslmode=verify-full`) on MSF requires a custom `SSLSocketFactory` that loads the CA bundle from the classpath, since MSF doesn't expose a stable filesystem path for `sslrootcert`; see [cdc-connector-guide.md](cdc-connector-guide.md#tls--ssl-to-the-database) for the constraints. See [cdc-connector-guide.md](cdc-connector-guide.md#database-credentials-and-secrets-management) for the full Secrets Manager pattern; the Iceberg lock-DB credentials should follow the same approach.
 
 ```java
-// Resolve credentials from AWS Secrets Manager — see cdc-connector-guide.md for the
+// Resolve credentials from AWS Secrets Manager -- see cdc-connector-guide.md for the
 // full SecretsManagerClient pattern and IAM grant.
 DbCreds lockDbCreds = loadDbCreds(cdcConfig.getProperty("iceberg.lock.secret.id"));
 
@@ -190,7 +190,7 @@ TableMaintenance.forTable(env, tableLoader, lockFactory)
 
 ### Post-Commit Maintenance via IcebergSink Configuration
 
-Alternative to the explicit TableMaintenance API — configure maintenance directly on the sink:
+Alternative to the explicit TableMaintenance API -- configure maintenance directly on the sink:
 
 ```java
 Map<String, String> flinkConf = new HashMap<>();
@@ -199,7 +199,7 @@ flinkConf.put(LockConfig.LOCK_TYPE_OPTION.key(), LockConfig.JdbcLockConfig.JDBC)
 flinkConf.put(LockConfig.JdbcLockConfig.JDBC_URI_OPTION.key(),
     "jdbc:postgresql://host:5432/iceberg?ssl=true");
 flinkConf.put(LockConfig.LOCK_ID_OPTION.key(), "catalog.db.table");
-// Lock-DB user/password must be supplied via Secrets Manager — do not hardcode.
+// Lock-DB user/password must be supplied via Secrets Manager -- do not hardcode.
 // e.g.: flinkConf.put(LockConfig.JdbcLockConfig.JDBC_USER_OPTION.key(), lockDbCreds.username);
 
 IcebergSink.forRowData(dataStream)
@@ -220,8 +220,8 @@ SET 'flink-maintenance.lock.jdbc.init-lock-tables' = 'true';
 -- jdbc.user / jdbc.password must come from a Secrets Manager lookup performed
 -- in main() and templated into the SET statement before submission. Do NOT
 -- store them in MSF runtime properties (even via {{resolve:secretsmanager:...}}
--- dynamic references) — they would land as plaintext on the deployed property
--- surface. See cdc-connector-guide.md → Database Credentials and Secrets Management.
+-- dynamic references) -- they would land as plaintext on the deployed property
+-- surface. See cdc-connector-guide.md -> Database Credentials and Secrets Management.
 
 INSERT INTO my_table SELECT ...;
 ```
@@ -238,8 +238,8 @@ Maintenance requires distributed locks to prevent concurrent operations on the s
 JDBC lock factory with auto-table creation:
 
 ```java
-// Resolve lock-DB credentials from Secrets Manager — do not hardcode (see
-// cdc-connector-guide.md → Database Credentials and Secrets Management).
+// Resolve lock-DB credentials from Secrets Manager -- do not hardcode (see
+// cdc-connector-guide.md -> Database Credentials and Secrets Management).
 DbCreds lockDbCreds = loadDbCreds(cdcConfig.getProperty("iceberg.lock.secret.id"));
 
 Map<String, String> jdbcProps = new HashMap<>();
@@ -248,8 +248,8 @@ jdbcProps.put("jdbc.password", lockDbCreds.password);
 jdbcProps.put("flink-maintenance.lock.jdbc.init-lock-tables", "true");
 
 // jdbcUrl should enforce TLS: jdbc:postgresql://host:5432/db?ssl=true
-// (sslmode=verify-full requires a custom SSLSocketFactory on MSF — see
-// cdc-connector-guide.md → TLS / SSL to the database)
+// (sslmode=verify-full requires a custom SSLSocketFactory on MSF -- see
+// cdc-connector-guide.md -> TLS / SSL to the database)
 TriggerLockFactory lockFactory = new JdbcLockFactory(jdbcUrl, lockId, jdbcProps);
 lockFactory.open();  // Initialize lock tables
 ```
@@ -344,7 +344,7 @@ CREATE CATALOG s3tables_catalog WITH (
 | Control | Full control over table properties, maintenance scheduling, retention | Less control; S3 Tables overrides some Iceberg table properties |
 | Branch/tag retention | Fully supported via Iceberg table properties | Setting branch/tag retention disables S3 Tables snapshot management |
 
-**Rule:** Do NOT enable Flink embedded maintenance or external compaction when using S3 Tables — it handles this automatically and concurrent maintenance causes commit conflicts.
+**Rule:** Do NOT enable Flink embedded maintenance or external compaction when using S3 Tables -- it handles this automatically and concurrent maintenance causes commit conflicts.
 
 ### Flink Connector-Style Catalog (SQL)
 
@@ -439,7 +439,7 @@ WHERE committed_at > CURRENT_TIMESTAMP - INTERVAL '1' HOUR;
         <version>0.1.8</version>
     </dependency>
 
-    <!-- Hadoop Common — required by Iceberg's CatalogLoader API
+    <!-- Hadoop Common -- required by Iceberg's CatalogLoader API
          (org.apache.hadoop.conf.Configuration is referenced by
          CatalogLoader.custom(name, props, new Configuration(), implClass)
          at compile and run time). Neither iceberg-flink-runtime-* nor
@@ -531,7 +531,7 @@ MSF bundles its own Hadoop and AWS SDK classes. You MUST relocate conflicting cl
 
 **The `ServicesResourceTransformer` is essential.** Without it, Iceberg's SPI-based service discovery (for FileIO implementations, catalog implementations) will fail at runtime with ClassNotFoundException.
 
-**The `org.apache.hadoop.conf` relocation requires `hadoop-common` as a compile-scope dependency.** The relocation rewrites references in your shaded JAR from `org.apache.hadoop.conf.*` to `shaded.org.apache.hadoop.conf.*` so they don't collide with classes loaded by `flink-s3-fs-hadoop` on MSF — but the relocation only has anything to rewrite if `hadoop-common` is actually in the shade input. If you call `CatalogLoader.custom(name, props, new Configuration(), implClass)` (or otherwise reference `org.apache.hadoop.conf.Configuration`) without adding `hadoop-common` to the pom, compilation fails with `package org.apache.hadoop.conf does not exist`. Adding `hadoop-common` and applying the relocation are a pair: the dep brings the class in, the relocation keeps it from colliding with the MSF-bundled copy.
+**The `org.apache.hadoop.conf` relocation requires `hadoop-common` as a compile-scope dependency.** The relocation rewrites references in your shaded JAR from `org.apache.hadoop.conf.*` to `shaded.org.apache.hadoop.conf.*` so they don't collide with classes loaded by `flink-s3-fs-hadoop` on MSF -- but the relocation only has anything to rewrite if `hadoop-common` is actually in the shade input. If you call `CatalogLoader.custom(name, props, new Configuration(), implClass)` (or otherwise reference `org.apache.hadoop.conf.Configuration`) without adding `hadoop-common` to the pom, compilation fails with `package org.apache.hadoop.conf does not exist`. Adding `hadoop-common` and applying the relocation are a pair: the dep brings the class in, the relocation keeps it from colliding with the MSF-bundled copy.
 
 ## Common Anti-Patterns
 
@@ -549,13 +549,13 @@ MSF bundles its own Hadoop and AWS SDK classes. You MUST relocate conflicting cl
 
 7. **Streaming reads from upsert tables.** IcebergSource streaming mode only supports append-only tables. Tables with equality deletes are not supported for streaming reads.
 
-8. **Running maintenance operations out of order.** The correct order is: compact → expire snapshots → delete orphans → rewrite manifests. Running orphan cleanup before snapshot expiration can delete files still referenced by active snapshots.
+8. **Running maintenance operations out of order.** The correct order is: compact -> expire snapshots -> delete orphans -> rewrite manifests. Running orphan cleanup before snapshot expiration can delete files still referenced by active snapshots.
 
 9. **High-cardinality partitioning.** Partitioning by a column with millions of distinct values creates millions of tiny partitions that can't be compacted within partition boundaries.
 
 10. **Missing `ServicesResourceTransformer` in shade plugin.** Causes runtime ClassNotFoundException for Iceberg FileIO and Catalog implementations on MSF.
 
-11. **Using distribution mode NONE with upsert.** Without HASH distribution, Flink uses rebalance to distribute records across writer tasks. Multiple updates to the same key within a checkpoint can land on different writers, causing the delete file on one writer to miss the insert on another — resulting in duplicate rows. Always use `distributionMode(DistributionMode.HASH)` for upsert workloads.
+11. **Using distribution mode NONE with upsert.** Without HASH distribution, Flink uses rebalance to distribute records across writer tasks. Multiple updates to the same key within a checkpoint can land on different writers, causing the delete file on one writer to miss the insert on another -- resulting in duplicate rows. Always use `distributionMode(DistributionMode.HASH)` for upsert workloads.
 
 12. **Assuming multi-table writes are atomic.** Iceberg commits are per-table. When writing to multiple tables via StatementSet, each table commits independently. Failure between commits leaves tables in inconsistent state. Design downstream consumers to tolerate this, or use snapshot correlation via `flink.job-id` in snapshot summary.
 

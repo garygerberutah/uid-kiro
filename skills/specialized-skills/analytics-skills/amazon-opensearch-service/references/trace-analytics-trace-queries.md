@@ -1,20 +1,20 @@
-# Trace-analytics capability — entry point and query templates
+# Trace-analytics capability -- entry point and query templates
 
-This file is the **entry point** for the `trace-analytics` capability. It covers distributed traces with OpenTelemetry — span queries, service maps, latency analysis (p50/p95/p99), error rate by service, and root-cause via parent/child spans.
+This file is the **entry point** for the `trace-analytics` capability. It covers distributed traces with OpenTelemetry -- span queries, service maps, latency analysis (p50/p95/p99), error rate by service, and root-cause via parent/child spans.
 
 ## When to use this capability
 
 `SKILL.md` routes here when the user is working with **distributed traces** on AOS / AOSS. Concrete triggers:
 
 - Phrases: *"trace analytics"*, *"service map"*, *"otel"*, *"distributed traces"*, *"span query"*, *"otel-v1-apm-span-*"*, *"Data Prepper"*, *"latency p99"*
-- Tasks: query trace spans, build service maps, ingest traces (OTel collector → Data Prepper / OSI), troubleshoot trace pipeline or query issues
+- Tasks: query trace spans, build service maps, ingest traces (OTel collector -> Data Prepper / OSI), troubleshoot trace pipeline or query issues
 
 ## All trace-analytics files (capability index)
 
 | User need | File |
 |---|---|
 | Span queries (PPL on `otel-v1-apm-span-*`) | this file |
-| Trace ingestion (OTel collector → Data Prepper / OSI) | [`trace-analytics-trace-ingestion.md`](trace-analytics-trace-ingestion.md) |
+| Trace ingestion (OTel collector -> Data Prepper / OSI) | [`trace-analytics-trace-ingestion.md`](trace-analytics-trace-ingestion.md) |
 | Troubleshoot trace pipeline or queries | [`trace-analytics-troubleshooting.md`](trace-analytics-troubleshooting.md) |
 
 Cross-cutting refs you may also load: [`security.md`](security.md), [`personas.md`](personas.md) (observability-engineer).
@@ -197,7 +197,7 @@ source = otel-v1-apm-span-* | where `attributes.gen_ai.operation.name` = 'execut
 
 ## Service Map Queries
 
-> **Important:** In `otel-v2-apm-service-map-*`, `sourceNode` and `targetNode` are nested struct objects with `keyAttributes.name` for the service name — not flat strings.
+> **Important:** In `otel-v2-apm-service-map-*`, `sourceNode` and `targetNode` are nested struct objects with `keyAttributes.name` for the service name -- not flat strings.
 
 ### Service Topology
 

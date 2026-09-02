@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DynamoDB Cost Calculator — reads dynamodb_data_model.json directly.
+"""DynamoDB Cost Calculator -- reads dynamodb_data_model.json directly.
 
 Reads the structured JSON data model (tables, entities, access_patterns),
 calculates RRU/WRU consumption and monthly on-demand costs, outputs a
@@ -16,9 +16,9 @@ Rules enforced (all verified):
   - Filters and projections DO NOT reduce capacity.
   - BatchGetItem / BatchWriteItem: rounded per-item, then summed.
   - PutItem / UpdateItem: sized on LARGER of before and after.
-  - Transactional writes: 2× multiplier applies to BASE TABLE ONLY.
-    GSI and LSI writes remain 1×. (Verified.)
-  - Transactional reads: 2× multiplier.
+  - Transactional writes: 2x multiplier applies to BASE TABLE ONLY.
+    GSI and LSI writes remain 1x. (Verified.)
+  - Transactional reads: 2x multiplier.
   - Conditional write failure still consumes capacity based on the existing
     item size (or new item size for PutItem on a non-existent key).
   - GSI write amplification:
@@ -28,7 +28,7 @@ Rules enforced (all verified):
   - Storage: (raw_bytes + 100 bytes per item) / 1_000_000_000 (decimal GB),
     billed at the full public Standard rate. Global tables add +48 bytes/item.
     The 25 GB free tier is intentionally NOT applied (account-wide, often
-    already consumed) — see _storage_cost.
+    already consumed) -- see _storage_cost.
 
 Usage:
     python3 calculate_costs.py --model artifacts/{app}/dynamodb_data_model.json
@@ -46,7 +46,7 @@ import sys
 from pathlib import Path
 
 # -----------------------------------------------------------------------------
-# Pricing constants — DynamoDB Standard table class, on-demand public rates.
+# Pricing constants -- DynamoDB Standard table class, on-demand public rates.
 # Rates vary by region; confirm against the AWS DynamoDB pricing page.
 # -----------------------------------------------------------------------------
 SECONDS_PER_MONTH = 2_592_000
@@ -60,7 +60,7 @@ RRU_PRICE = 0.125 / 1_000_000  # Strongly-consistent on-demand read
 
 # Storage.
 STORAGE_PRICE_PER_GB_MONTH = 0.25  # Standard class, full public rate
-# NOTE: the 25 GB Standard storage free tier is intentionally NOT modeled — it is
+# NOTE: the 25 GB Standard storage free tier is intentionally NOT modeled -- it is
 # account-wide and often already consumed, so we price all storage at full rate.
 BYTES_PER_GB = 1_000_000_000  # Decimal GB per AWS billing convention
 
@@ -90,8 +90,8 @@ PAGE_CAP_KB = 900
 #
 # All three dimensions are modelled, but on different footings, and the report says
 # which is which:
-#   storage, writes — derived from the design (dimensions, projection, item counts)
-#   searches        — CALIBRATED against live measurements, because the metered bytes
+#   storage, writes -- derived from the design (dimensions, projection, item counts)
+#   searches        -- CALIBRATED against live measurements, because the metered bytes
 #                     depend on index traversal rather than anything in the design
 # Live validation supersedes the search figure with the observed
 # VectorSearchRequestBytes. See references/vector-search.md.
@@ -126,7 +126,7 @@ VECTOR_METERING_MIN_BYTES = 1024
 #     measured at 256 / 1536 / 3072).
 #
 # What is NOT modellable, and why we refuse to emit a dollar figure: the fraction of the
-# index a search examines varies by an ORDER OF MAGNITUDE with index configuration —
+# index a search examines varies by an ORDER OF MAGNITUDE with index configuration --
 # 12.8% of all vector bytes on a 60-item unpartitioned index, but 1.3% on a 200-item
 # partitioned one. An earlier attempt to calibrate a traversal term linearly across two
 # probes was 51-69% low when tested at 256 / 1536 / 3072 dimensions, i.e. wrong at exactly
@@ -149,16 +149,16 @@ VECTOR_RETURN_BYTES_INCLUDE_BASE = 89
 
 # Traversal slope used ONLY by the pre-spend gate in benchmark_model.py, never for a
 # reported cost. Two measured points: 128 dims -> 2,647 B (20.7 B/dim) and 1,024 dims ->
-# 10,588 B (10.3 B/dim) — traversal grows SUBLINEARLY in dimensions. Taking the steeper
+# 10,588 B (10.3 B/dim) -- traversal grows SUBLINEARLY in dimensions. Taking the steeper
 # low-dimension slope therefore overshoots at higher dimensions, which is the correct
 # direction for a guard whose job is to refuse a bill. See
 # vector_search_bytes_spend_gate_upper().
 VECTOR_TRAVERSAL_BYTES_PER_DIM_UPPER = 20.7
 
-# Safety factor on the spend-gate bound. Not decoration — unfactored, the bound had
+# Safety factor on the spend-gate bound. Not decoration -- unfactored, the bound had
 # essentially NO margin on two of the sixteen measured search points: 128-dim KEYS_ONLY at
 # TopK=1 came out 2,739 B against 2,736 B measured (1.001x), and 1024-dim ALL at TopK=100
-# came out 1,739,097 B against 1,524,351 B (1.14x) — i.e. thinnest exactly where the bill
+# came out 1,739,097 B against 1,524,351 B (1.14x) -- i.e. thinnest exactly where the bill
 # is largest. The exposure is structural: for an ALL projection the per-result term IS the
 # declared item size, so the bound inherits the user's input error, and under-declaring
 # item size is a common mistake. 1.5x absorbs a ~33% input shortfall.
@@ -177,8 +177,8 @@ READ_OPS = {"GetItem", "Query", "Scan", "BatchGetItem", "TransactGetItems"}
 WRITE_OPS = {"PutItem", "UpdateItem", "DeleteItem", "BatchWriteItem", "TransactWriteItems"}
 TRANSACTIONAL_OPS = {"TransactGetItems", "TransactWriteItems"}
 MULTI_ITEM_READ = {"Query", "Scan", "BatchGetItem", "TransactGetItems"}
-# SearchVectors is deliberately NOT in READ_OPS. It consumes no RCU — it is billed on
-# bytes examined — so routing it through the RCU path would silently misprice it.
+# SearchVectors is deliberately NOT in READ_OPS. It consumes no RCU -- it is billed on
+# bytes examined -- so routing it through the RCU path would silently misprice it.
 VECTOR_SEARCH_OP = "SearchVectors"
 
 # Default write_action when requirements aren't provided.
@@ -205,7 +205,7 @@ DEFAULT_RETENTION_DAYS = 30
 PROJECTION_WRITE_RATIO = {
     "ALL": 1.0,
     "INCLUDE": 0.3,  # conservative default when include list is unknown
-    "KEYS_ONLY": 0.1,  # keys + optional sort key, typically ≤ 1 KB
+    "KEYS_ONLY": 0.1,  # keys + optional sort key, typically <= 1 KB
 }
 
 # Storage ratio relative to base table, by GSI projection type.
@@ -218,12 +218,12 @@ PROJECTION_STORAGE_RATIO = {
 DISCLAIMER = (
     "> **Disclaimer:** This estimate covers **read/write request costs** and "
     "**storage costs** only, at DynamoDB Standard table class on-demand **full "
-    "public rates** (the 25 GB storage free tier is NOT applied — it is "
-    "account-wide and often already used). **Rates vary by region** — confirm "
+    "public rates** (the 25 GB storage free tier is NOT applied -- it is "
+    "account-wide and often already used). **Rates vary by region** -- confirm "
     "the figure against the AWS DynamoDB pricing page (or `aws pricing "
     "get-products --service-code AmazonDynamoDB`) for the region you will "
     "deploy in before quoting it. The headline figure "
-    "is **peak-sustained** — it assumes every pattern runs at its declared "
+    "is **peak-sustained** -- it assumes every pattern runs at its declared "
     "`peak_rps` continuously, 24/7 for a month (the worst case). Real on-demand "
     "spend tracks actual request volume; set `avg_rps` on patterns to also get "
     "an expected average-volume figure. For up-to-date pricing, refer to "
@@ -231,7 +231,7 @@ DISCLAIMER = (
 )
 
 GSI_FOOTNOTE = (
-    "¹ **GSI additional writes** — When a table write changes attributes "
+    "[1] **GSI additional writes** -- When a table write changes attributes "
     "projected into a GSI, DynamoDB performs an additional write to that index. "
     "The additional write is sized by the projected attributes (not the base "
     "item), which is why KEYS_ONLY / INCLUDE projections are cheaper. "
@@ -241,12 +241,12 @@ GSI_FOOTNOTE = (
 
 # What a SearchVectors row shows in the Monthly Cost column. Never a dollar amount:
 # search consumes no RCU/WCU and its byte cost is deliberately unpriced, so any figure
-# there would be 0.00 — and "$0.00" in the table a reader scans to find expensive
+# there would be 0.00 -- and "$0.00" in the table a reader scans to find expensive
 # patterns asserts that vector search is free. It is not; it is unmeasured.
-VECTOR_SEARCH_CELL = "not priced²"
+VECTOR_SEARCH_CELL = "not priced[2]"
 
 VECTOR_SEARCH_FOOTNOTE = (
-    "² **Vector search is not priced here, and is NOT $0** — `SearchVectors` consumes no "
+    "[2] **Vector search is not priced here, and is NOT $0** -- `SearchVectors` consumes no "
     "RCU/WCU; it bills on vector bytes examined plus bytes returned, at "
     f"${VECTOR_SEARCH_PRICE_PER_GB:.3f}/GB. The examined fraction is not derivable from a "
     "design (measured to vary by an order of magnitude across index configurations), so no "
@@ -283,8 +283,8 @@ def rru_for_query(total_bytes_read: int, strong: bool = False) -> float:
     """RRUs for a Query/Scan that reads `total_bytes_read` from storage.
 
     Query/Scan aggregates all items, rounds the TOTAL to next 4 KB, then
-    halves for eventual consistency. (Verified: 5×1KB items = 1 RCU eventual,
-    10×512B items = 1 RCU eventual, etc.)
+    halves for eventual consistency. (Verified: 5x1KB items = 1 RCU eventual,
+    10x512B items = 1 RCU eventual, etc.)
     """
     strong_rru = max(1, math.ceil(max(1, total_bytes_read) / RCU_SIZE_BYTES))
     return float(strong_rru) if strong else strong_rru / 2.0
@@ -408,7 +408,7 @@ def _resolve_retention_days(ap: dict, tables: list[dict], requirements: dict | N
     # A per-pattern retention_days (documented in cost-model-schema.md) is the
     # most specific signal and wins over the requirements lookup and the default.
     # Without this, a write pattern declaring e.g. retention_days: 365 was
-    # silently priced at the 30-day default, understating storage ~12×.
+    # silently priced at the 30-day default, understating storage ~12x.
     if "retention_days" in ap:
         return int(ap["retention_days"])
     if not requirements:
@@ -503,7 +503,7 @@ def calc_pattern_capacity(ap: dict) -> dict:
     elif op == "TransactGetItems":
         item_sizes = ap.get("item_sizes") or [size] * items
         rcus = rru_for_batch_read(item_sizes, strong=True) * 2.0
-        notes.append("Transactional reads consume 2× RRUs.")
+        notes.append("Transactional reads consume 2x RRUs.")
 
     elif op == "PutItem":
         # Replacement costs the LARGER of before/after.
@@ -524,11 +524,11 @@ def calc_pattern_capacity(ap: dict) -> dict:
     elif op == "TransactWriteItems":
         item_sizes = ap.get("item_sizes") or [size] * items
         # Txn multiplier applies to base table only. GSI amplification is
-        # billed elsewhere (standard 1× per GSI write).
+        # billed elsewhere (standard 1x per GSI write).
         wcus = float(wru_for_batch_write(item_sizes)) * 2.0
         notes.append(
-            "Transactional writes: 2× multiplier on base table; "
-            "GSI amplification remains 1× per GSI write."
+            "Transactional writes: 2x multiplier on base table; "
+            "GSI amplification remains 1x per GSI write."
         )
 
     # Conditional-failure handling
@@ -557,7 +557,7 @@ def _entity_attr_names(table_def: dict) -> dict:
     A DynamoDB item only appears in (and only amplifies a write to) a GSI whose
     key attributes it actually CARRIES. In a single-table design with
     heterogeneous entities, each GSI is keyed on an attribute only some entities
-    have — so this per-entity attribute-name set is what decides GSI membership.
+    have -- so this per-entity attribute-name set is what decides GSI membership.
     """
     out = {}
     for ent in table_def.get("entities", []) or []:
@@ -576,7 +576,7 @@ def _gsi_key_attrs(gsi: dict) -> tuple:
 
 
 def _table_key_attrs(table_def: dict) -> set:
-    """The table's own PK/SK attribute names — every item carries these."""
+    """The table's own PK/SK attribute names -- every item carries these."""
     ks = table_def.get("key_schema") or {}
     return {a for a in (ks.get("partition_key"), ks.get("sort_key")) if a}
 
@@ -605,8 +605,8 @@ def _gsi_membership_determinable(table_def: dict, gsi: dict) -> bool:
     Determinable only when the GSI's partition key is positively declared
     somewhere we can attribute to items: by at least one entity's attribute
     list, or as a table key (every item carries table keys). A GSI key declared
-    nowhere — or only at table level (`attribute_definitions`, which can't say
-    WHICH entity carries it) — is INDETERMINATE: we must not infer absence and
+    nowhere -- or only at table level (`attribute_definitions`, which can't say
+    WHICH entity carries it) -- is INDETERMINATE: we must not infer absence and
     silently drop the GSI's cost. Callers fall back to the conservative
     charge-everything bound for such a GSI.
     """
@@ -642,9 +642,9 @@ def _resolve_written_items(ap: dict, table_def: dict) -> tuple[list, bool]:
     written entities and the caller must fall back to a conservative upper bound.
 
     Resolution order:
-      1. explicit `entities_written` on the access pattern — a list of entity
+      1. explicit `entities_written` on the access pattern -- a list of entity
          names (repeats allowed) or `[{"entity": "X", "count": n}]`.
-      2. exactly one entity declared on the table — the unambiguous single-entity
+      2. exactly one entity declared on the table -- the unambiguous single-entity
          / classic-multi-table case; each of the items_per_request written items
          is that entity.
       3. otherwise unresolved (multi-entity single-table design with no
@@ -663,7 +663,7 @@ def _resolve_written_items(ap: dict, table_def: dict) -> tuple[list, bool]:
             else:
                 name, cnt = e, 1
             # A named entity we can't find contributes items that carry no known
-            # key — i.e. amplify nowhere. That's the honest reading of a typo'd
+            # key -- i.e. amplify nowhere. That's the honest reading of a typo'd
             # or undeclared entity name; it surfaces as a visibly low number
             # rather than silently inheriting the full fan-out.
             attrs = ent_attrs.get(name, set())
@@ -687,12 +687,12 @@ def _gsi_index_writes_for_item(
       - Put / create / Delete, or an UpdateItem with no attrs_written info:
         1 index write per member item (the projected-size write).
       - UpdateItem that CHANGES the GSI's own key attribute (PK or SK): **2**
-        index writes — DynamoDB deletes the old index entry and inserts a new
+        index writes -- DynamoDB deletes the old index entry and inserts a new
         one (a "ByStatus" KEYS_ONLY index cost 2 WCU when `status` changed).
       - UpdateItem that changes a NON-key but projected attribute:
-          ALL → 1 (the whole item is re-projected);
-          INCLUDE → 1 if a projected attr changed, else 0;
-          KEYS_ONLY → 0 (nothing projected but the keys, which didn't move).
+          ALL -> 1 (the whole item is re-projected);
+          INCLUDE -> 1 if a projected attr changed, else 0;
+          KEYS_ONLY -> 0 (nothing projected but the keys, which didn't move).
       - UpdateItem touching nothing the GSI projects and no key it indexes: 0.
     Each returned write is later sized by gsi_write_wru (ALL=full item,
     INCLUDE/KEYS_ONLY=small).
@@ -729,10 +729,10 @@ def calc_gsi_amplification_wru(ap: dict, table_def: dict) -> tuple[float, list[s
     Returns (total_wru_amp, details_strings).
 
     A write amplifies to a GSI only when the written item CARRIES that GSI's key
-    attributes (PK, plus SK if the GSI is composite) — verified live against
+    attributes (PK, plus SK if the GSI is composite) -- verified live against
     ReturnConsumedCapacity=INDEXES. In a single-table design with heterogeneous
     entities, each GSI is keyed on an attribute only some entities have, so a
-    given write touches only the few GSIs its entity is a member of — not all of
+    given write touches only the few GSIs its entity is a member of -- not all of
     them. The per-GSI write is sized by the PROJECTED attributes (ALL = full
     item; INCLUDE / KEYS_ONLY = small), which the live run also confirmed.
     """
@@ -755,7 +755,7 @@ def calc_gsi_amplification_wru(ap: dict, table_def: dict) -> tuple[float, list[s
     if resolved:
         # Accurate path: each written item amplifies only to the GSIs whose key
         # it carries. A GSI whose key is declared NOWHERE attributable to an item
-        # (not on any entity, not a table key) is INDETERMINATE — we can't infer
+        # (not on any entity, not a table key) is INDETERMINATE -- we can't infer
         # absence, so charge it conservatively (fires for every item, honoring
         # the UpdateItem projection gate) rather than silently dropping its cost.
         per_gsi_writes: dict = {}  # index_name -> total index writes (1 or 2 each)
@@ -774,7 +774,7 @@ def calc_gsi_amplification_wru(ap: dict, table_def: dict) -> tuple[float, list[s
                     if is_member and writes == 0:
                         gsi_gated_member = True
                 else:
-                    # Indeterminate membership → conservative: count it unless the
+                    # Indeterminate membership -> conservative: count it unless the
                     # UpdateItem projection gate provably excludes it.
                     pk_a, sk_a = _gsi_key_attrs(gsi)
                     synthetic = {pk_a} | ({sk_a} if sk_a else set())
@@ -790,9 +790,9 @@ def calc_gsi_amplification_wru(ap: dict, table_def: dict) -> tuple[float, list[s
                 member_but_gated.append(name)
         if per_gsi_writes:
             details = [
-                f"{name} (×{n} index write{'s' if n != 1 else ''}"
+                f"{name} (x{n} index write{'s' if n != 1 else ''}"
                 + (
-                    ", membership unverified — GSI key not declared on any entity"
+                    ", membership unverified -- GSI key not declared on any entity"
                     if name in indeterminate
                     else ""
                 )
@@ -801,20 +801,20 @@ def calc_gsi_amplification_wru(ap: dict, table_def: dict) -> tuple[float, list[s
             ]
         elif member_but_gated:
             details = [
-                f"no GSI amplification — {op} touched no attribute "
+                f"no GSI amplification -- {op} touched no attribute "
                 f"projected into {', '.join(member_but_gated)} "
                 f"(projection gate)"
             ]
         else:
-            details = ["no GSI amplification — written item(s) carry no GSI key"]
+            details = ["no GSI amplification -- written item(s) carry no GSI key"]
         return total, details
 
     # Unresolved: multi-entity single-table design with no `entities_written`.
     # We cannot know which entity each written item is, so we keep the
     # conservative UPPER BOUND (every item is assumed a member of every GSI) and
-    # say so loudly — declaring `entities_written` on the pattern refines it. A
+    # say so loudly -- declaring `entities_written` on the pattern refines it. A
     # synthetic full-key item drives the same write-count logic (incl. the
-    # UpdateItem projection gate and the key-move 2× factor) as the accurate path.
+    # UpdateItem projection gate and the key-move 2x factor) as the accurate path.
     for gsi in gsis:
         pk_a, sk_a = _gsi_key_attrs(gsi)
         synthetic = {a for a in (pk_a, sk_a) if a}
@@ -823,7 +823,7 @@ def calc_gsi_amplification_wru(ap: dict, table_def: dict) -> tuple[float, list[s
     if op in ("BatchWriteItem", "TransactWriteItems"):
         total *= items_per
     details.append(
-        f"UPPER BOUND — '{ap.get('table', '?')}' has multiple entities and this "
+        f"UPPER BOUND -- '{ap.get('table', '?')}' has multiple entities and this "
         f"pattern has no `entities_written`, so every written item is charged "
         f"against every GSI. Declare `entities_written` to bill only the GSIs "
         f"each written entity is a member of."
@@ -859,8 +859,8 @@ def _ia_multiplier(table_def: dict | None) -> float:
 def _vector_projection(vi: dict) -> dict:
     """The index's projection block, accepting the bare-string shorthand.
 
-    `"projection": "KEYS_ONLY"` is the natural thing to write — it is how the API-level value
-    reads — and treating it as a dict raised a bare `AttributeError: 'str' object has no
+    `"projection": "KEYS_ONLY"` is the natural thing to write -- it is how the API-level value
+    reads -- and treating it as a dict raised a bare `AttributeError: 'str' object has no
     attribute 'get'` that said nothing about the model. Normalised here rather than at each
     call site, and it mirrors the `attribute_definitions` `{"name","type"}` shorthand these
     scripts already accept.
@@ -877,7 +877,7 @@ def _vector_item_bytes(vi: dict, table_def: dict, entity_attr_sizes: dict | None
 
       KEYS_ONLY  flat. Insensitive to item content: 4,105 / 4,104 / 4,104 B on a 1024-dim
                  index across a minimal item, a +10 KB item, and an item with a second
-                 vector. So it is dimensions x 4 plus a small key overhead — NOT a fraction
+                 vector. So it is dimensions x 4 plus a small key overhead -- NOT a fraction
                  of item size, which is what an earlier ratio-based model wrongly assumed.
       ALL        dimensions x 4 plus essentially the whole rest of the item. Adding a
                  10,240 B payload added 10,246 B. It also copies UNINDEXED vector
@@ -928,8 +928,8 @@ def _vector_item_bytes(vi: dict, table_def: dict, entity_attr_sizes: dict | None
 def _vector_indexed_item_count(vi: dict, table_def: dict) -> tuple[int, bool]:
     """(item count in this vector index, was it declared explicitly?).
 
-    Only items carrying the vector attribute — and the SearchSchema partition key, if
-    one is defined — are replicated into the index. The model can declare that directly
+    Only items carrying the vector attribute -- and the SearchSchema partition key, if
+    one is defined -- are replicated into the index. The model can declare that directly
     with `estimated_indexed_items`; otherwise we fall back to the table's entity counts,
     which is a conservative upper bound, and say so in the report.
     """
@@ -947,7 +947,7 @@ def vector_write_bytes_per_call(ap: dict, table_def: dict) -> tuple[float, list[
 
     Mirrors the GSI amplification gate: a write only pays for an index whose vector
     attribute it actually touched. When `attributes_written` is absent we cannot tell,
-    so we stay at the conservative upper bound (assume it did) and flag it — the same
+    so we stay at the conservative upper bound (assume it did) and flag it -- the same
     convention the GSI path uses.
 
     The 1 KB minimum is applied ONCE across all of the table's vector indexes, because
@@ -982,8 +982,8 @@ def _named_attr_bytes(table_def: dict, names: list) -> tuple[float, bool]:
     """(summed size of the named attributes, were they all actually declared?).
 
     Uses the sizes declared in entities[].attributes[] where available. Falls back to the
-    generic S=100 heuristic for anything undeclared, which is coarse — measurement showed
-    a 6-character Title contributes ~9 B per result, not 100 — so an undeclared attribute
+    generic S=100 heuristic for anything undeclared, which is coarse -- measurement showed
+    a 6-character Title contributes ~9 B per result, not 100 -- so an undeclared attribute
     list overstates INCLUDE cost. The report flags when the fallback was used.
     """
     type_sizes = {
@@ -1017,7 +1017,7 @@ def _vector_return_bytes_per_result(vi: dict, table_def: dict) -> tuple[float, s
     """Bytes returned per search result, driven by the index projection.
 
     Measured per result: ~89 B for KEYS_ONLY, ~98 B for a narrow INCLUDE, and the whole
-    projected item for ALL (15,243 B on the probe item — roughly 170x KEYS_ONLY). This is
+    projected item for ALL (15,243 B on the probe item -- roughly 170x KEYS_ONLY). This is
     the dominant term for ALL and negligible for KEYS_ONLY, which is why projection choice
     drives search cost far more than index size does.
     """
@@ -1028,7 +1028,7 @@ def _vector_return_bytes_per_result(vi: dict, table_def: dict) -> tuple[float, s
     if ptype == "INCLUDE":
         named = proj.get("attributes", []) or []
         extra, all_declared = _named_attr_bytes(table_def, named)
-        note = "" if all_declared else " (some sizes defaulted to 100 B — declare them to tighten)"
+        note = "" if all_declared else " (some sizes defaulted to 100 B -- declare them to tighten)"
         return (
             VECTOR_RETURN_BYTES_INCLUDE_BASE + extra,
             f"INCLUDE, keys + {len(named)} attribute(s){note}",
@@ -1040,7 +1040,7 @@ def _vector_return_bytes_per_result(vi: dict, table_def: dict) -> tuple[float, s
 
 
 def vector_search_bytes_per_call(ap: dict, vi: dict, table_def: dict) -> tuple[float, str]:
-    """Bytes RETURNED by one SearchVectors call — the part that is soundly measurable.
+    """Bytes RETURNED by one SearchVectors call -- the part that is soundly measurable.
 
     This is deliberately NOT the full metered figure. Metering also includes the vector
     data the search examines during traversal, and measurement showed that term varies by
@@ -1050,11 +1050,11 @@ def vector_search_bytes_per_call(ap: dict, vi: dict, table_def: dict) -> tuple[f
     """
     top_k = int(ap.get("top_k", 10) or 10)
     per_result, proj_basis = _vector_return_bytes_per_result(vi, table_def or {})
-    return top_k * per_result, f"TopK {top_k} x {per_result:,.0f} B/result — {proj_basis}"
+    return top_k * per_result, f"TopK {top_k} x {per_result:,.0f} B/result -- {proj_basis}"
 
 
 def vector_search_bytes_spend_gate_upper(ap: dict, vi: dict, table_def: dict) -> float:
-    """Deliberately HIGH byte estimate for one SearchVectors call — pre-spend gate ONLY.
+    """Deliberately HIGH byte estimate for one SearchVectors call -- pre-spend gate ONLY.
 
     Do not use this for a reported cost. vector_search_bytes_per_call() is the reported
     driver and is a LOWER bound: returned data only, no traversal term. A spend gate that
@@ -1062,8 +1062,8 @@ def vector_search_bytes_spend_gate_upper(ap: dict, vi: dict, table_def: dict) ->
     steeper of the two measured dimension slopes, then a safety factor.
 
     Measured against the search points from the live probe (declared item size set to the
-    13,048 B the ALL index actually copies — non-vector payload plus the other vector
-    attributes in base-table form — so the estimate is not fed the measured answer):
+    13,048 B the ALL index actually copies -- non-vector payload plus the other vector
+    attributes in base-table form -- so the estimate is not fed the measured answer):
 
       projection   dims  TopK  bound      measured   ratio
       ALL          1024   100  2,608,645  1,524,351  1.71x
@@ -1073,7 +1073,7 @@ def vector_search_bytes_spend_gate_upper(ap: dict, vi: dict, table_def: dict) ->
       KEYS_ONLY     128     1      4,108      2,736  1.50x
       INCLUDE      1024   100     60,145     20,437  2.94x
 
-    Loosest where the absolute cost is trivial, tightest where the money is — the same
+    Loosest where the absolute cost is trivial, tightest where the money is -- the same
     shape the cost model has. See VECTOR_SPEND_GATE_SAFETY for why the factor is load-
     bearing rather than padding. The gate is allowed to be loose. It is not allowed to be
     low.
@@ -1107,7 +1107,7 @@ def _as_int(value: object) -> int | None:
 
 def validate_vector_model(tables: list, access_patterns: list) -> list[str]:
     """Hard validation. These are service constraints, so a violation means the design
-    cannot be deployed — better to fail loudly than to price something impossible."""
+    cannot be deployed -- better to fail loudly than to price something impossible."""
     errors: list[str] = []
     for t in tables:
         vis = _vector_indexes(t)
@@ -1132,11 +1132,11 @@ def validate_vector_model(tables: list, access_patterns: list) -> list[str]:
             # `index_name` is what a SearchVectors pattern's `index` resolves against, so
             # a missing one is unpriceable rather than merely untidy. Called out on its own
             # because the plausible wrong spelling is a bare `name`, which leaves every
-            # other field looking correct — observed in a real run.
+            # other field looking correct -- observed in a real run.
             if not vi.get("index_name"):
                 errors.append(
                     f"{tname}: a vector index is missing `index_name` "
-                    f"(found keys: {sorted(vi)}) — the field is `index_name`, not `name`"
+                    f"(found keys: {sorted(vi)}) -- the field is `index_name`, not `name`"
                 )
             dims = vi.get("dimensions")
             dims_int = _as_int(dims)
@@ -1159,13 +1159,13 @@ def validate_vector_model(tables: list, access_patterns: list) -> list[str]:
             if len(dimset) > 1:
                 errors.append(
                     f"{tname}: indexes on attribute {attr!r} declare differing "
-                    f"dimensions {sorted(dimset)} — DynamoDB rejects this "
+                    f"dimensions {sorted(dimset)} -- DynamoDB rejects this "
                     f"('Attributes cannot be redefined')"
                 )
 
     # Only NAMED indexes are resolvable targets. Including unnamed ones would put
     # (table, None) in this set, and a pattern that omits `index` also looks up
-    # (table, None) — so a missing target would silently MATCH a missing name and the
+    # (table, None) -- so a missing target would silently MATCH a missing name and the
     # error below would never fire. Two bugs cancelling out is not a passing design.
     index_names = {
         (t.get("table_name"), vi.get("index_name"))
@@ -1184,14 +1184,14 @@ def validate_vector_model(tables: list, access_patterns: list) -> list[str]:
         if not ap.get("table"):
             errors.append(
                 f"{pid}: operation SearchVectors has no `table` (found keys: "
-                f"{sorted(ap)}) — a vector index belongs to a table, so the pattern must "
+                f"{sorted(ap)}) -- a vector index belongs to a table, so the pattern must "
                 f"name it just as every other access pattern does"
             )
             continue
         if not ap.get("index"):
             errors.append(
                 f"{pid}: operation SearchVectors has no `index` "
-                f"(found keys: {sorted(ap)}) — the field is `index`, not `vector_index`; "
+                f"(found keys: {sorted(ap)}) -- the field is `index`, not `vector_index`; "
                 f"it must name an entry in the table's vector_indexes"
             )
             continue
@@ -1213,9 +1213,9 @@ def pattern_monthly_cost(
     """Return per-pattern monthly cost and capacity detail for one access pattern.
 
     Inputs:
-      ap              — one access-pattern dict (see cost-model-schema.md).
-      table_def       — the table-def dict (used for GSI amplification); may be None.
-      entity_attr_sizes — output of _build_entity_attr_sizes(tables); needed to cap
+      ap              -- one access-pattern dict (see cost-model-schema.md).
+      table_def       -- the table-def dict (used for GSI amplification); may be None.
+      entity_attr_sizes -- output of _build_entity_attr_sizes(tables); needed to cap
                           Query/Scan items_per_request at the 900 KB page limit.
 
     Returns:
@@ -1231,7 +1231,7 @@ def pattern_monthly_cost(
 
     No AWS calls; no side effects. The same formulas the CLI uses.
     """
-    # SearchVectors consumes no RCU/WCU — it is billed on bytes examined — so it takes
+    # SearchVectors consumes no RCU/WCU -- it is billed on bytes examined -- so it takes
     # its own path rather than going through calc_pattern_capacity.
     if ap["operation"] == VECTOR_SEARCH_OP:
         return _search_vectors_monthly_cost(ap, table_def)
@@ -1245,7 +1245,7 @@ def pattern_monthly_cost(
     # Optional expected/average-volume scenario. `avg_rps` defaults to peak_rps,
     # so a model without it produces byte-identical numbers to before. When set,
     # `expected_*` is the same per-op CU (scale-invariant) driven at the lower
-    # average rate — the realistic monthly figure, computed by the calculator
+    # average rate -- the realistic monthly figure, computed by the calculator
     # instead of hand-derived.
     avg_rps = ap.get("avg_rps", rps)
 
@@ -1316,7 +1316,7 @@ def _vector_search_cap(ap: dict, notes: list[str]) -> dict:
 def _search_vectors_monthly_cost(ap: dict, table_def: dict | None) -> dict:
     """Monthly cost for one SearchVectors pattern.
 
-    The dollar figure here is an UPPER BOUND, not a model — see
+    The dollar figure here is an UPPER BOUND, not a model -- see
     vector_search_bytes_per_call. It is surfaced with its basis string so the report can
     say plainly how it was derived and that live validation supersedes it.
     """
@@ -1328,7 +1328,7 @@ def _search_vectors_monthly_cost(ap: dict, table_def: dict | None) -> dict:
         return {
             "ap": ap,
             "cap": _vector_search_cap(
-                ap, ["SearchVectors target index not found in the model — cost not estimated"]
+                ap, ["SearchVectors target index not found in the model -- cost not estimated"]
             ),
             "base_cost": 0.0,
             "gsi_amp_wru": 0.0,
@@ -1351,7 +1351,7 @@ def _search_vectors_monthly_cost(ap: dict, table_def: dict | None) -> dict:
     return {
         "ap": ap,
         "cap": _vector_search_cap(
-            ap, ["SearchVectors consumes no RCU/WCU — billed on vector bytes examined"]
+            ap, ["SearchVectors consumes no RCU/WCU -- billed on vector bytes examined"]
         ),
         "base_cost": 0.0,
         "gsi_amp_wru": 0.0,
@@ -1373,23 +1373,23 @@ def _gsi_membership_byte_fraction(table_def: dict, gsi: dict) -> float:
     """Fraction of the base table's BYTES that this GSI actually indexes.
 
     A GSI holds only the items that carry its key (PK + SK if composite), so its
-    storage is base_storage × (member-entity bytes / all-entity bytes), NOT the
+    storage is base_storage x (member-entity bytes / all-entity bytes), NOT the
     full base table. Computed from entity declarations; an ALL-projection GSI on
     a single-entity table yields 1.0 (unchanged from legacy behavior).
 
     Guard: the refinement only applies when the GSI's partition key is declared
-    by at least one entity's attribute list — proof that attributes are
+    by at least one entity's attribute list -- proof that attributes are
     specified meaningfully. If no entity declares the GSI PK at all (attributes
     underspecified, or a key that lives only in `attribute_definitions`), we
-    cannot reason about membership and return 1.0 (conservative — never silently
+    cannot reason about membership and return 1.0 (conservative -- never silently
     zeroes a GSI's storage on a thin model).
     """
     ents = table_def.get("entities") or []
     if not ents:
         return 1.0
     # Indeterminate membership (GSI key declared on no entity and not a table
-    # key) → conservative full size; never silently shrink a GSI's storage on a
-    # thin model. A GSI key that IS a table key is carried by every item → 1.0.
+    # key) -> conservative full size; never silently shrink a GSI's storage on a
+    # thin model. A GSI key that IS a table key is carried by every item -> 1.0.
     if not _gsi_membership_determinable(table_def, gsi):
         return 1.0
     table_keys = _table_key_attrs(table_def)
@@ -1413,11 +1413,11 @@ def _storage_cost(tables: list, by_table: dict) -> tuple[list, float]:
     """Storage rows + total dollars for a given per-table byte map.
 
     Factored out so the peak and the expected (average-volume) scenarios run
-    through identical projection-ratio logic — no drift between the two
-    headlines. `by_table` maps table_name → steady-state bytes (write-driven);
+    through identical projection-ratio logic -- no drift between the two
+    headlines. `by_table` maps table_name -> steady-state bytes (write-driven);
     tables with no write traffic fall back to entity-count storage.
 
-    All storage is billed at the **full public rate** — the 25 GB Standard free
+    All storage is billed at the **full public rate** -- the 25 GB Standard free
     tier is deliberately NOT applied. The free tier is account-wide and is often
     already consumed by other tables in the same account, so assuming it here
     understates the bill and produces a "$0.00, storage is free" claim a user
@@ -1461,8 +1461,8 @@ def _storage_cost(tables: list, by_table: dict) -> tuple[list, float]:
             total += gsc
 
         # Vector index storage. Sized from item COUNT rather than base-table bytes,
-        # because the vector portion is a fixed dimensions × 4 regardless of how large
-        # the rest of the item is. Priced at the same per-GB rate as table storage —
+        # because the vector portion is a fixed dimensions x 4 regardless of how large
+        # the rest of the item is. Priced at the same per-GB rate as table storage --
         # there is no separate vector-storage usage type.
         for vi in _vector_indexes(t):
             n_items, declared = _vector_indexed_item_count(vi, t)
@@ -1530,7 +1530,7 @@ def calculate_and_report(model: dict, requirements: dict | None = None) -> str:
     # -------------------------------------------------------------------------
     storage_by_table: dict = {}
     # Parallel accumulation at avg_rps so the expected (average-volume) headline
-    # uses average-rate storage growth, not peak — otherwise storage (often
+    # uses average-rate storage growth, not peak -- otherwise storage (often
     # ~10-15% of the bill) would keep the "expected" number peak-inflated.
     expected_storage_by_table: dict = {}
     for ap in access_patterns:
@@ -1610,7 +1610,7 @@ def calculate_and_report(model: dict, requirements: dict | None = None) -> str:
         # producing the "realistic" number so the agent never hand-derives it.
         lines += [
             f"**Peak-Sustained Monthly Cost: {_fmt(total)}**  *(every pattern at "
-            "its declared `peak_rps`, sustained 24/7 — the worst case)*",
+            "its declared `peak_rps`, sustained 24/7 -- the worst case)*",
             "",
             f"**Expected Monthly Cost (your stated average volume): "
             f"{_fmt(expected_total)}**  *(patterns driven at `avg_rps`; on-demand "
@@ -1641,10 +1641,10 @@ def calculate_and_report(model: dict, requirements: dict | None = None) -> str:
     if concentration_notes:
         lines += [
             "",
-            "> **Cost concentration — item-size sensitivity.** One or more "
+            "> **Cost concentration -- item-size sensitivity.** One or more "
             "patterns drive a disproportionate share of the estimate. The "
             "calculator formulas are empirically verified; the remaining risk "
-            "is in the inputs — particularly `estimated_item_size_bytes`. If "
+            "is in the inputs -- particularly `estimated_item_size_bytes`. If "
             "any of these patterns' item sizes were guessed without an "
             "attribute walkthrough, the headline number could be off by "
             "tens of percent.",
@@ -1658,7 +1658,7 @@ def calculate_and_report(model: dict, requirements: dict | None = None) -> str:
         f"**Monthly Cost:** {_fmt(storage_total)}",
         "",
         "*Priced at the full public Standard rate ($0.25/GB-month). The 25 GB "
-        "free tier is not applied — it is account-wide and often already "
+        "free tier is not applied -- it is account-wide and often already "
         "consumed by other tables.*",
         "",
         _padded_table(["Resource", "Type", "Storage (GB)", "Monthly Cost"], storage_rows),
@@ -1692,7 +1692,7 @@ def calculate_and_report(model: dict, requirements: dict | None = None) -> str:
                 f"{ru:.2f}",
                 # SearchVectors consumes no RCU/WCU AND its capacity is deliberately
                 # not priced, so BOTH base_cost and vector_search_cost are 0. Rendering
-                # either as "$0.00" states that search is free — in the one table a
+                # either as "$0.00" states that search is free -- in the one table a
                 # reader scans to find the expensive patterns. Render the carve-out
                 # instead and footnote it. This is the whole point of the section below:
                 # do not let an unpriced dimension read as a free one.
@@ -1704,7 +1704,7 @@ def calculate_and_report(model: dict, requirements: dict | None = None) -> str:
         if r["gsi_amp_cost"] > 0:
             detail_rows.append(
                 [
-                    f"{r['pattern_id']}¹",
+                    f"{r['pattern_id']}[1]",
                     "GSI writes",
                     r["table"],
                     f"{r['rps']:.1f}",
@@ -1771,7 +1771,7 @@ def _vector_report_section(results: list) -> list[str]:
             "Vector **search** capacity is **not priced here**, and that is deliberate. It "
             "is metered on the vector data a search examines inside the index plus the data "
             "returned, and measurement showed the examined fraction varies by an order of "
-            "magnitude with index configuration — 12.8% of all vector bytes on a 60-item "
+            "magnitude with index configuration -- 12.8% of all vector bytes on a 60-item "
             "unpartitioned index against 1.3% on a 200-item partitioned one. A calibration "
             "fitted across configurations came out 51-69% low when tested at 256 / 1536 / "
             "3072 dimensions, which is exactly where real embedding models sit. A "
@@ -1788,7 +1788,7 @@ def _vector_report_section(results: list) -> list[str]:
             "dimension measured at 256 / 1536 / 3072).",
             "- **Index size is not a linear driver.** ANN prunes: within one index, going "
             "from 10 to 200 vectors in the searched partition barely moved the figure. "
-            'That is not the same as "population never matters" — an EMPTY 1024-dim '
+            'That is not the same as "population never matters" -- an EMPTY 1024-dim '
             "index measured ~2x a populated one, so do not extrapolate this shape down "
             "to a sparse or freshly-created index.",
             "",
@@ -1827,7 +1827,7 @@ def _vector_report_section(results: list) -> list[str]:
 # CLI.
 # =============================================================================
 def main():
-    parser = argparse.ArgumentParser(description="DynamoDB Cost Calculator — reads data model JSON")
+    parser = argparse.ArgumentParser(description="DynamoDB Cost Calculator -- reads data model JSON")
     parser.add_argument("--model", required=True, help="Path to dynamodb_data_model.json")
     parser.add_argument(
         "--requirements",
@@ -1860,7 +1860,7 @@ def main():
     # Hard-fail a malformed or impossible vector design BEFORE pricing it. Without this
     # gate the failure is silent and expensive: a vector index missing `vector_attribute`,
     # or a SearchVectors pattern whose `index` does not resolve, still produces a
-    # plausible-looking report with vector write capacity priced at $0 — and $0 on the
+    # plausible-looking report with vector write capacity priced at $0 -- and $0 on the
     # line that is usually the largest in the estimate reads as "vectors are cheap"
     # rather than "the model is wrong". Observed exactly that: a model using `name`
     # instead of `index_name`, omitting `vector_attribute`, and `vector_index` instead of
@@ -1879,11 +1879,11 @@ def main():
             print(f"  - {problem}", file=sys.stderr)
         # Print the correct shape, not just the complaint. Observed recovery behaviour
         # when given only an error: the vector index gets DELETED from the model so the
-        # calculator will run, and the vector cost silently leaves the estimate — a worse
+        # calculator will run, and the vector cost silently leaves the estimate -- a worse
         # outcome than the original mistake. A copyable snippet makes fixing the field
         # names the path of least resistance.
         print(
-            "\nFix the model — do NOT delete the vector index to get past this, and do "
+            "\nFix the model -- do NOT delete the vector index to get past this, and do "
             "NOT estimate the vector cost by hand. Both drop a real cost that is often "
             "the largest line in the estimate. The correct shape is:\n"
             '\n  "tables": [{\n'

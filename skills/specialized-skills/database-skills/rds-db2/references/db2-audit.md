@@ -1,10 +1,10 @@
-# RDS for Db2 — Db2 Audit to S3
+# RDS for Db2 -- Db2 Audit to S3
 
 > **Source**
 >
-> - `04-db2-client/db2-audit/AWS-Blog-Post-DB2-Audit.md` — "Simplifying DB2 Audit Configuration on Amazon RDS: Three Easy Ways to Get Started"
+> - `04-db2-client/db2-audit/AWS-Blog-Post-DB2-Audit.md` -- "Simplifying DB2 Audit Configuration on Amazon RDS: Three Easy Ways to Get Started"
 > - Bundled script: `scripts/create-db2-audit-role.sh`
-> - AWS docs: DB2_AUDIT option — https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Db2.Options.Audit.html
+> - AWS docs: DB2_AUDIT option -- https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Db2.Options.Audit.html
 >
 > Commands and option/setting names are reproduced verbatim from the source script and blog. All identifiers are placeholders (`<account-id>`, `<region>`, `<audit-bucket>`, `<instance-id>`, `<dbname>`).
 
@@ -17,7 +17,7 @@ On RDS for Db2 the **DB2_AUDIT** option makes RDS automatically upload Db2 audit
 - An IAM role grants RDS permission to write to the bucket.
 - The `DB2_AUDIT` option on an RDS option group ties the role and bucket to the instance.
 
-> **Unverified:** the v1 `rdsadmin.enable_audit(...)` procedure is **not found in source**. Enable audit with the option-group method below instead — it is the sourced, supported path.
+> **Unverified:** the v1 `rdsadmin.enable_audit(...)` procedure is **not found in source**. Enable audit with the option-group method below instead -- it is the sourced, supported path.
 
 **Prerequisites:** an existing S3 bucket, AWS CLI configured, an RDS for Db2 instance (version 11.5 or later), and IAM permission to create policies, roles, and option groups.
 
@@ -115,7 +115,7 @@ db2 "SELECT * FROM SYSCAT.AUDITPOLICIES"
 
 ## Optional: stream to CloudWatch
 
-Deploy a Lambda (triggered by EventBridge on a `rate(5 minutes)` schedule, or by S3 events) to forward audit logs from S3 to CloudWatch Logs, then add CloudWatch alarms — for example on failed logins — and CloudWatch Logs Insights queries for analysis.
+Deploy a Lambda (triggered by EventBridge on a `rate(5 minutes)` schedule, or by S3 events) to forward audit logs from S3 to CloudWatch Logs, then add CloudWatch alarms -- for example on failed logins -- and CloudWatch Logs Insights queries for analysis.
 
 ## S3 security and lifecycle
 
@@ -125,6 +125,6 @@ Deploy a Lambda (triggered by EventBridge on a `rate(5 minutes)` schedule, or by
 
 ## Troubleshooting
 
-- **S3 bucket access denied (logs not appearing):** check the bucket and role policies — `aws s3api get-bucket-policy --bucket <audit-bucket>`, and for the managed policy attached in Section 1 use `aws iam list-attached-role-policies --role-name db2-audit-role` then `aws iam get-policy-version --policy-arn arn:aws:iam::<account-id>:policy/db2-audit-policy --version-id $(aws iam get-policy --policy-arn arn:aws:iam::<account-id>:policy/db2-audit-policy --query 'Policy.DefaultVersionId' --output text)`. (`aws iam get-role-policy` only returns inline policies, so it returns `NoSuchEntity` here.) Confirm `kms:GenerateDataKey`/`kms:Decrypt` if the bucket uses SSE-KMS.
+- **S3 bucket access denied (logs not appearing):** check the bucket and role policies -- `aws s3api get-bucket-policy --bucket <audit-bucket>`, and for the managed policy attached in Section 1 use `aws iam list-attached-role-policies --role-name db2-audit-role` then `aws iam get-policy-version --policy-arn arn:aws:iam::<account-id>:policy/db2-audit-policy --version-id $(aws iam get-policy --policy-arn arn:aws:iam::<account-id>:policy/db2-audit-policy --query 'Policy.DefaultVersionId' --output text)`. (`aws iam get-role-policy` only returns inline policies, so it returns `NoSuchEntity` here.) Confirm `kms:GenerateDataKey`/`kms:Decrypt` if the bucket uses SSE-KMS.
 - **Option not applied (DB2_AUDIT not visible):** `aws rds describe-option-groups --option-group-name db2-audit-option-group`, then re-check `OptionGroupMemberships` on the instance; `modify-db-instance` may still be pending.
 - **Audit policy not active (no logs despite policies):** verify with `SELECT * FROM SYSCAT.AUDITUSE`; run `db2 "FLUSH AUDIT CONFIGURATION"` if needed.

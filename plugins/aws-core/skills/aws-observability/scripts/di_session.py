@@ -10,13 +10,13 @@ the region precedence the client depends on.
 
 POLICY
 * ``AWS_PROFILE`` selects credentials only (the profile's configured region is
-  ignored — region comes from ``resolve_region``).
+  ignored -- region comes from ``resolve_region``).
 * The region is resolved at call time via ``di_region.resolve_region`` so a
   ``--region`` flag (set into ``AWS_REGION`` by the entry script) or the env vars
   take effect.
 * ``boto3`` is imported lazily inside the function so importing this module never
   requires boto3. (``--print-contract`` is a separate matter: it resolves the op
-  functions, which transitively import ``botocore`` via the op modules — only a bare
+  functions, which transitively import ``botocore`` via the op modules -- only a bare
   ``import di_instrumentation``/``di_snapshots`` is boto3-free.)
 
 Per-surface concerns stay with the caller, not here:

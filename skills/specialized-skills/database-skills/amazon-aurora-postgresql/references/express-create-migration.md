@@ -1,18 +1,18 @@
 # Migrating off Aurora Express Configuration
 
-This file covers moving an Aurora Express Configuration cluster to Full Configuration — for example, when the workload outgrows the public-endpoint connectivity model, or when VPC isolation, customer-managed KMS keys, or customer-owned parameter groups become requirements. There is no in-place modify operation to move an express cluster into a VPC, so migration is a data-movement story. AWS documents snapshot/PITR restore from an express cluster to a full-configuration cluster (see "Restoring a cluster created through express configuration").
+This file covers moving an Aurora Express Configuration cluster to Full Configuration -- for example, when the workload outgrows the public-endpoint connectivity model, or when VPC isolation, customer-managed KMS keys, or customer-owned parameter groups become requirements. There is no in-place modify operation to move an express cluster into a VPC, so migration is a data-movement story. AWS documents snapshot/PITR restore from an express cluster to a full-configuration cluster (see "Restoring a cluster created through express configuration").
 
 Express Configuration mechanics may evolve. Verify in the AWS User Guide before migrating, especially for production-adjacent clusters.
 
 ## In-place conversion
 
-AWS provides no `modify-db-cluster` operation that flips an express cluster into a customer VPC — no "convert to VPC-attached Full Configuration" button or call. What AWS *does* document is restoring out of the express flow: a snapshot or point-in-time restore lands in a full-configuration VPC cluster by default. If AWS later publishes in-place conversion (a `modify` flag or wizard), update this file.
+AWS provides no `modify-db-cluster` operation that flips an express cluster into a customer VPC -- no "convert to VPC-attached Full Configuration" button or call. What AWS *does* document is restoring out of the express flow: a snapshot or point-in-time restore lands in a full-configuration VPC cluster by default. If AWS later publishes in-place conversion (a `modify` flag or wizard), update this file.
 
 Pick the path that matches your cluster size, downtime tolerance, and connectivity:
 
-- **Snapshot-and-restore** — simplest, widest applicability.
-- **Logical replication** — lowest downtime; suitable when both clusters reach the same replication orchestrator.
-- **pg_dump / pg_restore** — quickest for small datasets where a maintenance window is acceptable.
+- **Snapshot-and-restore** -- simplest, widest applicability.
+- **Logical replication** -- lowest downtime; suitable when both clusters reach the same replication orchestrator.
+- **pg_dump / pg_restore** -- quickest for small datasets where a maintenance window is acceptable.
 
 ## Path 1: Snapshot and restore
 
@@ -21,7 +21,7 @@ Best for most migrations, especially with a short maintenance window.
 1. Snapshot the Express cluster. Source: [Creating a DB cluster snapshot](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_CreateSnapshotCluster.html).
 2. Stop application writes (writes after the snapshot are lost unless you add a logical-replication catch-up pass).
 3. Restore the snapshot to a new Aurora PostgreSQL cluster in Full Configuration mode, in the target VPC and subnet group, with customer security groups, customer-managed KMS key, and customer parameter group as needed. Source: [Restoring from a DB cluster snapshot](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_RestoreFromSnapshot.html).
-4. Validate the restored cluster — connectivity, extensions, roles, data integrity.
+4. Validate the restored cluster -- connectivity, extensions, roles, data integrity.
 5. Update the application's connection string to the new endpoint.
 6. Decommission the Express cluster once the new cluster is stable.
 
@@ -45,9 +45,9 @@ Best for migrations with strict downtime targets, typically production-adjacent 
 
 Prerequisites:
 
-- **Connectivity**: the target must reach the Express cluster over its public endpoint (or vice versa), and your replication orchestrator must reach both. Because Express clusters sit behind the AWS-managed connectivity layer (not a customer VPC), network planning differs from VPC-to-VPC replication — verify in the AWS User Guide.
+- **Connectivity**: the target must reach the Express cluster over its public endpoint (or vice versa), and your replication orchestrator must reach both. Because Express clusters sit behind the AWS-managed connectivity layer (not a customer VPC), network planning differs from VPC-to-VPC replication -- verify in the AWS User Guide.
 - **Version compatibility**: both clusters must run a PostgreSQL version that supports the chosen mechanism.
-- **Parameters**: logical replication requires `wal_level = logical`, `max_replication_slots`, and `max_wal_senders` on the source. Whether the Express flow permits these changes is subject to change — verify in the AWS User Guide.
+- **Parameters**: logical replication requires `wal_level = logical`, `max_replication_slots`, and `max_wal_senders` on the source. Whether the Express flow permits these changes is subject to change -- verify in the AWS User Guide.
 
 Downtime shrinks to the cutover moment (seconds to a few minutes), not the full data copy time.
 
@@ -72,7 +72,7 @@ When in doubt, start with Path 1: most broadly documented and fastest for most E
 Before executing any path, verify in the AWS Aurora User Guide:
 
 - Whether AWS has published an in-place conversion path, new migration tooling, or wizards since this file was written.
-- AWS documents this explicitly — a default restore (`restore-db-cluster-from-snapshot` or `restore-db-cluster-to-point-in-time` without `EnableVPCNetworking`/`EnableInternetAccessGateway`) lands in a full-configuration VPC cluster; restoring back to express requires `VPCNetworkingEnabled=false` and `InternetAccessGatewayEnabled=true`. Verify the restore-target constraints (engine version, KMS, storage type).
+- AWS documents this explicitly -- a default restore (`restore-db-cluster-from-snapshot` or `restore-db-cluster-to-point-in-time` without `EnableVPCNetworking`/`EnableInternetAccessGateway`) lands in a full-configuration VPC cluster; restoring back to express requires `VPCNetworkingEnabled=false` and `InternetAccessGatewayEnabled=true`. Verify the restore-target constraints (engine version, KMS, storage type).
 - Whether the Express cluster's parameter group can be adjusted to enable logical replication (`wal_level = logical`, `max_replication_slots`, `max_wal_senders`).
 
 Do not skip verification for production-adjacent clusters. The AWS User Guide is authoritative; this file is a planning aid.

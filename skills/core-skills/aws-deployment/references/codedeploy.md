@@ -53,23 +53,23 @@ hooks:
 
 **In-place deployment:**
 
-1. **ApplicationStop** — Runs PREVIOUS revision's stop script
-2. **DownloadBundle** — Agent-only; downloads revision
-3. **BeforeInstall** — Setup tasks (create dirs, decrypt)
-4. **Install** — Agent-only; copies files per `files` section
-5. **AfterInstall** — Post-install config (permissions, config generation)
-6. **ApplicationStart** — Start services
-7. **ValidateService** — Health checks, smoke tests
+1. **ApplicationStop** -- Runs PREVIOUS revision's stop script
+2. **DownloadBundle** -- Agent-only; downloads revision
+3. **BeforeInstall** -- Setup tasks (create dirs, decrypt)
+4. **Install** -- Agent-only; copies files per `files` section
+5. **AfterInstall** -- Post-install config (permissions, config generation)
+6. **ApplicationStart** -- Start services
+7. **ValidateService** -- Health checks, smoke tests
 
 **Additional hooks when a load balancer is configured (both in-place and blue/green):**
 
-1. **BeforeBlockTraffic** — Pre-deregistration on original instances
-2. **BlockTraffic** — Agent-only; deregisters from ELB
-3. **AfterBlockTraffic** — Cleanup on original instances
+1. **BeforeBlockTraffic** -- Pre-deregistration on original instances
+2. **BlockTraffic** -- Agent-only; deregisters from ELB
+3. **AfterBlockTraffic** -- Cleanup on original instances
 4. *(Standard hooks 1-7 on replacement instances)*
-5. **BeforeAllowTraffic** — Pre-registration on replacement instances
-6. **AllowTraffic** — Agent-only; registers with ELB
-7. **AfterAllowTraffic** — Post-registration validation
+5. **BeforeAllowTraffic** -- Pre-registration on replacement instances
+6. **AllowTraffic** -- Agent-only; registers with ELB
+7. **AfterAllowTraffic** -- Post-registration validation
 
 ### EC2 Deployment Configurations
 
@@ -88,7 +88,7 @@ hooks:
 
 **Auto Scaling loop**: Failed deployments on new instances cause infinite provision-terminate cycle. Fix: suspend `Launch` on ASG, fix deployment, resume.
 
-**MinimumHealthyHosts miscalculation**: Setting 90% on 3 instances = 2.7 rounded to 3 — deployment can never proceed. Ensure at least one instance can be taken offline.
+**MinimumHealthyHosts miscalculation**: Setting 90% on 3 instances = 2.7 rounded to 3 -- deployment can never proceed. Ensure at least one instance can be taken offline.
 
 ## ECS (Blue/Green)
 
@@ -117,14 +117,14 @@ Hooks:
 
 ### ECS Lifecycle Hooks (Ordered)
 
-1. **BeforeInstall** — Lambda (scriptable)
-2. **Install** — Agent-only; creates replacement task set, waits for stability
-3. **AfterInstall** — Lambda (scriptable); validate replacement task set
-4. **AllowTestTraffic** — Agent-only; routes test listener to replacement target group
-5. **AfterAllowTestTraffic** — Lambda (scriptable); test via test traffic port
-6. **BeforeAllowTraffic** — Lambda (scriptable); pre-cutover gate
-7. **AllowTraffic** — Agent-only; shifts production traffic per config
-8. **AfterAllowTraffic** — Lambda (scriptable); post-cutover validation
+1. **BeforeInstall** -- Lambda (scriptable)
+2. **Install** -- Agent-only; creates replacement task set, waits for stability
+3. **AfterInstall** -- Lambda (scriptable); validate replacement task set
+4. **AllowTestTraffic** -- Agent-only; routes test listener to replacement target group
+5. **AfterAllowTestTraffic** -- Lambda (scriptable); test via test traffic port
+6. **BeforeAllowTraffic** -- Lambda (scriptable); pre-cutover gate
+7. **AllowTraffic** -- Agent-only; shifts production traffic per config
+8. **AfterAllowTraffic** -- Lambda (scriptable); post-cutover validation
 
 Scriptable hooks: BeforeInstall, AfterInstall, AfterAllowTestTraffic, BeforeAllowTraffic, AfterAllowTraffic. All invoke Lambda functions (not shell scripts).
 
@@ -142,9 +142,9 @@ Scriptable hooks: BeforeInstall, AfterInstall, AfterAllowTestTraffic, BeforeAllo
 
 **Lifecycle hook 1-hour timeout**: CodeDeploy waits up to 3600s for the `PutLifecycleEventHookExecutionStatus` callback. This is the CodeDeploy hook timeout, not the Lambda execution timeout (which is max 900s). If the Lambda doesn't call back within 1 hour, the hook fails.
 
-**Test listener required for AfterAllowTestTraffic**: Without a test listener on the ALB, this hook is skipped — no pre-production validation window.
+**Test listener required for AfterAllowTestTraffic**: Without a test listener on the ALB, this hook is skipped -- no pre-production validation window.
 
-**Original task set termination**: Configure `terminationWaitTimeInMinutes` on deployment group. Default is 0 — original tasks terminated immediately after shift (no manual rollback window).
+**Original task set termination**: Configure `terminationWaitTimeInMinutes` on deployment group. Default is 0 -- original tasks terminated immediately after shift (no manual rollback window).
 
 ## Lambda
 
@@ -169,9 +169,9 @@ Hooks:
 
 ### Lambda Lifecycle Hooks
 
-1. **BeforeAllowTraffic** — Validate new version (invoke directly, run tests)
-2. **AllowTraffic** — Agent-only; shifts alias traffic per config
-3. **AfterAllowTraffic** — Validate production behavior post-shift
+1. **BeforeAllowTraffic** -- Validate new version (invoke directly, run tests)
+2. **AllowTraffic** -- Agent-only; shifts alias traffic per config
+3. **AfterAllowTraffic** -- Validate production behavior post-shift
 
 ### Lambda Deployment Configurations
 

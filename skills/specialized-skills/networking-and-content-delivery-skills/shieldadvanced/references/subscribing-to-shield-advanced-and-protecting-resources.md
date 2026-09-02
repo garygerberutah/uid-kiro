@@ -209,9 +209,9 @@ protection, then surfaces the console link to verify coverage.
 - You MUST capture the `ProtectionId` from each response
 - You MUST NOT consider the account protected until at least one protection exists
 - You SHOULD recommend associating an AWS WAF web ACL with every internet-facing protected resource
-  (CloudFront distributions and Application Load Balancers) as defense in depth — Shield Advanced
+  (CloudFront distributions and Application Load Balancers) as defense in depth -- Shield Advanced
   (layer 3/4) and AWS WAF (layer 7) are complementary, and a rate-based AWS WAF rule is also what
-  cost protection eligibility later requires — and point to the waf skill to set it up
+  cost protection eligibility later requires -- and point to the waf skill to set it up
 
 #### 4. Confirm and surface the console link
 

@@ -1,10 +1,10 @@
-# Auth — Mobile
+# Auth -- Mobile
 
 ## Prerequisites
 
 Initialize Amplify with the Auth plugin before using this feature:
 
-**Flutter** — `lib/main.dart`:
+**Flutter** -- `lib/main.dart`:
 
 ```dart
 await Amplify.addPlugins([AmplifyAuthCognito()]);
@@ -32,7 +32,7 @@ Amplify.configure(AmplifyOutputs(R.raw.amplify_outputs), applicationContext)
 > Place `amplify_outputs.json` in `app/src/main/res/raw/`. Enable core library desugaring for API level < 26.
 >
 > **Backend required:** Auth must be defined in `amplify/auth/resource.ts`
-> using `defineAuth` — see [auth-backend.md](auth-backend.md).
+> using `defineAuth` -- see [auth-backend.md](auth-backend.md).
 
 ## Authenticator Component (Recommended)
 
@@ -50,13 +50,13 @@ custom UI.** Zero manual `signInStep` handling is required.
 
 ### Flutter
 
-**Dependencies** — add to `pubspec.yaml`:
+**Dependencies** -- add to `pubspec.yaml`:
 
 ```bash
 flutter pub add amplify_flutter amplify_auth_cognito amplify_authenticator
 ```
 
-**Usage** — wrap your `MaterialApp` and set its `builder`:
+**Usage** -- wrap your `MaterialApp` and set its `builder`:
 
 ```dart
 import 'package:amplify_authenticator/amplify_authenticator.dart';
@@ -78,16 +78,16 @@ Widget build(BuildContext context) {
 
 ### Swift (Apple platforms)
 
-**Dependencies** — add both SPM packages in Xcode (**File > Add Packages…**):
+**Dependencies** -- add both SPM packages in Xcode (**File > Add Packages...**):
 
 | Package                        | URL                                                             | Libraries                         |
 | ------------------------------ | --------------------------------------------------------------- | --------------------------------- |
 | Amplify Library for Swift      | `https://github.com/aws-amplify/amplify-swift`                  | `Amplify`, `AWSCognitoAuthPlugin` |
 | Amplify UI Swift Authenticator | `https://github.com/aws-amplify/amplify-ui-swift-authenticator` | `Authenticator`                   |
 
-> **SPM versioning:** For both packages, select **"Up to Next Major Version"** in Xcode's dependency rule. Do NOT pin to a specific branch (e.g., `main`) — use "Up to Next Major Version" to get compatible updates automatically.
+> **SPM versioning:** For both packages, select **"Up to Next Major Version"** in Xcode's dependency rule. Do NOT pin to a specific branch (e.g., `main`) -- use "Up to Next Major Version" to get compatible updates automatically.
 
-**Usage** — SwiftUI entry point:
+**Usage** -- SwiftUI entry point:
 
 ```swift
 import Amplify
@@ -97,7 +97,7 @@ import SwiftUI
 
 @main
 struct MyApp: App {
-    // init() — configure Amplify (see Prerequisites above)
+    // init() -- configure Amplify (see Prerequisites above)
 
     var body: some Scene {
         WindowGroup {
@@ -126,9 +126,9 @@ Authenticator(authenticationFlow: .userChoice(
 
 ### Android (Kotlin)
 
-**Dependencies** — add to your app's `build.gradle.kts`:
+**Dependencies** -- add to your app's `build.gradle.kts`:
 
-> Core library desugaring required — see Prerequisites above.
+> Core library desugaring required -- see Prerequisites above.
 
 ```kotlin
 dependencies {
@@ -143,7 +143,7 @@ dependencies {
 <uses-permission android:name="android.permission.INTERNET"/>
 ```
 
-**Usage** — Jetpack Compose:
+**Usage** -- Jetpack Compose:
 
 ```kotlin
 import com.amplifyframework.ui.authenticator.ui.Authenticator
@@ -183,7 +183,7 @@ Authenticator(state = authenticatorState) { state ->
 ## Custom UI
 
 Use the low-level Auth APIs when you need full control over the UI. Each
-platform returns a `nextStep` from `signIn` / `signUp` — switch on it and
+platform returns a `nextStep` from `signIn` / `signUp` -- switch on it and
 call `confirmSignIn` as needed. The Authenticator handles all these steps
 automatically; the list below is for reference when building custom flows.
 
@@ -203,11 +203,11 @@ final result = await Amplify.Auth.signIn(
 if (result.isSignedIn) {
   safePrint('Sign in complete');
 } else {
-  // Handle result.nextStep.signInStep — e.g.:
-  //   confirmSignInWithSmsMfaCode → prompt for SMS code, call confirmSignIn
-  //   confirmSignInWithTotpMfaCode → prompt for TOTP code, call confirmSignIn
-  //   confirmSignInWithNewPassword → prompt new password, call confirmSignIn
-  //   done → authenticated
+  // Handle result.nextStep.signInStep -- e.g.:
+  //   confirmSignInWithSmsMfaCode -> prompt for SMS code, call confirmSignIn
+  //   confirmSignInWithTotpMfaCode -> prompt for TOTP code, call confirmSignIn
+  //   confirmSignInWithNewPassword -> prompt new password, call confirmSignIn
+  //   done -> authenticated
 }
 ```
 
@@ -319,7 +319,7 @@ import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.options.AuthSignUpOptions
 ```
 
-**Sign in (coroutines — recommended):**
+**Sign in (coroutines -- recommended):**
 
 ```kotlin
 try {
@@ -327,10 +327,10 @@ try {
     if (result.isSignedIn) {
         Log.i("Auth", "Sign in succeeded")
     } else {
-        // Handle result.nextStep.signInStep — e.g.:
-        //   CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE → prompt SMS code
-        //   CONFIRM_SIGN_IN_WITH_TOTP_CODE → prompt TOTP code
-        //   DONE → authenticated
+        // Handle result.nextStep.signInStep -- e.g.:
+        //   CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE -> prompt SMS code
+        //   CONFIRM_SIGN_IN_WITH_TOTP_CODE -> prompt TOTP code
+        //   DONE -> authenticated
         Log.i("Auth", "Next step: ${result.nextStep.signInStep}")
     }
 } catch (error: AuthException) {
@@ -338,7 +338,7 @@ try {
 }
 ```
 
-**Sign in (callbacks — alternative):**
+**Sign in (callbacks -- alternative):**
 
 ```kotlin
 import com.amplifyframework.core.Amplify  // Java facade for callback style
@@ -403,7 +403,7 @@ Platform setup for Flutter OAuth:
 
 - **Android:** Add `<intent-filter>` with your callback scheme to `MainActivity` in `AndroidManifest.xml`.
 - **iOS:** No additional platform configuration required.
-- **macOS:** Enable App Sandbox → "Incoming Connections (Server)" in Xcode.
+- **macOS:** Enable App Sandbox -> "Incoming Connections (Server)" in Xcode.
 
 **Swift:**
 

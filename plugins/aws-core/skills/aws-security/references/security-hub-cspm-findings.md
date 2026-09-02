@@ -2,7 +2,7 @@
 
 ## Overview
 
-Summarizes Security Hub CSPM compliance findings — standards-based posture results in ASFF format. Groups by standard (FSBP, CIS, PCI-DSS, NIST), control status (PASSED/FAILED/NOT_AVAILABLE), severity, and account.
+Summarizes Security Hub CSPM compliance findings -- standards-based posture results in ASFF format. Groups by standard (FSBP, CIS, PCI-DSS, NIST), control status (PASSED/FAILED/NOT_AVAILABLE), severity, and account.
 
 Also covers third-party ASFF findings for customers using Security Hub CSPM as their primary hub.
 
@@ -101,7 +101,7 @@ For customers using Security Hub CSPM as their primary hub:
 - MUST prioritize CRITICAL and HIGH severity failed controls
 - MUST filter RecordState=ACTIVE to exclude archived findings
 - SHOULD break down by standard (use GeneratorId prefix)
-- SHOULD note pagination — report sampled vs total when applicable
+- SHOULD note pagination -- report sampled vs total when applicable
 
 ## Troubleshooting
 
@@ -110,7 +110,7 @@ For customers using Security Hub CSPM as their primary hub:
 | No compliance findings | Confirm standards are enabled |
 | All controls NOT_AVAILABLE | Resource types may not exist in account |
 | Only from one account | Confirm delegated admin and cross-region aggregation |
-| Stale compliance status | Controls evaluate periodically — check UpdatedAt |
+| Stale compliance status | Controls evaluate periodically -- check UpdatedAt |
 
 ## Output Sensitivity
 

@@ -8,9 +8,9 @@ source .venv/bin/activate
 
 Two different situations, and it matters which one you are in:
 
-- **A refusal** — trusted code declined to pay. The control worked. Fix the
+- **A refusal** -- trusted code declined to pay. The control worked. Fix the
   policy (deliberately) or accept the refusal.
-- **A failure** — something is misconfigured or broken. Fix the wiring.
+- **A failure** -- something is misconfigured or broken. Fix the wiring.
 
 `x402_fetch` never raises into the agent loop; it returns JSON. `refused: true`
 means a policy decision, not a bug.
@@ -47,7 +47,7 @@ Compare, in this order:
 | Scheme | `accepts[].scheme` | `allowed_schemes` |
 
 Amounts are integer base units and USDC has 6 decimals: `2000` = $0.002,
-`500000` = $0.50. A cap of `0.001` refuses a `2000` challenge — that is correct
+`500000` = $0.50. A cap of `0.001` refuses a `2000` challenge -- that is correct
 arithmetic, not a bug.
 
 To confirm which rule fired, evaluate the real challenge directly:
@@ -69,7 +69,7 @@ PY
 ```
 
 Then widen the policy only if the merchant's values are genuinely expected.
-Re-run `init-config --force` with the corrected allowlists — never hand-edit
+Re-run `init-config --force` with the corrected allowlists -- never hand-edit
 mode or ownership.
 
 ### "Origin ... is not in the configured allowed_origins"
@@ -92,7 +92,7 @@ valid payment target from this agent.
 
 ### "No payment policy at ..."
 
-There is no permissive default — payments are refused until a policy exists:
+There is no permissive default -- payments are refused until a policy exists:
 
 ```bash
 python scripts/agents_pay_admin.py init-config \
@@ -110,7 +110,7 @@ chmod 600 ~/.agents-pay/config.json
 ```
 
 If it is a symlink, replace it with a real file. If it is not owned by you,
-investigate before "fixing" it — something wrote it as another user.
+investigate before "fixing" it -- something wrote it as another user.
 
 ### "Payment policy allows no recipients" / recipient modes are mutually exclusive
 
@@ -142,7 +142,7 @@ python -c "from bedrock_agentcore.payments import PaymentManager; print('OK')"
 ### "Response exceeded N bytes"
 
 The body passed `X402_MAX_BODY_BYTES` (default 256 KiB) and was not buffered
-further — a memory-exhaustion guard. Raise it deliberately if a merchant is
+further -- a memory-exhaustion guard. Raise it deliberately if a merchant is
 legitimately large:
 
 ```bash
@@ -171,7 +171,7 @@ python3 -c "import certifi; print(certifi.where())"
 
 `x402_fetch` prefers certifi's CA bundle when present, because some interpreters
 (notably mise-managed Pythons) have no system CA file. Verification is never
-disabled — install `certifi` rather than working around it.
+disabled -- install `certifi` rather than working around it.
 
 ### 30x response instead of content
 
@@ -186,12 +186,12 @@ another origin. Point the agent at the final URL instead.
 | `PaymentSessionExpired` | Past `expiry_time_in_minutes` | Human runs `new-session` |
 | `Payment instrument not found` / `does not belong to user` | Instrument/user mismatch | Confirm `PAYMENT_USER_ID` matches the instrument's user |
 | `Payment connector is not active` | Still provisioning, or deleted | Check status; recreate if needed |
-| `Network mismatch` | Challenge chain ≠ instrument family | `ETHEREUM` covers Base/Base Sepolia; `SOLANA` covers Solana |
+| `Network mismatch` | Challenge chain != instrument family | `ETHEREUM` covers Base/Base Sepolia; `SOLANA` covers Solana |
 | `Wallet does not have a USDC balance` | Unfunded wallet | Fund via <https://faucet.circle.com/> |
 | `Failed to obtain resource payment token` | Service role lacks token-vault/secrets access | Fix role; allow ~15s for IAM propagation |
 | `Failed to assume payment execution role` | Trust policy wrong | Must trust `bedrock-agentcore.amazonaws.com` with the right `aws:SourceAccount` |
 | `Delegated signing grant is not active` | End user has not delegated | Complete the `redirectUrl` (Coinbase) or Privy SDK flow |
-| `Delegated signing is not enabled` | CDP project setting off | Portal → Wallet → Embedded Wallets → Policies → enable |
+| `Delegated signing is not enabled` | CDP project setting off | Portal -> Wallet -> Embedded Wallets -> Policies -> enable |
 | `AccessDeniedException` on `CreatePaymentSession` | Runtime tried to mint a session | **Expected and correct.** Sessions are human-only |
 
 ### A payment went through that the policy should have refused
@@ -206,7 +206,7 @@ grep -rn 'AgentCorePaymentsPlugin\|AgentCorePaymentsMiddleware\|payments.integra
 ```
 
 If either is registered, payment happens inside the framework and
-`x402_policy.py` is never consulted — no ceiling, no origin check, no derived token.
+`x402_policy.py` is never consulted -- no ceiling, no origin check, no derived token.
 Remove it and register `x402_fetch`, or accept that the controls do not apply. Running
 both means the model picks which one settles a given `402`.
 
@@ -224,7 +224,7 @@ aws iam get-role-policy --role-name <ProcessPaymentRole> --policy-name <Policy> 
 
 | Message | Cause | Fix |
 |---|---|---|
-| `Delegated signing is not enabled` | Project setting off | portal.cdp.coinbase.com → Project → Wallet → Embedded Wallets → Policies → enable Delegated signing |
+| `Delegated signing is not enabled` | Project setting off | portal.cdp.coinbase.com -> Project -> Wallet -> Embedded Wallets -> Policies -> enable Delegated signing |
 | `Delegated signing grant is not active` / `Delegation not completed` | End user has not delegated | Have them visit the `redirectUrl` from `create-instrument`, sign in, grant access to the wallet address |
 
 #### Stripe Privy
@@ -233,7 +233,7 @@ aws iam get-role-policy --role-name <ProcessPaymentRole> --policy-name <Policy> 
 |---|---|---|
 | `Privy credentials are invalid` | Wrong App ID or App Secret in the credential provider | Re-check both in the Privy dashboard and recreate the connector |
 | `Privy appId is invalid or missing` | `appId` wrong in the credential provider | Correct it in the dashboard, recreate |
-| `Privy signing key is invalid or expired` | Authorization key rotated or expired | Generate a new P-256 pair (Wallet Infrastructure → Authorization), **strip the `wallet-auth:` prefix**, keep the raw base64 |
+| `Privy signing key is invalid or expired` | Authorization key rotated or expired | Generate a new P-256 pair (Wallet Infrastructure -> Authorization), **strip the `wallet-auth:` prefix**, keep the raw base64 |
 | `Wallet policy denied the transaction` | A Privy wallet policy is blocking it | Review amount, recipient, and frequency limits in the dashboard |
 | `The linked account data is invalid` | Malformed email in `linkedAccounts` | Re-create the instrument with a valid address |
 | `Rate limited by Privy` | Privy API throttling | Back off and retry |
@@ -258,8 +258,8 @@ not behind this tool.
 ### Paid but the merchant still returns 402
 
 The tool already replays this automatically up to `X402_MAX_PAYMENT_ATTEMPTS` times
-(default 5, clamped 1–10) because testnet settlement is intermittently slow. If you see
-`"attempts": 5` with `"paid": false`, all five replays still got 402 — the payment is
+(default 5, clamped 1-10) because testnet settlement is intermittently slow. If you see
+`"attempts": 5` with `"paid": false`, all five replays still got 402 -- the payment is
 not lost and was not doubled, since the same authorization was replayed each time.
 Retry shortly, or raise the cap:
 
@@ -276,7 +276,7 @@ python3 scripts/test_x402_policy.py -k IdempotencyTests
 
 If it persists, the merchant's settlement is lagging (common on testnets) or its
 x402 version handling differs. Confirm `x402Version` in the challenge and retry
-shortly. Never bypass the tool to "just fetch it" — that is how a double payment
+shortly. Never bypass the tool to "just fetch it" -- that is how a double payment
 happens.
 
 ## Health check

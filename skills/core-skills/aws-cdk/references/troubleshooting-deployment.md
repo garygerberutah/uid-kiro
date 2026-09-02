@@ -12,7 +12,7 @@
 
 ## Overview
 
-This reference covers deployment-time failures — errors that occur after `cdk synth` succeeds and CloudFormation begins creating or updating resources. The CDK CLI error message is almost never the root cause; you MUST inspect CloudFormation stack events to find the actual failure.
+This reference covers deployment-time failures -- errors that occur after `cdk synth` succeeds and CloudFormation begins creating or updating resources. The CDK CLI error message is almost never the root cause; you MUST inspect CloudFormation stack events to find the actual failure.
 
 Three error categories exist:
 
@@ -36,7 +36,7 @@ cdk deploy $STACK --verbose
 
 Prints every AWS API call, the change-set diff, and a fuller stack trace (`-vv` / `-vvv` for more).
 
-### Step 2: `cdk diagnose` (preferred, CDK CLI ≥ 2.1120.0)
+### Step 2: `cdk diagnose` (preferred, CDK CLI >= 2.1120.0)
 
 ```bash
 cdk --unstable=diagnose diagnose $STACK
@@ -52,17 +52,17 @@ If `cdk diagnose` is unavailable (older CLI) or you need the raw stream:
 aws cloudformation describe-events --stack-name $STACK --filters FailedEvents=true
 ```
 
-`describe-events` groups events by operation ID and surfaces validation, provisioning, and hook-invocation errors — it supersedes `describe-stack-events`. The FIRST event in the output is the real root cause; later failures are rollback cascade.
+`describe-events` groups events by operation ID and surfaces validation, provisioning, and hook-invocation errors -- it supersedes `describe-stack-events`. The FIRST event in the output is the real root cause; later failures are rollback cascade.
 
 ### Step 4: Read the `ResourceStatusReason`
 
-| Reason | Likely cause → fix |
+| Reason | Likely cause -> fix |
 |---|---|
-| `... already exists` | Physical-name collision — remove `bucketName`/`tableName`/`roleName` and let CDK auto-generate. |
-| `resource creation cancelled` | Not the root — another resource failed first; find that event. |
+| `... already exists` | Physical-name collision -- remove `bucketName`/`tableName`/`roleName` and let CDK auto-generate. |
+| `resource creation cancelled` | Not the root -- another resource failed first; find that event. |
 | `... in the WAITING state for approximately ... seconds` | Stabilization timeout (RDS, ASG signals, long-running Lambda). |
-| `Export X cannot be deleted as it is in use by Stack Y` | Cross-stack deadlock — see [Deadly Embrace](#deadly-embrace-cross-stack-reference-deadlock). |
-| `is not authorized to perform ...` | The default CDK bootstrap grants AdministratorAccess to the execution role — this error means you're using a customized bootstrap with a restricted execution role, a permissions boundary, or an SCP. Check which specific action/resource is denied, then add only that permission to your custom execution role or permissions boundary. Do NOT widen to `*` — grant the minimum action on the minimum resource ARN. |
+| `Export X cannot be deleted as it is in use by Stack Y` | Cross-stack deadlock -- see [Deadly Embrace](#deadly-embrace-cross-stack-reference-deadlock). |
+| `is not authorized to perform ...` | The default CDK bootstrap grants AdministratorAccess to the execution role -- this error means you're using a customized bootstrap with a restricted execution role, a permissions boundary, or an SCP. Check which specific action/resource is denied, then add only that permission to your custom execution role or permissions boundary. Do NOT widen to `*` -- grant the minimum action on the minimum resource ARN. |
 
 ### Step 5: Service logs for Lambda / API Gateway / custom resources
 
@@ -74,9 +74,9 @@ CloudFormation only reports *that* a resource failed. The actual reason (e.g. a 
 
 ### `EarlyValidationFailure` specifically
 
-Fails BEFORE the change set is submitted — a construct's `validate()` returned errors, a synth-time assertion tripped, or an `addError` annotation fired. The message names the exact property and constraint; fix it before redeploying.
+Fails BEFORE the change set is submitted -- a construct's `validate()` returned errors, a synth-time assertion tripped, or an `addError` annotation fired. The message names the exact property and constraint; fix it before redeploying.
 
-> If you have the awslabs `aws-iac-mcp-server`, its `troubleshoot_cloudformation_deployment` tool matches the failure event stream against 30+ known patterns and returns CloudTrail deep links — use it to shortcut Steps 2–4.
+> If you have the awslabs `aws-iac-mcp-server`, its `troubleshoot_cloudformation_deployment` tool matches the failure event stream against 30+ known patterns and returns CloudTrail deep links -- use it to shortcut Steps 2-4.
 
 ---
 
@@ -90,59 +90,59 @@ The deadlock is structural: a safe removal needs B deployed first (so it stops i
 
 Every cross-stack reference has a **strength**:
 
-- **Strong** (default) — uses `Fn::ImportValue`. CloudFormation blocks the producer from removing the export while any consumer still imports it.
-- **Weak** — uses `Fn::GetStackOutput`. No coupling; the producer can be changed or deleted independently.
-- **Both** — transitional state for migrating strong → weak.
+- **Strong** (default) -- uses `Fn::ImportValue`. CloudFormation blocks the producer from removing the export while any consumer still imports it.
+- **Weak** -- uses `Fn::GetStackOutput`. No coupling; the producer can be changed or deleted independently.
+- **Both** -- transitional state for migrating strong -> weak.
 
 Cross-account references are always weak (strong is unsupported cross-account).
 
-### Fix — reference strength (recommended)
+### Fix -- reference strength (recommended)
 
 CDK supports weakening the reference before removing the resource, with no manual `exportValue` hacks. You MUST do this as a **three-deploy migration**.
 
-**Weaken all references to a resource** — `CrossStackReferences.of(resource).produce()`:
+**Weaken all references to a resource** -- `CrossStackReferences.of(resource).produce()`:
 
 ```typescript
 import { CrossStackReferences, ReferenceStrength } from 'aws-cdk-lib';
 
-// Deploy 1 — consumers move to Fn::GetStackOutput; the strong export stays
+// Deploy 1 -- consumers move to Fn::GetStackOutput; the strong export stays
 CrossStackReferences.of(bucket).produce(ReferenceStrength.BOTH);
 
-// Deploy 2 — drop the strong export now that no consumer uses Fn::ImportValue
+// Deploy 2 -- drop the strong export now that no consumer uses Fn::ImportValue
 CrossStackReferences.of(bucket).produce(ReferenceStrength.WEAK);
 
-// Deploy 3 — remove the resource or the reference entirely
+// Deploy 3 -- remove the resource or the reference entirely
 ```
 
-**Weaken a single reference** — `Stack.consumeReference()`:
+**Weaken a single reference** -- `Stack.consumeReference()`:
 
 ```typescript
 import { Stack, ReferenceStrength } from 'aws-cdk-lib';
 
-// Deploy 1 — wrap with consumeReference (defaults to BOTH)
+// Deploy 1 -- wrap with consumeReference (defaults to BOTH)
 new CfnOutput(consumer, 'BucketArn', { value: Stack.consumeReference(bucket.bucketArn) });
 
-// Deploy 2 — switch to WEAK
+// Deploy 2 -- switch to WEAK
 new CfnOutput(consumer, 'BucketArn', {
   value: Stack.consumeReference(bucket.bucketArn, ReferenceStrength.WEAK),
 });
 
-// Deploy 3 — remove the resource or reference
+// Deploy 3 -- remove the resource or reference
 ```
 
 (Use `Stack.consumeListReference()` for string-list references.)
 
-### Fix — legacy two-deploy (`exportValue`)
+### Fix -- legacy two-deploy (`exportValue`)
 
 Use this only on CDK versions that lack `ReferenceStrength`. It MUST be done in exactly two deployments:
 
-**Deploy 1 — decouple the consumer, keep the export alive:**
+**Deploy 1 -- decouple the consumer, keep the export alive:**
 
 1. In consumer Stack B, remove the cross-stack reference (replace with a hardcoded value, SSM lookup, etc.).
 2. In producer Stack A, add `this.exportValue(resource.attribute)` to keep the export alive during the transition.
 3. Deploy both.
 
-**Deploy 2 — remove the export:**
+**Deploy 2 -- remove the export:**
 
 1. In Stack A, remove the `this.exportValue()` call (and the underlying resource if desired).
 2. Deploy again.
@@ -169,7 +169,7 @@ cdk deploy -e $PRODUCER_STACK   # then producer, removing the export
   ```
 
 - Keep stateful, long-lived resources in their own stack, separate from consumers.
-- Use SSM Parameter Store as indirection (producer writes a parameter, consumer reads it) — no CFN export, no embrace.
+- Use SSM Parameter Store as indirection (producer writes a parameter, consumer reads it) -- no CFN export, no embrace.
 
 ---
 
@@ -186,13 +186,13 @@ A stack enters `UPDATE_ROLLBACK_FAILED` when CloudFormation cannot roll back a f
 
 ### Recovery options
 
-**Option 1 — Standard rollback:**
+**Option 1 -- Standard rollback:**
 
 ```bash
 cdk rollback $STACK
 ```
 
-**Option 2 — Orphan stuck resources:**
+**Option 2 -- Orphan stuck resources:**
 
 If a specific resource cannot be rolled back (e.g., it was deleted out-of-band), skip it:
 
@@ -202,7 +202,7 @@ cdk rollback $STACK --orphan $LOGICAL_ID
 
 The resource is removed from the stack's state without attempting to delete or update it.
 
-**Option 3 — Force rollback:**
+**Option 3 -- Force rollback:**
 
 ```bash
 cdk rollback $STACK --force
@@ -222,7 +222,7 @@ You SHOULD NOT leave a stack in a recovered-but-drifted state.
 
 ## Non-Empty Bucket Deletion
 
-Setting `removalPolicy: cdk.RemovalPolicy.DESTROY` alone MUST NOT be expected to delete an S3 bucket that contains objects. CloudFormation cannot empty a bucket during deletion. Versioned buckets are worse — delete markers and non-current object versions persist even after apparent object deletion, so the bucket can appear empty yet still fail to delete.
+Setting `removalPolicy: cdk.RemovalPolicy.DESTROY` alone MUST NOT be expected to delete an S3 bucket that contains objects. CloudFormation cannot empty a bucket during deletion. Versioned buckets are worse -- delete markers and non-current object versions persist even after apparent object deletion, so the bucket can appear empty yet still fail to delete.
 
 ### Fix
 
@@ -256,8 +256,8 @@ Runtime.ImportModuleError: No module named 'requests'
 ### Cause
 
 - Wrong `handler` value (e.g., `handler: 'handler'` instead of `handler: 'index.handler'`)
-- `aws-sdk` v2 was removed from Node.js 18+ Lambda runtimes — code still imports it
-- Python dependencies not bundled — `Code.fromAsset()` zips the directory without running `pip install`
+- `aws-sdk` v2 was removed from Node.js 18+ Lambda runtimes -- code still imports it
+- Python dependencies not bundled -- `Code.fromAsset()` zips the directory without running `pip install`
 
 ### Fix
 
