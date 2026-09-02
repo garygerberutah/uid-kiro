@@ -44,7 +44,7 @@ adopted_buckets_without_customer_kms = ["uploads", "downloads"]
 # (uid-dev-postgresqlv2.cluster-....rds.amazonaws.com), which bypasses the proxy.
 # Put the proxy endpoint here, not the cluster endpoint.
 db_proxy_host = "uid-dev-portal-proxy.proxy-cxk41gv3busd.us-west-2.rds.amazonaws.com"
-db_name       = "postgres"
+db_name       = "insureu"
 db_schema     = "uid_portal"
 
 # --- database secret --------------------------------------------------------
