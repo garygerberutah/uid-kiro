@@ -5,6 +5,14 @@ Routing comes only from the parent service repository's
 `services/api/routes/routes.yaml`; environment roots forward values and must
 not develop their own architecture.
 
+## Database boundary
+
+The portal application uses database `insureu`, schema `uid_portal`, in every
+environment. The separate Vertafore SnapProxy source keeps database `postgres`,
+schema `snapproxy`. Repository SBOM evidence uses its own database `sbom`,
+schema `sbom`; these Terraform roots neither provision nor migrate any of those
+State-owned databases.
+
 An initial AT apply on 2026-08-17 was interrupted after partially creating the
 stack. The remote AT state is therefore not empty; follow the interrupted-apply
 recovery procedure and F-84 before making another plan or apply.

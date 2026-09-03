@@ -97,7 +97,7 @@ adopted_buckets_without_customer_kms = []
 # CLUSTER endpoint, which bypasses pooling and exhausts max_connections once
 # hundreds of Lambdas connect.
 db_proxy_host = "uid-dev-portal-proxy.proxy-cxk41gv3busd.us-west-2.rds.amazonaws.com"
-db_name       = "postgres"
+db_name       = "insureu"
 db_schema     = "uid_portal"
 
 # --- database secret --------------------------------------------------------

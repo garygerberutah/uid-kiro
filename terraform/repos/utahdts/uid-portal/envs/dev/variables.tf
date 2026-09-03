@@ -141,7 +141,7 @@ variable "db_port" {
 
 variable "db_name" {
   type    = string
-  default = "postgres"
+  default = "insureu"
 }
 
 variable "db_schema" {
