@@ -144,8 +144,8 @@ certificate_arn = "arn:aws:acm:us-west-2:705157108110:certificate/5b17baae-453a-
 # may create only the API's root mapping.
 hosted_zone_id = ""
 
-browser_origins   = ["https://uid-portal.local.utah.gov:9181", "http://localhost:9181"]
-portal_client_url = "https://uid-portal.local.utah.gov:9181"
+browser_origins   = ["http://localhost:9181"]
+portal_client_url = "http://localhost:9181"
 
 # snapproxy: the Vertafore replica the licensee handlers read. Leave the host
 # empty and /licensee/* answers 502 saying so, which is the right failure for an

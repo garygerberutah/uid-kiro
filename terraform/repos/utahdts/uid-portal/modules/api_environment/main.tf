@@ -55,6 +55,16 @@ resource "terraform_data" "reject_offline_provider_validation_in_plans" {
     }
 
     precondition {
+      condition = !local.developer_email_only || (
+        length(var.alert_emails) == 1 && alltrue([
+          for address in var.alert_emails :
+          can(regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", address))
+        ])
+      )
+      error_message = "Developer-only email delivery requires exactly one valid approved alert recipient. Supply the private AT override; no original message recipient may receive nonproduction mail."
+    }
+
+    precondition {
       condition = lower(var.env_name) != "at" || alltrue([
         lookup(var.tags, "app", "") == "uid-dev-portal-api",
         lookup(var.tags, "contact", "") == "gary gerber",
@@ -72,6 +82,11 @@ resource "terraform_data" "reject_offline_provider_validation_in_plans" {
 
 locals {
   name_prefix = "uid-portal-${var.env_name}"
+
+  # AT is the sole deploy owner for this development account. Reuse its
+  # approved private alarm recipient so app email and alarms share one inbox.
+  # Production and the historical dev root do not enable this override.
+  developer_email_only = var.env_name == "at" && var.aws_account_id == "705157108110"
 
   # This State-owned non-production domain is a read-only prerequisite, not an
   # application resource. Pin the reviewed contract independently of tfvars so
@@ -266,6 +281,7 @@ locals {
     SENDGRID_SECRET_ARN    = var.sendgrid_secret_arn
     ALERT_EMAILS           = join(",", var.alert_emails)
     EMAIL_FROM             = var.email_from
+    DEV_EMAIL_RECIPIENT    = local.developer_email_only ? try(var.alert_emails[0], "") : ""
     PORTAL_CLIENT_URL      = var.portal_client_url
     SIFE_EXCLUDE_GROUP_IDS = join(",", [for g in var.sife_exclude_group_ids : tostring(g)])
     SIFE_CAPTIVE_MAILBOX   = var.sife_captive_mailbox

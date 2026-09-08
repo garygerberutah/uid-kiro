@@ -177,6 +177,30 @@ destroy/targeting, imperative state surgery or AWS delete path.
 
 ## Reviewed-plan workflow
 
+### Developer-only email in the nonproduction account
+
+The AT deployment in account `705157108110` redirects all application email to
+its one approved private `alert_emails` recipient. The module forwards that
+address as `DEV_EMAIL_RECIPIENT`; production receives no override. SIFE messages
+and operational alerts carry a `[DEV]` subject plus the intended production
+recipients, original subject, and original message. Preview links and data
+remain from the current environment. CloudWatch alarm subscriptions also use
+the same single recipient, retaining their normal SNS message format.
+
+Keep the mailbox out of tracked files. CI supplies the one-entry list through
+`AT_ALERT_EMAILS_JSON`; local planning uses the ignored, mode-0600
+`envs/at/ci-alerts.local.auto.tfvars` file. The plan rejects missing, multiple,
+or malformed recipient addresses. Do not replace the list with a broader
+distribution list to satisfy this guard.
+
+Apply the reviewed saved plan and publish the matching tested Lambda code;
+configuration alone cannot update an already published worker implementation.
+This change does not provision or rotate the State-owned SendGrid secret,
+alter the sender, or grant database roles. The historical dev root stays
+non-deployable so AT remains the one nonproduction API owner.
+
+### Create and review the plan
+
 ```bash
 cd aws/terraform/repos/utahdts/uid-portal/envs/at
 terraform init

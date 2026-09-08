@@ -12,20 +12,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # A reusable workflow checks out the caller repository. Recursive
-      # submodules make this central repository's pinned Terraform available
-      # at aws/ without copying validation automation back into the app repo.
-      - uses: actions/checkout@v4
+      # A reusable workflow checks out the caller repository. Only its pinned
+      # aws/ gitlink is needed; unrelated private submodules are not fetched.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1, Node 24
         with:
-          submodules: recursive
+          submodules: false
 
-      - uses: actions/setup-python@v5
+      - name: Check out only the pinned AWS submodule
+        run: |
+          set -euo pipefail
+          git config submodule.aws.url https://github.com/garygerberutah/uid-kiro.git
+          git -c submodule.recurse=false submodule update --init --depth 1 -- aws
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0, Node 24
         with:
           python-version: "3.13"
           cache: pip
           cache-dependency-path: services/api/requirements.txt
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1, Node 24
         with:
           # S3 native locking (use_lockfile) requires Terraform 1.10+.
           terraform_version: "1.15.8"
