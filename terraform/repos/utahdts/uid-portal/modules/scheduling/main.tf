@@ -13,7 +13,7 @@
 # ---------------------------------------------------------------------------
 
 terraform {
-  required_version = ">= 1.6"
+  required_version = ">= 1.9"
   required_providers {
     aws = { source = "hashicorp/aws", version = ">= 5.40, < 7.0" }
   }
@@ -86,7 +86,8 @@ resource "aws_scheduler_schedule" "this" {
 }
 
 resource "aws_iam_role" "scheduler" {
-  name = "${var.name_prefix}-scheduler"
+  name                 = "${var.name_prefix}-scheduler"
+  permissions_boundary = var.permissions_boundary_arn
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -107,6 +108,13 @@ resource "aws_iam_role" "scheduler" {
     var.tags,
     local.name_tag_prefix == "" ? {} : { Name = "${local.name_tag_prefix}-scheduler-role" },
   )
+
+  lifecycle {
+    precondition {
+      condition     = var.name_prefix != "uid-portal-at" || var.permissions_boundary_arn != null
+      error_message = "The AT scheduler requires its independently provisioned permissions boundary."
+    }
+  }
 }
 
 resource "aws_iam_role_policy" "scheduler_invoke" {

@@ -10,7 +10,7 @@
 # ---------------------------------------------------------------------------
 
 terraform {
-  required_version = ">= 1.6"
+  required_version = ">= 1.9"
   required_providers {
     aws = { source = "hashicorp/aws", version = ">= 5.40, < 7.0" }
   }
@@ -64,13 +64,21 @@ locals {
 resource "aws_iam_role" "this" {
   for_each = local.roles
 
-  name               = "${var.name_prefix}-${each.value}"
-  assume_role_policy = data.aws_iam_policy_document.assume.json
+  name                 = "${var.name_prefix}-${each.value}"
+  assume_role_policy   = data.aws_iam_policy_document.assume.json
+  permissions_boundary = lookup(var.permissions_boundary_arns, each.value, null)
   tags = merge(
     var.tags,
     { Profile = each.value },
     local.name_tag_prefix == "" ? {} : { Name = "${local.name_tag_prefix}-${each.value}" },
   )
+
+  lifecycle {
+    precondition {
+      condition     = var.name_prefix != "uid-portal-at" || contains(keys(var.permissions_boundary_arns), each.value)
+      error_message = "Every AT execution role requires its independently provisioned permissions boundary."
+    }
+  }
 }
 
 # The AWS-managed basic policy grants writes to every Lambda log group in the

@@ -79,3 +79,11 @@ output "buckets" {
     artifacts = module.storage.artifact_bucket
   }
 }
+
+output "runtime_permissions_boundary_review" {
+  description = "Per-profile policy caps for independent bootstrap review; never provisioned by application Terraform."
+  value = var.env_name == "at" ? merge(
+    module.iam.permissions_boundary_review,
+    { scheduler = module.scheduling.permissions_boundary_review },
+  ) : {}
+}

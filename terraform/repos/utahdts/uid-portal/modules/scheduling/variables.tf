@@ -6,6 +6,17 @@ variable "account_id" {
   type = string
 }
 
+variable "permissions_boundary_arn" {
+  description = "Independently provisioned AT scheduler runtime boundary."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.permissions_boundary_arn == null || var.permissions_boundary_arn == "arn:aws:iam::${var.account_id}:policy/uid-insureu-at-runtime-scheduler"
+    error_message = "The scheduler boundary must use the exact bootstrap-owned AT policy name in this account."
+  }
+}
+
 variable "schedules" {
   description = "Job id -> schedule definition."
   type = map(object({

@@ -953,10 +953,14 @@ module "alerting" {
 module "iam" {
   source = "../iam"
 
-  name_prefix           = local.name_prefix
-  region                = var.region
-  account_id            = var.aws_account_id
-  role_profiles         = local.iam_role_profiles
+  name_prefix   = local.name_prefix
+  region        = var.region
+  account_id    = var.aws_account_id
+  role_profiles = local.iam_role_profiles
+  permissions_boundary_arns = var.env_name == "at" ? {
+    for profile in keys(local.iam_role_profiles) : profile =>
+    "arn:aws:iam::${var.aws_account_id}:policy/uid-insureu-at-runtime-${profile}"
+  } : {}
   dead_letter_queue_arn = module.alerting.dlq_arn
   tags                  = local.tags
 }
@@ -1280,8 +1284,9 @@ module "portal_api" {
 module "scheduling" {
   source = "../scheduling"
 
-  name_prefix = local.name_prefix
-  account_id  = var.aws_account_id
+  name_prefix              = local.name_prefix
+  account_id               = var.aws_account_id
+  permissions_boundary_arn = var.env_name == "at" ? "arn:aws:iam::${var.aws_account_id}:policy/uid-insureu-at-runtime-scheduler" : null
 
   schedules = {
     for s in local.manifest.scheduled : s.id => {

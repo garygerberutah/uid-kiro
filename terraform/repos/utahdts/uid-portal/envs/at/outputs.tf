@@ -2,6 +2,10 @@ output "api_gateway_url" {
   value = module.stack.api_gateway_url
 }
 
+output "runtime_permissions_boundary_review" {
+  value = module.stack.runtime_permissions_boundary_review
+}
+
 output "api_gateway_name" {
   value = module.stack.api_gateway_name
 }

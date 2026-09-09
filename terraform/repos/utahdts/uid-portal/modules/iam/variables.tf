@@ -10,6 +10,20 @@ variable "account_id" {
   type = string
 }
 
+variable "permissions_boundary_arns" {
+  description = "Independently provisioned runtime boundaries, keyed by manifest IAM profile."
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition = alltrue([
+      for profile, arn in var.permissions_boundary_arns :
+      arn == "arn:aws:iam::${var.account_id}:policy/uid-insureu-at-runtime-${profile}"
+    ])
+    error_message = "Runtime boundaries must use the exact bootstrap-owned AT policy names in this account."
+  }
+}
+
 variable "role_profiles" {
   description = "Least-privilege capabilities keyed by the iam_profile values in routes.yaml."
   type = map(object({

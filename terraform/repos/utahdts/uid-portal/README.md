@@ -5,6 +5,20 @@ Routing comes only from the parent service repository's
 `services/api/routes/routes.yaml`; environment roots forward values and must
 not develop their own architecture.
 
+## AT runtime permissions boundaries
+
+AT execution roles require separate bootstrap-owned managed policies named
+`uid-insureu-at-runtime-PROFILE`; the scheduler has its own policy. Application
+Terraform references these policies but must never create or update them.
+The `runtime_permissions_boundary_review` output derives each review document
+from the matching profile's existing capabilities. It is not approval to
+provision policies or apply a plan. The independent bootstrap must exist first.
+
+The IAM and scheduler modules require Terraform 1.9 or newer for cross-variable
+validation. Their `permissions_boundaries.tftest.hcl` files use mock providers
+and plan-only runs; CI executes them without AWS access. The parent repository's
+`docs/spec/at-deployment-roles.md` records policy review and activation steps.
+
 ## Database boundary
 
 The portal application uses database `insureu`, schema `uid_portal`, in every
