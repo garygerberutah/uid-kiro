@@ -16,7 +16,7 @@ vpc_ipv4_cidr              = "10.192.6.0/23"
 private_subnet_ids         = ["subnet-0c6272b1eea00003c", "subnet-0a1e2c8e6751b6833"]
 lambda_security_group_ids  = ["sg-01e9d097e3d7585ea"]
 private_route_table_ids    = ["rtb-00f83bc1b800e256e"]
-database_security_group_id = "sg-0f8629e93d313e6d5"
+database_security_group_id = "sg-0637efea445216701"
 
 # Live inventory on 2026-08-18 found no Secrets Manager, Logs, Lambda, KMS,
 # X-Ray or S3 endpoint. The remaining interface endpoints serve GuardDuty Data,
@@ -48,7 +48,7 @@ db_name       = "insureu"
 db_schema     = "uid_portal"
 
 # --- database secret --------------------------------------------------------
-portal_secret_name  = "dev/postgres/portal/rotate"
+portal_secret_name  = "arn:aws:secretsmanager:us-west-2:705157108110:secret:dev/postgres/portal/rotate-w0w68d"
 sendgrid_secret_arn = "arn:aws:secretsmanager:us-west-2:705157108110:secret:prod/sendgrid/new-ri9tTm"
 
 # --- identity ---------------------------------------------------------------
@@ -94,10 +94,10 @@ hosted_zone_id = ""
 browser_origins   = ["https://insureu.uid-dev.utah.gov"]
 portal_client_url = "https://insureu.uid-dev.utah.gov"
 
-# snapproxy: live inventory confirmed that AT reuses the dev Aurora cluster,
-# secret and database security group for the Vertafore replica path.
-snap_secret_name                = "dev/postgres/snapproxy/rotate"
-snap_db_host                    = "uid-dev-postgresqlv2.cluster-cxk41gv3busd.us-west-2.rds.amazonaws.com"
+# AT PostgreSQL always uses the same approved proxy and credential secret.
+# Keep the snapproxy database/schema selection; never bypass proxy pooling.
+snap_secret_name                = "arn:aws:secretsmanager:us-west-2:705157108110:secret:dev/postgres/portal/rotate-w0w68d"
+snap_db_host                    = "uid-dev-portal-proxy.proxy-cxk41gv3busd.us-west-2.rds.amazonaws.com"
 snap_database_security_group_id = "sg-0637efea445216701"
 snap_db_name                    = "postgres"
 snap_db_schema                  = "snapproxy"

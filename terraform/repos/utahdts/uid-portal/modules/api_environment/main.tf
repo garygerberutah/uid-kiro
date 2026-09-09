@@ -42,6 +42,19 @@ provider "aws" {
 resource "terraform_data" "reject_offline_provider_validation_in_plans" {
   lifecycle {
     precondition {
+      condition = var.env_name != "at" || (
+        var.aws_account_id == "705157108110" && var.region == "us-west-2" &&
+        !var.allow_cluster_db_host &&
+        var.db_proxy_host == local.approved_at_db_proxy_host &&
+        var.snap_db_host == local.approved_at_db_proxy_host &&
+        var.db_port == 5432 && var.snap_db_port == 5432 &&
+        var.portal_secret_name == local.approved_at_db_secret_arn &&
+        var.snap_secret_name == local.approved_at_db_secret_arn
+      )
+      error_message = "AT PostgreSQL must use uid-dev-portal-proxy on port 5432 and the exact approved portal rotation secret ARN for both portal and snapproxy. Direct-cluster overrides are forbidden."
+    }
+
+    precondition {
       condition     = !var.offline_provider_validation
       error_message = "offline_provider_validation is only for credential-free terraform init/validate; disable it before plan or apply."
     }
@@ -82,6 +95,11 @@ resource "terraform_data" "reject_offline_provider_validation_in_plans" {
 
 locals {
   name_prefix = "uid-portal-${var.env_name}"
+
+  # Owner-approved AT connection boundary, independent of tfvars/CLI overrides.
+  # The proxy and its credential secret remain State-owned and read-only.
+  approved_at_db_proxy_host = "uid-dev-portal-proxy.proxy-cxk41gv3busd.us-west-2.rds.amazonaws.com"
+  approved_at_db_secret_arn = "arn:aws:secretsmanager:us-west-2:705157108110:secret:dev/postgres/portal/rotate-w0w68d"
 
   # AT is the sole deploy owner for this development account. Reuse its
   # approved private alarm recipient so app email and alarms share one inbox.
@@ -329,9 +347,11 @@ locals {
   )
 
   portal_secret_arns = var.portal_secret_name == "" ? [] : [
+    startswith(var.portal_secret_name, "arn:") ? var.portal_secret_name :
     "arn:aws:secretsmanager:${var.region}:${var.aws_account_id}:secret:${var.portal_secret_name}-??????",
   ]
   snap_secret_arns = var.snap_secret_name == "" ? [] : [
+    startswith(var.snap_secret_name, "arn:") ? var.snap_secret_name :
     "arn:aws:secretsmanager:${var.region}:${var.aws_account_id}:secret:${var.snap_secret_name}-??????",
   ]
   oracle_admin_secret_arns = var.oracle_admin_secret == "" ? [] : [
