@@ -15,7 +15,7 @@ vpc_id                     = "vpc-05d3e6ccb65d2d11c"
 vpc_ipv4_cidr              = "10.192.6.0/23"
 private_subnet_ids         = ["subnet-0c6272b1eea00003c", "subnet-0a1e2c8e6751b6833"]
 lambda_security_group_ids  = ["sg-01e9d097e3d7585ea"]
-private_route_table_ids    = ["rtb-00f83bc1b800e256e"]
+private_route_table_ids    = ["rtb-05baf67fbb981e644", "rtb-09559281d3a188e63"]
 database_security_group_id = "sg-0637efea445216701"
 
 # Live inventory on 2026-08-18 found no Secrets Manager, Logs, Lambda, KMS,

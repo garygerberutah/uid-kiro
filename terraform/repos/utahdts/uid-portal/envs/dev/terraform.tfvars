@@ -35,7 +35,7 @@ lambda_security_group_ids = ["sg-0ab06d83d516f0163"]
 # Live inventory on 2026-08-17 resolved both selected subnets to this exact
 # route table. Keep it explicit: the external-egress guard must inspect every
 # Lambda subnet route table instead of passing vacuously through discovery.
-private_route_table_ids = ["rtb-00f83bc1b800e256e"]
+private_route_table_ids = ["rtb-05baf67fbb981e644", "rtb-09559281d3a188e63"]
 
 # Live inventory on 2026-08-18 found no Secrets Manager, Logs, Lambda, KMS,
 # X-Ray or S3 endpoint. The remaining interface endpoints serve GuardDuty Data,

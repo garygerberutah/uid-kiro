@@ -412,9 +412,9 @@ owner and duplicate-delivery analysis.
 
 ## Network traps
 
-- Both selected AT subnets use `rtb-00f83bc1b800e256e`. The last live inventory
-  showed that its IPv4 default route was not operational, even though the VPC
-  also contains existing Internet and NAT gateways. Terraform reads the
+- Since 2026-09-09 the selected AT subnets use `rtb-05baf67fbb981e644` and
+  `rtb-09559281d3a188e63`. The previously pinned `rtb-00f83bc1b800e256e`, whose
+  IPv4 default route was not operational, has no associations. Terraform reads the
   selected Lambda route tables but never prescribes, creates or repairs their
   State-owned targets. It requires the VPC to have only the reviewed IPv4 CIDR
   and no IPv6 association, uses an exact lookup for the
