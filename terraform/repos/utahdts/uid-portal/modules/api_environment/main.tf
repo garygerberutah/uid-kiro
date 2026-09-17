@@ -1223,9 +1223,15 @@ module "function" {
   # Bound the number of database connections the whole fleet can demand. The
   # RDS Proxy has a finite pool; without a cap, one traffic spike on one route
   # starves every other route of connections.
+  # A route may reserve less than the fleet default. The generic table CRUD
+  # routes do: there are 110 of them, they are administrative and low traffic,
+  # and at the default they would reserve 550 of the account's 1,000 concurrent
+  # executions to sit idle, starving every other workload in the account.
   reserved_concurrency = try(each.value.vpc, local.defaults.vpc) ? (
     !local.function_enabled[each.key] ? 0 : (
-      contains(keys(local.scheduled_functions), each.key) ? 1 : var.per_function_reserved_concurrency
+      contains(keys(local.scheduled_functions), each.key)
+      ? 1
+      : try(each.value.concurrency, var.per_function_reserved_concurrency)
     )
   ) : -1
 

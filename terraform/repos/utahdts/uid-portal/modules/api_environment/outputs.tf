@@ -55,7 +55,11 @@ output "reserved_concurrency_total" {
   value = sum([
     for id, f in local.all_functions :
     try(f.vpc, local.defaults.vpc) && local.function_enabled[id]
-    ? (contains(keys(local.scheduled_functions), id) ? 1 : var.per_function_reserved_concurrency)
+    ? (
+      contains(keys(local.scheduled_functions), id)
+      ? 1
+      : try(f.concurrency, var.per_function_reserved_concurrency)
+    )
     : 0
   ])
 }
