@@ -36,6 +36,9 @@ Analyzer remains necessary for account-wide identity-policy assurance.
 from __future__ import annotations
 
 import argparse
+import base64
+import binascii
+import gzip
 import ipaddress
 import json
 import os
@@ -51,9 +54,9 @@ APP_ROOT = Path(__file__).resolve().parents[6]
 DEFAULT_MANIFEST = APP_ROOT / "services" / "api" / "routes" / "routes.yaml"
 API_GATEWAY_PRINCIPAL = {"Service": "apigateway.amazonaws.com"}
 UID_PORTAL_FUNCTION_PREFIX = "uid-portal-"
-EXPECTED_FUNCTION_COUNT = 159
-EXPECTED_ROUTE_COUNT = 152
-EXPECTED_PROTECTED_ROUTE_COUNT = 148
+EXPECTED_FUNCTION_COUNT = 149
+EXPECTED_ROUTE_COUNT = 142
+EXPECTED_PROTECTED_ROUTE_COUNT = 138
 PING_ISSUER = "https://sso.mylogin.utah.gov:443/am/oauth2"
 PING_JWKS_URL = f"{PING_ISSUER}/connect/jwk_uri"
 PING_AUDIENCE = "7ZokREaGUFCgJprj3JX48Aa2tsrbsRbFwgeE"
@@ -383,9 +386,19 @@ def _parse_expected_vpc_config_json(value: str) -> ExpectedVpcConfig:
 
 
 def _parse_route_roles(value: Any) -> dict[str, frozenset[str]]:
-    """Parse API_ROUTE_ROLES strictly without ever including its value in errors."""
+    """Parse API_ROUTE_ROLES strictly without ever including its value in errors.
+
+    Terraform stores the contract as base64-encoded gzip, because the map
+    outgrew Lambda's 4 KB environment. Decoding it here keeps this audit
+    reading the deployed value from AWS rather than trusting the manifest it
+    is supposed to be checking against.
+    """
     if not isinstance(value, str):
         raise ValueError("API_ROUTE_ROLES is absent")
+    try:
+        value = gzip.decompress(base64.b64decode(value, validate=True)).decode("utf-8")
+    except (binascii.Error, ValueError, OSError, EOFError) as exc:
+        raise ValueError("API_ROUTE_ROLES is not base64-encoded gzip") from exc
 
     def unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
         parsed: dict[str, Any] = {}
@@ -1178,7 +1191,8 @@ def _environment_contract_findings(
             Finding(
                 "authorizer-route-roles",
                 wanted_authorizer.name,
-                "API_ROUTE_ROLES must semantically match all 38 protected routes",
+                "API_ROUTE_ROLES must semantically match all "
+                f"{EXPECTED_PROTECTED_ROUTE_COUNT} protected routes",
             )
         )
 

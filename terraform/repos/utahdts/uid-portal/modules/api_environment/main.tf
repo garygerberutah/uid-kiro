@@ -320,6 +320,12 @@ locals {
   # role-database configuration plus its route contract. Selecting those keys
   # here prevents unrelated S3, snapproxy, Oracle and notification settings from
   # crowding API_ROUTE_ROLES out of the authorizer environment.
+  #
+  # Key selection alone stopped being enough once every table gained a route per
+  # operation: the contract is about 11 KB of JSON on its own, roughly three
+  # times the whole environment budget. It is therefore stored gzipped and
+  # base64-encoded, which is about 1.8 KB. base64gzip is deterministic for a
+  # given input, so this produces no plan churn, and shared/config.py decodes it.
   portal_authorizer_environment_keys = toset([
     "UID_RUNTIME",
     "UID_ENV",
@@ -345,7 +351,7 @@ locals {
       if contains(local.portal_authorizer_environment_keys, key)
     },
     {
-      API_ROUTE_ROLES             = jsonencode(local.api_route_roles)
+      API_ROUTE_ROLES             = base64gzip(jsonencode(local.api_route_roles))
       OIDC_SCOPE_CLAIM            = var.oidc_scope_claim
       OIDC_REQUIRED_SCOPES        = join(" ", var.oidc_required_scopes)
       OIDC_AUTHORIZED_PARTY_CLAIM = var.oidc_authorized_party_claim
