@@ -161,12 +161,6 @@ variable "per_function_reserved_concurrency" {
   default     = 5
 }
 
-variable "authorizer_provisioned_concurrency" {
-  description = "Pre-warmed authorizer environments. 0 in dev; production should hold a few so no user pays the cold start."
-  type        = number
-  default     = 0
-}
-
 # --- identity ---------------------------------------------------------------
 
 variable "oidc_issuer" {

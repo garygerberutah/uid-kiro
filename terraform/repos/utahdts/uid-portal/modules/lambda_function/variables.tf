@@ -103,17 +103,6 @@ variable "reserved_concurrency" {
   }
 }
 
-variable "provisioned_concurrency" {
-  description = "Pre-warmed environments. Worth it only for the authorizer, which is on the critical path of every request."
-  type        = number
-  default     = 0
-
-  validation {
-    condition     = var.provisioned_concurrency >= 0
-    error_message = "provisioned_concurrency cannot be negative."
-  }
-}
-
 variable "kms_key_arn" {
   description = "Customer-managed key for environment variable encryption at rest."
   type        = string

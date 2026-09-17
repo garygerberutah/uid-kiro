@@ -287,11 +287,10 @@ locals {
       "" : local.effective_storage_kms_key_arns["artifacts"]
     )
 
-    ZIP_LAMBDA_NAME = "${local.name_prefix}-sife_zip_worker:live"
-    # Invoke the stable alias, not $LATEST. Every gateway and scheduled target
-    # already uses an alias; asynchronous report work must have the same
-    # rollback boundary.
-    REPORT_WORKER_LAMBDA_NAME = "${local.name_prefix}-sife_report_worker:live"
+    ZIP_LAMBDA_NAME = "${local.name_prefix}-sife_zip_worker"
+    # Unqualified, like every other caller: the configuration Terraform
+    # applied is the configuration the next invocation runs.
+    REPORT_WORKER_LAMBDA_NAME = "${local.name_prefix}-sife_report_worker"
 
     # snapproxy: the Vertafore replica the ported licensee handlers read. A
     # second database entirely -- different host, different credentials -- and
@@ -397,12 +396,12 @@ locals {
     purpose => key_arn == null ? [] : [key_arn]
   }
 
-  # Callers use the stable alias names in their environment variables. Grant
-  # exactly those aliases too: permission on the unqualified function ARN (or
-  # every qualifier) would let a compromised orchestrator invoke $LATEST or a
-  # version that has not passed the live-alias deployment gate.
-  report_worker_arn = "arn:aws:lambda:${var.region}:${var.aws_account_id}:function:${local.name_prefix}-sife_report_worker:live"
-  zip_worker_arn    = "arn:aws:lambda:${var.region}:${var.aws_account_id}:function:${local.name_prefix}-sife_zip_worker:live"
+  # Each orchestrator may invoke exactly one worker, named exactly. With no
+  # alias there is no narrower grant than the unqualified function ARN, so
+  # the scoping that remains is the function identity itself: these two
+  # statements never widen to a wildcard or to every function in the stack.
+  report_worker_arn = "arn:aws:lambda:${var.region}:${var.aws_account_id}:function:${local.name_prefix}-sife_report_worker"
+  zip_worker_arn    = "arn:aws:lambda:${var.region}:${var.aws_account_id}:function:${local.name_prefix}-sife_zip_worker"
 
   empty_iam_profile = {
     secret_arns             = []
@@ -1232,7 +1231,6 @@ module "function" {
 
   # Only the authorizer gets pre-warmed: it is on the critical path of every
   # protected request, so its cold start is everyone's cold start.
-  provisioned_concurrency = endswith(each.value.profile, "_authorizer") ? var.authorizer_provisioned_concurrency : 0
 
   # Only functions invoked asynchronously can use a Lambda DLQ. Attaching one
   # to synchronous API handlers and authorizers is decorative and forces queue
@@ -1323,7 +1321,7 @@ module "scheduling" {
     for s in local.manifest.scheduled : s.id => {
       schedule      = s.schedule
       timezone      = try(s.timezone, "America/Denver")
-      target_arn    = module.function[s.id].alias_arn
+      target_arn    = module.function[s.id].function_arn
       function_name = module.function[s.id].function_name
       # Disabled unless an environment explicitly opts in. A newly added
       # manifest job must never become live in every account merely because an

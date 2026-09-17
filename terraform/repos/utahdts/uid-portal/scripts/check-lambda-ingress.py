@@ -4,7 +4,7 @@
 The deploy creates one function per HTTP route, one Ping authorizer, two
 Lambda-to-Lambda workers, and the scheduled jobs declared in routes.yaml.  A
 request function is intentionally invokable by API Gateway only through its
-``live`` alias and only from the one supplied HTTP API.  Workers and schedules
+unqualified function and only from the one supplied HTTP API.  Workers and schedules
 use exact same-account IAM identity grants and therefore need no Lambda
 resource-policy statement.
 
@@ -107,7 +107,7 @@ class ExpectedFunction:
     function_id: str
     name: str
     kind: str
-    alias_arn: str
+    function_arn: str
     source_arn: str | None = None
     source_account: str | None = None
     integration_uri: str | None = None
@@ -262,12 +262,12 @@ def _permission_findings(
                 "permission principal must be only apigateway.amazonaws.com",
             )
         )
-    if statement.get("Resource") != expected.alias_arn:
+    if statement.get("Resource") != expected.function_arn:
         out.append(
             Finding(
                 "permission-resource",
                 subject,
-                f"permission Resource must be the live alias {expected.alias_arn}",
+                f"permission Resource must be the exact function {expected.function_arn}",
             )
         )
     if expected.source_arn is not None and _source_arns(statement) != {expected.source_arn}:
@@ -423,10 +423,15 @@ def _parse_route_roles(value: Any) -> dict[str, frozenset[str]]:
     return result
 
 
-def _integration_targets_alias(value: Any, expected: ExpectedFunction) -> bool:
-    """Accept the two AWS representations that identify the same live alias."""
+def _integration_targets_function(value: Any, expected: ExpectedFunction) -> bool:
+    """Accept the two AWS representations that identify the same function.
+
+    A qualified target is rejected rather than tolerated: the stack no longer
+    has a `live` alias, and a route still pointing at one would be serving a
+    pinned version that Terraform can no longer update.
+    """
     return isinstance(value, str) and value in {
-        expected.alias_arn,
+        expected.function_arn,
         expected.integration_uri,
     }
 
@@ -847,12 +852,12 @@ def _route_contract_findings(
                     "route integration must use payload format 2.0",
                 )
             )
-        if not _integration_targets_alias(integration.get("IntegrationUri"), wanted):
+        if not _integration_targets_function(integration.get("IntegrationUri"), wanted):
             findings.append(
                 Finding(
                     "integration-target",
                     route_key,
-                    "route integration must target its expected live Lambda alias",
+                    "route integration must target its expected unqualified Lambda",
                 )
             )
     return findings
@@ -908,8 +913,8 @@ def _authorizer_configuration_findings(
         ),
         (
             "authorizer-target",
-            _integration_targets_alias(actual.get("AuthorizerUri"), wanted),
-            "portal_jwt must target its expected live Lambda alias",
+            _integration_targets_function(actual.get("AuthorizerUri"), wanted),
+            "portal_jwt must target its expected unqualified Lambda",
         ),
     )
     for code, passed, detail in checks:
@@ -937,7 +942,7 @@ def _function_configuration_findings(
                 Finding(
                     "function-configuration",
                     wanted.name,
-                    "selected live-alias configuration could not be read",
+                    "selected function configuration could not be read",
                 )
             )
             continue
@@ -945,17 +950,17 @@ def _function_configuration_findings(
             (
                 "function-runtime",
                 selected.get("Runtime") == wanted.runtime == "python3.13",
-                "live alias must run on Python 3.13",
+                "function must run on Python 3.13",
             ),
             (
                 "function-role",
                 selected.get("Role") == wanted.role_arn,
-                "live alias execution role does not match its manifest IAM profile",
+                "function execution role does not match its manifest IAM profile",
             ),
             (
                 "function-handler",
                 selected.get("Handler") == wanted.handler,
-                "live alias handler does not match routes.yaml",
+                "function handler does not match routes.yaml",
             ),
         )
         for code, passed, detail in checks:
@@ -970,7 +975,7 @@ def _vpc_configuration_findings(
     *,
     expected_vpc_config: ExpectedVpcConfig,
 ) -> list[Finding]:
-    """Require the exact reviewed VPC attachment on all 49 live aliases."""
+    """Require the exact reviewed VPC attachment on all 49 functions."""
     findings: list[Finding] = []
     functions = inventory.get("functions") or {}
     if not isinstance(functions, Mapping):
@@ -987,7 +992,7 @@ def _vpc_configuration_findings(
                 Finding(
                     "function-vpc-configuration",
                     wanted.name,
-                    "selected live alias has no readable VPC configuration",
+                    "selected function has no readable VPC configuration",
                 )
             )
             continue
@@ -997,7 +1002,7 @@ def _vpc_configuration_findings(
                 Finding(
                     "function-vpc-id",
                     wanted.name,
-                    "live alias VPC does not match the canonical Terraform output",
+                    "function VPC does not match the canonical Terraform output",
                 )
             )
 
@@ -1013,7 +1018,7 @@ def _vpc_configuration_findings(
                 Finding(
                     "function-vpc-subnets",
                     wanted.name,
-                    "live alias subnet set does not match the canonical Terraform output",
+                    "function subnet set does not match the canonical Terraform output",
                 )
             )
 
@@ -1029,7 +1034,7 @@ def _vpc_configuration_findings(
                 Finding(
                     "function-vpc-security-groups",
                     wanted.name,
-                    "live alias security-group set does not match the canonical "
+                    "function security-group set does not match the canonical "
                     "Terraform output",
                 )
             )
@@ -1038,7 +1043,7 @@ def _vpc_configuration_findings(
                 Finding(
                     "function-vpc-ipv6",
                     wanted.name,
-                    "live alias must have dual-stack IPv6 egress disabled",
+                    "function must have dual-stack IPv6 egress disabled",
                 )
             )
     return findings
@@ -1065,7 +1070,7 @@ def _environment_contract_findings(
                 Finding(
                     "route-environment",
                     wanted.name,
-                    "selected live-alias environment could not be read",
+                    "selected function environment could not be read",
                 )
             )
             continue
@@ -1074,7 +1079,7 @@ def _environment_contract_findings(
                 Finding(
                     "route-runtime-mode",
                     wanted.name,
-                    "UID_RUNTIME must be aws on the live alias",
+                    "UID_RUNTIME must be aws on the function",
                 )
             )
         if selected.get("DEV_AUTH_BYPASS") not in (None, "false"):
@@ -1082,7 +1087,7 @@ def _environment_contract_findings(
                 Finding(
                     "route-dev-auth-bypass",
                     wanted.name,
-                    "DEV_AUTH_BYPASS must be absent or false on the live alias",
+                    "DEV_AUTH_BYPASS must be absent or false on the function",
                 )
             )
         expected_authentication = (
@@ -1136,7 +1141,7 @@ def _environment_contract_findings(
             Finding(
                 "authorizer-environment",
                 wanted_authorizer.name,
-                "selected live-alias environment could not be read",
+                "selected function environment could not be read",
             )
         )
         return findings
@@ -1145,7 +1150,7 @@ def _environment_contract_findings(
             Finding(
                 "authorizer-runtime-mode",
                 wanted_authorizer.name,
-                "UID_RUNTIME must be aws on the live alias",
+                "UID_RUNTIME must be aws on the function",
             )
         )
     if selected.get("DEV_AUTH_BYPASS") not in (None, "false"):
@@ -1153,7 +1158,7 @@ def _environment_contract_findings(
             Finding(
                 "authorizer-dev-auth-bypass",
                 wanted_authorizer.name,
-                "DEV_AUTH_BYPASS must be absent or false on the live alias",
+                "DEV_AUTH_BYPASS must be absent or false on the function",
             )
         )
 
@@ -1409,23 +1414,17 @@ def audit_inventory(
         if not isinstance(raw, Mapping):
             continue
         for alias in raw.get("aliases") or []:
-            if not isinstance(alias, Mapping) or alias.get("Name") != "live":
+            if not isinstance(alias, Mapping) or not isinstance(alias.get("Name"), str):
                 continue
-            routing = alias.get("RoutingConfig")
-            weights = (
-                routing.get("AdditionalVersionWeights")
-                if isinstance(routing, Mapping)
-                else None
-            )
-            if weights:
-                findings.append(
-                    Finding(
-                        "live-alias-weighted-routing",
-                        name,
-                        "the live alias must point to one immutable version without "
-                        "additional version weights",
-                    )
+            findings.append(
+                Finding(
+                    "unexpected-alias",
+                    name,
+                    f"found alias {alias['Name']!r}; this stack invokes unqualified "
+                    "functions, and a surviving alias pins a version that Terraform "
+                    "cannot update",
                 )
+            )
         urls = raw.get("function_urls") or []
         if urls:
             findings.append(
@@ -1519,25 +1518,17 @@ def audit_inventory(
             findings.append(Finding("function-inventory", name, "inventory entry is malformed"))
             continue
 
-        aliases = {
-            alias.get("Name")
-            for alias in raw.get("aliases", [])
-            if isinstance(alias, Mapping) and isinstance(alias.get("Name"), str)
-        }
-        if "live" not in aliases:
-            findings.append(Finding("missing-live-alias", name, "live alias is absent"))
-
         policies = raw.get("policies") or {}
         if not isinstance(policies, Mapping):
             policies = {}
-        live_statements = _statements(policies.get("alias:live"))
+        live_statements = _statements(policies.get("unqualified"))
         if wanted.kind in {"route", "authorizer"}:
             if len(live_statements) != 1:
                 findings.append(
                     Finding(
                         "live-permission-count",
                         name,
-                        "expected exactly one live-alias API Gateway statement; "
+                        "expected exactly one unqualified API Gateway statement; "
                         f"found {len(live_statements)}",
                     )
                 )
@@ -1549,12 +1540,12 @@ def audit_inventory(
                     "non-http-resource-policy",
                     name,
                     f"{wanted.kind} function must use identity-based invocation, "
-                    "not a live resource policy",
+                    "not a resource policy",
                 )
             )
 
         for scope, document in policies.items():
-            if scope == "alias:live":
+            if scope == "unqualified":
                 continue
             count = len(_statements(document))
             if count:
@@ -1563,7 +1554,7 @@ def audit_inventory(
                         "unexpected-policy-scope",
                         name,
                         f"found {count} resource-policy statement(s) at {scope}; "
-                        "only alias:live is permitted for HTTP ingress",
+                        "only the unqualified function is permitted for HTTP ingress",
                     )
                 )
 
@@ -1685,10 +1676,10 @@ def build_expectations(
             kind = "route"
             permission_path = re.sub(r"\{[^}]+\}", "*", path)
             source_arn = f"{execution_arn}/*/{method}{permission_path}"
-            alias_arn = f"{base_arn}{name}:live"
+            function_arn = f"{base_arn}{name}"
             integration_uri = (
                 f"arn:aws:apigateway:{region}:lambda:path/2015-03-31/functions/"
-                f"{alias_arn}/invocations"
+                f"{function_arn}/invocations"
             )
             route_key = f"{method} {path}"
             authentication_required = auth == "jwt"
@@ -1698,7 +1689,7 @@ def build_expectations(
                 function_id=function_id,
                 name=name,
                 kind=kind,
-                alias_arn=f"{base_arn}{name}:live",
+                function_arn=f"{base_arn}{name}",
                 source_arn=source_arn,
                 source_account=account_id if kind == "route" else None,
                 integration_uri=integration_uri,
@@ -1732,13 +1723,13 @@ def build_expectations(
         raise RuntimeError("portal authorizer TTL is malformed") from exc
     name = prefix + function_id
     role_arn, handler = runtime_contract(authorizer, function_id)
-    alias_arn = f"{base_arn}{name}:live"
+    function_arn = f"{base_arn}{name}"
     add_expected(
         ExpectedFunction(
             function_id=function_id,
             name=name,
             kind="authorizer",
-            alias_arn=alias_arn,
+            function_arn=function_arn,
             source_arn=(
                 f"{execution_arn}/authorizers/{authorizer_id}"
                 if authorizer_id
@@ -1747,7 +1738,7 @@ def build_expectations(
             source_account=account_id,
             integration_uri=(
                 f"arn:aws:apigateway:{region}:lambda:path/2015-03-31/functions/"
-                f"{alias_arn}/invocations"
+                f"{function_arn}/invocations"
             ),
             identity_sources=tuple(raw_identity_sources),
             authorizer_ttl=authorizer_ttl,
@@ -1769,7 +1760,7 @@ def build_expectations(
                 function_id=function_id,
                 name=name,
                 kind="schedule",
-                alias_arn=f"{base_arn}{name}:live",
+                function_arn=f"{base_arn}{name}",
                 role_arn=role_arn,
                 handler=handler,
             )
@@ -1794,22 +1785,18 @@ def _collect_function(cli: AwsCli, function: Mapping[str, Any]) -> tuple[str, di
 
     alias_items = aliases.get("Aliases") or []
     version_items = versions.get("Versions") or []
-    selected_environment = None
-    if any(
-        isinstance(alias, Mapping) and alias.get("Name") == "live"
-        for alias in alias_items
-    ):
-        selected_environment = cli.json(
-            "lambda",
-            "get-function-configuration",
-            "--function-name",
-            name,
-            "--qualifier",
-            "live",
-            "--query",
-            _SELECTED_ENVIRONMENT_QUERY,
-            missing_ok=True,
-        )
+    # Read the unqualified configuration: that is what an invocation actually
+    # runs. Reading a qualifier's configuration was how this audit could pass
+    # while the serving configuration differed from the one Terraform applied.
+    selected_environment = cli.json(
+        "lambda",
+        "get-function-configuration",
+        "--function-name",
+        name,
+        "--query",
+        _SELECTED_ENVIRONMENT_QUERY,
+        missing_ok=True,
+    )
     policies: dict[str, Any] = {"unqualified": _policy(cli, name)}
     for alias in alias_items:
         if isinstance(alias, Mapping) and alias.get("Name"):

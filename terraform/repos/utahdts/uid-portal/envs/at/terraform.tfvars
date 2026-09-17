@@ -119,8 +119,7 @@ layer_zip_path    = "../../assets/layer-placeholder.zip"
 function_zip_path = "../../assets/lambda-placeholder.zip"
 
 # --- capacity ---------------------------------------------------------------
-per_function_reserved_concurrency  = 5
-authorizer_provisioned_concurrency = 1
+per_function_reserved_concurrency = 5
 
 portal_throttle_burst = 200
 portal_throttle_rate  = 100

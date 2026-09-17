@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# One Python Lambda function, its log group, its alias and its alarms.
+# One Python Lambda function, its log group and its alarms.
 #
 # Every route in routes.yaml gets its own instance of this module rather than
 # sharing one fat function behind a proxy route. That costs a little more
@@ -100,9 +100,9 @@ resource "aws_lambda_function" "this" {
   }
 
   lifecycle {
-    # CI publishes the application package and dependency layer, then advances
-    # the live alias. Terraform retains ownership of runtime configuration but
-    # must not roll any of those software release fields back.
+    # CI publishes the application package and dependency layer. Terraform
+    # retains ownership of runtime configuration but must not roll any of
+    # those software release fields back.
     ignore_changes = [source_code_hash, filename, image_uri, layers]
 
     precondition {
@@ -134,34 +134,21 @@ resource "aws_lambda_function" "this" {
   )
 }
 
-# API Gateway and EventBridge point at this alias, never at $LATEST. That makes
-# a rollback a single alias update instead of a redeploy.
-resource "aws_lambda_alias" "live" {
-  name             = "live"
-  function_name    = aws_lambda_function.this.function_name
-  function_version = aws_lambda_function.this.version
-
-  lifecycle {
-    # Application deployment publishes code and advances this alias. Terraform
-    # owns the alias resource, not its deployed software version.
-    ignore_changes = [function_version]
-  }
-}
-
-resource "aws_lambda_provisioned_concurrency_config" "this" {
-  count = var.provisioned_concurrency > 0 ? 1 : 0
-
-  function_name                     = aws_lambda_function.this.function_name
-  qualifier                         = aws_lambda_alias.live.name
-  provisioned_concurrent_executions = var.provisioned_concurrency
-
-  lifecycle {
-    precondition {
-      condition     = var.reserved_concurrency == -1 || var.provisioned_concurrency <= var.reserved_concurrency
-      error_message = "provisioned_concurrency cannot exceed reserved_concurrency for ${var.name}."
-    }
-  }
-}
+# There is deliberately no `live` alias. Every caller -- API Gateway,
+# EventBridge and the worker orchestrators -- invokes the unqualified function,
+# so the configuration Terraform applies is the configuration that serves the
+# next request. The alias this replaced was pinned with
+# `ignore_changes = [function_version]`, which meant an applied change sat in
+# $LATEST until a separate software release advanced the alias; a corrected
+# authorizer contract stayed invisible in AT for exactly that reason.
+#
+# Two properties were given up with it, both consciously:
+#
+#   * Rollback is no longer one `update-alias` call. `deploy_lambda_code.py`
+#     restores the previous code from its published version instead, and
+#     `publish = true` above keeps those versions as the material it needs.
+#   * Provisioned concurrency is gone. It cannot target $LATEST -- AWS requires
+#     a version or alias qualifier -- so there is no unqualified equivalent.
 
 # --- alarms ----------------------------------------------------------------
 

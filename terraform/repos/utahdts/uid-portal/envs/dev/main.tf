@@ -31,13 +31,12 @@ module "stack" {
     var.existing_interface_endpoint_security_group_ids
   )
 
-  db_proxy_host                      = var.db_proxy_host
-  allow_cluster_db_host              = var.allow_cluster_db_host
-  db_port                            = var.db_port
-  db_name                            = var.db_name
-  db_schema                          = var.db_schema
-  per_function_reserved_concurrency  = var.per_function_reserved_concurrency
-  authorizer_provisioned_concurrency = var.authorizer_provisioned_concurrency
+  db_proxy_host                     = var.db_proxy_host
+  allow_cluster_db_host             = var.allow_cluster_db_host
+  db_port                           = var.db_port
+  db_name                           = var.db_name
+  db_schema                         = var.db_schema
+  per_function_reserved_concurrency = var.per_function_reserved_concurrency
 
   oidc_issuer                 = var.oidc_issuer
   oidc_jwks_url               = var.oidc_jwks_url

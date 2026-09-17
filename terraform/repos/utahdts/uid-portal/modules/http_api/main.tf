@@ -228,7 +228,6 @@ resource "aws_lambda_permission" "authorizer" {
   statement_id   = "AllowInvokeFrom-${var.name}-authorizer"
   action         = "lambda:InvokeFunction"
   function_name  = var.authorizer.function_name
-  qualifier      = "live"
   principal      = "apigateway.amazonaws.com"
   source_account = var.account_id
   source_arn     = "${aws_apigatewayv2_api.this.execution_arn}/authorizers/${aws_apigatewayv2_authorizer.this.id}"
@@ -272,7 +271,6 @@ resource "aws_lambda_permission" "python" {
   statement_id   = "AllowInvokeFrom-${var.name}-${each.key}"
   action         = "lambda:InvokeFunction"
   function_name  = var.integration_function_names[each.key]
-  qualifier      = "live"
   principal      = "apigateway.amazonaws.com"
   source_account = var.account_id
   source_arn     = "${aws_apigatewayv2_api.this.execution_arn}/*/${each.value.method}${local.permission_paths[each.key]}"
