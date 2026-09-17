@@ -127,14 +127,25 @@ locals {
   # Cloud IAM-approved Ping access-token contract shared by AT and production.
   # Pin it independently of tfvars so a CLI override cannot substitute a
   # different but merely nonempty audience, scope, client, or token type.
+  #
+  # The authorized-party and token-type halves were corrected on 2026-09-16
+  # against the live provider. A MyLogin access token carries no `azp`: the
+  # client travels in `client_id`, and the access-token discriminator is the
+  # signed payload claim `tokenName`, under a generic `typ=JWT` header. RFC
+  # 9068, which defines `typ=at+jwt`, requires `client_id` rather than `azp`
+  # too, so the former pin could not have matched a compliant token either.
+  # Evidence: the 2026-09-08 browser-token diagnostic in
+  # docs/apigw-migration/03-local-dev.md, and AT `auth.denied` records naming
+  # this exact check while every earlier clause passed. Audience and scope are
+  # unchanged; live AT tokens satisfy both.
   approved_ping_audience               = "7ZokREaGUFCgJprj3JX48Aa2tsrbsRbFwgeE"
   approved_ping_scope_claim            = "scope"
   approved_ping_required_scopes        = toset(["openid", "profile", "email", "directory"])
-  approved_ping_authorized_party_claim = "azp"
+  approved_ping_authorized_party_claim = "client_id"
   approved_ping_authorized_party_value = "7ZokREaGUFCgJprj3JX48Aa2tsrbsRbFwgeE"
-  approved_ping_token_type_source      = "header"
-  approved_ping_token_type_name        = "typ"
-  approved_ping_token_type_value       = "at+jwt"
+  approved_ping_token_type_source      = "claim"
+  approved_ping_token_type_name        = "tokenName"
+  approved_ping_token_type_value       = "access_token"
 
   # API Gateway permits duplicate display names, so inventory both the tag
   # contract and every name this repository has used. The set union counts a

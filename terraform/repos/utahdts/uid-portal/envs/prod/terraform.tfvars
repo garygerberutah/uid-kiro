@@ -73,15 +73,18 @@ api_allowed_hosts  = ["insureu.uid.utah.gov"]
 # Cloud IAM confirmed this exact shared AT/production Ping access-token
 # contract for the public SPA client. These are non-secret verification facts,
 # not credentials. Keep every value exact; changing one requires a fresh token
-# sample and IAM review under D-026.
+# sample and IAM review under D-026. The authorized-party and token-type
+# values were corrected on 2026-09-16 from fresh samples: MyLogin emits
+# `client_id` and the payload claim `tokenName=access_token`, never `azp`
+# or a protected `typ=at+jwt` header.
 oidc_audience               = "7ZokREaGUFCgJprj3JX48Aa2tsrbsRbFwgeE"
 oidc_scope_claim            = "scope"
 oidc_required_scopes        = ["openid", "profile", "email", "directory"]
-oidc_authorized_party_claim = "azp"
+oidc_authorized_party_claim = "client_id"
 oidc_authorized_party_value = "7ZokREaGUFCgJprj3JX48Aa2tsrbsRbFwgeE"
-oidc_token_type_source      = "header"
-oidc_token_type_name        = "typ"
-oidc_token_type_value       = "at+jwt"
+oidc_token_type_source      = "claim"
+oidc_token_type_name        = "tokenName"
+oidc_token_type_value       = "access_token"
 
 # --- REQUIRED: edge ---------------------------------------------------------
 # D-028 must resolve whether CloudFront presents the insureu viewer host or a

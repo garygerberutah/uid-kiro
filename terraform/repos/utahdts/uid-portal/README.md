@@ -313,8 +313,9 @@ Resolve every placeholder from the target account. In particular:
 - API custom-origin hostname, certificate, and the separately owned CloudFront
   behavior that preserves the approved Host/Authorization contract;
 - preserve the Cloud IAM-approved shared Ping contract pinned in AT/production:
-  the exact audience, required scope set, `azp` client, and protected-header
-  `typ=at+jwt`; lifecycle preconditions reject incomplete or different values;
+  the exact audience, required scope set, `client_id` client claim, and payload
+  `tokenName=access_token`; lifecycle preconditions reject incomplete or
+  different values;
 - JWKS egress and, before mail-producing jobs are enabled, outbound HTTPS to
   the SendGrid v3 Mail Send API;
 - alarm recipients and account concurrency budget.

@@ -59,11 +59,11 @@ PING_JWKS_URL = f"{PING_ISSUER}/connect/jwk_uri"
 PING_AUDIENCE = "7ZokREaGUFCgJprj3JX48Aa2tsrbsRbFwgeE"
 PING_SCOPE_CLAIM = "scope"
 PING_REQUIRED_SCOPES = frozenset(("openid", "profile", "email", "directory"))
-PING_AUTHORIZED_PARTY_CLAIM = "azp"
+PING_AUTHORIZED_PARTY_CLAIM = "client_id"
 PING_AUTHORIZED_PARTY_VALUE = PING_AUDIENCE
-PING_TOKEN_TYPE_SOURCE = "header"
-PING_TOKEN_TYPE_NAME = "typ"
-PING_TOKEN_TYPE_VALUE = "at+jwt"
+PING_TOKEN_TYPE_SOURCE = "claim"
+PING_TOKEN_TYPE_NAME = "tokenName"
+PING_TOKEN_TYPE_VALUE = "access_token"
 IDENTITY_POLICY_LIMITATION = (
     "Same-account IAM identity policies can invoke Lambda without a Lambda "
     "resource policy; this audit cannot enumerate every identity policy, "
