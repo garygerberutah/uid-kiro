@@ -22,6 +22,9 @@ terraform/repos/**/.terraform.lock.hcl
 terraform/repos/**/*.tfstate
 terraform/repos/**/*.tfstate.*
 terraform/repos/**/*.tfplan
+# A plan rendered as JSON is the same artifact in a different format,
+# and `terraform show -json` names its output whatever the caller says.
+terraform/repos/**/*plan.json
 terraform/repos/**/tfplan
 terraform/repos/**/tfplan.txt
 terraform/repos/**/planA
