@@ -21,7 +21,14 @@ distribution id is not yet known to this repository:
 | Environment | Distribution | Bucket |
 |---|---|---|
 | `prod` | `E2FZZADHPAMGOH` | `cloudfront-static-site-portal-uid-prod` |
-| `at` | unknown -- UID operations must supply it | `cloudfront-static-site-portal-uid-dev` |
+| `at` | `E3VBU8PSNYBN8D` | `cloudfront-static-site-portal-uid-dev` |
+| `at`, multi-tenant replacement | `E27M1PAVF6U3YD` | `cloudfront-static-site-portal-uid-dev` |
+
+The AT ids were read from the account on 2026-09-22 rather than supplied.
+`E3VBU8PSNYBN8D` carries the `insureu.uid-dev.utah.gov` alias and is serving.
+`E27M1PAVF6U3YD` is the deployed multi-tenant distribution that will replace
+it; it is tenant-only and has no alias of its own. What it still lacks before
+it can serve the portal is listed in the `cdn-function` stack's README.
 
 The former AT id, `E2L8GSFVL165TN`, returned `NoSuchDistribution` in the
 expected account on 2026-08-24. It is historical, not a value to reuse. Do not

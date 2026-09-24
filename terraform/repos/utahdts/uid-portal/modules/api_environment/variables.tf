@@ -683,3 +683,25 @@ variable "existing_bucket_names" {
   description = "Buckets that already exist and must be used rather than created, keyed uploads/downloads/artifacts. Empty creates them."
   type        = map(string)
 }
+
+variable "infrastructure_monitor_scope" {
+  description = "Approved read-only monitoring scope. Empty resource lists remain Unknown. No resource mutations. Oracle requires a dedicated read-only observer secret."
+  type = object({
+    customer_gateways = optional(list(string), [])
+    oracle_links = optional(list(object({
+      name        = string
+      gateway     = string
+      mview_owner = optional(string, "")
+      mviews      = list(string)
+    })), [])
+    oracle_secret_arn   = optional(string, "")
+    oracle_kms_key_arns = optional(list(string), [])
+    postgres_proxies    = optional(list(string), [])
+    distributions       = optional(list(string), [])
+    log_prefixes        = optional(list(string), [])
+    alarm_prefixes      = optional(list(string), [])
+    dependencies        = optional(map(list(string)), {})
+    health_checks       = optional(map(string), {})
+  })
+  default = {}
+}

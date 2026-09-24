@@ -177,6 +177,13 @@ APPROVED_MANAGED_RESOURCE_TYPES = frozenset(
         "aws_apigatewayv2_integration",
         "aws_apigatewayv2_route",
         "aws_apigatewayv2_stage",
+        # Application-owned, and attached by the distribution owner rather
+        # than by this repository -- the same arrangement as the response
+        # headers policy below, and for the same reason: the distributions
+        # themselves stay out of this state. A function is inert until a
+        # cache behaviour references it, so creating one changes nothing
+        # that is serving traffic.
+        "aws_cloudfront_function",
         "aws_cloudfront_response_headers_policy",
         "aws_cloudwatch_dashboard",
         "aws_cloudwatch_log_group",

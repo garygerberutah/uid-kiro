@@ -47,6 +47,11 @@ response-headers policy but cannot attach it because the existing distributions
 are not owned here. Do not plan it until its environment and backend are
 explicitly decided.
 
+`stacks/cdn-function/unassigned` is the matching independently stateful,
+currently unassigned SPA rewrite function. It creates and publishes only the
+function; the State CloudFront owner must attach it to a distribution. Do not
+plan it until its environment and backend are explicitly decided.
+
 Dev and AT intentionally share the existing state bucket because they share
 account `705157108110`, while their keys remain distinct. They must not both
 continue to own an API: inventory both states and live APIs, then migrate or

@@ -280,3 +280,39 @@ resource "aws_iam_role_policy" "dead_letter" {
   role   = aws_iam_role.this[each.key].id
   policy = data.aws_iam_policy_document.dead_letter[each.key].json
 }
+
+# Only the manifest's diagnostics profile may read application error logs.
+resource "aws_iam_role_policy" "read_application_logs" {
+  for_each = { for profile, capabilities in var.role_profiles : profile => capabilities if capabilities.read_application_logs }
+  name     = "read-application-errors"
+  role     = aws_iam_role.this[each.key].id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["logs:FilterLogEvents"]
+      Resource = ["arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws/lambda/${var.name_prefix}-*:*"]
+    }]
+  })
+}
+
+# Discovery APIs do not support resource-level restrictions for every action.
+# The observer validates explicit scope and filters opaque records before use.
+resource "aws_iam_role_policy" "read_infrastructure" {
+  for_each = { for profile, capabilities in var.role_profiles : profile => capabilities if capabilities.read_infrastructure }
+  name     = "read-infrastructure-health"
+  role     = aws_iam_role.this[each.key].id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "cloudwatch:GetMetricData", "cloudwatch:DescribeAlarms",
+        "logs:DescribeLogGroups", "logs:DescribeMetricFilters",
+        "ec2:DescribeVpnConnections", "rds:DescribeDBProxies", "rds:DescribeDBProxyTargets",
+        "cloudfront:GetDistribution", "cloudfront:ListDistributionTenants"
+      ]
+      Resource = "*"
+    }]
+  })
+}

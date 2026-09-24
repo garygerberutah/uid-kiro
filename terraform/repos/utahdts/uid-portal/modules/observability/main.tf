@@ -334,3 +334,17 @@ resource "aws_cloudwatch_dashboard" "this" {
     ]
   })
 }
+
+# Returned server errors are not reflected in Lambda's native Errors metric.
+resource "aws_cloudwatch_log_metric_filter" "status_handler_errors" {
+  for_each       = var.handler_log_groups
+  name           = "${var.name_prefix}-status-${each.key}"
+  log_group_name = each.value
+  pattern        = "{ ($.status >= 500) || ($.msg = \"request.unhandled\") }"
+  metric_transformation {
+    name          = "HandlerErrors-${each.key}"
+    namespace     = "${var.name_prefix}/Status"
+    value         = "1"
+    default_value = "0"
+  }
+}

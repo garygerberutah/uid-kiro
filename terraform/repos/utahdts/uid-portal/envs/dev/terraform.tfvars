@@ -198,6 +198,8 @@ licensee_route_throttles = {
 # emails is exactly the duplicate-email problem this migration fixes.
 # Flip these to true in the same change that stops the Beanstalk environment.
 scheduled_jobs_enabled = {
+  infrastructure_probe = false
+  status_probe         = false
   sife_notification    = false
   sife_retention_sweep = false
   search_log_reaper    = false
@@ -205,6 +207,8 @@ scheduled_jobs_enabled = {
 }
 
 scheduled_job_intervals = {
+  infrastructure_probe = 300
+  status_probe         = 300
   sife_notification    = 1800
   sife_retention_sweep = 90000
   search_log_reaper    = 7200

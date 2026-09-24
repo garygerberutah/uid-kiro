@@ -50,7 +50,8 @@ jobs:
             --terraform-root aws/terraform/repos/utahdts/uid-portal/envs/at \
             --terraform-root aws/terraform/repos/utahdts/uid-portal/envs/prod \
             --terraform-root aws/terraform/repos/utahdts/uid-portal/stacks/db-proxy/dev \
-            --terraform-root aws/terraform/repos/utahdts/uid-portal/stacks/cdn-headers/unassigned
+            --terraform-root aws/terraform/repos/utahdts/uid-portal/stacks/cdn-headers/unassigned \
+            --terraform-root aws/terraform/repos/utahdts/uid-portal/stacks/cdn-function/unassigned
 
       # -backend=false: no remote state, no credentials, nothing touched in AWS.
       # validate still type-checks every module and evaluates the yamldecode
@@ -73,7 +74,8 @@ jobs:
           done
           for root in \
             aws/terraform/repos/utahdts/uid-portal/stacks/db-proxy/dev \
-            aws/terraform/repos/utahdts/uid-portal/stacks/cdn-headers/unassigned; do
+            aws/terraform/repos/utahdts/uid-portal/stacks/cdn-headers/unassigned \
+            aws/terraform/repos/utahdts/uid-portal/stacks/cdn-function/unassigned; do
             echo "::group::$root"
             root_key="${root//\//-}"
             export TF_DATA_DIR="${RUNNER_TEMP}/uid-portal-${root_key}"

@@ -97,6 +97,20 @@ hosted_zone_id = ""
 browser_origins   = ["https://insureu.uid-dev.utah.gov"]
 portal_client_url = "https://insureu.uid-dev.utah.gov"
 
+# Read-only metadata verified on 2026-09-23. Schedules remain disabled until
+# owner-managed schema migrations and runtime boundaries are in place.
+# Oracle lineage and observer privileges are not yet verified; no inferred IDs.
+infrastructure_monitor_scope = {
+  postgres_proxies = ["uid-dev-portal-proxy"]
+  distributions    = ["E3VBU8PSNYBN8D", "E27M1PAVF6U3YD"]
+  log_prefixes     = ["/aws/lambda/uid-portal-at-"]
+  alarm_prefixes   = ["uid-portal-at-"]
+  health_checks = {
+    "distribution:E3VBU8PSNYBN8D"           = "https://insureu.uid-dev.utah.gov/"
+    "tenant:dt_3JhyX5qNRHNp5QrrB5cn86Q39TH" = "https://portal.uid-dev.utah.gov/"
+  }
+}
+
 # AT PostgreSQL always uses the same approved proxy and credential secret.
 # Keep the snapproxy database/schema selection; never bypass proxy pooling.
 snap_secret_name                = "arn:aws:secretsmanager:us-west-2:705157108110:secret:dev/postgres/portal/rotate-w0w68d"
@@ -147,6 +161,8 @@ licensee_route_throttles = {
 # emails is exactly the duplicate-email problem this migration fixes.
 # Flip these to true in the same change that stops the Beanstalk environment.
 scheduled_jobs_enabled = {
+  infrastructure_probe = false
+  status_probe         = false
   sife_notification    = false
   sife_retention_sweep = false
   search_log_reaper    = false
@@ -154,6 +170,8 @@ scheduled_jobs_enabled = {
 }
 
 scheduled_job_intervals = {
+  infrastructure_probe = 300
+  status_probe         = 300
   sife_notification    = 1800
   sife_retention_sweep = 90000
   search_log_reaper    = 7200

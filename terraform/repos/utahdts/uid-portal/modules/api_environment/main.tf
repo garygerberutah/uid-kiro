@@ -435,6 +435,17 @@ locals {
       secret_kms_key_arns = local.portal_secret_kms_key_arns
       vpc_access          = true
     })
+    infrastructure_monitor = merge(local.empty_iam_profile, {
+      read_infrastructure   = true
+      read_application_logs = true
+      secret_arns           = concat(local.portal_secret_arns, local.snap_secret_arns, compact([var.infrastructure_monitor_scope.oracle_secret_arn]))
+      secret_kms_key_arns   = concat(local.portal_secret_kms_key_arns, local.snap_secret_kms_key_arns, var.infrastructure_monitor_scope.oracle_kms_key_arns)
+      vpc_access            = true
+    })
+    status_diagnostics = merge(local.empty_iam_profile, {
+      read_application_logs = true
+      vpc_access            = true
+    })
     portal_database = merge(local.empty_iam_profile, {
       secret_arns         = local.portal_secret_arns
       secret_kms_key_arns = local.portal_secret_kms_key_arns
@@ -1220,6 +1231,20 @@ module "function" {
       # the authorizer's manifest-derived route decision.
       REQUIRED_ROLES         = join(",", try(each.value.roles, local.defaults.roles))
       REQUIRE_AUTHENTICATION = tostring(try(each.value.auth, "none") != "none")
+    },
+    each.key == "system_status_api_errors" ? {
+      STATUS_LOG_PREFIX = "/aws/lambda/${local.name_prefix}-"
+    } : {},
+    each.key == "infrastructure_probe" ? {
+      STATUS_FUNCTION_PREFIX = "${local.name_prefix}-"
+      STATUS_INFRASTRUCTURE_SCOPE = jsonencode(merge(var.infrastructure_monitor_scope, {
+        log_prefixes   = length(var.infrastructure_monitor_scope.log_prefixes) > 0 ? var.infrastructure_monitor_scope.log_prefixes : ["/aws/lambda/${local.name_prefix}-"]
+        alarm_prefixes = length(var.infrastructure_monitor_scope.alarm_prefixes) > 0 ? var.infrastructure_monitor_scope.alarm_prefixes : [local.name_prefix]
+      }))
+    } : {},
+    each.key == "status_probe" ? {
+      STATUS_API_ORIGIN = "https://${var.api_allowed_hosts[0]}"
+      } : {
     },
   )
 

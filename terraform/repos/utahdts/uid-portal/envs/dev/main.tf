@@ -86,8 +86,9 @@ module "stack" {
   licensee_throttle_rate   = var.licensee_throttle_rate
   licensee_route_throttles = var.licensee_route_throttles
 
-  scheduled_jobs_enabled  = var.scheduled_jobs_enabled
-  scheduled_job_intervals = var.scheduled_job_intervals
+  infrastructure_monitor_scope = var.infrastructure_monitor_scope
+  scheduled_jobs_enabled       = var.scheduled_jobs_enabled
+  scheduled_job_intervals      = var.scheduled_job_intervals
 
   email_from             = var.email_from
   portal_client_url      = var.portal_client_url
