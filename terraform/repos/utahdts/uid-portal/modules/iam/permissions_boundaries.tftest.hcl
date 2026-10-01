@@ -22,10 +22,22 @@ variables {
       s3_statements       = [], invokable_function_arns = [],
       write_dead_letter   = false, vpc_access = true
     }
+    status_diagnostics = {
+      secret_arns       = [], secret_kms_key_arns = [], data_kms_actions = [],
+      data_kms_key_arns = [], s3_statements = [], invokable_function_arns = [],
+      write_dead_letter = false, vpc_access = true, read_application_logs = true
+    }
+    infrastructure_monitor = {
+      secret_arns       = [], secret_kms_key_arns = [], data_kms_actions = [],
+      data_kms_key_arns = [], s3_statements = [], invokable_function_arns = [],
+      write_dead_letter = false, vpc_access = true, read_infrastructure = true
+    }
   }
   permissions_boundary_arns = {
-    public          = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-public"
-    portal_database = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
+    public                 = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-public"
+    portal_database        = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
+    status_diagnostics     = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-status_diagnostics"
+    infrastructure_monitor = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-infrastructure_monitor"
   }
 }
 
@@ -52,6 +64,17 @@ run "attach_each_profile_boundary" {
     )
     error_message = "The public cap must not inherit another profile's secret access."
   }
+  assert {
+    condition = (
+      strcontains(output.permissions_boundary_review["status_diagnostics"].document, "logs:FilterLogEvents") &&
+      !strcontains(output.permissions_boundary_review["status_diagnostics"].document, "cloudwatch:GetMetricData") &&
+      strcontains(output.permissions_boundary_review["infrastructure_monitor"].document, "cloudwatch:GetMetricData") &&
+      !strcontains(output.permissions_boundary_review["infrastructure_monitor"].document, "logs:FilterLogEvents") &&
+      !strcontains(output.permissions_boundary_review["public"].document, "logs:FilterLogEvents") &&
+      !strcontains(output.permissions_boundary_review["portal_database"].document, "cloudwatch:")
+    )
+    error_message = "Each cap must cover its own log and infrastructure reads and no other profile's."
+  }
 }
 
 run "reject_missing_boundary" {
@@ -64,8 +87,10 @@ run "reject_cross_profile_boundary" {
   command = plan
   variables {
     permissions_boundary_arns = {
-      public          = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
-      portal_database = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
+      public                 = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
+      portal_database        = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
+      status_diagnostics     = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-status_diagnostics"
+      infrastructure_monitor = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-infrastructure_monitor"
     }
   }
   expect_failures = [var.permissions_boundary_arns]
@@ -75,8 +100,10 @@ run "reject_cross_account_boundary" {
   command = plan
   variables {
     permissions_boundary_arns = {
-      public          = "arn:aws:iam::000000000000:policy/uid-insureu-at-runtime-public"
-      portal_database = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
+      public                 = "arn:aws:iam::000000000000:policy/uid-insureu-at-runtime-public"
+      portal_database        = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
+      status_diagnostics     = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-status_diagnostics"
+      infrastructure_monitor = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-infrastructure_monitor"
     }
   }
   expect_failures = [var.permissions_boundary_arns]

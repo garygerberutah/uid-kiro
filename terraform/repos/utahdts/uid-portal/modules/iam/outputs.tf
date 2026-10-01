@@ -33,6 +33,8 @@ output "permissions_boundary_review" {
           try(jsondecode(data.aws_iam_policy_document.buckets[profile].json).Statement, []),
           try(jsondecode(data.aws_iam_policy_document.invoke[profile].json).Statement, []),
           try(jsondecode(data.aws_iam_policy_document.dead_letter[profile].json).Statement, []),
+          var.role_profiles[profile].read_application_logs ? local.read_application_logs_statements : [],
+          var.role_profiles[profile].read_infrastructure ? local.read_infrastructure_statements : [],
         )
       })
     }
