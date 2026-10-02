@@ -69,7 +69,7 @@ sendgrid_secret_arn = "REPLACE_ME_SENDGRID_SECRET_ARN"
 # --- identity ---------------------------------------------------------------
 oidc_issuer        = "https://sso.mylogin.utah.gov:443/am/oauth2"
 oidc_utah_id_claim = "legacy_sub"
-api_allowed_hosts  = ["insureu.uid.utah.gov"]
+api_allowed_hosts  = ["api.uid.utah.gov"]
 # Cloud IAM confirmed this exact shared AT/production Ping access-token
 # contract for the public SPA client. These are non-secret verification facts,
 # not credentials. Keep every value exact; changing one requires a fresh token
@@ -87,22 +87,31 @@ oidc_token_type_name        = "tokenName"
 oidc_token_type_value       = "access_token"
 
 # --- REQUIRED: edge ---------------------------------------------------------
-# D-028 must resolve whether CloudFront presents the insureu viewer host or a
-# distinct API origin host. The domain and allowlist intentionally disagree so
-# the plan-time contract stops instead of guessing; update them together from
-# the approved CloudFront/API mapping without moving insureu DNS off CloudFront.
+# D-028 resolved: the browser calls the API directly on its own API Gateway
+# custom domain, api.uid.utah.gov. CloudFront has no API origin or behavior;
+# the UI is served from portal.uid.utah.gov. The legacy insureu.uid.utah.gov
+# site and its distribution are not touched by this stack.
 # Empty is permitted only after live inventory proves this account/Region has
 # no current or historical UID Portal HTTP API. Otherwise set the exact sole id
 # so imports.tf makes the reviewed plan import it instead of creating another.
 api_gateway_survivor_id = ""
 api_gateway_name        = "uid-prod-api-gateway"
-portal_domain_name      = "portal-api.uid.utah.gov"
-portal_domain_ownership = "managed"
-certificate_arn         = "arn:aws:acm:us-west-2:REPLACE_ME:certificate/REPLACE_ME"
-hosted_zone_id          = "REPLACE_ME"
 
-browser_origins   = ["https://insureu.uid.utah.gov"]
-portal_client_url = "https://insureu.uid.utah.gov"
+# Production keeps managed custom-domain ownership: application Terraform
+# creates the api.uid.utah.gov API Gateway custom-domain object and its root
+# API mapping on a certificate it does not own. The State cloud group issues the
+# regional ACM certificate and owns DNS. REPLACE_ME: the cloud group supplies
+# the exact certificate ARN in this account and Region, then creates the DNS
+# record that points at the api_gateway_custom_domain_target output.
+portal_domain_name      = "api.uid.utah.gov"
+portal_domain_ownership = "managed"
+certificate_arn         = "arn:aws:acm:us-west-2:281669077180:certificate/REPLACE_ME"
+
+# DNS is State-owned; application Terraform never writes a record.
+hosted_zone_id = ""
+
+browser_origins   = ["https://portal.uid.utah.gov"]
+portal_client_url = "https://portal.uid.utah.gov"
 
 # snapproxy: the Vertafore replica the licensee handlers read. Leave the host
 # empty and /licensee/* answers 502 saying so, which is the right failure for an
