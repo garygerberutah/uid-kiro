@@ -99,6 +99,14 @@ jobs:
       - name: Check Terraform formatting
         run: terraform fmt -recursive -check -diff aws/terraform/repos/utahdts/uid-portal
 
+      - name: Build the pinned release orchestration artifacts
+        run: |
+          set -euo pipefail
+          python3 scripts/build_release_orchestration.py --output "$TF_ROOT/release-orchestration-artifacts"
+          python3 scripts/check-visible-text.py --artifacts "$TF_ROOT/release-orchestration-artifacts"
+          cd "$TF_ROOT/release-orchestration-artifacts"
+          sha256sum validator.zip release.asl.json health.asl.json > SHA256SUMS
+
       # Reject placeholders before assuming an AWS role. Terraform validates
       # several ID shapes too, but not every account-owned name can have a
       # useful syntactic validator (for example an adopted bucket name).
@@ -240,6 +248,7 @@ jobs:
           path: |
             ${{ env.TF_ROOT }}/tfplan
             ${{ env.TF_ROOT }}/tfplan.txt
+            ${{ env.TF_ROOT }}/release-orchestration-artifacts/
 
   apply:
     name: Apply reviewed ${{ inputs.environment }} plan
@@ -319,6 +328,12 @@ jobs:
         with:
           name: api-gateway-${{ inputs.environment }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ env.TF_ROOT }}
+
+      - name: Verify the orchestration artifacts retained with the reviewed plan
+        run: |
+          set -euo pipefail
+          cd "$TF_ROOT/release-orchestration-artifacts"
+          sha256sum --check SHA256SUMS
 
       # A reviewed plan does not freeze account inventory. Re-run the same
       # state/live ownership proof after the approval wait and immediately

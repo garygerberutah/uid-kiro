@@ -705,3 +705,14 @@ variable "infrastructure_monitor_scope" {
   })
   default = {}
 }
+
+variable "release_orchestration" {
+  description = "Optional reviewed release/health coordinator roles and published probe version. Null creates no orchestration resources."
+  type = object({
+    validator_role_arn = string
+    release_role_arn   = string
+    health_role_arn    = string
+    probe_version_arn  = string
+  })
+  default = null
+}

@@ -48,3 +48,7 @@ output "dashboard_url" {
 output "buckets" {
   value = module.stack.buckets
 }
+
+output "release_orchestration" {
+  value = module.stack.release_orchestration
+}

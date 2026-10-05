@@ -210,6 +210,9 @@ APPROVED_MANAGED_RESOURCE_TYPES = frozenset(
         "aws_s3_bucket_versioning",
         "aws_scheduler_schedule",
         "aws_scheduler_schedule_group",
+        # Application-owned release/health coordination, never State resources.
+        "aws_sfn_activity",
+        "aws_sfn_state_machine",
         "aws_sns_topic",
         "aws_sns_topic_subscription",
         "aws_sqs_queue",
@@ -220,6 +223,8 @@ APPROVED_DATA_SOURCE_TYPES = frozenset(
     {
         "aws_api_gateway_domain_name",
         "aws_apigatewayv2_apis",
+        "aws_caller_identity",
+        "aws_region",
         "aws_ec2_transit_gateway_vpc_attachments",
         "aws_iam_policy_document",
         "aws_route",

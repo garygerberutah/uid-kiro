@@ -33,3 +33,4 @@ terraform/repos/**/*.tf.plan
 terraform/repos/**/*.local.auto.tfvars
 terraform/repos/**/scripts/uid-full-build-*/
 terraform/repos/**/.terraform-validation/
+terraform/repos/**/release-orchestration-artifacts/

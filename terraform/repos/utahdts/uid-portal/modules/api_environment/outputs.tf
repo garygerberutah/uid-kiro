@@ -61,7 +61,7 @@ output "reserved_concurrency_total" {
       : try(f.concurrency, var.per_function_reserved_concurrency)
     )
     : 0
-  ])
+  ]) + (var.release_orchestration == null ? 0 : 2)
 }
 
 output "log_groups" {
@@ -90,4 +90,15 @@ output "runtime_permissions_boundary_review" {
     module.iam.permissions_boundary_review,
     { scheduler = module.scheduling.permissions_boundary_review },
   ) : {}
+}
+
+output "release_orchestration" {
+  description = "Managed coordinator interfaces, or null until reviewed roles enable them."
+  value = var.release_orchestration == null ? null : {
+    release_state_machine_arn = module.release_orchestration[0].release_state_machine_arn
+    health_state_machine_arn  = module.release_orchestration[0].health_state_machine_arn
+    evidence_activity_arn     = module.release_orchestration[0].evidence_activity_arn
+    validator_version_arn     = module.release_orchestration[0].validator_version_arn
+    invoke_policy_review      = module.release_orchestration[0].reviewed_invoke_policy_inputs
+  }
 }
