@@ -119,8 +119,10 @@ portal_client_url = "https://portal.uid.utah.gov"
 snap_secret_name                = "prod/postgres/snapproxy"
 snap_db_host                    = "REPLACE_ME"
 snap_database_security_group_id = ""
-snap_db_name                    = "postgres"
-snap_db_schema                  = "snapproxy"
+# Green release: both application schemas live in insureu. The existing
+# production postgres database remains the blue application's data source.
+snap_db_name   = "insureu"
+snap_db_schema = "snapproxy"
 
 # Oracle refresh watchdog. Confirm whether its listener is protected by an AWS
 # security group; leave the group empty only when the existing network owns it.

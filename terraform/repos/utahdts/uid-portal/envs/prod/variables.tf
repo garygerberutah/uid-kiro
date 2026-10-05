@@ -525,7 +525,7 @@ variable "snap_db_port" {
 
 variable "snap_db_name" {
   type    = string
-  default = "postgres"
+  default = "insureu"
 }
 
 variable "snap_db_schema" {
