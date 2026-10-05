@@ -1,0 +1,57 @@
+{
+  "Comment": "One bounded infrastructure observation; stale/missing evidence stays unknown.",
+  "StartAt": "Probe",
+  "TimeoutSeconds": 360,
+  "States": {
+    "Probe": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${probe_arn}",
+        "Payload": {}
+      },
+      "ResultSelector": {
+        "health.$": "$.Payload.release_health",
+        "unavailable_stages.$": "$.Payload.unavailable_stages"
+      },
+      "TimeoutSeconds": 300,
+      "Next": "CheckHealth",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": null,
+          "Next": "ObserverFailed"
+        }
+      ]
+    },
+    "CheckHealth": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.unavailable_stages[0]",
+          "IsPresent": true,
+          "Next": "ObserverFailed"
+        },
+        {
+          "Variable": "$.health.status",
+          "StringEquals": "operational",
+          "Next": "Healthy"
+        }
+      ],
+      "Default": "NeedsAttention"
+    },
+    "Healthy": {
+      "Type": "Succeed"
+    },
+    "NeedsAttention": {
+      "Type": "Succeed"
+    },
+    "ObserverFailed": {
+      "Type": "Fail",
+      "Error": "HealthObserverUnavailable",
+      "Cause": "Health is unknown; inspect the existing observer diagnostics."
+    }
+  }
+}

@@ -5,6 +5,9 @@ health observations. The shared `api_environment` module owns this optional
 module. Set its `release_orchestration` object only after the three distinct
 execution roles and the published infrastructure-probe version are reviewed.
 
+The checked-in [release.asl.json](release.asl.json) and
+[health.asl.json](health.asl.json) are the canonical workflow definitions.
+Terraform binds their qualified Lambda and activity ARN placeholders.
 The application checkout builds the validator ZIP and ASL templates with
 `scripts/build_release_orchestration.py`. The saved-plan workflow preserves
 these exact artifacts with the plan and verifies their hashes before apply.

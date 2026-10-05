@@ -1,0 +1,131 @@
+{
+  "Comment": "Status evidence only. Protected GitHub workflows retain deployment authority.",
+  "StartAt": "Initialize",
+  "TimeoutSeconds": 604800,
+  "States": {
+    "Initialize": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${validator_arn}",
+        "Payload": {
+          "mode": "initialize",
+          "context.$": "$.context",
+          "execution_name.$": "$$.Execution.Name"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "TimeoutSeconds": 30,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.TooManyRequestsException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "AwaitEvidence"
+    },
+    "AwaitEvidence": {
+      "Type": "Task",
+      "Resource": "${activity_arn}",
+      "TimeoutSeconds": 86400,
+      "ResultPath": "$.callback",
+      "Next": "ValidateEvidence",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": null,
+          "Next": "RecordTimeout"
+        }
+      ]
+    },
+    "ValidateEvidence": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${validator_arn}",
+        "Payload": {
+          "mode": "callback",
+          "current": {
+            "release.$": "$.release",
+            "callbacks.$": "$.callbacks",
+            "rejection.$": "$.rejection"
+          },
+          "callback.$": "$.callback"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "TimeoutSeconds": 30,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.TooManyRequestsException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "CheckState"
+    },
+    "RecordTimeout": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${validator_arn}",
+        "Payload": {
+          "mode": "timeout",
+          "current.$": "$"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "TimeoutSeconds": 30,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.TooManyRequestsException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "CheckState"
+    },
+    "CheckState": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.release.state",
+          "StringEquals": "complete",
+          "Next": "Complete"
+        },
+        {
+          "Variable": "$.callbacks",
+          "NumericGreaterThanEquals": 500,
+          "Next": "CallbackLimit"
+        }
+      ],
+      "Default": "AwaitEvidence"
+    },
+    "Complete": {
+      "Type": "Succeed"
+    },
+    "CallbackLimit": {
+      "Type": "Fail",
+      "Error": "CallbackBudgetExhausted",
+      "Cause": "Review the retained state; no deployment success is inferred."
+    }
+  }
+}
