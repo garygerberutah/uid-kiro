@@ -16,6 +16,13 @@ invoke only the reviewed published probe version. IAM provisioning remains
 with the State review process. No new network resources, database access,
 API routes, schedules, or second Terraform-apply path are introduced.
 
+When enabled, the shared module reserves one concurrent invocation for the
+existing infrastructure probe, even if its scheduled trigger is disabled.
+This permits the reviewed health workflow to observe on demand. It does not
+enable any scheduled trigger or change the zero-concurrency protection on
+other disabled jobs. Disabling the coordinator restores zero for the probe
+unless its scheduled trigger is independently enabled.
+
 See the application repository's `docs/spec/release-state-machine.md` and
 `handoff/release-orchestration/README.md` for evidence, operator, and IAM review
 interfaces. The module inherits the environment provider and organizational

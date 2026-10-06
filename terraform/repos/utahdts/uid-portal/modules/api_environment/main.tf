@@ -229,12 +229,16 @@ locals {
     [for schedule in local.manifest.scheduled : schedule.id],
   )
 
-  # Disabled scheduled jobs reserve zero as a second safety belt; enabling the
-  # schedule and its function happens in the same reviewed plan.
+  # Disabled scheduled jobs reserve zero as a second safety belt. The reviewed
+  # coordinator can invoke its infrastructure observer once without enabling
+  # any timer. Mutating jobs still require their schedule activation gate.
   function_enabled = merge(
     { for id, f in local.route_functions : id => true },
     {
-      for id, f in local.scheduled_functions : id => try(var.scheduled_jobs_enabled[id], false)
+      for id, f in local.scheduled_functions : id => (
+        try(var.scheduled_jobs_enabled[id], false) ||
+        (id == "infrastructure_probe" && var.release_orchestration != null)
+      )
     },
     { for id, f in local.authorizer_functions : id => true },
   )
