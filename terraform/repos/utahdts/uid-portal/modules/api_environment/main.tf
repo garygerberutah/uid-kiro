@@ -162,6 +162,19 @@ locals {
   ])
 
   manifest = yamldecode(file("${path.root}/../../../../../../../services/api/routes/routes.yaml"))
+
+  # One app label per line. These files are the only provider-to-host mapping.
+  oidc_apps = {
+    ping  = compact(split("\n", file("${path.root}/../../../../../../../apps-pingidp.csv")))
+    entra = compact(split("\n", file("${path.root}/../../../../../../../apps-entraid.csv")))
+  }
+  oidc_domain = var.env_name == "prod" ? "uid.utah.gov" : "uid-dev.utah.gov"
+  oidc_hosts = {
+    for provider, apps in local.oidc_apps :
+    provider => [for app in apps : "${app}.${local.oidc_domain}"]
+  }
+  oidc_allowed_hosts = concat(local.oidc_hosts.ping, local.oidc_hosts.entra)
+
   defaults = local.manifest.defaults
 
   # IAM rejects tag keys differing only by case, and this account's convention
@@ -261,7 +274,7 @@ locals {
     OIDC_JWKS_URL      = var.oidc_jwks_url
     OIDC_AUDIENCE      = var.oidc_audience
     OIDC_UTAH_ID_CLAIM = var.oidc_utah_id_claim
-    API_ALLOWED_HOSTS  = join(",", var.api_allowed_hosts)
+    API_ALLOWED_HOSTS  = join(",", local.oidc_allowed_hosts)
 
     PORTAL_SECRET_NAME = var.portal_secret_name
     # The RDS Proxy endpoint, not the cluster endpoint. Pointing at the cluster
@@ -355,6 +368,7 @@ locals {
       if contains(local.portal_authorizer_environment_keys, key)
     },
     {
+      OIDC_ENTRA_CONFIG           = var.oidc_entra == null ? "" : jsonencode(merge(var.oidc_entra, { hosts = local.oidc_hosts.entra }))
       API_ROUTE_ROLES             = base64gzip(jsonencode(local.api_route_roles))
       OIDC_SCOPE_CLAIM            = var.oidc_scope_claim
       OIDC_REQUIRED_SCOPES        = join(" ", var.oidc_required_scopes)
@@ -1085,6 +1099,20 @@ resource "aws_lambda_layer_version" "deps" {
       error_message = "The sole gateway name must be uid-dev-api-gateway for AT or uid-prod-api-gateway for production."
     }
 
+    precondition {
+      condition = (
+        alltrue([for apps in values(local.oidc_apps) : length(apps) == length(distinct(apps))]) &&
+        alltrue([for app in concat(local.oidc_apps.ping, local.oidc_apps.entra) : length(app) <= 63 && can(regex("^[a-z0-9]([a-z0-9-]*[a-z0-9])?$", app))]) &&
+        length(setintersection(toset(local.oidc_apps.ping), toset(local.oidc_apps.entra))) == 0 &&
+        length(setsubtract(toset(var.api_allowed_hosts), toset(local.oidc_allowed_hosts))) == 0
+      )
+      error_message = "Provider CSV files must contain unique lowercase app labels, never share a label, and assign the canonical API host to exactly one provider."
+    }
+
+    precondition {
+      condition     = (length(local.oidc_apps.entra) == 0) == (var.oidc_entra == null)
+      error_message = "A nonempty apps-entraid.csv requires the complete Entra API audience, delegated scopes and Utah-ID claim; an empty file requires oidc_entra = null."
+    }
     precondition {
       condition     = !contains(["at", "prod"], var.env_name) || var.oidc_audience == local.approved_ping_audience
       error_message = "AT and production oidc_audience must exactly match the Cloud IAM-approved shared Ping access-token audience recorded by D-026. A different nonempty value is not an acceptable override."

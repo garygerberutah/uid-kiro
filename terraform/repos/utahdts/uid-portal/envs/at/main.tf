@@ -37,6 +37,7 @@ module "stack" {
   db_schema                         = var.db_schema
   per_function_reserved_concurrency = var.per_function_reserved_concurrency
 
+  oidc_entra                  = var.oidc_entra
   oidc_issuer                 = var.oidc_issuer
   oidc_jwks_url               = var.oidc_jwks_url
   oidc_audience               = var.oidc_audience
