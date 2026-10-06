@@ -586,7 +586,7 @@ variable "usage_metrics_scope" {
 
 
 variable "oidc_entra" {
-  description = "Entra access-token contract for apps-entraid.csv. API audience and delegated scopes require owner confirmation. The signed Utah-ID claim is uid. Null is allowed only while that file is empty."
+  description = "Entra access-token contract for apps-entraid.csv. API audience and delegated scopes require owner confirmation. The signed sub claim contains the same nine-digit Utah ID as Ping legacy_sub. Null is allowed only while that file is empty."
   type = object({
     audience        = string
     required_scopes = set(string)
