@@ -586,22 +586,20 @@ variable "usage_metrics_scope" {
 
 
 variable "oidc_entra" {
-  description = "Entra access-token contract for apps-entraid.csv. API audience, delegated scopes and signed Utah-ID claim require owner confirmation. Null is allowed only while that file is empty."
+  description = "Entra access-token contract for apps-entraid.csv. API audience and delegated scopes require owner confirmation. The signed Utah-ID claim is uid. Null is allowed only while that file is empty."
   type = object({
     audience        = string
     required_scopes = set(string)
-    utah_id_claim   = string
   })
   default = null
 
   validation {
     condition = var.oidc_entra == null ? true : (
       can(regex("^[^[:space:]]+$", var.oidc_entra.audience)) &&
-      can(regex("^[^[:space:]]+$", var.oidc_entra.utah_id_claim)) &&
       length(var.oidc_entra.required_scopes) > 0 &&
       alltrue([for scope in var.oidc_entra.required_scopes : can(regex("^[^[:space:]]+$", scope))]) &&
       length(setintersection(var.oidc_entra.required_scopes, toset(["openid", "profile", "email", "offline_access"]))) == 0
     )
-    error_message = "Entra needs an explicit API audience, delegated API scopes and a signed Utah-ID claim. Login scopes alone do not authorize the API."
+    error_message = "Entra needs an explicit API audience, delegated API scopes. Login scopes alone do not authorize the API."
   }
 }

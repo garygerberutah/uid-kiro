@@ -1111,7 +1111,7 @@ resource "aws_lambda_layer_version" "deps" {
 
     precondition {
       condition     = (length(local.oidc_apps.entra) == 0) == (var.oidc_entra == null)
-      error_message = "A nonempty apps-entraid.csv requires the complete Entra API audience, delegated scopes and Utah-ID claim; an empty file requires oidc_entra = null."
+      error_message = "A nonempty apps-entraid.csv requires the complete Entra API audience and delegated scopes; an empty file requires oidc_entra = null."
     }
     precondition {
       condition     = !contains(["at", "prod"], var.env_name) || var.oidc_audience == local.approved_ping_audience
