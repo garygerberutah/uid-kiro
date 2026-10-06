@@ -17,3 +17,11 @@ output "reviewed_invoke_policy_inputs" {
     health  = { Action = "lambda:InvokeFunction", Resource = var.probe_version_arn }
   }
 }
+
+output "validator_ingress" {
+  description = "Exact coordinator function version and reviewed role for the ingress audit."
+  value = {
+    version_arn = aws_lambda_function.validator.qualified_arn
+    role_arn    = var.validator_role_arn
+  }
+}

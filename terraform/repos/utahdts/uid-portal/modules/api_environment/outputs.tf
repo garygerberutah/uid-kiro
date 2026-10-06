@@ -99,6 +99,7 @@ output "release_orchestration" {
     health_state_machine_arn  = module.release_orchestration[0].health_state_machine_arn
     evidence_activity_arn     = module.release_orchestration[0].evidence_activity_arn
     validator_version_arn     = module.release_orchestration[0].validator_version_arn
+    validator_ingress         = module.release_orchestration[0].validator_ingress
     invoke_policy_review      = module.release_orchestration[0].reviewed_invoke_policy_inputs
   }
 }

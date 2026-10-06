@@ -86,6 +86,9 @@ _SELECTED_ENVIRONMENT_QUERY = (
     "SecurityGroupIds:VpcConfig.SecurityGroupIds,"
     "Ipv6AllowedForDualStack:VpcConfig.Ipv6AllowedForDualStack},"
     "UID_RUNTIME:Environment.Variables.UID_RUNTIME,"
+    "Version:Version,"
+    "RELEASE_ACCOUNT:Environment.Variables.RELEASE_ACCOUNT,"
+    "RELEASE_ENVIRONMENT:Environment.Variables.RELEASE_ENVIRONMENT,"
     "DEV_AUTH_BYPASS:Environment.Variables.DEV_AUTH_BYPASS,"
     "REQUIRE_AUTHENTICATION:Environment.Variables.REQUIRE_AUTHENTICATION,"
     "REQUIRED_ROLES:Environment.Variables.REQUIRED_ROLES,"
@@ -122,6 +125,7 @@ class ExpectedFunction:
     runtime: str = "python3.13"
     role_arn: str | None = None
     handler: str | None = None
+    version_arn: str | None = None
 
 
 @dataclass(frozen=True)
@@ -1366,6 +1370,91 @@ def audit_api_cardinality(
     return []
 
 
+def parse_release_validator(value, *, env_name, region, account_id):
+    """Accept only the explicit coordinator output from the reviewed stack."""
+    try:
+        config = json.loads(value)
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError("release validator output must be JSON") from exc
+    if config is None:
+        return None
+    if (
+        env_name not in {"at", "prod"}
+        or account_id != {"at": "705157108110", "prod": "281669077180"}.get(env_name)
+        or region != "us-west-2"
+        or not isinstance(config, dict)
+        or set(config) != {"version_arn", "role_arn"}
+    ):
+        raise RuntimeError("release validator output is malformed")
+    name = f"uid-portal-{env_name}-release-validator"
+    arn = f"arn:aws:lambda:{region}:{account_id}:function:{name}"
+    version = config["version_arn"]
+    role = config["role_arn"]
+    if (
+        not isinstance(version, str)
+        or not re.fullmatch(re.escape(arn) + r":[1-9][0-9]*", version)
+        or not isinstance(role, str)
+        or not re.fullmatch(rf"arn:aws:iam::{account_id}:role/[A-Za-z0-9+=,.@_/-]+", role)
+    ):
+        raise RuntimeError("release validator must pin an account-local role and numeric version")
+    return ExpectedFunction(
+        function_id="release-validator",
+        name=name,
+        kind="coordinator",
+        function_arn=arn,
+        role_arn=role,
+        handler="scripts.release_controller.handler",
+        version_arn=version,
+    )
+
+
+def release_validator_findings(wanted, inventory, *, expected_vpc_config):
+    """Check both the published invocation target and its current configuration."""
+    functions = inventory.get("functions") or {}
+    raw = functions.get(wanted.name) if isinstance(functions, Mapping) else None
+    if not isinstance(raw, Mapping):
+        return []
+    pinned = raw.get("pinned_environment")
+    pinned_inventory = {"functions": {wanted.name: {"selected_environment": pinned}}}
+    expected = {wanted.name: wanted}
+    findings = _function_configuration_findings(expected, pinned_inventory)
+    findings.extend(
+        _vpc_configuration_findings(
+            expected, pinned_inventory, expected_vpc_config=expected_vpc_config
+        )
+    )
+    account = wanted.function_arn.split(":")[4]
+    environment = wanted.name.removeprefix("uid-portal-").removesuffix("-release-validator")
+    for scope, selected in (
+        ("current", raw.get("selected_environment")),
+        ("pinned", pinned),
+    ):
+        if not isinstance(selected, Mapping):
+            continue
+        if (
+            selected.get("RELEASE_ACCOUNT") != account
+            or selected.get("RELEASE_ENVIRONMENT") != environment
+        ):
+            findings.append(
+                Finding(
+                    "coordinator-environment",
+                    wanted.name,
+                    f"{scope} validator must bind its exact account and environment",
+                )
+            )
+    if not isinstance(pinned, Mapping) or (
+        pinned.get("Version") != wanted.version_arn.rsplit(":", 1)[1]
+    ):
+        findings.append(
+            Finding(
+                "coordinator-version",
+                wanted.name,
+                "the pinned numeric validator version could not be verified",
+            )
+        )
+    return findings
+
+
 def audit_inventory(
     expected: Mapping[str, ExpectedFunction],
     inventory: Mapping[str, Any],
@@ -1376,6 +1465,7 @@ def audit_inventory(
     expected_vpc_config: ExpectedVpcConfig,
     authorizer_name: str = "portal_jwt",
     enforce_custom_domain_singleton: bool = True,
+    release_validator: ExpectedFunction | None = None,
 ) -> list[Finding]:
     """Return every live-state violation in a normalised inventory."""
     findings: list[Finding] = []
@@ -1405,17 +1495,23 @@ def audit_inventory(
     if not isinstance(functions, Mapping):
         functions = {}
 
+    all_expected = dict(expected)
+    if release_validator is not None:
+        all_expected[release_validator.name] = release_validator
+        findings.extend(release_validator_findings(
+            release_validator, inventory, expected_vpc_config=expected_vpc_config
+        ))
     actual_names = set(str(name) for name in functions)
-    expected_names = set(expected)
+    expected_names = set(all_expected)
     for name in sorted(expected_names - actual_names):
-        findings.append(Finding("missing-function", name, "manifest function is absent"))
+        findings.append(Finding("missing-function", name, "reviewed function is absent"))
     for name in sorted(actual_names - expected_names):
         findings.append(
             Finding(
                 "unexpected-function",
                 name,
                 f"function has managed prefix {UID_PORTAL_FUNCTION_PREFIX} but is "
-                "not in this environment's routes.yaml",
+                "not in this environment's manifest or reviewed coordinator output",
             )
         )
 
@@ -1434,9 +1530,8 @@ def audit_inventory(
                 Finding(
                     "unexpected-alias",
                     name,
-                    f"found alias {alias['Name']!r}; this stack invokes unqualified "
-                    "functions, and a surviving alias pins a version that Terraform "
-                    "cannot update",
+                    f"found alias {alias['Name']!r}; aliases are absent from "
+                    "the reviewed API and coordinator invocation contracts",
                 )
             )
         urls = raw.get("function_urls") or []
@@ -1509,10 +1604,10 @@ def audit_inventory(
             authorizer_id=sole_authorizer_id,
         )
     )
-    findings.extend(_function_configuration_findings(expected, inventory))
+    findings.extend(_function_configuration_findings(all_expected, inventory))
     findings.extend(
         _vpc_configuration_findings(
-            expected,
+            all_expected,
             inventory,
             expected_vpc_config=expected_vpc_config,
         )
@@ -1526,7 +1621,7 @@ def audit_inventory(
     )
 
     for name in sorted(expected_names & actual_names):
-        wanted = expected[name]
+        wanted = all_expected[name]
         raw = functions[name]
         if not isinstance(raw, Mapping):
             findings.append(Finding("function-inventory", name, "inventory entry is malformed"))
@@ -2020,6 +2115,12 @@ def collect_inventory(
         for future in as_completed(futures):
             name, data = future.result()
             functions[name] = data
+            if len(functions) % 20 == 0 or len(functions) == len(candidates):
+                print(
+                    f"Collected Lambda ingress metadata: {len(functions)}/{len(candidates)}",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
     target_groups_result = cli.json("elbv2", "describe-target-groups") or {}
     lambda_target_groups = []
@@ -2078,6 +2179,11 @@ def _parser() -> argparse.ArgumentParser:
             "canonical non-sensitive lambda_vpc_config Terraform output as JSON; "
             "required outside --cardinality-only mode"
         ),
+    )
+    parser.add_argument(
+        "--expected-release-validator-json",
+        default="null",
+        help="reviewed validator_ingress Terraform output, or null when disabled",
     )
     parser.add_argument("--region", default="us-west-2")
     parser.add_argument("--profile", help="optional AWS CLI profile")
@@ -2233,6 +2339,19 @@ def main(argv: Iterable[str] | None = None) -> int:
             api_id=args.api_id,
             authorizer_id=authorizer_id,
         )
+        release_validator = parse_release_validator(
+            args.expected_release_validator_json,
+            env_name=args.env_name, region=args.region, account_id=account_id,
+        )
+        if release_validator is not None:
+            raw = inventory["functions"].get(release_validator.name)
+            if isinstance(raw, dict):
+                raw["pinned_environment"] = cli.json(
+                    "lambda", "get-function-configuration",
+                    "--function-name", release_validator.name,
+                    "--qualifier", release_validator.version_arn.rsplit(":", 1)[1],
+                    "--query", _SELECTED_ENVIRONMENT_QUERY, missing_ok=True,
+                )
         findings = audit_inventory(
             expected,
             inventory,
@@ -2241,6 +2360,7 @@ def main(argv: Iterable[str] | None = None) -> int:
             allowed_host=args.allowed_host,
             expected_vpc_config=expected_vpc_config,
             enforce_custom_domain_singleton=args.env_name in {"at", "dev"},
+            release_validator=release_validator,
         )
     except (AwsCliError, OSError, RuntimeError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
