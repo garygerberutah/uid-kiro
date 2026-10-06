@@ -112,11 +112,11 @@ infrastructure_monitor_scope = {
 }
 
 # AT PostgreSQL always uses the same approved proxy and credential secret.
-# Keep the snapproxy database/schema selection; never bypass proxy pooling.
+# Both schemas are verified in insureu; never bypass proxy pooling.
 snap_secret_name                = "arn:aws:secretsmanager:us-west-2:705157108110:secret:dev/postgres/portal/rotate-w0w68d"
 snap_db_host                    = "uid-dev-portal-proxy.proxy-cxk41gv3busd.us-west-2.rds.amazonaws.com"
 snap_database_security_group_id = "sg-0637efea445216701"
-snap_db_name                    = "postgres"
+snap_db_name                    = "insureu"
 snap_db_schema                  = "snapproxy"
 
 # Live inventory confirmed that AT reuses the dev Oracle secret and database
