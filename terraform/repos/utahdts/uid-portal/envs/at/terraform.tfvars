@@ -202,3 +202,13 @@ tags = {
   Name     = "uid-dev"
   security = "0"
 }
+
+# Reviewed bootstrap roles and verified probe artifact from AT API run 37483134993.
+# Bind validator/probe invocation versions through the separate reviewed IAM update
+# after applying the exact saved coordinator plan; configuration is not deployment.
+release_orchestration = {
+  validator_role_arn = "arn:aws:iam::705157108110:role/uid-portal-at-release-validator"
+  release_role_arn   = "arn:aws:iam::705157108110:role/uid-portal-at-release-execution"
+  health_role_arn    = "arn:aws:iam::705157108110:role/uid-portal-at-release-health-execution"
+  probe_version_arn  = "arn:aws:lambda:us-west-2:705157108110:function:uid-portal-at-infrastructure_probe:6"
+}
