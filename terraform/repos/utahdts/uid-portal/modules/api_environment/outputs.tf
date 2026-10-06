@@ -103,3 +103,11 @@ output "release_orchestration" {
     invoke_policy_review      = module.release_orchestration[0].reviewed_invoke_policy_inputs
   }
 }
+
+output "oidc_host_config" {
+  description = "Non-secret provider contract bound to the reviewed root app files."
+  value = {
+    ping_hosts = local.oidc_hosts.ping
+    entra      = var.oidc_entra == null ? null : merge(var.oidc_entra, { hosts = local.oidc_hosts.entra })
+  }
+}

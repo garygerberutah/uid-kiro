@@ -94,6 +94,7 @@ _SELECTED_ENVIRONMENT_QUERY = (
     "REQUIRED_ROLES:Environment.Variables.REQUIRED_ROLES,"
     "API_ROUTE_ROLES:Environment.Variables.API_ROUTE_ROLES,"
     "API_ALLOWED_HOSTS:Environment.Variables.API_ALLOWED_HOSTS,"
+    "OIDC_ENTRA_CONFIG:Environment.Variables.OIDC_ENTRA_CONFIG,"
     "OIDC_ISSUER:Environment.Variables.OIDC_ISSUER,"
     "OIDC_JWKS_URL:Environment.Variables.OIDC_JWKS_URL,"
     "OIDC_AUDIENCE:Environment.Variables.OIDC_AUDIENCE,"
@@ -1066,13 +1067,71 @@ def _vpc_configuration_findings(
     return findings
 
 
+def parse_oidc_host_config(
+    raw: str, *, env_name: str, allowed_host: str, app_root: Path = APP_ROOT,
+) -> dict[str, Any]:
+    """Bind non-secret Terraform output to the reviewed app assignment files."""
+    try:
+        record = json.loads(raw)
+    except (ValueError, TypeError) as exc:
+        raise RuntimeError("OIDC host output must be JSON") from exc
+    if not isinstance(record, dict) or set(record) != {"ping_hosts", "entra"}:
+        raise RuntimeError("OIDC host output has unexpected fields")
+    suffix = "uid.utah.gov" if env_name == "prod" else "uid-dev.utah.gov"
+    assignments = {}
+    for provider, filename in (("ping", "apps-pingidp.csv"), ("entra", "apps-entraid.csv")):
+        content = (app_root / filename).read_bytes()
+        if any(byte != 10 and not 32 <= byte <= 126 for byte in content):
+            raise RuntimeError("OIDC app files must contain printable ASCII and LF")
+        labels = [line for line in content.decode("ascii").split("\n") if line]
+        if (
+            len(labels) != len(set(labels))
+            or any(len(label) > 63 or not _HOST_LABEL.fullmatch(label) for label in labels)
+        ):
+            raise RuntimeError("OIDC app files require unique lowercase DNS labels")
+        assignments[provider] = [f"{label}.{suffix}" for label in labels]
+    if set(assignments["ping"]) & set(assignments["entra"]):
+        raise RuntimeError("OIDC providers must not share an app host")
+    if allowed_host not in assignments["ping"] + assignments["entra"]:
+        raise RuntimeError("The canonical gateway host must have a provider")
+    if record["ping_hosts"] != assignments["ping"]:
+        raise RuntimeError("Ping hosts differ from the reviewed app file")
+    entra = record["entra"]
+    if not assignments["entra"]:
+        if entra is not None:
+            raise RuntimeError("Entra must be disabled when its app file is empty")
+        return record
+    if not isinstance(entra, dict) or set(entra) != {"hosts", "audience", "required_scopes"}:
+        raise RuntimeError("Entra requires only hosts, API audience and delegated scopes")
+    if entra["hosts"] != assignments["entra"]:
+        raise RuntimeError("Entra hosts differ from the reviewed app file")
+    audience = entra["audience"]
+    scopes = entra["required_scopes"]
+    if not isinstance(audience, str) or not audience or any(c.isspace() for c in audience):
+        raise RuntimeError("Entra API audience is missing or malformed")
+    if (
+        not isinstance(scopes, list) or not scopes
+        or not all(isinstance(scope, str) and scope and not any(c.isspace() for c in scope) for scope in scopes)
+        or len(scopes) != len(set(scopes))
+        or set(scopes) & {"openid", "profile", "email", "offline_access"}
+    ):
+        raise RuntimeError("Entra requires unique delegated API scopes")
+    return record
+
+
 def _environment_contract_findings(
     expected: Mapping[str, ExpectedFunction],
     inventory: Mapping[str, Any],
     *,
     allowed_host: str,
+    expected_oidc_config: Mapping[str, Any] | None = None,
 ) -> list[Finding]:
     findings: list[Finding] = []
+    expected_entra = expected_oidc_config["entra"] if expected_oidc_config else None
+    expected_hosts = (
+        expected_oidc_config["ping_hosts"] + (expected_entra["hosts"] if expected_entra else [])
+        if expected_oidc_config else [allowed_host]
+    )
     functions = inventory.get("functions") or {}
     if not isinstance(functions, Mapping):
         return findings
@@ -1132,12 +1191,12 @@ def _environment_contract_findings(
             if isinstance(raw_route_hosts, str)
             else []
         )
-        if route_hosts != [allowed_host]:
+        if route_hosts != expected_hosts:
             findings.append(
                 Finding(
                     "route-allowed-hosts",
                     wanted.name,
-                    "API_ALLOWED_HOSTS must contain only the required allowed host",
+                    "API_ALLOWED_HOSTS must exactly match the reviewed provider hosts",
                 )
             )
 
@@ -1206,14 +1265,25 @@ def _environment_contract_findings(
         if isinstance(raw_hosts, str)
         else []
     )
-    if hosts != [allowed_host]:
+    if hosts != expected_hosts:
         findings.append(
             Finding(
                 "authorizer-allowed-hosts",
                 wanted_authorizer.name,
-                "API_ALLOWED_HOSTS must contain only the required allowed host",
+                "API_ALLOWED_HOSTS must exactly match the reviewed provider hosts",
             )
         )
+
+    raw_entra = selected.get("OIDC_ENTRA_CONFIG")
+    try:
+        actual_entra = json.loads(raw_entra) if raw_entra else None
+    except (ValueError, TypeError):
+        actual_entra = "invalid"
+    if actual_entra != expected_entra or (expected_entra is None and raw_entra not in (None, "")):
+        findings.append(Finding(
+            "authorizer-entra-config", wanted_authorizer.name,
+            "OIDC_ENTRA_CONFIG must exactly match the reviewed deployment contract",
+        ))
 
     # These checks intentionally inspect only the authorizer. Route Lambdas do
     # not consume the access-token contract, and duplicating it there would
@@ -1466,6 +1536,7 @@ def audit_inventory(
     authorizer_name: str = "portal_jwt",
     enforce_custom_domain_singleton: bool = True,
     release_validator: ExpectedFunction | None = None,
+    expected_oidc_config: Mapping[str, Any] | None = None,
 ) -> list[Finding]:
     """Return every live-state violation in a normalised inventory."""
     findings: list[Finding] = []
@@ -1617,6 +1688,7 @@ def audit_inventory(
             expected,
             inventory,
             allowed_host=allowed_host,
+            expected_oidc_config=expected_oidc_config,
         )
     )
 
@@ -2185,6 +2257,10 @@ def _parser() -> argparse.ArgumentParser:
         default="null",
         help="reviewed validator_ingress Terraform output, or null when disabled",
     )
+    parser.add_argument(
+        "--expected-oidc-config-json",
+        help="non-secret oidc_host_config Terraform output, verified against app files",
+    )
     parser.add_argument("--region", default="us-west-2")
     parser.add_argument("--profile", help="optional AWS CLI profile")
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
@@ -2319,6 +2395,12 @@ def main(argv: Iterable[str] | None = None) -> int:
     prefix = f"uid-portal-{args.env_name}-"
     try:
         manifest = _load_manifest(args.manifest)
+        expected_oidc_config = (
+            parse_oidc_host_config(
+                args.expected_oidc_config_json,
+                env_name=args.env_name, allowed_host=args.allowed_host, app_root=APP_ROOT,
+            ) if args.expected_oidc_config_json is not None else None
+        )
         inventory = collect_inventory(
             cli, api_id=args.api_id, workers=args.workers
         )
@@ -2361,6 +2443,7 @@ def main(argv: Iterable[str] | None = None) -> int:
             expected_vpc_config=expected_vpc_config,
             enforce_custom_domain_singleton=args.env_name in {"at", "dev"},
             release_validator=release_validator,
+            expected_oidc_config=expected_oidc_config,
         )
     except (AwsCliError, OSError, RuntimeError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)

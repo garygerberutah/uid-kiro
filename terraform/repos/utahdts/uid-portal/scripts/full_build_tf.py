@@ -1106,6 +1106,7 @@ def _apply(environment: str, config: Mapping[str, Any], plan_file: Path) -> None
     api_id = _run(("terraform", "output", "-raw", "api_gateway_id"), cwd=config["tf_root"], capture=True).stdout.strip()
     api_name = _run(("terraform", "output", "-raw", "api_gateway_name"), cwd=config["tf_root"], capture=True).stdout.strip()
     vpc_json = _run(("terraform", "output", "-json", "lambda_vpc_config"), cwd=config["tf_root"], capture=True).stdout.strip()
+    oidc_json = _run(("terraform", "output", "-json", "oidc_host_config"), cwd=config["tf_root"], capture=True).stdout.strip()
     _run(
         (
             sys.executable,
@@ -1122,6 +1123,8 @@ def _apply(environment: str, config: Mapping[str, Any], plan_file: Path) -> None
             config["allowed_host"],
             "--expected-vpc-config-json",
             vpc_json,
+            "--expected-oidc-config-json",
+            oidc_json,
         )
     )
 

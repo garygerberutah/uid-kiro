@@ -48,3 +48,7 @@ output "buckets" {
 output "release_orchestration" {
   value = module.stack.release_orchestration
 }
+
+output "oidc_host_config" {
+  value = module.stack.oidc_host_config
+}
