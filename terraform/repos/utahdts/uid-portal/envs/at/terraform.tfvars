@@ -161,6 +161,7 @@ licensee_route_throttles = {
 # emails is exactly the duplicate-email problem this migration fixes.
 # Flip these to true in the same change that stops the Beanstalk environment.
 scheduled_jobs_enabled = {
+  usage_reporter       = false
   infrastructure_probe = false
   status_probe         = false
   sife_notification    = false
@@ -170,6 +171,7 @@ scheduled_jobs_enabled = {
 }
 
 scheduled_job_intervals = {
+  usage_reporter       = 300
   infrastructure_probe = 300
   status_probe         = 300
   sife_notification    = 1800
@@ -211,4 +213,10 @@ release_orchestration = {
   release_role_arn   = "arn:aws:iam::705157108110:role/uid-portal-at-release-execution"
   health_role_arn    = "arn:aws:iam::705157108110:role/uid-portal-at-release-health-execution"
   probe_version_arn  = "arn:aws:lambda:us-west-2:705157108110:function:uid-portal-at-infrastructure_probe:6"
+}
+
+# Verified existing sole API; collection stays disabled until schema/code installation.
+usage_metrics_scope = {
+  api_id        = "ler9ythto0"
+  distributions = ["E3VBU8PSNYBN8D", "E27M1PAVF6U3YD"]
 }

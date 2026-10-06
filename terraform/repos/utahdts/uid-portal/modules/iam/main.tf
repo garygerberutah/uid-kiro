@@ -326,3 +326,25 @@ resource "aws_iam_role_policy" "read_infrastructure" {
     Statement = local.read_infrastructure_statements
   })
 }
+
+# CloudWatch metric reads only; no inventory discovery or log access.
+locals {
+  read_usage_metrics_statements = [{
+    Sid      = "ReadUsageMetrics"
+    Effect   = "Allow"
+    Action   = ["cloudwatch:GetMetricData"]
+    Resource = "*"
+    Condition = {
+      StringEquals = { "aws:RequestedRegion" = [var.region, "us-east-1"] }
+    }
+  }]
+}
+resource "aws_iam_role_policy" "read_usage_metrics" {
+  for_each = { for profile, capabilities in var.role_profiles : profile => capabilities if capabilities.read_usage_metrics }
+  name     = "read-usage-metrics"
+  role     = aws_iam_role.this[each.key].id
+  policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = local.read_usage_metrics_statements
+  })
+}

@@ -27,6 +27,11 @@ variables {
       data_kms_key_arns = [], s3_statements = [], invokable_function_arns = [],
       write_dead_letter = false, vpc_access = true, read_application_logs = true
     }
+    usage_monitor = {
+      secret_arns       = [], secret_kms_key_arns = [], data_kms_actions = [],
+      data_kms_key_arns = [], s3_statements = [], invokable_function_arns = [],
+      write_dead_letter = false, vpc_access = true, read_usage_metrics = true
+    }
     infrastructure_monitor = {
       secret_arns       = [], secret_kms_key_arns = [], data_kms_actions = [],
       data_kms_key_arns = [], s3_statements = [], invokable_function_arns = [],
@@ -38,6 +43,7 @@ variables {
     portal_database        = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
     status_diagnostics     = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-status_diagnostics"
     infrastructure_monitor = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-infrastructure_monitor"
+    usage_monitor          = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-usage_monitor"
   }
 }
 
@@ -50,6 +56,17 @@ override_data {
 
 run "attach_each_profile_boundary" {
   command = plan
+  assert {
+    condition = (
+      strcontains(output.permissions_boundary_review["usage_monitor"].document, "cloudwatch:GetMetricData") &&
+      !strcontains(output.permissions_boundary_review["usage_monitor"].document, "logs:FilterLogEvents") &&
+      !strcontains(output.permissions_boundary_review["usage_monitor"].document, "cloudwatch:PutMetricData") &&
+      !strcontains(output.permissions_boundary_review["public"].document, "cloudwatch:GetMetricData") &&
+      jsondecode(aws_iam_role_policy.read_usage_metrics["usage_monitor"].policy).Statement[0].Action == ["cloudwatch:GetMetricData"]
+    )
+    error_message = "Usage monitoring may read metrics only and must preserve profile boundaries."
+  }
+
   assert {
     condition = alltrue([
       for profile, role in aws_iam_role.this :
@@ -91,6 +108,7 @@ run "reject_cross_profile_boundary" {
       portal_database        = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
       status_diagnostics     = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-status_diagnostics"
       infrastructure_monitor = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-infrastructure_monitor"
+      usage_monitor          = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-usage_monitor"
     }
   }
   expect_failures = [var.permissions_boundary_arns]
@@ -104,6 +122,7 @@ run "reject_cross_account_boundary" {
       portal_database        = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-portal_database"
       status_diagnostics     = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-status_diagnostics"
       infrastructure_monitor = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-infrastructure_monitor"
+      usage_monitor          = "arn:aws:iam::705157108110:policy/uid-insureu-at-runtime-usage_monitor"
     }
   }
   expect_failures = [var.permissions_boundary_arns]

@@ -446,6 +446,12 @@ locals {
       secret_kms_key_arns   = concat(local.portal_secret_kms_key_arns, local.snap_secret_kms_key_arns, var.infrastructure_monitor_scope.oracle_kms_key_arns)
       vpc_access            = true
     })
+    usage_monitor = merge(local.empty_iam_profile, {
+      read_usage_metrics  = true
+      secret_arns         = local.portal_secret_arns
+      secret_kms_key_arns = local.portal_secret_kms_key_arns
+      vpc_access          = true
+    })
     status_diagnostics = merge(local.empty_iam_profile, {
       read_application_logs = true
       vpc_access            = true
@@ -1246,6 +1252,17 @@ module "function" {
         alarm_prefixes = length(var.infrastructure_monitor_scope.alarm_prefixes) > 0 ? var.infrastructure_monitor_scope.alarm_prefixes : [local.name_prefix]
       }))
     } : {},
+    each.key == "usage_reporter" ? {
+      USAGE_METRICS_SCOPE = jsonencode({
+        api_id          = var.usage_metrics_scope.api_id
+        stage           = "$default"
+        region          = var.region
+        function_prefix = local.name_prefix
+        distributions   = var.usage_metrics_scope.distributions
+        buckets         = var.usage_metrics_scope.buckets
+        instances       = var.usage_metrics_scope.instances
+      })
+    } : {},
     each.key == "status_probe" ? {
       STATUS_API_ORIGIN = "https://${var.api_allowed_hosts[0]}"
       } : {
@@ -1351,8 +1368,19 @@ module "portal_api" {
 # scheduled work
 # ---------------------------------------------------------------------------
 
+resource "terraform_data" "usage_metrics_scope" {
+  input = var.usage_metrics_scope
+  lifecycle {
+    precondition {
+      condition     = !try(var.scheduled_jobs_enabled["usage_reporter"], false) || var.usage_metrics_scope.api_id == module.portal_api.api_id
+      error_message = "Enabled usage reporting must name this environment's sole API Gateway ID."
+    }
+  }
+}
+
 module "scheduling" {
-  source = "../scheduling"
+  depends_on = [terraform_data.usage_metrics_scope]
+  source     = "../scheduling"
 
   name_prefix              = local.name_prefix
   account_id               = var.aws_account_id

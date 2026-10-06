@@ -86,6 +86,7 @@ module "stack" {
   licensee_route_throttles = var.licensee_route_throttles
 
   release_orchestration        = var.release_orchestration
+  usage_metrics_scope          = var.usage_metrics_scope
   infrastructure_monitor_scope = var.infrastructure_monitor_scope
   scheduled_jobs_enabled       = var.scheduled_jobs_enabled
   scheduled_job_intervals      = var.scheduled_job_intervals

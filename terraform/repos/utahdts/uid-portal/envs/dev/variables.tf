@@ -559,3 +559,27 @@ variable "release_orchestration" {
   })
   default = null
 }
+
+variable "usage_metrics_scope" {
+  description = "Explicit resources to read existing CloudWatch metrics for. S3 requires an existing request metric filter. No resource or metric activation is performed."
+  type = object({
+    api_id        = optional(string, "")
+    distributions = optional(list(string), [])
+    buckets       = optional(list(object({ name = string, filter_id = string })), [])
+    instances     = optional(list(string), [])
+  })
+  default = {}
+  validation {
+    condition = (
+      (var.usage_metrics_scope.api_id == "" || can(regex("^[a-z0-9]{1,32}$", var.usage_metrics_scope.api_id))) &&
+      length(var.usage_metrics_scope.distributions) <= 50 &&
+      length(var.usage_metrics_scope.buckets) <= 50 &&
+      length(var.usage_metrics_scope.instances) <= 50 &&
+      length(distinct([for b in var.usage_metrics_scope.buckets : b.name])) == length(var.usage_metrics_scope.buckets) &&
+      alltrue([for id in var.usage_metrics_scope.distributions : can(regex("^[A-Z0-9]{1,32}$", id))]) &&
+      alltrue([for id in var.usage_metrics_scope.instances : can(regex("^i-[a-f0-9]{8,17}$", id))]) &&
+      alltrue([for b in var.usage_metrics_scope.buckets : can(regex("^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$", b.name)) && can(regex("^[A-Za-z0-9._-]{1,64}$", b.filter_id))])
+    )
+    error_message = "Usage scope requires explicit resource IDs, at most 50 of each kind, and one non-overlapping request metric filter per S3 bucket."
+  }
+}

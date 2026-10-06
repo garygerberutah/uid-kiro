@@ -36,6 +36,7 @@ variable "role_profiles" {
       resources = list(string)
     }))
     invokable_function_arns = list(string)
+    read_usage_metrics      = optional(bool, false)
     read_infrastructure     = optional(bool, false)
     read_application_logs   = optional(bool, false)
     write_dead_letter       = bool
