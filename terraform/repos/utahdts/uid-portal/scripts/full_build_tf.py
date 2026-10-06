@@ -106,11 +106,11 @@ HELD_TYPES = frozenset(
 EXPECTED_COUNTS = {
     "aws_apigatewayv2_api": 1,
     "aws_apigatewayv2_api_mapping": 1,
-    "aws_apigatewayv2_integration": 152,
-    "aws_apigatewayv2_route": 152,
+    "aws_apigatewayv2_integration": 151,
+    "aws_apigatewayv2_route": 151,
     "aws_apigatewayv2_stage": 1,
-    "aws_lambda_function": 159,
-    "aws_scheduler_schedule": 4,
+    "aws_lambda_function": 161,
+    "aws_scheduler_schedule": 7,
 }
 
 
@@ -589,6 +589,38 @@ def _deferred_external_domain_is_guarded(
     return False
 
 
+def _retained_external_domain(plan: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    """Use refreshed plan state only when its exact domain check already passed."""
+    prior = plan.get("prior_state") or {}
+    values = prior.get("values") or {}
+    domains = [
+        resource
+        for resource in _planned_resources(values.get("root_module"), mode="data")
+        if resource.get("type") == "aws_api_gateway_domain_name"
+    ]
+    if len(domains) != 1:
+        return []
+    address = domains[0].get("address")
+    if not isinstance(address, str) or any(
+        item.get("address") == address for item in plan.get("resource_changes", [])
+    ):
+        return []
+    for check in plan.get("checks", []):
+        check_address = check.get("address") or {}
+        if (
+            check.get("status") == "pass"
+            and check_address.get("mode") == "data"
+            and check_address.get("type") == "aws_api_gateway_domain_name"
+            and any(
+                instance.get("status") == "pass"
+                and (instance.get("address") or {}).get("to_display") == address
+                for instance in check.get("instances", [])
+            )
+        ):
+            return domains
+    return []
+
+
 def validate_full_stack(plan: Mapping[str, Any], environment: str) -> None:
     planned = plan.get("planned_values")
     root = planned.get("root_module") if isinstance(planned, Mapping) else None
@@ -600,8 +632,12 @@ def validate_full_stack(plan: Mapping[str, Any], environment: str) -> None:
         if isinstance(resource_type, str):
             counts[resource_type] = counts.get(resource_type, 0) + 1
     config = ENVIRONMENTS[environment]
+    variables = plan.get("variables") or {}
+    orchestration = variables.get("release_orchestration") or {}
+    has_validator = orchestration.get("value") is not None
     expected_counts = {
         **EXPECTED_COUNTS,
+        "aws_lambda_function": EXPECTED_COUNTS["aws_lambda_function"] + int(has_validator),
         "aws_apigatewayv2_domain_name": (
             1 if config["domain_ownership"] == "managed" else 0
         ),
@@ -638,6 +674,11 @@ def validate_full_stack(plan: Mapping[str, Any], environment: str) -> None:
         ):
             raise BuildError("planned managed API custom-domain boundary is incorrect")
     else:
+        # Evaluated data used only by a lifecycle check can be absent from
+        # planned_values. Require its exact passed check before consulting the
+        # refreshed prior_state retained in this same saved plan.
+        if not external_domains:
+            external_domains = _retained_external_domain(plan)
         domain_values = (
             external_domains[0].get("values") if len(external_domains) == 1 else None
         )
@@ -700,6 +741,12 @@ def validate_full_stack(plan: Mapping[str, Any], environment: str) -> None:
             "planned API stage must be the sole auto-deployed $default stage"
         )
     functions = [resource for resource in resources if resource.get("type") == "aws_lambda_function"]
+    if has_validator and not any(
+        (function.get("values") or {}).get("function_name")
+        == config["lambda_prefix"] + "release-validator"
+        for function in functions
+    ):
+        raise BuildError("planned release validator is missing")
     for function in functions:
         values = function.get("values")
         if not isinstance(values, Mapping):
