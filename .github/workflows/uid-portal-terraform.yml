@@ -383,6 +383,7 @@ jobs:
           api_id=$(terraform -chdir="$TF_ROOT" output -raw api_gateway_id)
           api_name=$(terraform -chdir="$TF_ROOT" output -raw api_gateway_name)
           expected_vpc_config_json=$(terraform -chdir="$TF_ROOT" output -json lambda_vpc_config)
+          expected_oidc_config_json=$(terraform -chdir="$TF_ROOT" output -json oidc_host_config)
           validator_json=$(terraform -chdir="$TF_ROOT" output -json |
             python3 -c 'import json,sys; value=json.load(sys.stdin).get("release_orchestration", {}).get("value"); print(json.dumps(value["validator_ingress"] if value is not None else None))')
           python3 aws/terraform/repos/utahdts/uid-portal/scripts/check-lambda-ingress.py \
@@ -392,4 +393,5 @@ jobs:
             --api-name "$api_name" \
             --allowed-host "${{ inputs['allowed-host'] }}" \
             --expected-vpc-config-json "$expected_vpc_config_json" \
-            --expected-release-validator-json "$validator_json"
+            --expected-release-validator-json "$validator_json" \
+            --expected-oidc-config-json "$expected_oidc_config_json"
