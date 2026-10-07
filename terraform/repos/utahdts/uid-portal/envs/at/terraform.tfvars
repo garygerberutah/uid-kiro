@@ -78,11 +78,9 @@ oidc_token_type_value       = "access_token"
 api_gateway_survivor_id = "ler9ythto0"
 api_gateway_name        = "uid-dev-api-gateway"
 
-# The browser stays on the existing CloudFront distribution at insureu.*.
-# CloudFront's API behaviors use this custom origin and do not forward
-# the viewer Host, so API Gateway and every Lambda see this exact allowlisted
-# origin hostname. The issued wildcard certificate is shared with the
-# historical dev inventory in this same account.
+# The UI stays on the existing CloudFront distribution at insureu.*.
+# The browser calls this API custom domain directly; CORS admits the exact
+# UI origin below. DNS, certificates and CloudFront remain State-owned.
 portal_domain_name      = "api.uid-dev.utah.gov"
 portal_domain_ownership = "external"
 certificate_arn         = "arn:aws:acm:us-west-2:705157108110:certificate/5b17baae-453a-4418-81e8-788e8336c3de"
@@ -156,12 +154,12 @@ licensee_route_throttles = {
 }
 
 # --- scheduling -------------------------------------------------------------
-# Every job starts DISABLED. Elastic Beanstalk is still running the Spring
-# @Scheduled versions during cutover, and having both send SIFE notification
-# emails is exactly the duplicate-email problem this migration fixes.
-# Flip these to true in the same change that stops the Beanstalk environment.
+# Reporting alone is enabled after V035 installation and verified publication
+# from protected API run 37545876042. Collect usage every five minutes.
+# Legacy jobs stay disabled until their source schedulers are stopped and
+# each job's runtime acceptance gates pass. Infrastructure timers stay off.
 scheduled_jobs_enabled = {
-  usage_reporter       = false
+  usage_reporter       = true
   infrastructure_probe = false
   status_probe         = false
   sife_notification    = false
@@ -205,17 +203,18 @@ tags = {
   security = "0"
 }
 
-# Reviewed bootstrap roles and verified probe artifact from AT API run 37483134993.
+# Reviewed bootstrap roles and verified probe version 10 from API run 37545876042.
 # Bind validator/probe invocation versions through the separate reviewed IAM update
 # after applying the exact saved coordinator plan; configuration is not deployment.
 release_orchestration = {
   validator_role_arn = "arn:aws:iam::705157108110:role/uid-portal-at-release-validator"
   release_role_arn   = "arn:aws:iam::705157108110:role/uid-portal-at-release-execution"
   health_role_arn    = "arn:aws:iam::705157108110:role/uid-portal-at-release-health-execution"
-  probe_version_arn  = "arn:aws:lambda:us-west-2:705157108110:function:uid-portal-at-infrastructure_probe:6"
+  probe_version_arn  = "arn:aws:lambda:us-west-2:705157108110:function:uid-portal-at-infrastructure_probe:10"
 }
 
-# Verified existing sole API; collection stays disabled until schema/code installation.
+# Existing sole API and distribution IDs verified read-only. V035 and reporting
+# code are installed and verified; this candidate enables only usage collection.
 usage_metrics_scope = {
   api_id        = "ler9ythto0"
   distributions = ["E3VBU8PSNYBN8D", "E27M1PAVF6U3YD"]
