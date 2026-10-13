@@ -89,8 +89,8 @@ oidc_token_type_value       = "access_token"
 # --- REQUIRED: edge ---------------------------------------------------------
 # D-028 resolved: the browser calls the API directly on its own API Gateway
 # custom domain, api.uid.utah.gov. CloudFront has no API origin or behavior;
-# the UI is served from portal.uid.utah.gov. The legacy insureu.uid.utah.gov
-# site and its distribution are not touched by this stack.
+# the UI is served from portal.uid.utah.gov and, for the green side of a
+# blue-green switch, insureu.uid.utah.gov. Both are CORS origins of this API.
 # Empty is permitted only after live inventory proves this account/Region has
 # no current or historical UID Portal HTTP API. Otherwise set the exact sole id
 # so imports.tf makes the reviewed plan import it instead of creating another.
@@ -110,7 +110,7 @@ certificate_arn         = "arn:aws:acm:us-west-2:281669077180:certificate/REPLAC
 # DNS is State-owned; application Terraform never writes a record.
 hosted_zone_id = ""
 
-browser_origins   = ["https://portal.uid.utah.gov"]
+browser_origins   = ["https://portal.uid.utah.gov", "https://insureu.uid.utah.gov"]
 portal_client_url = "https://portal.uid.utah.gov"
 
 # snapproxy: the Vertafore replica the licensee handlers read. Leave the host
