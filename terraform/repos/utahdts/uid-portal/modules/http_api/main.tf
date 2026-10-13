@@ -27,11 +27,24 @@ locals {
 
   # Routes that API Gateway should actually expose. Entries with method NONE
   # exist only so Terraform provisions their function (the async workers).
-  routed = {
+  single_routes = {
     for r in local.api_def.routes :
     r.id => r
-    if try(r.method, "NONE") != "NONE" && try(r.path, null) != null
+    if !can(r.routes) && try(r.method, "NONE") != "NONE" && try(r.path, null) != null
   }
+
+  # A grouped entry is one function serving several routes that share its
+  # roles, authentication and sizing. Each method and path becomes its own
+  # gateway route, integration and invoke permission under "<id>__<action>".
+  grouped_routes = merge([
+    for r in local.api_def.routes : {
+      for pair in r.routes :
+      "${r.id}__${pair.action}" => merge(r, { method = upper(pair.method), path = pair.path })
+    }
+    if can(r.routes)
+  ]...)
+
+  routed = merge(local.single_routes, local.grouped_routes)
 
   # Every routed endpoint is an independently managed Python Lambda. Keeping a
   # second integration path here would let the gateway drift from the manifest

@@ -222,10 +222,30 @@ locals {
   # derived from the same manifest that supplies REQUIRED_ROLES to each handler,
   # so neither side can be widened independently. Public and worker entries do
   # not belong in an authorization decision keyed by an HTTP route.
-  api_route_roles = {
-    for r in local.manifest.apis.portal.routes : "${upper(r.method)} ${r.path}" => try(r.roles, local.defaults.roles)
-    if try(r.method, "NONE") != "NONE" && try(r.auth, "none") != "none"
-  }
+  # A grouped entry is one function serving several routes. Each method and
+  # path is keyed "<id>__<action>", the same key the HTTP API module derives.
+  grouped_http_routes = merge([
+    for r in local.manifest.apis.portal.routes : {
+      for pair in r.routes : "${r.id}__${pair.action}" => {
+        function_id = r.id
+        route_key   = "${upper(pair.method)} ${pair.path}"
+        auth        = try(r.auth, "none")
+        roles       = try(r.roles, local.defaults.roles)
+      }
+    }
+    if can(r.routes)
+  ]...)
+
+  api_route_roles = merge(
+    {
+      for r in local.manifest.apis.portal.routes : "${upper(r.method)} ${r.path}" => try(r.roles, local.defaults.roles)
+      if try(r.method, "NONE") != "NONE" && try(r.auth, "none") != "none"
+    },
+    {
+      for key, route in local.grouped_http_routes : route.route_key => route.roles
+      if route.auth != "none"
+    },
+  )
 
   all_functions = merge(local.route_functions, local.scheduled_functions, local.authorizer_functions)
 
@@ -1226,6 +1246,32 @@ resource "aws_lambda_layer_version" "deps" {
     }
 
     precondition {
+      condition = length(distinct(concat(
+        [for route in local.manifest.apis.portal.routes : "${upper(route.method)} ${route.path}" if try(route.method, "NONE") != "NONE"],
+        [for key, route in local.grouped_http_routes : route.route_key],
+        ))) == (
+        length([for route in local.manifest.apis.portal.routes : route.id if try(route.method, "NONE") != "NONE"]) +
+        length(local.grouped_http_routes)
+      )
+      error_message = "A method and path may be served by exactly one manifest entry, grouped or not."
+    }
+
+    precondition {
+      condition = alltrue([
+        for route in local.manifest.apis.portal.routes :
+        !can(route.method) && !can(route.path) && can(route.concurrency) && length(route.routes) > 0 &&
+        length(distinct([for pair in route.routes : pair.action])) == length(route.routes) &&
+        alltrue([
+          for pair in route.routes :
+          sort(keys(pair)) == ["action", "method", "path"] && can(regex("^[a-z][a-z0-9_]*$", pair.action)) &&
+          contains(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"], upper(pair.method)) && startswith(pair.path, "/")
+        ])
+        if can(route.routes)
+      ])
+      error_message = "A grouped entry sets concurrency, has no method or path of its own, and lists unique actions whose routes hold method, path and action only. Roles, authentication, profile and sizing cannot vary inside a group."
+    }
+
+    precondition {
       condition = (
         length(setsubtract(toset(keys(local.scheduled_functions)), toset(keys(var.scheduled_jobs_enabled)))) == 0 &&
         length(setsubtract(toset(keys(var.scheduled_jobs_enabled)), toset(keys(local.scheduled_functions)))) == 0 &&
@@ -1273,6 +1319,13 @@ module "function" {
       REQUIRED_ROLES         = join(",", try(each.value.roles, local.defaults.roles))
       REQUIRE_AUTHENTICATION = tostring(try(each.value.auth, "none") != "none")
     },
+    # Only a grouped function needs to know which action each of its routes
+    # runs; a single-route function receives no new variable.
+    can(each.value.routes) ? {
+      ROUTE_ACTIONS = jsonencode({
+        for pair in each.value.routes : "${upper(pair.method)} ${pair.path}" => pair.action
+      })
+    } : {},
     each.key == "system_status_api_errors" ? {
       STATUS_LOG_PREFIX = "/aws/lambda/${local.name_prefix}-"
     } : {},
@@ -1355,16 +1408,22 @@ module "portal_api" {
   region     = var.region
   account_id = var.aws_account_id
 
-  integrations = {
-    for r in local.manifest.apis.portal.routes :
-    r.id => module.function[r.id].invoke_arn
-    if try(r.method, "NONE") != "NONE"
-  }
-  integration_function_names = {
-    for r in local.manifest.apis.portal.routes :
-    r.id => module.function[r.id].function_name
-    if try(r.method, "NONE") != "NONE"
-  }
+  integrations = merge(
+    {
+      for r in local.manifest.apis.portal.routes :
+      r.id => module.function[r.id].invoke_arn
+      if try(r.method, "NONE") != "NONE"
+    },
+    { for key, route in local.grouped_http_routes : key => module.function[route.function_id].invoke_arn },
+  )
+  integration_function_names = merge(
+    {
+      for r in local.manifest.apis.portal.routes :
+      r.id => module.function[r.id].function_name
+      if try(r.method, "NONE") != "NONE"
+    },
+    { for key, route in local.grouped_http_routes : key => module.function[route.function_id].function_name },
+  )
 
   authorizer = {
     invoke_arn    = module.function["portal_jwt"].invoke_arn
