@@ -92,6 +92,7 @@ _SELECTED_ENVIRONMENT_QUERY = (
     "DEV_AUTH_BYPASS:Environment.Variables.DEV_AUTH_BYPASS,"
     "REQUIRE_AUTHENTICATION:Environment.Variables.REQUIRE_AUTHENTICATION,"
     "REQUIRED_ROLES:Environment.Variables.REQUIRED_ROLES,"
+    "ROUTE_ACTIONS:Environment.Variables.ROUTE_ACTIONS,"
     "API_ROUTE_ROLES:Environment.Variables.API_ROUTE_ROLES,"
     "API_ALLOWED_HOSTS:Environment.Variables.API_ALLOWED_HOSTS,"
     "OIDC_ENTRA_CONFIG:Environment.Variables.OIDC_ENTRA_CONFIG,"
@@ -109,6 +110,9 @@ _SELECTED_ENVIRONMENT_QUERY = (
 )
 
 
+HTTP_METHODS = frozenset({"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"})
+
+
 @dataclass(frozen=True)
 class ExpectedFunction:
     function_id: str
@@ -119,6 +123,10 @@ class ExpectedFunction:
     source_account: str | None = None
     integration_uri: str | None = None
     route_key: str | None = None
+    # A grouped entry is one function serving several routes. Each pair is
+    # (route key, invoke source ARN); route_actions is its ROUTE_ACTIONS map.
+    routes: tuple[tuple[str, str], ...] = ()
+    route_actions: tuple[tuple[str, str], ...] = ()
     authentication_required: bool | None = None
     roles: tuple[str, ...] = ()
     identity_sources: tuple[str, ...] = ()
@@ -216,6 +224,15 @@ def _values(value: Any) -> set[str]:
     return set()
 
 
+def _route_pairs(expected: "ExpectedFunction") -> tuple[tuple[str, str], ...]:
+    """Every (route key, source ARN) one routed function is expected to serve."""
+    if expected.routes:
+        return expected.routes
+    if expected.route_key is not None and expected.source_arn is not None:
+        return ((expected.route_key, expected.source_arn),)
+    return ()
+
+
 def _source_arns(statement: Mapping[str, Any]) -> set[str]:
     found: set[str] = set()
     condition = statement.get("Condition")
@@ -278,7 +295,19 @@ def _permission_findings(
                 f"permission Resource must be the exact function {expected.function_arn}",
             )
         )
-    if expected.source_arn is not None and _source_arns(statement) != {expected.source_arn}:
+    grouped_sources = {source for _, source in expected.routes}
+    if grouped_sources:
+        # One statement per grouped route, each scoped to exactly that route.
+        sources = _source_arns(statement)
+        if len(sources) != 1 or not sources <= grouped_sources:
+            out.append(
+                Finding(
+                    "permission-source",
+                    subject,
+                    "AWS:SourceArn must be exactly one route of the grouped function",
+                )
+            )
+    elif expected.source_arn is not None and _source_arns(statement) != {expected.source_arn}:
         out.append(
             Finding(
                 "permission-source",
@@ -675,9 +704,10 @@ def _route_contract_findings(
 ) -> list[Finding]:
     findings: list[Finding] = []
     expected_routes = {
-        item.route_key: item
+        route_key: item
         for item in expected.values()
-        if item.kind == "route" and item.route_key is not None
+        if item.kind == "route"
+        for route_key, _ in _route_pairs(item)
     }
     protected_routes = {
         key: item
@@ -1185,6 +1215,20 @@ def _environment_contract_findings(
                     "REQUIRED_ROLES does not match routes.yaml",
                 )
             )
+        raw_actions = selected.get("ROUTE_ACTIONS")
+        try:
+            actual_actions = None if raw_actions is None else json.loads(raw_actions)
+        except (TypeError, ValueError):
+            actual_actions = False
+        if actual_actions != (dict(wanted.route_actions) or None):
+            findings.append(
+                Finding(
+                    "route-actions",
+                    wanted.name,
+                    "ROUTE_ACTIONS must equal the grouped routes in routes.yaml "
+                    "and be absent on a single-route function",
+                )
+            )
         raw_route_hosts = selected.get("API_ALLOWED_HOSTS")
         route_hosts = (
             [item.strip() for item in raw_route_hosts.split(",") if item.strip()]
@@ -1239,11 +1283,10 @@ def _environment_contract_findings(
         )
 
     protected_roles = {
-        item.route_key: frozenset(item.roles)
+        route_key: frozenset(item.roles)
         for item in expected.values()
-        if item.kind == "route"
-        and item.authentication_required
-        and item.route_key is not None
+        if item.kind == "route" and item.authentication_required
+        for route_key, _ in _route_pairs(item)
     }
     try:
         actual_roles = _parse_route_roles(selected.get("API_ROUTE_ROLES"))
@@ -1704,17 +1747,36 @@ def audit_inventory(
             policies = {}
         live_statements = _statements(policies.get("unqualified"))
         if wanted.kind in {"route", "authorizer"}:
-            if len(live_statements) != 1:
+            grouped_sources = {source for _, source in wanted.routes}
+            wanted_count = len(grouped_sources) or 1
+            if len(live_statements) != wanted_count:
                 findings.append(
                     Finding(
                         "live-permission-count",
                         name,
-                        "expected exactly one unqualified API Gateway statement; "
-                        f"found {len(live_statements)}",
+                        (
+                            "expected exactly one unqualified API Gateway statement; "
+                            if wanted_count == 1
+                            else f"expected exactly {wanted_count} unqualified API Gateway "
+                            "statements, one per grouped route; "
+                        )
+                        + f"found {len(live_statements)}",
                     )
                 )
-            if len(live_statements) == 1:
-                findings.extend(_permission_findings(wanted, live_statements[0]))
+            if len(live_statements) == wanted_count:
+                for statement in live_statements:
+                    findings.extend(_permission_findings(wanted, statement))
+                granted = set().union(*(_source_arns(item) for item in live_statements))
+                if grouped_sources and granted != grouped_sources:
+                    # Each statement is one valid route, but a route is
+                    # missing because another is granted twice.
+                    findings.append(
+                        Finding(
+                            "live-permission-set",
+                            name,
+                            "the statements must grant every grouped route exactly once",
+                        )
+                    )
         elif live_statements:
             findings.append(
                 Finding(
@@ -1829,6 +1891,51 @@ def build_expectations(
         role_arn, handler = runtime_contract(route, function_id)
         method = str(route.get("method") or "NONE").upper()
         path = route.get("path")
+        pairs: tuple[tuple[str, str], ...] = ()
+        actions: tuple[tuple[str, str], ...] = ()
+        if "routes" in route:
+            # One function serving several routes with one role set.
+            grouped = route["routes"]
+            if "method" in route or "path" in route or "concurrency" not in route:
+                raise RuntimeError(
+                    f"grouped function {function_id} sets concurrency and has no "
+                    "method or path of its own"
+                )
+            if not isinstance(grouped, list) or not grouped:
+                raise RuntimeError(f"grouped function {function_id} lists no routes")
+            collected = []
+            for pair in grouped:
+                if not isinstance(pair, Mapping) or set(pair) != {"method", "path", "action"}:
+                    raise RuntimeError(
+                        f"grouped function {function_id} routes hold method, path "
+                        "and action only"
+                    )
+                pair_method, pair_path = str(pair["method"]).upper(), pair["path"]
+                action = pair["action"]
+                if (
+                    pair_method not in HTTP_METHODS
+                    or not isinstance(pair_path, str)
+                    or not pair_path.startswith("/")
+                    or not isinstance(action, str)
+                    or not re.fullmatch(r"[a-z][a-z0-9_]*", action)
+                ):
+                    raise RuntimeError(f"grouped function {function_id} has an invalid route")
+                permission = re.sub(r"\{[^}]+\}", "*", pair_path)
+                collected.append(
+                    (
+                        f"{pair_method} {pair_path}",
+                        f"{execution_arn}/*/{pair_method}{permission}",
+                        action,
+                    )
+                )
+            if len({key for key, _, _ in collected}) != len(collected) or len(
+                {action for _, _, action in collected}
+            ) != len(collected):
+                raise RuntimeError(f"grouped function {function_id} repeats a route or action")
+            pairs = tuple((key, source) for key, source, _ in collected)
+            actions = tuple((key, action) for key, _, action in collected)
+            # The shared path below validates auth and roles once for the group.
+            method, path = collected[0][0].split(" ", 1)
         if method == "NONE":
             kind = "worker"
             source_arn = None
@@ -1871,10 +1978,12 @@ def build_expectations(
                 name=name,
                 kind=kind,
                 function_arn=f"{base_arn}{name}",
-                source_arn=source_arn,
+                source_arn=None if pairs else source_arn,
                 source_account=account_id if kind == "route" else None,
                 integration_uri=integration_uri,
-                route_key=route_key,
+                route_key=None if pairs else route_key,
+                routes=pairs,
+                route_actions=actions,
                 authentication_required=authentication_required,
                 roles=roles,
                 role_arn=role_arn,
