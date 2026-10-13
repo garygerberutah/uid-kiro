@@ -17,6 +17,8 @@ module "stack" {
   build_time                  = var.build_time
   log_level                   = var.log_level
 
+  runtime_permissions_boundary_arn = var.runtime_permissions_boundary_arn
+
   vpc_id                            = var.vpc_id
   vpc_ipv4_cidr                     = var.vpc_ipv4_cidr
   private_subnet_ids                = var.private_subnet_ids

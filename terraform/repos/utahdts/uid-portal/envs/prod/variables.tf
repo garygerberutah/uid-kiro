@@ -16,6 +16,17 @@ variable "aws_account_id" {
   }
 }
 
+variable "runtime_permissions_boundary_arn" {
+  description = "Required State-reviewed permissions boundary policy. Every production Lambda execution role and the scheduler role carries it; no role is created without it."
+  type        = string
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^arn:aws:iam::281669077180:policy/[A-Za-z0-9+=,.@_/-]+$", var.runtime_permissions_boundary_arn))
+    error_message = "Supply the State-reviewed customer managed boundary policy ARN in account 281669077180."
+  }
+}
+
 variable "offline_provider_validation" {
   description = "Disable AWS identity and metadata checks only for credential-free terraform init/validate. Never enable for plan or apply."
   type        = bool

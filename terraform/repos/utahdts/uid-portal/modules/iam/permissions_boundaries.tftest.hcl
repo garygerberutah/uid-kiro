@@ -128,14 +128,51 @@ run "reject_cross_account_boundary" {
   expect_failures = [var.permissions_boundary_arns]
 }
 
-run "preserve_other_environments" {
+run "preserve_dev_environment" {
   command = plan
   variables {
-    name_prefix               = "uid-portal-prod"
+    name_prefix               = "uid-portal-dev"
     permissions_boundary_arns = {}
   }
   assert {
     condition     = alltrue([for role in aws_iam_role.this : role.permissions_boundary == null])
-    error_message = "The AT-only change must not attach boundaries in other environments."
+    error_message = "Boundaries are required only in AT and production."
   }
+}
+
+run "reject_production_without_boundary" {
+  command = plan
+  variables {
+    name_prefix               = "uid-portal-prod"
+    account_id                = "281669077180"
+    permissions_boundary_arns = {}
+  }
+  expect_failures = [aws_iam_role.this]
+}
+
+run "attach_production_boundary_to_every_role" {
+  command = plan
+  variables {
+    name_prefix = "uid-portal-prod"
+    account_id  = "281669077180"
+    permissions_boundary_arns = {
+      for profile in keys(var.role_profiles) : profile => "arn:aws:iam::281669077180:policy/synthetic-reviewed-boundary"
+    }
+  }
+  assert {
+    condition     = alltrue([for role in aws_iam_role.this : role.permissions_boundary == "arn:aws:iam::281669077180:policy/synthetic-reviewed-boundary"])
+    error_message = "Every production execution role must carry the reviewed boundary."
+  }
+}
+
+run "reject_production_boundary_from_another_account" {
+  command = plan
+  variables {
+    name_prefix = "uid-portal-prod"
+    account_id  = "281669077180"
+    permissions_boundary_arns = {
+      for profile in keys(var.role_profiles) : profile => "arn:aws:iam::705157108110:policy/synthetic-reviewed-boundary"
+    }
+  }
+  expect_failures = [var.permissions_boundary_arns]
 }

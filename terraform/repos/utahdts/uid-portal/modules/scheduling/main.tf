@@ -114,6 +114,10 @@ resource "aws_iam_role" "scheduler" {
       condition     = var.name_prefix != "uid-portal-at" || var.permissions_boundary_arn != null
       error_message = "The AT scheduler requires its independently provisioned permissions boundary."
     }
+    precondition {
+      condition     = var.name_prefix != "uid-portal-prod" || var.permissions_boundary_arn != null
+      error_message = "The production scheduler requires the State-reviewed permissions boundary."
+    }
   }
 }
 

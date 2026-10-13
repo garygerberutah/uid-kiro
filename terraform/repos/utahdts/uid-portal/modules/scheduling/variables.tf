@@ -7,13 +7,20 @@ variable "account_id" {
 }
 
 variable "permissions_boundary_arn" {
-  description = "Independently provisioned AT scheduler runtime boundary."
+  description = "Independently provisioned scheduler runtime boundary."
   type        = string
   default     = null
 
   validation {
-    condition     = var.permissions_boundary_arn == null || var.permissions_boundary_arn == "arn:aws:iam::${var.account_id}:policy/uid-insureu-at-runtime-scheduler"
-    error_message = "The scheduler boundary must use the exact bootstrap-owned AT policy name in this account."
+    condition = (
+      var.permissions_boundary_arn == null ||
+      var.permissions_boundary_arn == "arn:aws:iam::${var.account_id}:policy/uid-insureu-at-runtime-scheduler" ||
+      (
+        var.name_prefix == "uid-portal-prod" &&
+        can(regex("^arn:aws:iam::${var.account_id}:policy/[A-Za-z0-9+=,.@_/-]+$", var.permissions_boundary_arn))
+      )
+    )
+    error_message = "The scheduler boundary must use the exact bootstrap-owned AT policy name, or in production a State-reviewed customer managed policy in this account."
   }
 }
 

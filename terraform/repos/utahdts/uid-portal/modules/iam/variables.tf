@@ -18,9 +18,12 @@ variable "permissions_boundary_arns" {
   validation {
     condition = alltrue([
       for profile, arn in var.permissions_boundary_arns :
-      arn == "arn:aws:iam::${var.account_id}:policy/uid-insureu-at-runtime-${profile}"
+      arn == "arn:aws:iam::${var.account_id}:policy/uid-insureu-at-runtime-${profile}" || (
+        var.name_prefix == "uid-portal-prod" &&
+        can(regex("^arn:aws:iam::${var.account_id}:policy/[A-Za-z0-9+=,.@_/-]+$", arn))
+      )
     ])
-    error_message = "Runtime boundaries must use the exact bootstrap-owned AT policy names in this account."
+    error_message = "Runtime boundaries must use the exact bootstrap-owned AT policy names, or in production a State-reviewed customer managed policy in this account."
   }
 }
 

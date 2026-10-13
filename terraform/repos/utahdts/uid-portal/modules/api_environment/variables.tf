@@ -32,6 +32,12 @@ variable "aws_account_id" {
   }
 }
 
+variable "runtime_permissions_boundary_arn" {
+  description = "State-reviewed permissions boundary attached to every runtime and scheduler role outside AT. AT uses its bootstrap-owned per-profile boundaries."
+  type        = string
+  default     = null
+}
+
 variable "offline_provider_validation" {
   description = "Disable AWS identity and metadata checks only for credential-free terraform init/validate. Never enable for plan or apply."
   type        = bool

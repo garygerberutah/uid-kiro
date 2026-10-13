@@ -42,14 +42,47 @@ run "reject_cross_account_boundary" {
   expect_failures = [var.permissions_boundary_arn]
 }
 
-run "preserve_other_environments" {
+run "preserve_dev_environment" {
   command = plan
   variables {
-    name_prefix              = "uid-portal-prod"
+    name_prefix              = "uid-portal-dev"
     permissions_boundary_arn = null
   }
   assert {
     condition     = aws_iam_role.scheduler.permissions_boundary == null
-    error_message = "The AT-only change must not attach boundaries in other environments."
+    error_message = "Boundaries are required only in AT and production."
   }
+}
+
+run "reject_production_without_boundary" {
+  command = plan
+  variables {
+    name_prefix              = "uid-portal-prod"
+    account_id               = "281669077180"
+    permissions_boundary_arn = null
+  }
+  expect_failures = [aws_iam_role.scheduler]
+}
+
+run "attach_production_boundary" {
+  command = plan
+  variables {
+    name_prefix              = "uid-portal-prod"
+    account_id               = "281669077180"
+    permissions_boundary_arn = "arn:aws:iam::281669077180:policy/synthetic-reviewed-boundary"
+  }
+  assert {
+    condition     = aws_iam_role.scheduler.permissions_boundary == "arn:aws:iam::281669077180:policy/synthetic-reviewed-boundary"
+    error_message = "The production scheduler role must carry the reviewed boundary."
+  }
+}
+
+run "reject_production_boundary_from_another_account" {
+  command = plan
+  variables {
+    name_prefix              = "uid-portal-prod"
+    account_id               = "281669077180"
+    permissions_boundary_arn = "arn:aws:iam::705157108110:policy/synthetic-reviewed-boundary"
+  }
+  expect_failures = [var.permissions_boundary_arn]
 }

@@ -78,6 +78,10 @@ resource "aws_iam_role" "this" {
       condition     = var.name_prefix != "uid-portal-at" || contains(keys(var.permissions_boundary_arns), each.value)
       error_message = "Every AT execution role requires its independently provisioned permissions boundary."
     }
+    precondition {
+      condition     = var.name_prefix != "uid-portal-prod" || contains(keys(var.permissions_boundary_arns), each.value)
+      error_message = "Every production execution role requires the State-reviewed permissions boundary."
+    }
   }
 }
 

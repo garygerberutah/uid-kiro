@@ -16,6 +16,12 @@ variable "aws_account_id" {
   }
 }
 
+variable "runtime_permissions_boundary_arn" {
+  description = "Unused here: AT attaches its bootstrap-owned per-profile boundaries and dev has none. Production requires it."
+  type        = string
+  default     = null
+}
+
 variable "offline_provider_validation" {
   description = "Disable AWS identity and metadata checks only for credential-free terraform init/validate. Never enable for plan or apply."
   type        = bool

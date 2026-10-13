@@ -1031,7 +1031,10 @@ module "iam" {
   permissions_boundary_arns = var.env_name == "at" ? {
     for profile in keys(local.iam_role_profiles) : profile =>
     "arn:aws:iam::${var.aws_account_id}:policy/uid-insureu-at-runtime-${profile}"
-  } : {}
+    } : {
+    for profile in keys(local.iam_role_profiles) : profile => var.runtime_permissions_boundary_arn
+    if var.runtime_permissions_boundary_arn != null
+  }
   dead_letter_queue_arn = module.alerting.dlq_arn
   tags                  = local.tags
 }
@@ -1412,7 +1415,7 @@ module "scheduling" {
 
   name_prefix              = local.name_prefix
   account_id               = var.aws_account_id
-  permissions_boundary_arn = var.env_name == "at" ? "arn:aws:iam::${var.aws_account_id}:policy/uid-insureu-at-runtime-scheduler" : null
+  permissions_boundary_arn = var.env_name == "at" ? "arn:aws:iam::${var.aws_account_id}:policy/uid-insureu-at-runtime-scheduler" : var.runtime_permissions_boundary_arn
 
   schedules = {
     for s in local.manifest.scheduled : s.id => {
