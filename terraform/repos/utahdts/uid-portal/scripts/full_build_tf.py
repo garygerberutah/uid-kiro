@@ -106,10 +106,10 @@ HELD_TYPES = frozenset(
 EXPECTED_COUNTS = {
     "aws_apigatewayv2_api": 1,
     "aws_apigatewayv2_api_mapping": 1,
-    "aws_apigatewayv2_integration": 151,
-    "aws_apigatewayv2_route": 151,
+    "aws_apigatewayv2_integration": 163,
+    "aws_apigatewayv2_route": 163,
     "aws_apigatewayv2_stage": 1,
-    "aws_lambda_function": 161,
+    "aws_lambda_function": 163,
     "aws_scheduler_schedule": 7,
 }
 
