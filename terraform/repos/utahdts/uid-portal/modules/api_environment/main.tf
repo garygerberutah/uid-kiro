@@ -1084,7 +1084,8 @@ module "observability" {
     sife_report_worker = module.function["sife_report_worker"].log_group
   }
   notification_log_groups = {
-    sife_notification = module.function["sife_notification"].log_group
+    sife_notification  = module.function["sife_notification"].log_group
+    forms_notification = module.function["forms_notification"].log_group
   }
   licensee_sync_log_groups = {
     licensee_fast_sync = module.function["licensee_fast_sync"].log_group
