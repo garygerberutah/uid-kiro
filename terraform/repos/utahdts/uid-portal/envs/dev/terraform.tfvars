@@ -159,7 +159,8 @@ snap_db_schema                  = "snapproxy"
 # Oracle refresh watchdog. The host and credentials remain inside this named
 # secret; the listener port is repeated only so Terraform can scope an optional
 # security-group ingress rule to the same port.
-oracle_admin_secret               = "dev/oracle/admin"
+# The devops Oracle database is being removed (2026-10-15); no Oracle here.
+oracle_admin_secret               = ""
 oracle_database_security_group_id = ""
 oracle_database_port              = 1521
 licensee_sync_stale_seconds       = 7200

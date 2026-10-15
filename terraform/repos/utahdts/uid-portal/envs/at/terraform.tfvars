@@ -117,11 +117,12 @@ snap_database_security_group_id = "sg-0637efea445216701"
 snap_db_name                    = "insureu"
 snap_db_schema                  = "snapproxy"
 
-# Live inventory confirmed that AT reuses the dev Oracle secret and database
-# security group. Keep licensee_fast_sync disabled until SendGrid and egress
-# probes pass and the legacy scheduler has been stopped.
-oracle_admin_secret               = "dev/oracle/admin"
-oracle_database_security_group_id = "sg-088e3b3e7215f4bb9"
+# AT mirrors production after the change over: no Oracle. The devops Oracle
+# database is being removed (2026-10-15), so no Oracle secret, security group
+# or watchdog is configured. Keep licensee_fast_sync disabled until its data
+# comes from Vertafore directly and the SendGrid and egress probes pass.
+oracle_admin_secret               = ""
+oracle_database_security_group_id = ""
 oracle_database_port              = 1521
 licensee_sync_stale_seconds       = 7200
 licensee_sync_kill_settle_seconds = 10
