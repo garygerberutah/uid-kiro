@@ -158,11 +158,14 @@ licensee_route_throttles = {
 # Reporting alone is enabled after V035 installation and verified publication
 # from protected API run 37545876042. Collect usage every five minutes.
 # Legacy jobs stay disabled until their source schedulers are stopped and
-# each job's runtime acceptance gates pass. Infrastructure timers stay off.
+# each job's runtime acceptance gates pass. status_probe runs every five
+# minutes so the public /status page has measurements (owner, 2026-10-15);
+# the infrastructure observer stays timer-free and runs only when the health
+# state machine invokes it.
 scheduled_jobs_enabled = {
   usage_reporter       = true
   infrastructure_probe = false
-  status_probe         = false
+  status_probe         = true
   sife_notification    = false
   forms_notification   = false
   sife_retention_sweep = false
