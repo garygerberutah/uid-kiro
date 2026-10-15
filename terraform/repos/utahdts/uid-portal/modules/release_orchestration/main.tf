@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 1.6"
   required_providers {
-    aws = { source = "hashicorp/aws", version = ">= 5.40, < 7.0" }
+    aws = { source = "hashicorp/aws", version = ">= 6.0, < 7.0" }
   }
 }
 
@@ -43,7 +43,7 @@ resource "aws_lambda_function" "validator" {
   depends_on = [aws_cloudwatch_log_group.validator]
   lifecycle {
     precondition {
-      condition     = data.aws_caller_identity.current.account_id == local.account && data.aws_region.current.name == "us-west-2"
+      condition     = data.aws_caller_identity.current.account_id == local.account && data.aws_region.current.region == "us-west-2"
       error_message = "The coordinator must use its reviewed environment account in us-west-2."
     }
     precondition {
