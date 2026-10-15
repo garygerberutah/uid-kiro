@@ -1264,7 +1264,7 @@ resource "aws_lambda_layer_version" "deps" {
         length(distinct([for pair in route.routes : pair.action])) == length(route.routes) &&
         alltrue([
           for pair in route.routes :
-          sort(keys(pair)) == ["action", "method", "path"] && can(regex("^[a-z][a-z0-9_]*$", pair.action)) &&
+          sort(keys(pair)) == tolist(["action", "method", "path"]) && can(regex("^[a-z][a-z0-9_]*$", pair.action)) &&
           contains(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"], upper(pair.method)) && startswith(pair.path, "/")
         ])
         if can(route.routes)
