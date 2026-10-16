@@ -92,7 +92,9 @@ certificate_arn         = "arn:aws:acm:us-west-2:705157108110:certificate/5b17ba
 # the domain or DNS.
 hosted_zone_id = ""
 
-browser_origins   = ["https://insureu.uid-dev.utah.gov"]
+# One UI build serves insureu and the portal and nexus tenants of the
+# multi-tenant distribution E27M1PAVF6U3YD; the API answers all three.
+browser_origins   = ["https://insureu.uid-dev.utah.gov", "https://portal.uid-dev.utah.gov", "https://nexus.uid-dev.utah.gov"]
 portal_client_url = "https://insureu.uid-dev.utah.gov"
 
 # Read-only metadata verified on 2026-09-23. Schedules remain disabled until
@@ -106,6 +108,7 @@ infrastructure_monitor_scope = {
   health_checks = {
     "distribution:E3VBU8PSNYBN8D"           = "https://insureu.uid-dev.utah.gov/"
     "tenant:dt_3JhyX5qNRHNp5QrrB5cn86Q39TH" = "https://portal.uid-dev.utah.gov/"
+    "tenant:dt_3Kkj4w0y9FlJpFMAi0iHqCrVKIC" = "https://nexus.uid-dev.utah.gov/nexus"
   }
 }
 
