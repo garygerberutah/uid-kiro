@@ -305,9 +305,11 @@ locals {
     PORTAL_DB_SCHEMA = var.db_schema
     DB_SSLMODE       = "require"
 
-    UPLOAD_BUCKET   = module.storage.upload_bucket
-    DOWNLOAD_BUCKET = module.storage.download_bucket
-    ARTIFACT_BUCKET = module.storage.artifact_bucket
+    UPLOAD_BUCKET    = module.storage.upload_bucket
+    DOWNLOAD_BUCKET  = module.storage.download_bucket
+    ARTIFACT_BUCKET  = module.storage.artifact_bucket
+    FORMS_BUCKET     = module.storage.forms_bucket
+    FORMS_KMS_KEY_ID = var.storage_kms_key_arn == null ? "" : var.storage_kms_key_arn
     # Runtime writes choose a key by the actual destination bucket. A single
     # global value is unsafe in a mixed environment: it can force the managed
     # bucket key onto an adopted bucket whose policy requires a different CMK.
@@ -327,7 +329,12 @@ locals {
     ZIP_LAMBDA_NAME = "${local.name_prefix}-sife_zip_worker"
     # Unqualified, like every other caller: the configuration Terraform
     # applied is the configuration the next invocation runs.
-    REPORT_WORKER_LAMBDA_NAME = "${local.name_prefix}-sife_report_worker"
+    NEXUS_REPORT_WORKER_LAMBDA_NAME = "${local.name_prefix}-nexus_report_worker"
+    FORMS_NOTIFY_NEW                = tostring(var.forms_notify_new)
+    NEXUS_COMMISSIONER_NAME         = var.nexus_commissioner_name
+    NEXUS_DIRECTOR_NAME             = var.nexus_director_name
+    FORMS_PDF_WORKER_LAMBDA_NAME    = "${local.name_prefix}-forms_pdf_worker"
+    REPORT_WORKER_LAMBDA_NAME       = "${local.name_prefix}-sife_report_worker"
 
     # snapproxy: the Vertafore replica the ported licensee handlers read. A
     # second database entirely -- different host, different credentials -- and
@@ -489,6 +496,46 @@ locals {
     status_diagnostics = merge(local.empty_iam_profile, {
       read_application_logs = true
       vpc_access            = true
+    })
+    nexus_reports = merge(local.empty_iam_profile, {
+      invokable_function_arns = ["arn:aws:lambda:${var.region}:${var.aws_account_id}:function:${local.name_prefix}-nexus_report_worker"]
+      secret_arns             = local.portal_secret_arns
+      secret_kms_key_arns     = local.portal_secret_kms_key_arns
+      vpc_access              = true
+    })
+    nexus_report_worker = merge(local.empty_iam_profile, {
+      secret_arns         = local.portal_secret_arns
+      secret_kms_key_arns = local.portal_secret_kms_key_arns
+      s3_statements = [{
+        actions   = ["s3:PutObject"]
+        resources = ["${module.storage.bucket_arns["artifacts"]}/jobs/*"]
+      }]
+      data_kms_actions  = ["kms:GenerateDataKey"]
+      data_kms_key_arns = local.storage_data_kms_key_arns["artifacts"]
+      vpc_access        = true
+    })
+    forms_pdf_worker = merge(local.empty_iam_profile, {
+      secret_arns         = local.portal_secret_arns
+      secret_kms_key_arns = local.portal_secret_kms_key_arns
+      s3_statements = [
+        { actions = ["s3:GetObject"], resources = ["${module.storage.bucket_arns["forms"]}/applications/*"] },
+        { actions = ["s3:PutObject"], resources = ["${module.storage.bucket_arns["artifacts"]}/jobs/*"] },
+      ]
+      data_kms_actions  = ["kms:Decrypt", "kms:GenerateDataKey"]
+      data_kms_key_arns = distinct(concat(var.storage_kms_key_arn == null ? [] : [var.storage_kms_key_arn], local.storage_data_kms_key_arns["artifacts"]))
+      vpc_access        = true
+    })
+    forms_applications = merge(local.empty_iam_profile, {
+      invokable_function_arns = ["arn:aws:lambda:${var.region}:${var.aws_account_id}:function:${local.name_prefix}-forms_pdf_worker"]
+      secret_arns             = local.portal_secret_arns
+      secret_kms_key_arns     = local.portal_secret_kms_key_arns
+      s3_statements = [{
+        actions   = ["s3:GetObject", "s3:PutObject"]
+        resources = ["${module.storage.bucket_arns["forms"]}/applications/*"]
+      }]
+      data_kms_actions  = ["kms:GenerateDataKey", "kms:Decrypt"]
+      data_kms_key_arns = var.storage_kms_key_arn == null ? [] : [var.storage_kms_key_arn]
+      vpc_access        = true
     })
     portal_database = merge(local.empty_iam_profile, {
       secret_arns         = local.portal_secret_arns
@@ -1023,6 +1070,7 @@ module "storage" {
   upload_bucket_name    = "${local.name_prefix}-sife-uploads"
   download_bucket_name  = "${local.name_prefix}-sife-downloads"
   artifact_bucket_name  = "${local.name_prefix}-artifacts"
+  forms_bucket_name     = "${local.name_prefix}-forms"
   browser_origins       = var.browser_origins
   kms_key_arn           = var.storage_kms_key_arn
   generated_object_days = var.generated_object_days

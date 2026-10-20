@@ -766,3 +766,21 @@ variable "oidc_entra" {
     error_message = "Entra needs an explicit API audience, delegated API scopes. Login scopes alone do not authorize the API."
   }
 }
+
+variable "nexus_commissioner_name" {
+  description = "Division-reviewed certificate signatory; blank disables Nexus certificates."
+  type        = string
+  default     = ""
+}
+
+variable "nexus_director_name" {
+  description = "Division-reviewed Captive Insurance Director name; blank disables certificates."
+  type        = string
+  default     = ""
+}
+
+variable "forms_notify_new" {
+  description = "Enable legacy application-start confirmations; signing notices are independent."
+  type        = bool
+  default     = false
+}

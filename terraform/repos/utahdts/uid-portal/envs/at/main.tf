@@ -9,6 +9,9 @@
 module "stack" {
   source = "../../modules/api_environment"
 
+  forms_notify_new            = var.forms_notify_new
+  nexus_commissioner_name     = var.nexus_commissioner_name
+  nexus_director_name         = var.nexus_director_name
   env_name                    = "at"
   region                      = var.region
   aws_account_id              = var.aws_account_id

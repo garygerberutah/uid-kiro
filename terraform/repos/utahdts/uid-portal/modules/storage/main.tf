@@ -37,11 +37,11 @@ terraform {
 }
 
 locals {
-  buckets = {
+  buckets = merge({
     uploads   = var.upload_bucket_name
     downloads = var.download_bucket_name
     artifacts = var.artifact_bucket_name
-  }
+  }, var.forms_bucket_name == "" ? {} : { forms = var.forms_bucket_name })
 
   adopted = { for k, v in var.existing_bucket_names : k => v if v != "" }
   created = { for k, v in local.buckets : k => v if !contains(keys(local.adopted), k) }
@@ -228,4 +228,18 @@ resource "aws_s3_bucket_policy" "tls_only" {
       }
     }]
   })
+}
+
+# Forms records are retained independently of SIFE and generated artifacts.
+# No lifecycle expiry or object-delete permission is assigned to this bucket.
+resource "aws_s3_bucket_cors_configuration" "forms" {
+  count  = var.forms_bucket_name == "" ? 0 : 1
+  bucket = aws_s3_bucket.this["forms"].id
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT", "GET", "HEAD"]
+    allowed_origins = var.browser_origins
+    expose_headers  = ["ETag", "x-amz-request-id"]
+    max_age_seconds = 3000
+  }
 }

@@ -110,7 +110,7 @@ certificate_arn         = "arn:aws:acm:us-west-2:281669077180:certificate/REPLAC
 # DNS is State-owned; application Terraform never writes a record.
 hosted_zone_id = ""
 
-browser_origins   = ["https://portal.uid.utah.gov", "https://insureu.uid.utah.gov"]
+browser_origins   = ["https://portal.uid.utah.gov", "https://insureu.uid.utah.gov", "https://nexus.uid.utah.gov", "https://nexusuid.utah.gov", "https://forms.uid.utah.gov"]
 portal_client_url = "https://portal.uid.utah.gov"
 
 # snapproxy: the Vertafore replica the licensee handlers read. Leave the host

@@ -94,7 +94,7 @@ hosted_zone_id = ""
 
 # One UI build serves insureu and the portal and nexus tenants of the
 # multi-tenant distribution E27M1PAVF6U3YD; the API answers all three.
-browser_origins   = ["https://insureu.uid-dev.utah.gov", "https://portal.uid-dev.utah.gov", "https://nexus.uid-dev.utah.gov"]
+browser_origins   = ["https://insureu.uid-dev.utah.gov", "https://portal.uid-dev.utah.gov", "https://nexus.uid-dev.utah.gov", "https://forms.uid-dev.utah.gov"]
 portal_client_url = "https://insureu.uid-dev.utah.gov"
 
 # Read-only metadata verified on 2026-09-23. Schedules remain disabled until

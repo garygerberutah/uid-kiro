@@ -26,3 +26,7 @@ output "adopted_buckets" {
   description = "Buckets used but not managed here. Their settings are somebody else's."
   value       = keys(local.adopted)
 }
+
+output "forms_bucket" {
+  value = lookup(local.bucket_ids, "forms", "")
+}

@@ -58,3 +58,9 @@ variable "existing_bucket_names" {
     error_message = "Keys must be uploads, downloads or artifacts."
   }
 }
+
+variable "forms_bucket_name" {
+  description = "Dedicated retained Forms attachments bucket; never an adopted SIFE bucket."
+  type        = string
+  default     = ""
+}
