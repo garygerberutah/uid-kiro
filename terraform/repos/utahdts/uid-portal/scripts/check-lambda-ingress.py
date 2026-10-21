@@ -54,9 +54,9 @@ APP_ROOT = Path(__file__).resolve().parents[6]
 DEFAULT_MANIFEST = APP_ROOT / "services" / "api" / "routes" / "routes.yaml"
 API_GATEWAY_PRINCIPAL = {"Service": "apigateway.amazonaws.com"}
 UID_PORTAL_FUNCTION_PREFIX = "uid-portal-"
-EXPECTED_FUNCTION_COUNT = 178
-EXPECTED_ROUTE_COUNT = 257
-EXPECTED_PROTECTED_ROUTE_COUNT = 250
+EXPECTED_FUNCTION_COUNT = 180
+EXPECTED_ROUTE_COUNT = 258
+EXPECTED_PROTECTED_ROUTE_COUNT = 251
 PING_ISSUER = "https://sso.mylogin.utah.gov:443/am/oauth2"
 PING_JWKS_URL = f"{PING_ISSUER}/connect/jwk_uri"
 PING_AUDIENCE = "7ZokREaGUFCgJprj3JX48Aa2tsrbsRbFwgeE"
@@ -1023,7 +1023,7 @@ def _vpc_configuration_findings(
     *,
     expected_vpc_config: ExpectedVpcConfig,
 ) -> list[Finding]:
-    """Require the exact reviewed VPC attachment on all 178 functions."""
+    """Require the exact reviewed VPC attachment on all 180 functions."""
     findings: list[Finding] = []
     functions = inventory.get("functions") or {}
     if not isinstance(functions, Mapping):

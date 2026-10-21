@@ -171,7 +171,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "ephemeral" {
   rule {
     id     = "expire-generated-objects"
     status = "Enabled"
-    filter {}
+    # Forms downloads expire from confirmed download time in the database.
+    # Never apply creation-age expiry to forms-downloads/ objects.
+    filter {
+      prefix = each.value == "artifacts" ? "jobs/" : ""
+    }
     expiration {
       days = var.generated_object_days
     }

@@ -37,6 +37,11 @@ variable "role_profiles" {
     s3_statements = list(object({
       actions   = list(string)
       resources = list(string)
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
     }))
     invokable_function_arns = list(string)
     read_usage_metrics      = optional(bool, false)

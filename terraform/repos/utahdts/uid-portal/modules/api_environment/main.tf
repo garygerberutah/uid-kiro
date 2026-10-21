@@ -519,10 +519,31 @@ locals {
       secret_kms_key_arns = local.portal_secret_kms_key_arns
       s3_statements = [
         { actions = ["s3:GetObject"], resources = ["${module.storage.bucket_arns["forms"]}/applications/*"] },
-        { actions = ["s3:PutObject"], resources = ["${module.storage.bucket_arns["artifacts"]}/jobs/*"] },
+        { actions = ["s3:PutObject"], resources = ["${module.storage.bucket_arns["artifacts"]}/forms-downloads/*"] },
       ]
       data_kms_actions  = ["kms:Decrypt", "kms:GenerateDataKey"]
       data_kms_key_arns = distinct(concat(var.storage_kms_key_arn == null ? [] : [var.storage_kms_key_arn], local.storage_data_kms_key_arns["artifacts"]))
+      vpc_access        = true
+    })
+    forms_download_retention = merge(local.empty_iam_profile, {
+      secret_arns         = local.portal_secret_arns
+      secret_kms_key_arns = local.portal_secret_kms_key_arns
+      s3_statements = [
+        {
+          actions   = ["s3:ListBucketVersions"]
+          resources = [module.storage.bucket_arns["artifacts"]]
+          conditions = [{
+            test     = "StringLike"
+            variable = "s3:prefix"
+            values   = ["forms-downloads/*"]
+          }]
+        },
+        {
+          actions   = ["s3:DeleteObjectVersion"]
+          resources = ["${module.storage.bucket_arns["artifacts"]}/forms-downloads/*"]
+        },
+      ]
+      write_dead_letter = true
       vpc_access        = true
     })
     forms_applications = merge(local.empty_iam_profile, {
