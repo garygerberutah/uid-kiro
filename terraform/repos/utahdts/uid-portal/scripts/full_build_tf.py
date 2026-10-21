@@ -109,7 +109,7 @@ EXPECTED_COUNTS = {
     "aws_apigatewayv2_integration": 257,
     "aws_apigatewayv2_route": 257,
     "aws_apigatewayv2_stage": 1,
-    "aws_lambda_function": 177,
+    "aws_lambda_function": 178,
     "aws_scheduler_schedule": 8,
 }
 
