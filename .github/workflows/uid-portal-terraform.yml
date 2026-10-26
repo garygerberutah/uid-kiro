@@ -281,8 +281,10 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install read-only acceptance-audit dependency
-        run: python -m pip install PyYAML==6.0.3
+      # boto3 keeps the ingress proof's thousands of Lambda reads in one
+      # process; one AWS CLI process per read outlasted the credentials.
+      - name: Install read-only acceptance-audit dependencies
+        run: python -m pip install PyYAML==6.0.3 boto3==1.43.108
 
       - name: Require the target database at the repository schema version
         env:
@@ -373,6 +375,15 @@ jobs:
         run: |
           api_url=$(terraform -chdir="$TF_ROOT" output -raw api_gateway_url)
           printf 'api_url=%s\n' "$api_url" >> "$GITHUB_OUTPUT"
+
+      # The proof starts after a plan, an approval wait, and an apply. Fresh
+      # credentials give it a full session of its own.
+      - name: Refresh AWS credentials for the ingress proof
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        with:
+          role-to-assume: ${{ inputs['aws-role-arn'] }}
+          aws-region: ${{ inputs['aws-region'] }}
+          role-session-name: uid-portal-${{ inputs.environment }}-${{ github.run_id }}-proof
 
       # This audit is deliberately configuration-only. Terraform provisions
       # placeholder Lambda payloads, so functional health belongs after the

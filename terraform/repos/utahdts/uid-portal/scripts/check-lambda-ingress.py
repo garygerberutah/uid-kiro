@@ -21,8 +21,13 @@ This script reads the live account with the AWS CLI and fails on:
 * any function URL or event-source mapping on a UID Portal function; or
 * any Lambda target group that names a UID Portal function.
 
-It is deliberately read-only.  The AWS CLI is used instead of adding boto3 as
-a repository dependency.
+It is deliberately read-only.  The per-function Lambda reads go through the
+AWS SDK when boto3 is installed, and every other read uses the AWS CLI.  The
+fleet has about 180 functions, each with one policy per published version,
+so the audit makes thousands of reads; starting one CLI process for each read
+made the proof outlast its one-hour deploy credentials.  The SDK path
+paginates and renders dates exactly as the CLI does, and without boto3 the
+same reads fall back to the CLI.
 
 Important limitation: a same-account IAM principal can invoke Lambda using an
 identity policy even when the function has no resource policy.  This audit
@@ -45,7 +50,10 @@ import os
 import re
 import subprocess
 import sys
+import threading
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import date, datetime
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -156,15 +164,180 @@ class AwsCliError(RuntimeError):
     """A read failed, so a clean account cannot be asserted."""
 
 
+# The Lambda reads made once per function or per version, and so thousands of
+# times per audit. Each maps a CLI operation to its SDK method, the CLI flags
+# it accepts, and the result key a paginator merges (None: one call).
+_SDK_LAMBDA_OPERATIONS: dict[str, tuple[str, dict[str, str], str | None]] = {
+    "list-functions": ("list_functions", {}, "Functions"),
+    "list-aliases": ("list_aliases", {"--function-name": "FunctionName"}, "Aliases"),
+    "list-versions-by-function": (
+        "list_versions_by_function", {"--function-name": "FunctionName"}, "Versions",
+    ),
+    "list-function-url-configs": (
+        "list_function_url_configs",
+        {"--function-name": "FunctionName"},
+        "FunctionUrlConfigs",
+    ),
+    "list-event-source-mappings": (
+        "list_event_source_mappings",
+        {"--function-name": "FunctionName"},
+        "EventSourceMappings",
+    ),
+    "get-policy": (
+        "get_policy",
+        {"--function-name": "FunctionName", "--qualifier": "Qualifier"},
+        None,
+    ),
+    "get-function-configuration": (
+        "get_function_configuration",
+        {"--function-name": "FunctionName", "--qualifier": "Qualifier"},
+        None,
+    ),
+}
+
+
+def _cli_json_value(value: Any) -> Any:
+    """Render SDK dates as the AWS CLI prints them (ISO 8601)."""
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    raise TypeError(f"{type(value).__name__} is not JSON serializable")
+
+
+# Lambda allows 15 GetPolicy requests a second per account, and 15 a second
+# for the other control-plane reads. Both quotas are shared with everything
+# else in the account, so the audit spends well under half of each.
+LAMBDA_READS_PER_SECOND = 6.0
+
+
+class _RateLimiter:
+    """Space requests evenly across threads, at most `rate` a second."""
+
+    def __init__(self, rate: float, *, clock: Any = time.monotonic, sleep: Any = time.sleep):
+        self.interval = 1.0 / rate
+        self.clock = clock
+        self.sleep = sleep
+        self.lock = threading.Lock()
+        self.next_start = 0.0
+
+    def wait(self) -> None:
+        with self.lock:
+            now = self.clock()
+            start = max(now, self.next_start)
+            self.next_start = start + self.interval
+        if start > now:
+            self.sleep(start - now)
+
+
+def _default_sdk_session(*, region: str, profile: str | None) -> Any:
+    """A boto3 session, or None when boto3 is not installed."""
+    try:
+        import boto3
+    except ImportError:
+        return None
+    return boto3.session.Session(profile_name=profile, region_name=region)
+
+
 class AwsCli:
-    def __init__(self, *, region: str, profile: str | None = None):
+    def __init__(
+        self,
+        *,
+        region: str,
+        profile: str | None = None,
+        sdk_session: Any = None,
+        reads_per_second: float = LAMBDA_READS_PER_SECOND,
+    ):
         self.region = region
         self.base = ["aws", "--region", region, "--output", "json"]
         if profile:
             self.base[1:1] = ["--profile", profile]
         self.env = {**os.environ, "AWS_PAGER": ""}
+        self.sdk_session = (
+            sdk_session
+            if sdk_session is not None
+            else _default_sdk_session(region=region, profile=profile)
+        )
+        self._lambda_client: Any = None
+        self._policy_limiter = _RateLimiter(reads_per_second)
+        self._control_limiter = _RateLimiter(reads_per_second)
+
+    def _pace_lambda_request(self, event_name: str = "", **_: Any) -> None:
+        # Runs before every HTTP attempt, pages and retries included, so the
+        # whole audit stays under the account quotas. Returning None lets the
+        # request go ahead.
+        if event_name.endswith(".GetPolicy"):
+            self._policy_limiter.wait()
+        else:
+            self._control_limiter.wait()
+
+    def _sdk_lambda(self) -> Any:
+        # boto3 clients are thread-safe; one is shared by the worker pool.
+        if self._lambda_client is None:
+            from botocore.config import Config
+
+            client = self.sdk_session.client(
+                "lambda",
+                region_name=self.region,
+                config=Config(
+                    retries={"mode": "standard", "max_attempts": 10},
+                    max_pool_connections=32,
+                ),
+            )
+            client.meta.events.register("before-send.lambda", self._pace_lambda_request)
+            self._lambda_client = client
+        return self._lambda_client
+
+    def _sdk_json(
+        self, operation: str, args: Sequence[str], *, missing_ok: bool
+    ) -> dict[str, Any] | None:
+        method, flags, result_key = _SDK_LAMBDA_OPERATIONS[operation]
+        params: dict[str, str] = {}
+        query: str | None = None
+        if len(args) % 2:
+            raise AwsCliError(f"lambda {operation} has a flag without a value")
+        for flag, value in zip(args[0::2], args[1::2]):
+            if flag == "--query":
+                query = value
+            elif flag in flags:
+                params[flags[flag]] = value
+            else:
+                raise AwsCliError(f"lambda {operation} does not accept {flag}")
+        from botocore.exceptions import BotoCoreError, ClientError
+
+        client = self._sdk_lambda()
+        try:
+            if result_key is not None:
+                # build_full_result is how the AWS CLI joins pages, so a
+                # list longer than one page is read in full, as before.
+                value = client.get_paginator(method).paginate(**params).build_full_result()
+            else:
+                value = getattr(client, method)(**params)
+        except ClientError as exc:
+            if missing_ok and exc.response.get("Error", {}).get("Code") in (
+                "ResourceNotFoundException",
+                "ResourceNotFound",
+            ):
+                return None
+            raise AwsCliError(f"lambda {operation} failed: {exc}") from exc
+        except BotoCoreError as exc:
+            raise AwsCliError(f"lambda {operation} failed: {exc}") from exc
+        value.pop("ResponseMetadata", None)
+        value = json.loads(json.dumps(value, default=_cli_json_value))
+        if query is not None:
+            import jmespath
+
+            value = jmespath.search(query, value)
+        if not isinstance(value, dict):
+            raise AwsCliError(f"AWS SDK returned a non-object for lambda {operation}")
+        return value
 
     def json(self, *args: str, missing_ok: bool = False) -> dict[str, Any] | None:
+        if (
+            self.sdk_session is not None
+            and len(args) >= 2
+            and args[0] == "lambda"
+            and args[1] in _SDK_LAMBDA_OPERATIONS
+        ):
+            return self._sdk_json(args[1], args[2:], missing_ok=missing_ok)
         command = [*self.base, *args]
         try:
             completed = subprocess.run(
