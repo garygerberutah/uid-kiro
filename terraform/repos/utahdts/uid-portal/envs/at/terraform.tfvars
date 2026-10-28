@@ -83,7 +83,7 @@ api_gateway_name        = "uid-dev-api-gateway"
 # UI origin below. DNS, certificates and CloudFront remain State-owned.
 portal_domain_name      = "api.uid-dev.utah.gov"
 portal_domain_ownership = "external"
-certificate_arn         = "arn:aws:acm:us-west-2:705157108110:certificate/5b17baae-453a-4418-81e8-788e8336c3de"
+certificate_arn         = "arn:aws:acm:us-west-2:705157108110:certificate/789fbf47-d890-4da4-b298-c8996dc1ea16"
 
 # The State-owned custom-domain object is REGIONAL/TLS_1_2 with the reviewed
 # certificate, but its routing mode must be mapping-only before the HTTP API can
