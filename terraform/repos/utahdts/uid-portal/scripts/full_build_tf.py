@@ -45,7 +45,7 @@ ENVIRONMENTS = {
         "allowed_host": "api.uid-dev.utah.gov",
         "domain_name": "api.uid-dev.utah.gov",
         "domain_ownership": "external",
-        "certificate_arn": "arn:aws:acm:us-west-2:705157108110:certificate/5b17baae-453a-4418-81e8-788e8336c3de",
+        "certificate_arn": "arn:aws:acm:us-west-2:705157108110:certificate/789fbf47-d890-4da4-b298-c8996dc1ea16",
         "lambda_prefix": "uid-portal-at-",
     },
     "prod": {
