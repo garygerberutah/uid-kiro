@@ -132,7 +132,7 @@ portal_domain_ownership = "external"
 
 # The only ISSUED *.uid-dev.utah.gov certificate in the account; the other four
 # are EXPIRED.
-certificate_arn = "arn:aws:acm:us-west-2:705157108110:certificate/5b17baae-453a-4418-81e8-788e8336c3de"
+certificate_arn = "arn:aws:acm:us-west-2:705157108110:certificate/789fbf47-d890-4da4-b298-c8996dc1ea16"
 
 # Deliberately empty, and not a placeholder. uid-dev.utah.gov is not a delegated
 # zone -- it sits inside utah.gov, served by state nameservers (ns3/ns4/ns6.

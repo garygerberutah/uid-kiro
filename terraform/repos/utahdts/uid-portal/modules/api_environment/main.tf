@@ -112,7 +112,7 @@ locals {
   # because the live object happens to match the override.
   approved_nonprod_api_domain = "api.uid-dev.utah.gov"
   approved_nonprod_api_certificate_arn = (
-    "arn:aws:acm:us-west-2:705157108110:certificate/5b17baae-453a-4418-81e8-788e8336c3de"
+    "arn:aws:acm:us-west-2:705157108110:certificate/789fbf47-d890-4da4-b298-c8996dc1ea16"
   )
 
   # Keep the existing portal module/resource addresses while allowing the
