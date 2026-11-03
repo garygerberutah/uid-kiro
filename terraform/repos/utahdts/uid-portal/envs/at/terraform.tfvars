@@ -38,6 +38,10 @@ storage_kms_key_arn                  = null
 adopted_bucket_kms_key_arns          = {}
 adopted_buckets_without_customer_kms = ["uploads", "downloads"]
 
+# GuardDuty Malware Protection plan role, created by the IAM owner (D-071,
+# D-079; handoff/at/2026-11-03-forms-malware-scan). Only it may tag scan results.
+forms_malware_scan_role_arn = "arn:aws:iam::705157108110:role/uid-insureu-at-forms-malware-scan"
+
 # --- REQUIRED: existing database --------------------------------------------
 # The RDS Proxy endpoint. The Elastic Beanstalk app read this from DB_PROXY_HOST;
 # application-dev.properties currently defaults it to the CLUSTER endpoint

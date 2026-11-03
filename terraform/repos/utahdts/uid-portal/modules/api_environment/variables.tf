@@ -784,3 +784,14 @@ variable "forms_notify_new" {
   type        = bool
   default     = false
 }
+
+variable "forms_malware_scan_role_arn" {
+  description = "Role of the owner-provisioned GuardDuty Malware Protection plan for the Forms bucket (D-071, D-079). When set, the bucket policy lets only that role write the scan tag."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.forms_malware_scan_role_arn == null || can(regex("^arn:aws:iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_/-]+$", var.forms_malware_scan_role_arn))
+    error_message = "forms_malware_scan_role_arn must be an IAM role ARN."
+  }
+}

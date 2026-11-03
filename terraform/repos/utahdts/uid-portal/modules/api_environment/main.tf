@@ -551,7 +551,8 @@ locals {
       secret_arns             = local.portal_secret_arns
       secret_kms_key_arns     = local.portal_secret_kms_key_arns
       s3_statements = [{
-        actions   = ["s3:GetObject", "s3:PutObject"]
+        # GetObjectTagging reads the malware scan verdict (D-071).
+        actions   = ["s3:GetObject", "s3:GetObjectTagging", "s3:PutObject"]
         resources = ["${module.storage.bucket_arns["forms"]}/applications/*"]
       }]
       data_kms_actions  = ["kms:GenerateDataKey", "kms:Decrypt"]
@@ -1100,6 +1101,13 @@ module "storage" {
   # SIFE's buckets predate this migration. Naming them here uses them in place
   # instead of creating empty replacements alongside the files in flight.
   existing_bucket_names = var.existing_bucket_names
+
+  # Malware scan gate (D-071): the PDF worker merges uploads, so it may read
+  # one only after it is scanned clean.
+  forms_scan_gated_principal_arns = [
+    "arn:aws:iam::${var.aws_account_id}:role/${local.name_prefix}-forms_pdf_worker",
+  ]
+  forms_malware_scan_role_arn = var.forms_malware_scan_role_arn
 }
 
 module "alerting" {

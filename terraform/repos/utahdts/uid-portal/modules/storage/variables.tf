@@ -64,3 +64,15 @@ variable "forms_bucket_name" {
   type        = string
   default     = ""
 }
+
+variable "forms_scan_gated_principal_arns" {
+  description = "Roles that may read a Forms attachment only after its malware scan tag says NO_THREATS_FOUND (D-071), such as the PDF merge worker."
+  type        = list(string)
+  default     = []
+}
+
+variable "forms_malware_scan_role_arn" {
+  description = "Role of the owner-provisioned GuardDuty Malware Protection plan for the Forms bucket. When set, only that role may write the scan tag. Null until the plan exists (D-079)."
+  type        = string
+  default     = null
+}

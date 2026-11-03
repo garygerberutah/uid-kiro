@@ -106,6 +106,7 @@ module "stack" {
 
   kms_key_arn                          = var.kms_key_arn
   storage_kms_key_arn                  = var.storage_kms_key_arn
+  forms_malware_scan_role_arn          = var.forms_malware_scan_role_arn
   adopted_bucket_kms_key_arns          = var.adopted_bucket_kms_key_arns
   adopted_buckets_without_customer_kms = var.adopted_buckets_without_customer_kms
   log_retention_days                   = var.log_retention_days

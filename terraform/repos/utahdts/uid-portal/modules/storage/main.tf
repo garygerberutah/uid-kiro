@@ -218,7 +218,7 @@ resource "aws_s3_bucket_policy" "tls_only" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
+    Statement = concat([{
       Sid       = "DenyInsecureTransport"
       Effect    = "Deny"
       Principal = "*"
@@ -230,8 +230,61 @@ resource "aws_s3_bucket_policy" "tls_only" {
       Condition = {
         Bool = { "aws:SecureTransport" = "false" }
       }
-    }]
+    }], each.key == "forms" ? local.forms_scan_statements : [])
   })
+}
+
+# Forms uploads are served only after GuardDuty Malware Protection tags them
+# clean (D-071). The application already refuses to issue links for files
+# still scanning or quarantined; these statements make S3 itself refuse.
+#
+# The deny is narrower than AWS's "deny unless clean for everyone but the
+# scanner" example on purpose. HeadObject is authorized by s3:GetObject, and
+# the API must inspect an upload the moment it completes, before any scan
+# result exists. So the gate covers the two ways file bytes leave the bucket:
+# presigned links (query-string authentication, which is how browsers
+# download) and the PDF merge worker. Scoped to applications/ so the
+# validation object GuardDuty writes at the bucket root is untouched.
+#
+# GuardDuty manages the bucket's EventBridge notification itself; never add
+# an aws_s3_bucket_notification for this bucket.
+locals {
+  forms_arn = try(aws_s3_bucket.this["forms"].arn, "")
+  forms_scan_statements = concat(
+    [{
+      Sid       = "DenyUnscannedFormsLinks"
+      Effect    = "Deny"
+      Principal = "*"
+      Action    = ["s3:GetObject", "s3:GetObjectVersion"]
+      Resource  = "${local.forms_arn}/applications/*"
+      Condition = {
+        StringNotEquals = { "s3:ExistingObjectTag/GuardDutyMalwareScanStatus" = "NO_THREATS_FOUND" }
+        StringEquals    = { "s3:authType" = "REST-QUERY-STRING" }
+      }
+    }],
+    length(var.forms_scan_gated_principal_arns) == 0 ? [] : [{
+      Sid       = "DenyUnscannedFormsReads"
+      Effect    = "Deny"
+      Principal = "*"
+      Action    = ["s3:GetObject", "s3:GetObjectVersion"]
+      Resource  = "${local.forms_arn}/applications/*"
+      Condition = {
+        StringNotEquals = { "s3:ExistingObjectTag/GuardDutyMalwareScanStatus" = "NO_THREATS_FOUND" }
+        ArnEquals       = { "aws:PrincipalArn" = var.forms_scan_gated_principal_arns }
+      }
+    }],
+    var.forms_malware_scan_role_arn == null ? [] : [{
+      Sid       = "OnlyTheScannerTagsScanStatus"
+      Effect    = "Deny"
+      Principal = "*"
+      Action    = ["s3:PutObjectTagging", "s3:PutObjectVersionTagging"]
+      Resource  = "${local.forms_arn}/applications/*"
+      Condition = {
+        "ForAnyValue:StringEquals" = { "s3:RequestObjectTagKeys" = "GuardDutyMalwareScanStatus" }
+        ArnNotEquals               = { "aws:PrincipalArn" = var.forms_malware_scan_role_arn }
+      }
+    }],
+  )
 }
 
 # Forms records are retained independently of SIFE and generated artifacts.

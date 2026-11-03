@@ -627,3 +627,9 @@ variable "forms_notify_new" {
   type        = bool
   default     = false
 }
+
+variable "forms_malware_scan_role_arn" {
+  description = "Role of the owner-provisioned GuardDuty Malware Protection plan for this environment's Forms bucket (D-079). Null until the owner creates the plan."
+  type        = string
+  default     = null
+}
