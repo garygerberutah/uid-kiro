@@ -230,7 +230,7 @@ resource "aws_s3_bucket_policy" "tls_only" {
       Condition = {
         Bool = { "aws:SecureTransport" = "false" }
       }
-    }], each.key == "forms" ? local.forms_scan_statements : [])
+    }], [for statement in local.forms_scan_statements : statement if each.key == "forms"])
   })
 }
 
