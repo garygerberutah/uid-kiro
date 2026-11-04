@@ -106,12 +106,16 @@ HELD_TYPES = frozenset(
 EXPECTED_COUNTS = {
     "aws_apigatewayv2_api": 1,
     "aws_apigatewayv2_api_mapping": 1,
-    "aws_apigatewayv2_integration": 258,
-    "aws_apigatewayv2_route": 258,
+    "aws_apigatewayv2_integration": 259,
+    "aws_apigatewayv2_route": 259,
     "aws_apigatewayv2_stage": 1,
-    "aws_lambda_function": 180,
+    "aws_lambda_function": 181,
     "aws_scheduler_schedule": 9,
 }
+# Manifest `package: image` functions. Every other planned function must be a
+# ZIP on python3.13; these must be digest-pinned images from the environment's
+# own functions repository. A test keeps this equal to the manifest.
+IMAGE_FUNCTION_IDS = frozenset({"translate_text"})
 
 
 class BuildError(RuntimeError):
@@ -747,6 +751,12 @@ def validate_full_stack(plan: Mapping[str, Any], environment: str) -> None:
         for function in functions
     ):
         raise BuildError("planned release validator is missing")
+    image_names = {config["lambda_prefix"] + function_id for function_id in IMAGE_FUNCTION_IDS}
+    image_repository = (
+        f"{config['account_id']}.dkr.ecr.{config['region']}.amazonaws.com/"
+        f"{config['lambda_prefix']}functions@sha256:"
+    )
+    planned_images: set[str] = set()
     for function in functions:
         values = function.get("values")
         if not isinstance(values, Mapping):
@@ -756,11 +766,31 @@ def validate_full_stack(plan: Mapping[str, Any], environment: str) -> None:
         if (
             not isinstance(name, str)
             or not name.startswith(config["lambda_prefix"])
-            or values.get("runtime") != "python3.13"
             or not isinstance(vpc_config, list)
             or len(vpc_config) != 1
         ):
             raise BuildError(f"planned Lambda contract is incomplete at {function.get('address')}")
+        if name in image_names:
+            image_uri = values.get("image_uri")
+            if (
+                values.get("package_type") != "Image"
+                or values.get("runtime") is not None
+                or values.get("layers") not in (None, [])
+                or not isinstance(image_uri, str)
+                or not image_uri.startswith(image_repository)
+                or len(image_uri) != len(image_repository) + 64
+            ):
+                raise BuildError(
+                    f"planned image Lambda contract is incomplete at {function.get('address')}"
+                )
+            planned_images.add(name)
+        elif (
+            values.get("package_type") not in (None, "Zip")
+            or values.get("runtime") != "python3.13"
+        ):
+            raise BuildError(f"planned Lambda contract is incomplete at {function.get('address')}")
+    if planned_images != image_names:
+        raise BuildError("planned image Lambda set does not match the approved manifest images")
 
 
 def validate_plan_identity(

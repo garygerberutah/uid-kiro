@@ -62,9 +62,9 @@ APP_ROOT = Path(__file__).resolve().parents[6]
 DEFAULT_MANIFEST = APP_ROOT / "services" / "api" / "routes" / "routes.yaml"
 API_GATEWAY_PRINCIPAL = {"Service": "apigateway.amazonaws.com"}
 UID_PORTAL_FUNCTION_PREFIX = "uid-portal-"
-EXPECTED_FUNCTION_COUNT = 180
-EXPECTED_ROUTE_COUNT = 258
-EXPECTED_PROTECTED_ROUTE_COUNT = 251
+EXPECTED_FUNCTION_COUNT = 181
+EXPECTED_ROUTE_COUNT = 259
+EXPECTED_PROTECTED_ROUTE_COUNT = 252
 PING_ISSUER = "https://sso.mylogin.utah.gov:443/am/oauth2"
 PING_JWKS_URL = f"{PING_ISSUER}/connect/jwk_uri"
 PING_AUDIENCE = "7ZokREaGUFCgJprj3JX48Aa2tsrbsRbFwgeE"
@@ -90,6 +90,7 @@ _SUBNET_ID = re.compile(r"^subnet-[0-9a-f]{8,17}$")
 _SECURITY_GROUP_ID = re.compile(r"^sg-[0-9a-f]{8,17}$")
 _SELECTED_ENVIRONMENT_QUERY = (
     "{Runtime:Runtime,Role:Role,Handler:Handler,"
+    "PackageType:PackageType,ImageCommand:ImageConfigResponse.ImageConfig.Command,"
     "VpcConfig:{VpcId:VpcConfig.VpcId,SubnetIds:VpcConfig.SubnetIds,"
     "SecurityGroupIds:VpcConfig.SecurityGroupIds,"
     "Ipv6AllowedForDualStack:VpcConfig.Ipv6AllowedForDualStack},"
@@ -143,6 +144,9 @@ class ExpectedFunction:
     role_arn: str | None = None
     handler: str | None = None
     version_arn: str | None = None
+    # "zip" runs the shared package on python3.13. "image" (manifest
+    # `package: image`) runs a container image whose command is the handler.
+    package: str = "zip"
 
 
 @dataclass(frozen=True)
@@ -1167,21 +1171,44 @@ def _function_configuration_findings(
                 )
             )
             continue
-        checks = (
-            (
-                "function-runtime",
-                selected.get("Runtime") == wanted.runtime == "python3.13",
-                "function must run on Python 3.13",
-            ),
+        if wanted.package == "image":
+            # An image has no managed runtime or handler. Its base image is
+            # the Python 3.13 Lambda image, and its command is the handler.
+            package_checks: tuple[tuple[str, bool, str], ...] = (
+                (
+                    "function-package",
+                    selected.get("PackageType") == "Image" and selected.get("Runtime") is None,
+                    "function must run its manifest container image",
+                ),
+                (
+                    "function-handler",
+                    selected.get("ImageCommand") == [wanted.handler],
+                    "function image command does not match the routes.yaml handler",
+                ),
+            )
+        else:
+            package_checks = (
+                (
+                    "function-package",
+                    selected.get("PackageType") in (None, "Zip"),
+                    "function must run the shared ZIP package",
+                ),
+                (
+                    "function-runtime",
+                    selected.get("Runtime") == wanted.runtime == "python3.13",
+                    "function must run on Python 3.13",
+                ),
+                (
+                    "function-handler",
+                    selected.get("Handler") == wanted.handler,
+                    "function handler does not match routes.yaml",
+                ),
+            )
+        checks = package_checks + (
             (
                 "function-role",
                 selected.get("Role") == wanted.role_arn,
                 "function execution role does not match its manifest IAM profile",
-            ),
-            (
-                "function-handler",
-                selected.get("Handler") == wanted.handler,
-                "function handler does not match routes.yaml",
             ),
         )
         for code, passed, detail in checks:
@@ -1196,7 +1223,7 @@ def _vpc_configuration_findings(
     *,
     expected_vpc_config: ExpectedVpcConfig,
 ) -> list[Finding]:
-    """Require the exact reviewed VPC attachment on all 180 functions."""
+    """Require the exact reviewed VPC attachment on every manifest function."""
     findings: list[Finding] = []
     functions = inventory.get("functions") or {}
     if not isinstance(functions, Mapping):
@@ -2062,6 +2089,9 @@ def build_expectations(
             raise RuntimeError("route without id in routes.yaml")
         name = prefix + function_id
         role_arn, handler = runtime_contract(route, function_id)
+        package = route.get("package", "zip")
+        if package not in {"zip", "image"}:
+            raise RuntimeError(f"function {function_id} has an invalid package")
         method = str(route.get("method") or "NONE").upper()
         path = route.get("path")
         pairs: tuple[tuple[str, str], ...] = ()
@@ -2161,6 +2191,7 @@ def build_expectations(
                 roles=roles,
                 role_arn=role_arn,
                 handler=handler,
+                package=package,
             )
         )
 

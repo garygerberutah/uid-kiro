@@ -249,6 +249,15 @@ locals {
 
   all_functions = merge(local.route_functions, local.scheduled_functions, local.authorizer_functions)
 
+  # Manifest `package: image` functions run a container image instead of the
+  # shared ZIP and layer. Each needs a digest-pinned image from this
+  # environment's own ECR repository before Terraform can create it.
+  image_functions = {
+    for id, f in local.all_functions : id => f
+    if try(f.package, "zip") == "image"
+  }
+  function_image_repository = "${var.aws_account_id}.dkr.ecr.${var.region}.amazonaws.com/${local.name_prefix}-functions"
+
   # Keep the unmerged ids as well. `merge` necessarily overwrites a duplicate,
   # so validating only all_functions would make the very defect we need to
   # detect disappear before the assertion sees it.
@@ -1191,6 +1200,29 @@ resource "aws_lambda_layer_version" "deps" {
     ignore_changes = [filename, source_code_hash]
 
     precondition {
+      condition = alltrue([
+        for id, f in local.all_functions : contains(["zip", "image"], try(f.package, "zip"))
+      ])
+      error_message = "A manifest package must be zip (the default) or image."
+    }
+
+    precondition {
+      condition = (
+        length(setsubtract(keys(var.function_image_uris), keys(local.image_functions))) == 0 &&
+        length(setsubtract(keys(local.image_functions), keys(var.function_image_uris))) == 0
+      )
+      error_message = "function_image_uris must name exactly the manifest package: image functions. Build and push each image to the environment ECR repository first, then record its digest-pinned URI."
+    }
+
+    precondition {
+      condition = alltrue([
+        for id, uri in var.function_image_uris :
+        startswith(uri, "${local.function_image_repository}@sha256:")
+      ])
+      error_message = "Every function image must come from this environment's uid-portal functions ECR repository and be pinned by sha256 digest."
+    }
+
+    precondition {
       condition     = var.env_name != "dev"
       error_message = "The dev and AT roots share one AWS account. AT is the sole non-production API Gateway owner; reconcile the historical dev state instead of planning this root."
     }
@@ -1386,6 +1418,10 @@ module "function" {
   memory_size            = try(each.value.memory, local.defaults.memory)
   ephemeral_storage_size = try(each.value.ephemeral_storage, 512)
   role_arn               = module.iam.role_arns[each.value.profile]
+
+  # A missing image URI must fail the module's digest validation, never fall
+  # back to creating a ZIP function for an image entry.
+  image_uri = contains(keys(local.image_functions), each.key) ? try(var.function_image_uris[each.key], "missing") : null
 
   vpc_enabled = try(each.value.vpc, local.defaults.vpc)
   vpc_config  = try(each.value.vpc, local.defaults.vpc) ? module.network.vpc_config : null

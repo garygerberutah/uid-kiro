@@ -73,8 +73,9 @@ module "stack" {
   licensee_sync_stale_seconds       = var.licensee_sync_stale_seconds
   licensee_sync_kill_settle_seconds = var.licensee_sync_kill_settle_seconds
 
-  layer_zip_path    = var.layer_zip_path
-  function_zip_path = var.function_zip_path
+  layer_zip_path      = var.layer_zip_path
+  function_zip_path   = var.function_zip_path
+  function_image_uris = var.function_image_uris
 
   api_gateway_name        = var.api_gateway_name
   portal_domain_name      = var.portal_domain_name

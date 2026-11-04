@@ -191,6 +191,11 @@ APPROVED_MANAGED_RESOURCE_TYPES = frozenset(
         "aws_cloudwatch_metric_alarm",
         "aws_db_proxy",
         "aws_db_proxy_default_target_group",
+        # Application-owned repository for manifest `package: image` Lambda
+        # images (stacks/function-images). It holds build output only.
+        "aws_ecr_lifecycle_policy",
+        "aws_ecr_repository",
+        "aws_ecr_repository_policy",
         "aws_db_proxy_target",
         "aws_iam_role",
         "aws_iam_role_policy",

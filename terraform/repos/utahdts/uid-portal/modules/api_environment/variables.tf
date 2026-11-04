@@ -413,6 +413,12 @@ variable "function_zip_path" {
   default     = "../../assets/lambda-placeholder.zip"
 }
 
+variable "function_image_uris" {
+  description = "Digest-pinned ECR image for each manifest `package: image` function, keyed by manifest id. Terraform uses it only to create the function; the software deployment owns later image versions."
+  type        = map(string)
+  default     = {}
+}
+
 # --- snapproxy (the Vertafore replica) --------------------------------------
 # The Python licensee handlers read these directly.
 

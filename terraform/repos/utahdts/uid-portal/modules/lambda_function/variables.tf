@@ -13,6 +13,20 @@ variable "package_zip_path" {
   type        = string
 }
 
+variable "image_uri" {
+  description = "Digest-pinned ECR image for a manifest `package: image` function. Null for every ZIP function."
+  type        = string
+  default     = null
+
+  validation {
+    condition = var.image_uri == null || can(regex(
+      "^[0-9]{12}\\.dkr\\.ecr\\.[a-z0-9-]+\\.amazonaws\\.com/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$",
+      var.image_uri,
+    ))
+    error_message = "image_uri must be a private ECR image pinned by sha256 digest, never a mutable tag."
+  }
+}
+
 variable "layer_arns" {
   description = "Layers providing third-party dependencies."
   type        = list(string)

@@ -21,10 +21,12 @@ terraform {
   }
 }
 
-# Terraform provisions with a committed placeholder package. The application
-# deployment workflow owns every subsequent code version.
+# Terraform provisions with a committed placeholder package, or for an image
+# function with the reviewed digest-pinned image. The application deployment
+# workflow owns every subsequent code version.
 
 locals {
+  image_package   = var.image_uri != null
   name_tag_prefix = lookup(var.tags, "Name", "")
   resource_id = trimprefix(
     trimprefix(
@@ -51,16 +53,23 @@ resource "aws_cloudwatch_log_group" "this" {
 resource "aws_lambda_function" "this" {
   function_name = var.name
   role          = var.role_arn
-  handler       = var.handler
-  runtime       = var.runtime
   architectures = [var.architecture]
 
-  filename         = var.package_zip_path
-  source_code_hash = filebase64sha256(var.package_zip_path)
+  # A ZIP function runs the shared package on the dependency layer. An image
+  # function (manifest `package: image`) runs its container image; the image
+  # has no runtime, handler or layers, and the manifest handler becomes the
+  # image command so the manifest stays the one handler source.
+  package_type = local.image_package ? "Image" : "Zip"
+  image_uri    = var.image_uri
+  handler      = local.image_package ? null : var.handler
+  runtime      = local.image_package ? null : var.runtime
+
+  filename         = local.image_package ? null : var.package_zip_path
+  source_code_hash = local.image_package ? null : filebase64sha256(var.package_zip_path)
 
   timeout     = var.timeout
   memory_size = var.memory_size
-  layers      = var.layer_arns
+  layers      = local.image_package ? [] : var.layer_arns
   kms_key_arn = var.kms_key_arn
   publish     = true
 
@@ -92,6 +101,13 @@ resource "aws_lambda_function" "this" {
     for_each = var.dead_letter_enabled ? [1] : []
     content {
       target_arn = var.dead_letter_arn
+    }
+  }
+
+  dynamic "image_config" {
+    for_each = local.image_package ? [1] : []
+    content {
+      command = [var.handler]
     }
   }
 
