@@ -106,10 +106,10 @@ HELD_TYPES = frozenset(
 EXPECTED_COUNTS = {
     "aws_apigatewayv2_api": 1,
     "aws_apigatewayv2_api_mapping": 1,
-    "aws_apigatewayv2_integration": 259,
-    "aws_apigatewayv2_route": 259,
+    "aws_apigatewayv2_integration": 261,
+    "aws_apigatewayv2_route": 261,
     "aws_apigatewayv2_stage": 1,
-    "aws_lambda_function": 181,
+    "aws_lambda_function": 182,
     "aws_scheduler_schedule": 9,
 }
 # Manifest `package: image` functions. Every other planned function must be a

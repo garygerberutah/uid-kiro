@@ -524,8 +524,11 @@ locals {
       vpc_access        = true
     })
     forms_pdf_worker = merge(local.empty_iam_profile, {
-      secret_arns         = local.portal_secret_arns
-      secret_kms_key_arns = local.portal_secret_kms_key_arns
+      # Translated PDF copies: the worker sends narrative text to the one
+      # translate function by direct invocation, never through the gateway.
+      invokable_function_arns = ["arn:aws:lambda:${var.region}:${var.aws_account_id}:function:${local.name_prefix}-translate_text"]
+      secret_arns             = local.portal_secret_arns
+      secret_kms_key_arns     = local.portal_secret_kms_key_arns
       s3_statements = [
         { actions = ["s3:GetObject"], resources = ["${module.storage.bucket_arns["forms"]}/applications/*"] },
         { actions = ["s3:PutObject"], resources = ["${module.storage.bucket_arns["artifacts"]}/forms-downloads/*"] },
@@ -1439,6 +1442,10 @@ module "function" {
       ROUTE_ACTIONS = jsonencode({
         for pair in each.value.routes : "${upper(pair.method)} ${pair.path}" => pair.action
       })
+    } : {},
+    # Only the Forms PDF worker invokes the translate function.
+    each.key == "forms_pdf_worker" ? {
+      TRANSLATE_LAMBDA_NAME = "${local.name_prefix}-translate_text"
     } : {},
     each.key == "system_status_api_errors" ? {
       STATUS_LOG_PREFIX = "/aws/lambda/${local.name_prefix}-"
