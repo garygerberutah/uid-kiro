@@ -234,3 +234,10 @@ usage_metrics_scope = {
   api_id        = "ler9ythto0"
   distributions = ["E3VBU8PSNYBN8D", "E27M1PAVF6U3YD"]
 }
+
+# The translate_text container image (D-080), pinned by digest. Terraform uses
+# it only to create the function; deploy_lambda_code.py --image-function owns
+# later image versions.
+function_image_uris = {
+  translate_text = "705157108110.dkr.ecr.us-west-2.amazonaws.com/uid-portal-at-functions@sha256:15485626ae653b2a7ddc4ec2ddabc9c050c168373f2448652ab58ebc4ccf1e6a"
+}
