@@ -239,5 +239,5 @@ usage_metrics_scope = {
 # it only to create the function; deploy_lambda_code.py --image-function owns
 # later image versions.
 function_image_uris = {
-  translate_text = "705157108110.dkr.ecr.us-west-2.amazonaws.com/uid-portal-at-functions@sha256:15485626ae653b2a7ddc4ec2ddabc9c050c168373f2448652ab58ebc4ccf1e6a"
+  translate_text = "705157108110.dkr.ecr.us-west-2.amazonaws.com/uid-portal-at-functions@sha256:0daa4d8be6c4b0571893998d7194f1751e091c9ee461eaace096560017b1f56d"
 }
